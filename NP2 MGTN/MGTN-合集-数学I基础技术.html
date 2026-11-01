@@ -1109,6 +1109,56 @@
 </style>
 <style id="glass-fit">h1 { --h1n: 14.6; }</style>
 <script id="glass-mode">try{if(localStorage.getItem("lmu-notes-mode")==="day")document.documentElement.setAttribute("data-mode","day")}catch(e){}try{if(matchMedia("(max-width: 640px) and (hover: none) and (pointer: coarse)").matches)document.documentElement.classList.add("lite")}catch(e){}</script>
+<style id="toc2">
+  /* 两级折叠目录 (IML / SL / IDP 合集), v2: 和系列 INDEX 同一套语言: 状态灯圆点 + 等宽编号 + 常规字重; 章可折叠, 展开后小节挂在细竖线上 */
+  header nav.toc2 { display: block !important; padding: 38px 18px 12px !important; }
+  header nav.toc2 a::before { content: none !important; }
+  header nav.toc2 a { display: flex !important; align-items: baseline; gap: 8px !important; min-width: 0; }
+  /* 编号: 等宽小字, 前面一颗状态灯 (与系列 nav a::before 相同的画法) */
+  header nav.toc2 a i { flex: none; font: 500 10px/1 var(--mono); font-style: normal; letter-spacing: .04em; color: var(--muted);
+    padding-left: 9px; background: radial-gradient(circle, var(--led, color-mix(in srgb, var(--ink) 16%, transparent)) 2px, transparent 2.5px) 0 50% / 5px 5px no-repeat; }
+  header nav.toc2 a.ch i { min-width: 3.1em; }
+  header nav.toc2 a:hover { --led: color-mix(in srgb, var(--glow) 55%, transparent); }
+  header nav.toc2 a.active { --led: var(--glow); }
+  header nav.toc2 a.active i { color: color-mix(in srgb, var(--glow) 80%, var(--ink)) !important; filter: drop-shadow(0 0 3px color-mix(in srgb, var(--glow) 60%, transparent)); }
+  /* 章: 一行一章, 无分隔线, 字号字重同系列条目 */
+  header nav.toc2 details.tc { background: none !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+  header nav.toc2 details.tc > summary { display: flex; align-items: center; gap: 8px; margin: 0 !important; padding: 0 !important; cursor: pointer; list-style: none; border-radius: 2px; transition: background-color .2s; }
+  header nav.toc2 details.tc > summary::-webkit-details-marker { display: none; }
+  header nav.toc2 details.tc > summary::marker { content: ""; }
+  header nav.toc2 details.tc > summary:hover { background: var(--l1); }
+  header nav.toc2 a.ch { flex: 1 1 auto; font-size: 13.5px !important; font-weight: 400 !important; line-height: 1.4 !important; padding: 5px 4px !important; background: transparent !important; }
+  html header nav.toc2 a.ch { color: color-mix(in srgb, var(--ink) 82%, transparent) !important; }
+  html header nav.toc2 details.tc[open] > summary a.ch, html header nav.toc2 a.ch:hover, html header nav.toc2 a.ch.active { color: var(--ink) !important; }
+  /* 小节数 + 折叠箭头: 等宽, 和 INDEX 右上角的 SEC 计数同一种字 */
+  header nav.toc2 .tc-n { flex: none; margin-left: auto; padding: 5px 6px 5px 4px; display: inline-flex; align-items: center; gap: 8px; font: 500 10px/1 var(--mono); letter-spacing: .08em; color: var(--muted); user-select: none; transition: color .2s; }
+  header nav.toc2 .tc-n::after { content: "+"; display: inline-block; width: 1em; text-align: center; font-size: 12px; transition: transform .25s; }
+  header nav.toc2 details.tc[open] .tc-n::after { content: "−"; }
+  header nav.toc2 details.tc > summary:hover .tc-n { color: var(--ink); }
+  /* 小节: 挂在章编号下方的细竖线上, 两列, 字小一号 */
+  header nav.toc2 .tc-s { columns: 2 250px; column-gap: 18px; margin: 1px 0 8px 10px; padding-left: 14px;
+    border-left: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+  header nav.toc2 .tc-s a { break-inside: avoid; font-size: 12.5px !important; line-height: 1.4 !important; padding: 3px 4px !important; }
+  header nav.toc2 .tc-s a i { min-width: 3.4em; background-size: 4px 4px; }
+  html header nav.toc2 .tc-s a { color: color-mix(in srgb, var(--ink) 68%, transparent) !important; }
+  html header nav.toc2 .tc-s a:hover, html header nav.toc2 .tc-s a.active { color: var(--ink) !important; }
+  header nav.toc2 a.wide { grid-column: auto !important; }
+  @media (max-width: 560px) {
+    header nav.toc2 { padding: 36px 12px 10px !important; }
+    header nav.toc2 a.ch { font-size: 13px !important; }
+    header nav.toc2 .tc-s { columns: 1; margin-left: 8px; padding-left: 10px; }
+    header nav.toc2 .tc-s a { font-size: 12px !important; }
+  }
+  /* 悬顶胶囊的面板: 同样的编号和状态灯, 小节缩进; 面板可滚动 */
+  #toc-pill .panel { max-height: min(72vh, 640px); overflow-y: auto; overscroll-behavior: contain; }
+  #toc-pill .panel a::before { content: none !important; }
+  #toc-pill .panel a i { flex: none; min-width: 3.1em; font: 500 10px/1 var(--mono); font-style: normal; letter-spacing: .04em; color: var(--muted);
+    padding-left: 9px; background: radial-gradient(circle, var(--led, color-mix(in srgb, var(--ink) 16%, transparent)) 2px, transparent 2.5px) 0 50% / 5px 5px no-repeat; }
+  #toc-pill .panel a.active { --led: var(--glow); }
+  #toc-pill .panel a.ch { margin-top: 4px; }
+  #toc-pill .panel a.sub { font-size: 12.5px; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 26px !important; }
+  #toc-pill .panel a.sub i { min-width: 3.4em; background-size: 4px 4px; }
+</style>
 </head>
 <body>
 <div id="progress" aria-hidden="true"></div>
@@ -1116,10 +1166,40 @@
 <header>
   <div class="wrap">
     <h1>数学 I: 面向辅修学生的基础技术<br><span class="de-title">Mathematik I: Grundlegende Techniken für Nebenfachstudierende</span></h1>
-    <nav>
-      <a href="#s0">0 集合与映射</a>
-      <a href="#s1">1 线性代数</a>
-      <a href="#s2">2 一元分析</a>
+    <nav class="toc2">
+      <details class="tc">
+        <summary><a href="#s0" class="ch"><i>00</i> 集合、命题逻辑与映射</a><span class="tc-n">6</span></summary>
+        <div class="tc-s">
+          <a href="#s01" class="sub"><i>0.1</i> 集合</a>
+          <a href="#s02" class="sub"><i>0.2</i> 命题逻辑与量词</a>
+          <a href="#s03" class="sub"><i>0.3</i> 集合之间的关系与集合运算</a>
+          <a href="#smaecht" class="sub"><i>0.4</i> 有限集的势</a>
+          <a href="#s04" class="sub"><i>0.5</i> 映射</a>
+          <a href="#s05" class="sub"><i>0.6</i> 单射、满射、双射</a>
+        </div>
+      </details>
+      <details class="tc">
+        <summary><a href="#s1" class="ch"><i>01</i> 线性代数</a><span class="tc-n">6</span></summary>
+        <div class="tc-s">
+          <a href="#s11" class="sub"><i>1.1</i> 线性相关与线性无关</a>
+          <a href="#s12" class="sub"><i>1.2</i> 范数与度量</a>
+          <a href="#s13" class="sub"><i>1.3</i> 实向量空间</a>
+          <a href="#s14" class="sub"><i>1.4</i> 一般向量空间</a>
+          <a href="#s15" class="sub"><i>1.5</i> 矩阵计算</a>
+          <a href="#s16" class="sub"><i>1.6</i> 像、核、表示矩阵</a>
+        </div>
+      </details>
+      <details class="tc">
+        <summary><a href="#s2" class="ch"><i>02</i> 一元分析</a><span class="tc-n">6</span></summary>
+        <div class="tc-s">
+          <a href="#s21" class="sub"><i>2.1</i> 数列</a>
+          <a href="#s22" class="sub"><i>2.2</i> 级数</a>
+          <a href="#s23" class="sub"><i>2.3</i> 实函数</a>
+          <a href="#s24" class="sub"><i>2.4</i> 连续性</a>
+          <a href="#s25" class="sub"><i>2.5</i> 可导性</a>
+          <a href="#s26" class="sub"><i>2.6</i> 曲线讨论与极值</a>
+        </div>
+      </details>
     </nav>
   </div>
 </header>
