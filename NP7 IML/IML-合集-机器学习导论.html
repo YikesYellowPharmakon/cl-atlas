@@ -267,95 +267,37 @@
   .math-block .katex-display { margin: 0.4em 0; }
 </style>
 <style id="toc2">
-  /* 两级折叠目录 (IML / SL / IDP / MGTN 合集), v3: 版式同系列 INDEX (状态灯圆点 + 等宽编号 + 常规字重);
-     动效按复习层 v14 笔记栏目: 手风琴 (0fr -> 1fr, 同时只开一章) + 旋钮 + 触碰层 (柔光 / 网点透镜 / 涟漪 / 边光). 脚本见 toc2-js. 只写 transform / opacity / 叶子元素, 不用 backdrop-filter */
-  @property --tk { syntax: "<color>"; inherits: false; initial-value: transparent; }
-  header nav.toc2 { display: block !important; padding: 38px 18px 12px !important; isolation: isolate; }
+  /* 大合集课件笔记 (MGTN / IML / SL / IDP) 的两级目录 v5: 卡片、条目字体颜色、悬停、状态灯都用视觉层给所有笔记的 INDEX 规则, 这里只改排布和折叠.
+     排布不用普通笔记的三列网格: 章一行一条, 编号 / 标题 / 小节数和箭头各成一条竖线; 展开的小节挂在章下面, 和章标题左对齐, 两列 (手机一列).
+     不做逐帧改高度的动画: 这几份文档很大, 目录一变高就要重排重绘后面整篇. 展开时高度一次到位, 只淡入小节 (opacity / transform) */
+  header nav.toc2 { display: block !important; }
   header nav.toc2 a::before { content: none !important; }
-  header nav.toc2 a { display: flex !important; align-items: baseline; gap: 8px !important; min-width: 0; }
-  /* 编号: 等宽小字, 前面一颗状态灯 (与系列 nav a::before 相同的画法) */
-  header nav.toc2 a i { flex: none; font: 500 10px/1 var(--mono); font-style: normal; letter-spacing: .04em; color: var(--muted); transition: color .15s;
-    padding-left: 9px; background: radial-gradient(circle, var(--led, color-mix(in srgb, var(--ink) 16%, transparent)) 2px, transparent 2.5px) 0 50% / 5px 5px no-repeat; }
-  header nav.toc2 a.ch i { min-width: 3.1em; }
-  header nav.toc2 a:hover { --led: color-mix(in srgb, var(--glow) 55%, transparent); }
-  header nav.toc2 a:hover i { color: color-mix(in srgb, var(--glow) 75%, var(--ink)); }
-  header nav.toc2 a.active { --led: var(--glow); }
-  header nav.toc2 a.active i { color: color-mix(in srgb, var(--glow) 80%, var(--ink)) !important; filter: drop-shadow(0 0 3px color-mix(in srgb, var(--glow) 60%, transparent)); }
-  /* 当前小节在折叠的章里时, 章的状态灯替它亮 */
-  header nav.toc2 details.tc:has(.tc-s a.active) a.ch { --led: color-mix(in srgb, var(--glow) 70%, transparent); }
-  /* 章: 一行一章, 无分隔线. 展开时整章铺一层极淡的主色, 上沿一条渐隐细线 (同 v14 的板); 负边距 + 内边距互相抵消, 文字位置不变 */
-  header nav.toc2 details.tc { background: transparent !important; background-image: none !important; border: 0 !important; border-radius: 2px !important; box-shadow: none !important; margin: 0 -8px !important; padding: 0 8px !important; transition: background-color .32s var(--ease); }
-  header nav.toc2 details.tc.t-on { background-color: color-mix(in srgb, var(--glow) 2.5%, transparent) !important; }
-  header nav.toc2 details.tc > summary { position: relative; isolation: isolate; display: flex; align-items: center; gap: 8px; margin: 0 !important; padding: 0 !important; cursor: pointer; list-style: none; border-radius: 2px; }
-  header nav.toc2 details.tc > summary::-webkit-details-marker { display: none; }
-  header nav.toc2 details.tc > summary::marker { content: ""; }
-  header nav.toc2 details.tc > summary::before { content: ""; position: absolute; left: -8px; right: -8px; top: 0; height: 1px; pointer-events: none; opacity: 0; transition: opacity .32s var(--ease);
-    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--glow) 52%, transparent) 14%, color-mix(in srgb, var(--glow) 52%, transparent) 86%, transparent); }
-  header nav.toc2 details.tc.t-on > summary::before { opacity: .9; }
-  header nav.toc2 details.tc > summary:focus-visible { outline: 1px solid color-mix(in srgb, var(--glow) 60%, transparent); outline-offset: -1px; }
-  header nav.toc2 a.ch { flex: 1 1 auto; font-size: 13.5px !important; font-weight: 400 !important; line-height: 1.4 !important; padding: 5px 4px !important; background: transparent !important; transition: color .12s, transform .24s var(--ease); }
-  html header nav.toc2 a.ch { color: color-mix(in srgb, var(--ink) 82%, transparent) !important; }
-  html header nav.toc2 details.tc.t-on > summary a.ch, html header nav.toc2 a.ch:hover, html header nav.toc2 a.ch.active { color: var(--ink) !important; }
-  header nav.toc2 a.ch:hover { transform: translateX(3px); }
-  /* 小节数 + 旋钮 (v14 / 笔记答案框的装置, 按行高缩小): 一个伪元素画完圆盘和指针, 整个转; 悬停转 14 度, 展开转到 90 度 */
-  header nav.toc2 .tc-n { flex: none; margin-left: auto; padding: 5px 6px 5px 4px; display: inline-flex; align-items: center; gap: 8px; font: 500 10px/1 var(--mono); letter-spacing: .08em; color: var(--muted); user-select: none; transition: color .2s; }
-  header nav.toc2 .tc-n::after { content: ""; flex: none; display: block; width: 18px; height: 18px; border-radius: 50%; --tk: color-mix(in srgb, var(--ink) 62%, var(--glow)); --td: color-mix(in srgb, var(--bg-b) 70%, #000);
-    background: linear-gradient(var(--tk), var(--tk)) 50% 50% / 2px 8px no-repeat, radial-gradient(circle, var(--td) 0 4.6px, color-mix(in srgb, var(--glow) 14%, transparent) 4.6px 5.1px, transparent 5.1px), color-mix(in srgb, var(--bg-b) 86%, var(--glow));
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--glow) 28%, transparent), 0 2px 4px -2px rgba(0,0,0,.5); transition: transform .45s cubic-bezier(.34,1.56,.64,1), --tk .3s, box-shadow .3s; }
-  html[data-mode="day"] header nav.toc2 .tc-n::after { --td: color-mix(in srgb, var(--bg-b) 88%, var(--ink)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--glow) 28%, transparent), 0 2px 4px -2px rgba(0,0,0,.2); }
-  header nav.toc2 details.tc > summary:hover .tc-n { color: var(--ink); }
-  header nav.toc2 details.tc > summary:hover .tc-n::after { transform: rotate(14deg); }
-  header nav.toc2 details.tc.t-on .tc-n { color: color-mix(in srgb, var(--glow) 75%, var(--ink)); }
-  html header nav.toc2 details.tc.t-on .tc-n::after { transform: rotate(90deg); --tk: color-mix(in srgb, var(--glow) 80%, var(--ink)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--glow) 42%, transparent), 0 0 8px -1px color-mix(in srgb, var(--glow) 55%, transparent); }
-  /* 手风琴: 高度走 0fr -> 1fr; 小节整体淡入上浮, 竖线从上往下画出来 */
-  header nav.toc2 .tc-w { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .32s var(--ease); }
-  header nav.toc2 .tc-w > div { min-height: 0; overflow: hidden; }
-  header nav.toc2 details.tc.t-on > .tc-w { grid-template-rows: 1fr; }
-  header nav.toc2 .tc-w .tc-s { opacity: 0; transform: translateY(-4px); transition: opacity .24s var(--ease), transform .32s var(--ease); }
-  header nav.toc2 details.tc.t-on > .tc-w .tc-s { opacity: 1; transform: none; }
-  /* 小节: 挂在章编号下方的细竖线上, 两列, 字小一号 */
-  header nav.toc2 .tc-s { position: relative; columns: 2 250px; column-gap: 18px; margin: 1px 0 8px 10px; padding-left: 15px; }
-  header nav.toc2 .tc-s::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: color-mix(in srgb, var(--glow) 34%, color-mix(in srgb, var(--ink) 12%, transparent)); box-shadow: 0 0 6px color-mix(in srgb, var(--glow) 28%, transparent); transform-origin: 50% 0; }
-  header nav.toc2 .tc-w .tc-s::before { transform: scaleY(0); transition: transform .42s var(--ease); }
-  header nav.toc2 details.tc.t-on > .tc-w .tc-s::before { transform: none; }
-  header nav.toc2 .tc-s a { position: relative; isolation: isolate; break-inside: avoid; font-size: 12.5px !important; line-height: 1.4 !important; padding: 3px 4px !important; background: transparent !important; transition: color .12s, transform .24s var(--ease); }
-  header nav.toc2 .tc-s a:hover { transform: translateX(3px); }
-  header nav.toc2 .tc-s a i { min-width: 3.4em; background-size: 4px 4px; }
-  html header nav.toc2 .tc-s a { color: color-mix(in srgb, var(--ink) 68%, transparent) !important; }
-  html header nav.toc2 .tc-s a:hover, html header nav.toc2 .tc-s a.active { color: var(--ink) !important; }
   header nav.toc2 a.wide { grid-column: auto !important; }
-  /* 触碰层 (同 v14 的 .fxl / 笔记 glass7 v21): 光标坐标只写在这个叶子上. 行 = 柔光 + 透镜 + 涟漪; 整张卡 = 上沿高光 + 边光 + 涟漪 */
-  header nav.toc2 .tfx { --ca: var(--glow); --cb: var(--glow); --lr: 90px; --gr: 200px; --gk: 8%; --rw: 40px; --rt: 1s; --hr: 0px; position: absolute; inset: 0; z-index: -1; pointer-events: none; display: block; contain: strict; border-radius: inherit;
-    --dot: color-mix(in srgb, color-mix(in srgb, var(--ca) 55%, #fff) 34%, transparent); --lens: color-mix(in srgb, color-mix(in srgb, var(--cb) 45%, var(--ink)) 38%, transparent);
-    background: radial-gradient(var(--hr) 3px at var(--mx, -999px) 0, color-mix(in srgb, var(--ink) 42%, transparent), transparent 72%) top left / 100% 3px no-repeat, radial-gradient(var(--gr) circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--cb) var(--gk), transparent), transparent 70%); opacity: 0; transition: opacity .45s var(--ease); }
-  html[data-mode="day"] header nav.toc2 .tfx { --dot: color-mix(in srgb, var(--ca) 40%, transparent); --lens: color-mix(in srgb, var(--ca) 45%, transparent);
-    background: radial-gradient(var(--hr) 3px at var(--mx, -999px) 0, rgba(255,255,255,.95), transparent 72%) top left / 100% 3px no-repeat, radial-gradient(var(--gr) circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--cb) calc(var(--gk) * .9), transparent), transparent 70%); }
-  /* 章行的触碰层铺满展开时的底板, 两边和底板对齐 */
-  header nav.toc2 details.tc > summary > .tfx { inset: 0 -8px; }
-  header nav.toc2 .t-lit > .tfx, header nav.toc2.t-lit > .tfx { opacity: 1; }
-  header nav.toc2 .tfx::before, header nav.toc2 .tfx::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
-  header nav.toc2 .tfx::before { background: radial-gradient(circle, var(--lens) 1.15px, transparent 1.6px) 0 0 / 4px 4px, radial-gradient(circle, color-mix(in srgb, var(--ca) 30%, transparent) 1px, transparent 1.45px) 2px 2px / 4px 4px;
-    -webkit-mask: radial-gradient(var(--lr) circle at var(--hx, -999px) var(--hy, -999px), #000, rgba(0,0,0,.45) 40%, transparent 72%); mask: radial-gradient(var(--lr) circle at var(--hx, -999px) var(--hy, -999px), #000, rgba(0,0,0,.45) 40%, transparent 72%); }
-  header nav.toc2 .tfx::after { opacity: 0; background: radial-gradient(circle, var(--dot) 1px, transparent 1.45px) 0 0 / 4px 4px;
-    -webkit-mask: radial-gradient(circle at var(--ox, 0px) var(--oy, 0px), transparent calc(var(--rr) - var(--rw)), #000 calc(var(--rr) - 16px), transparent var(--rr)); mask: radial-gradient(circle at var(--ox, 0px) var(--oy, 0px), transparent calc(var(--rr) - var(--rw)), #000 calc(var(--rr) - 16px), transparent var(--rr)); }
-  header nav.toc2 .tfx.rip::after { animation: tfxrip var(--rt) cubic-bezier(.25,.55,.35,1) forwards; }
-  @keyframes tfxrip { 0% { --rr: 0px; opacity: .95; } 60% { opacity: .75; } 100% { --rr: var(--R, 800px); opacity: 0; } }
-  header nav.toc2 .tfx > b { position: absolute; inset: 0; padding: 1px; border-radius: inherit; pointer-events: none; display: none; }
-  /* 整张卡: 透镜不画 (行上才有), 光很淡, 边光跟光标 */
-  header nav.toc2 > .tfx { --gr: 340px; --gk: 3.5%; --hr: 220px; --rw: 60px; --rt: 1.5s; }
-  header nav.toc2 > .tfx::before { display: none; }
-  html:not([data-mode="day"]) header nav.toc2 > .tfx > b { display: block; background: radial-gradient(190px circle at var(--mx, -999px) var(--my, -999px), rgba(255,255,255,.42), rgba(255,255,255,.1) 45%, transparent 72%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
-  @media (prefers-reduced-motion: reduce) {
-    header nav.toc2 .tc-w, header nav.toc2 .tc-w .tc-s, header nav.toc2 .tc-w .tc-s::before, header nav.toc2 .tc-n::after, header nav.toc2 a.ch, header nav.toc2 .tc-s a, header nav.toc2 details.tc { transition: none; }
-    header nav.toc2 a.ch:hover, header nav.toc2 .tc-s a:hover { transform: none; }
-    header nav.toc2 .tfx::after { display: none; }
-  }
-  @media (max-width: 560px) {
-    header nav.toc2 { padding: 36px 12px 10px !important; }
-    header nav.toc2 a.ch { font-size: 13px !important; }
-    header nav.toc2 .tc-s { columns: 1; margin-left: 8px; padding-left: 11px; }
-    header nav.toc2 .tc-s a { font-size: 12px !important; }
-  }
+  header nav.toc2 a i { flex: none; box-sizing: border-box; font: 500 10px/1 var(--mono); font-style: normal; letter-spacing: .04em; color: var(--muted); transition: --led .2s;
+    padding-left: 9px; background: radial-gradient(circle, var(--led, color-mix(in srgb, var(--ink) 16%, transparent)) 2px, transparent 2.5px) 0 50% / 5px 5px no-repeat; }
+  header nav.toc2 a.active i { color: color-mix(in srgb, var(--glow) 80%, var(--ink)) !important; filter: drop-shadow(0 0 3px color-mix(in srgb, var(--glow) 60%, transparent)); }
+  /* 章: 编号定宽, 标题都从同一条线开始; 悬停底色铺满整行 */
+  header nav.toc2 .tc { display: flex; align-items: stretch; min-width: 0; border-radius: 2px; transition: background-color .2s; }
+  header nav.toc2 .tc:hover { background: var(--l1); }
+  header nav.toc2 .tc > a.ch { flex: 1 1 auto; background: transparent !important; }
+  header nav.toc2 .tc > a.ch i { min-width: 31px; }
+  /* 小节数 + 箭头 (同顶部胶囊的 ▾): 靠右, 箭头成一条竖线 */
+  header nav.toc2 .tc-n { flex: none; appearance: none; -webkit-appearance: none; display: inline-flex; align-items: flex-start; justify-content: flex-end; gap: 6px; min-width: 44px; margin: 0; padding: 10px 6px 0 8px; border: 0; border-radius: 2px; background: none; cursor: pointer; user-select: none;
+    font: 500 10px/1 var(--mono); letter-spacing: .04em; color: var(--muted); opacity: .8; transition: color .2s, opacity .2s; }
+  header nav.toc2 .tc-n::after { content: "▾"; font-size: 9px; line-height: 10px; opacity: .55; transition: transform .25s; }
+  header nav.toc2 .tc-n:hover, header nav.toc2 .tc-n:focus-visible { color: var(--ink); opacity: 1; }
+  header nav.toc2 .tc-n:focus-visible { outline: 1px solid color-mix(in srgb, var(--glow) 60%, transparent); outline-offset: -1px; }
+  header nav.toc2 .tc-n[aria-expanded="true"] { color: color-mix(in srgb, var(--glow) 80%, var(--ink)); opacity: 1; }
+  header nav.toc2 .tc-n[aria-expanded="true"]::after { transform: rotate(180deg); opacity: 1; }
+  /* 小节: 左边和章标题对齐 (条目内边距 4 + 编号 31 + 间距 8 - 小节内边距 4 = 39); 上下各一条和 INDEX 标头相同的渐隐细线 */
+  header nav.toc2 .tc-p { min-width: 0; }
+  header nav.toc2 .tc-s { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; margin: 2px 0 6px; padding: 5px 0 5px 39px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--ink) 14%, transparent), transparent 85%) top left / 100% 1px no-repeat, linear-gradient(90deg, color-mix(in srgb, var(--ink) 14%, transparent), transparent 85%) bottom left / 100% 1px no-repeat; }
+  header nav.toc2 .tc-p:not([hidden]) .tc-s { animation: tcin .22s var(--ease) both; }
+  @keyframes tcin { from { opacity: 0; transform: translateY(-4px); } }
+  header nav.toc2 .tc-s a i { min-width: 39px; }
+  @media (prefers-reduced-motion: reduce) { header nav.toc2 .tc-p:not([hidden]) .tc-s { animation: none; } }
+  @media (max-width: 560px) { header nav.toc2 .tc-s { grid-template-columns: minmax(0, 1fr); } }
   /* 悬顶胶囊的面板: 同样的编号和状态灯, 小节缩进; 面板可滚动 */
   #toc-pill .panel { max-height: min(72vh, 640px); overflow-y: auto; overscroll-behavior: contain; }
   #toc-pill .panel a::before { content: none !important; }
@@ -1234,9 +1176,8 @@
   <div class="wrap">
     <h1>机器学习导论<br><span class="de-title">Introduction to Machine Learning</span></h1>
     <nav class="toc2">
-      <details class="tc">
-        <summary><a href="#l0" class="ch"><i>00</i> 预备: 机器学习中的重要算法</a><span class="tc-n">11</span></summary>
-        <div class="tc-s">
+      <div class="tc"><a href="#l0" class="ch"><i>00</i> 预备: 机器学习中的重要算法</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p0">11</button></div>
+      <div class="tc-p" id="tc-p0" hidden="until-found"><div class="tc-s">
           <a href="#l0-goals" class="sub"><i>·</i> 学习目标与目录</a>
           <a href="#l-knn" class="sub"><i>·</i> k 近邻 (k-NN)</a>
           <a href="#l-glm" class="sub"><i>·</i> 广义线性模型 (GLM)</a>
@@ -1248,11 +1189,9 @@
           <a href="#l-ksvm" class="sub"><i>·</i> 非线性 SVM</a>
           <a href="#l-gp" class="sub"><i>·</i> 高斯过程 (GP)</a>
           <a href="#l-nn" class="sub"><i>·</i> 神经网络 (NN)</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c1" class="ch"><i>01</i> 机器学习基础</a><span class="tc-n">8</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c1" class="ch"><i>01</i> 机器学习基础</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p1">8</button></div>
+      <div class="tc-p" id="tc-p1" hidden="until-found"><div class="tc-s">
           <a href="#c1-what" class="sub"><i>1.1</i> 什么是机器学习</a>
           <a href="#c1-data" class="sub"><i>1.2</i> 数据</a>
           <a href="#c1-tasks" class="sub"><i>1.3</i> 监督学习任务</a>
@@ -1261,31 +1200,25 @@
           <a href="#c1-risk" class="sub"><i>1.6</i> 损失与风险最小化</a>
           <a href="#c1-optim" class="sub"><i>1.7</i> 优化</a>
           <a href="#c1-comp" class="sub"><i>1.8</i> 监督学习的组成部分</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c2" class="ch"><i>02</i> 监督回归</a><span class="tc-n">4</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c2" class="ch"><i>02</i> 监督回归</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p2">4</button></div>
+      <div class="tc-p" id="tc-p2" hidden="until-found"><div class="tc-s">
           <a href="#c2-l2" class="sub"><i>2.1</i> 使用 L2 损失的线性模型</a>
           <a href="#c2-proof" class="sub"><i>2.2</i> 深入: OLS 的推导</a>
           <a href="#c2-l1" class="sub"><i>2.3</i> 使用 L1 损失的线性模型</a>
           <a href="#c2-poly" class="sub"><i>2.4</i> 多项式回归模型</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c3" class="ch"><i>03</i> 监督分类</a><span class="tc-n">6</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c3" class="ch"><i>03</i> 监督分类</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p3">6</button></div>
+      <div class="tc-p" id="tc-p3" hidden="until-found"><div class="tc-s">
           <a href="#c3-tasks" class="sub"><i>3.1</i> 分类任务</a>
           <a href="#c3-def" class="sub"><i>3.2</i> 基本定义</a>
           <a href="#c3-linear" class="sub"><i>3.3</i> 线性分类器</a>
           <a href="#c3-logreg" class="sub"><i>3.4</i> 逻辑回归</a>
           <a href="#c3-da" class="sub"><i>3.5</i> 判别分析</a>
           <a href="#c3-nb" class="sub"><i>3.6</i> 朴素贝叶斯</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c4" class="ch"><i>04</i> 性能评估</a><span class="tc-n">14</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c4" class="ch"><i>04</i> 性能评估</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p4">14</button></div>
+      <div class="tc-p" id="tc-p4" hidden="until-found"><div class="tc-s">
           <a href="#c4-ge" class="sub"><i>4.1</i> 泛化误差</a>
           <a href="#c4-regm" class="sub"><i>4.2</i> 回归的评估指标</a>
           <a href="#c4-train" class="sub"><i>4.3</i> 训练误差</a>
@@ -1300,16 +1233,10 @@
           <a href="#c4-mcauc" class="sub"><i>4.12</i> 多分类 AUC</a>
           <a href="#c4-pr" class="sub"><i>4.13</i> 精确率–召回率曲线</a>
           <a href="#c4-mwu" class="sub"><i>4.14</i> AUC 与 Mann–Whitney U 检验</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c5" class="ch"><i>05</i> k 近邻</a><span class="tc-n">0</span></summary>
-        <div class="tc-s">
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c6" class="ch"><i>06</i> 分类与回归树 (CART)</a><span class="tc-n">7</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c5" class="ch"><i>05</i> k 近邻</a></div>
+      <div class="tc"><a href="#c6" class="ch"><i>06</i> 分类与回归树 (CART)</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p6">7</button></div>
+      <div class="tc-p" id="tc-p6" hidden="until-found"><div class="tc-s">
           <a href="#c6-pred" class="sub"><i>6.1</i> 用 CART 预测</a>
           <a href="#c6-grow" class="sub"><i>6.2</i> 生长一棵树</a>
           <a href="#c6-regcrit" class="sub"><i>6.3</i> 回归的分裂准则</a>
@@ -1317,21 +1244,17 @@
           <a href="#c6-comp" class="sub"><i>6.5</i> 找分裂的计算问题</a>
           <a href="#c6-prune" class="sub"><i>6.6</i> 停止准则与剪枝</a>
           <a href="#c6-proscons" class="sub"><i>6.7</i> 优点与缺点</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c7" class="ch"><i>07</i> 随机森林</a><span class="tc-n">5</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c7" class="ch"><i>07</i> 随机森林</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p7">5</button></div>
+      <div class="tc-p" id="tc-p7" hidden="until-found"><div class="tc-s">
           <a href="#c7-bag" class="sub"><i>7.1</i> Bagging 集成</a>
           <a href="#c7-rf" class="sub"><i>7.2</i> 随机森林基础</a>
           <a href="#c7-oob" class="sub"><i>7.3</i> 袋外误差估计</a>
           <a href="#c7-fi" class="sub"><i>7.4</i> 特征重要性</a>
           <a href="#c7-prox" class="sub"><i>7.5</i> 邻近度</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c8" class="ch"><i>08</i> 深度学习</a><span class="tc-n">7</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c8" class="ch"><i>08</i> 深度学习</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p8">7</button></div>
+      <div class="tc-p" id="tc-p8" hidden="until-found"><div class="tc-s">
           <a href="#c8-intro" class="sub"><i>8.1</i> 引言</a>
           <a href="#c8-neuron" class="sub"><i>8.2</i> 单个神经元 / 感知机</a>
           <a href="#c8-shl" class="sub"><i>8.3</i> 单隐藏层神经网络</a>
@@ -1339,26 +1262,21 @@
           <a href="#c8-mlp" class="sub"><i>8.5</i> 多层前馈神经网络 (MLP)</a>
           <a href="#c8-hist" class="sub"><i>8.6</i> 简史</a>
           <a href="#c8-bp" class="sub"><i>8.7</i> 反向传播基础</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c9" class="ch"><i>09</i> 超参数调优</a><span class="tc-n">5</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c9" class="ch"><i>09</i> 超参数调优</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p9">5</button></div>
+      <div class="tc-p" id="tc-p9" hidden="until-found"><div class="tc-s">
           <a href="#c9-intro" class="sub"><i>9.1</i> 引言</a>
           <a href="#c9-def" class="sub"><i>9.2</i> 问题定义</a>
           <a href="#c9-basic" class="sub"><i>9.3</i> 基本方法</a>
           <a href="#c9-adv" class="sub"><i>9.4</i> 高级调优方法</a>
           <a href="#c9-pipe" class="sub"><i>9.5</i> 流水线与 AutoML</a>
-        </div>
-      </details>
-      <details class="tc">
-        <summary><a href="#c10" class="ch"><i>10</i> 嵌套重采样</a><span class="tc-n">3</span></summary>
-        <div class="tc-s">
+        </div></div>
+      <div class="tc"><a href="#c10" class="ch"><i>10</i> 嵌套重采样</a><button type="button" class="tc-n" aria-expanded="false" aria-controls="tc-p10">3</button></div>
+      <div class="tc-p" id="tc-p10" hidden="until-found"><div class="tc-s">
           <a href="#c10-mot" class="sub"><i>10.1</i> 动机</a>
           <a href="#c10-tvt" class="sub"><i>10.2</i> 训练–验证–测试</a>
           <a href="#c10-nested" class="sub"><i>10.3</i> 嵌套重采样的过程</a>
-        </div>
-      </details>
+        </div></div>
     </nav>
   </div>
 </header>
@@ -12289,81 +12207,20 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 
 </script>
 <script id="toc2-js">
-/* 两级目录的动效 v3 (复习层 v14 笔记栏目的逻辑): 手风琴 + 触碰层. 点章名跳转, 点右侧小节数 / 旋钮展开; 只动 header nav.toc2.
-   叶子元素在第一次悬停时才建, 所以和 glass-js 谁先跑都行, 胶囊面板克隆的链接里也不会多东西. */
+/* 大合集课件笔记的两级目录 v5: 点章名跳转, 点右侧小节数 / 箭头展开, 同时只开一章, 默认折叠. 版面只变一次, 不做逐帧动画. */
 (function () {
   var nav = document.querySelector('header nav.toc2'); if (!nav) return;
-  var LITE = document.documentElement.classList.contains('lite'), CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var ds = [].slice.call(nav.querySelectorAll('details.tc')), SPEED = 360;
-
-  /* ---- 手风琴 ---- 收起动画走完才去掉 open, 否则内容瞬间消失; 中途再点从当前高度接着走 */
-  function set(d, on) {
-    clearTimeout(d._tt); d._tt = 0;
-    if (on) { d.open = true; void d.offsetHeight; d.classList.add('t-on'); }
-    else { d.classList.remove('t-on'); if (CALM) d.open = false; else d._tt = setTimeout(function () { d._tt = 0; d.open = false; }, SPEED); }
-  }
-  function show(d, on) {
-    window.__glassBusy = performance.now() + SPEED + 100;   /* 动画期间背景画布不测量版面 (同答案框) */
-    if (on) ds.forEach(function (x) { if (x !== d && x.classList.contains('t-on')) set(x, false); });
-    set(d, on);
-  }
-  ds.forEach(function (d) {
-    var sec = d.querySelector(':scope > .tc-s'); if (!sec) return;
-    var w = document.createElement('div'), inner = document.createElement('div'); w.className = 'tc-w';
-    d.insertBefore(w, sec); w.appendChild(inner); inner.appendChild(sec);
-    if (d.open) d.classList.add('t-on');
-    /* 浏览器自己打开的 (页内查找命中折叠的小节) 也要接住, 否则内容被 0fr 压着看不见 */
-    d.addEventListener('toggle', function () { if (d.open && !d._tt && !d.classList.contains('t-on')) show(d, true); else if (!d.open) d.classList.remove('t-on'); });
-  });
+  var cur = null;
+  function close(b) { document.getElementById(b.getAttribute('aria-controls')).setAttribute('hidden', 'until-found'); b.setAttribute('aria-expanded', 'false'); }
+  function open(b) { if (cur && cur !== b) close(cur); cur = b; document.getElementById(b.getAttribute('aria-controls')).removeAttribute('hidden'); b.setAttribute('aria-expanded', 'true'); }
   nav.addEventListener('click', function (e) {
-    var s = e.target.closest('summary'); if (!s || e.target.closest('a')) return;
-    e.preventDefault(); var d = s.parentNode; show(d, !d.classList.contains('t-on'));
+    var b = e.target.closest ? e.target.closest('.tc-n') : null; if (!b) return;
+    if (cur === b) { close(b); cur = null; } else open(b);
   });
-
-  /* ---- 触碰层 ---- 同 v14 / glass7 v21: 坐标只写在叶子上, 透镜位置平滑, 从进入点荡开涟漪, 按下的点再荡一次 */
-  if (LITE) return;
-  var hk = null, px = 0, py = 0, raf = 0, KEYS = 'details.tc > summary, .tc-s a';
-  function leaf(el) {
-    var f = el._tfx; if (f && f.parentNode === el) return f;
-    f = document.createElement('span'); f.className = 'tfx'; f.setAttribute('aria-hidden', 'true'); f.appendChild(document.createElement('b'));
-    el.insertBefore(f, el.firstChild); el._tfx = f; el._left = -1e9; el._hx = null;
-    f.addEventListener('animationend', function () { f.classList.remove('rip'); });
-    return f;
-  }
-  function rip(f, ox, oy, r) {
-    if (CALM) return;
-    var R = Math.max(Math.hypot(ox, oy), Math.hypot(r.width - ox, oy), Math.hypot(ox, r.height - oy), Math.hypot(r.width - ox, r.height - oy)) + 70;
-    f.style.setProperty('--ox', ox + 'px'); f.style.setProperty('--oy', oy + 'px'); f.style.setProperty('--R', R.toFixed(0) + 'px');
-    f.classList.remove('rip'); void f.offsetWidth; f.classList.add('rip');
-  }
-  function enter(el, e) {
-    var f = leaf(el), r = f.getBoundingClientRect(), ox = e.clientX - r.left, oy = e.clientY - r.top; el._hx = ox; el._hy = oy;
-    ['--mx', '--hx'].forEach(function (k) { f.style.setProperty(k, ox + 'px'); }); ['--my', '--hy'].forEach(function (k) { f.style.setProperty(k, oy + 'px'); });
-    el.classList.add('t-lit'); if (performance.now() - el._left >= 600) rip(f, ox, oy, r);
-  }
-  function leave(el) { if (el) { el.classList.remove('t-lit'); el._left = performance.now(); } }
-  function one(el) {
-    if (!el || !el.isConnected || !el._tfx) return false;
-    var f = el._tfx, r = f.getBoundingClientRect(), tx = px - r.left, ty = py - r.top;
-    f.style.setProperty('--mx', tx.toFixed(0) + 'px'); f.style.setProperty('--my', ty.toFixed(0) + 'px');
-    var nx = el._hx + (tx - el._hx) * .18, ny = el._hy + (ty - el._hy) * .18, moved = Math.abs(nx - el._hx) + Math.abs(ny - el._hy) > .3;
-    el._hx = nx; el._hy = ny; if (moved) { f.style.setProperty('--hx', nx.toFixed(1) + 'px'); f.style.setProperty('--hy', ny.toFixed(1) + 'px'); }
-    return moved;
-  }
-  function tick() { raf = 0; var a = one(hk), b = nav.classList.contains('t-lit') && one(nav); if (a || b) raf = requestAnimationFrame(tick); }
-  function mouse(e) { return e.pointerType === 'mouse' || e.pointerType === 'pen'; }
-  nav.addEventListener('pointerenter', function (e) { if (mouse(e)) { px = e.clientX; py = e.clientY; enter(nav, e); } });
-  nav.addEventListener('pointerleave', function () { leave(hk); hk = null; leave(nav); });
-  nav.addEventListener('pointerover', function (e) {
-    if (!mouse(e) || !e.target.closest) return; px = e.clientX; py = e.clientY;
-    var k = e.target.closest(KEYS); if (k !== hk) { leave(hk); hk = k; if (k) enter(k, e); }
-    if (!raf) raf = requestAnimationFrame(tick);
-  }, { passive: true });
-  nav.addEventListener('pointermove', function (e) { px = e.clientX; py = e.clientY; if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
-  nav.addEventListener('pointerdown', function (e) {
-    if (!mouse(e)) return; var k = e.target.closest && e.target.closest(KEYS); if (!k) return;
-    var f = leaf(k), r = f.getBoundingClientRect(); rip(f, e.clientX - r.left, e.clientY - r.top, r);
-  }, { passive: true });
+  /* 页内查找命中折叠的小节时, 浏览器会自己去掉 hidden; 这里补上其余状态 */
+  [].forEach.call(nav.querySelectorAll('.tc-n'), function (b) {
+    document.getElementById(b.getAttribute('aria-controls')).addEventListener('beforematch', function () { if (cur !== b) open(b); });
+  });
 })();
 </script>
 </body>
