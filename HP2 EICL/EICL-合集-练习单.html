@@ -1138,6 +1138,7 @@
       <a href="#a1">Aufgabe 01 · 语言与歧义</a>
       <a href="#a2">Aufgabe 02 · 词与形态</a>
       <a href="#a3">Aufgabe 03 · 词类与依存</a>
+      <a href="#a4">Aufgabe 04 · 成分与短语结构</a>
     </nav>
   </div>
 </header>
@@ -1835,6 +1836,224 @@
   <p><b>易错</b>: ① 把 neighbour 挂到 told 上标 nsubj: 一个动词不会因为括号就多出一个主语, 括号里的名词短语是 Karla 的同位语. ② him 和 story 配反: 换成 to 结构检验, told the story <b>to him</b>, 能加 to 的是间接宾语. ③ 括号是标点, 不进表格 (UD 里标 <span class="nb">punct).</span></p>
 </details>
 <div class="warn"><p><b>原题小错:</b> 同一张表里, 前四列 (Karla 到 told) 的关系选项写的是 <b>advmod</b>, 后三列 (him、the、story) 写成了 <b>adv</b>. UD 里没有 adv 这个关系, 应为 advmod. 这三个词都用不到这个选项, <span class="nb">不影响答案.</span></p></div>
+</article>
+
+</section>
+
+<!-- ======================= AUFGABE 04 ======================= -->
+
+<section class="part" id="a4">
+<h2>Aufgabe 04<br><span class="de-title">Konstituententests, Phrasenstrukturgrammatik, Köpfe</span><small><span class="rl">Frage 1 对应 <a href="EICL-06-短语结构语法.html#konstituenten">EICL 06 · 成分与测试</a>;</span><span class="rl">Frage 2 和 Frage 4 对应 <a href="EICL-06-短语结构语法.html#psg">EICL 06 · 短语结构语法</a>;</span><span class="rl">Frage 3 和 Frage 5 对应 <a href="EICL-06-短语结构语法.html#kopf">EICL 06 · 中心语与依存</a>;</span><span class="rl">源文件 Aufgabe 05 (Seite 1 von 5) _ moodle.lmu.de.html 至 (Seite 5 von 5);</span><span class="rl">原标题为 Aufgabe 05.</span></small></h2>
+
+<div class="zh"><p>五道题都考第 6 讲 (短语结构语法): ① 用八种成分测试找成分, 也要知道每种测试在哪里失灵; ② 按给定文法判断句法树对不对; ③ 按课上的中心语约定找短语的中心词; ④ 判断一个小文法能不能生成某个句子; ⑤ 用中心语渗透把成分树转<span class="nb">成依存树.</span></p></div>
+
+<!-- ===== A5-1 ===== -->
+<article id="a4-1">
+<h3>Frage 1 · 每种成分测试: 一处管用, 一处失灵<br><span class="de-title">Konstituententests: wo sie funktionieren und wo sie versagen</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 04 · Frage 1 · 6 Punkte</span>
+  <p>Betrachten Sie den Satz: <i>Die Besucher betrachteten die Gemälde in der Ausstellung.</i></p>
+  <p>Wählen Sie für jeden der unterstehenden Tests (i) eine Konstituente des Satzes aus, für die der jeweilige Test gut funktioniert, in dem Sinne, dass der Test diese Konstituente richtiger Weise als solche ausweist, und (ii) eine Wortfolge, für die er nicht hilfreich ist, sondern versagt, in dem Sinne, dass der Test auf die Wortfolge nicht anwendbar ist, obwohl es sich um eine Konstituente handelt (z.B. beim Weglasstest, dass eine Konstituente nicht weglassbar ist), oder dass er die Wortfolge fälschlicher Weise als Konstituente des Satzes <span class="nb">ausweist.</span></p>
+  <p>Wichtige Rahmenbedingung für die Bearbeitung dieser Aufgabe: "die Gemälde in der Ausstellung" soll (neben einigen weiteren, sowohl größeren als auch kleineren) eine der Konstituenten des Satzes <span class="nb">sein!</span></p>
+  <p>Zeichnen Sie am besten den Konstituentenbaum mit dieser Rahmenbedingung auf ein Blatt Papier, um alle Konstituenten im Blick zu <span class="nb">haben!</span></p>
+  <div class="tablewrap"><table>
+    <tr><th>Test</th><th class="wide">Konstituente, die vom Test richtig erkannt wird</th><th class="wide">Wortfolge, bei der der Test im obigen Sinne versagt</th></tr>
+    <tr><td>Ersetzungstest</td><td></td><td></td></tr>
+    <tr><td class="wide">Pronominalisierungstest (ohne Variante, wie sie in der Vorlesung erwähnt wurde!)</td><td></td><td></td></tr>
+    <tr><td>Fragetest</td><td></td><td></td></tr>
+    <tr><td class="wide">Koordinationstest</td><td></td><td></td></tr>
+    <tr><td class="wide">Verschiebetest (strikte Interpretation)</td><td></td><td></td></tr>
+    <tr><td class="wide">Weglasstest (mit strikter Interpretation!)</td><td></td><td></td></tr>
+    <tr><td>Spaltsätze</td><td></td><td></td></tr>
+  </table></div>
+  <p><b>Auswahl</b> (jeweils): [keine Wortfolge aus dieser Liste] · die Besucher · betrachteten · die Besucher betrachteten · betrachteten die Gemälde · betrachteten die Gemälde in der Ausstellung · die Gemälde in der Ausstellung · in der <span class="nb">Ausstellung</span></p>
+  <p><b>Abweichungen</b>: Pronominalisierungstest ohne „in der Ausstellung“; Fragetest ohne „betrachteten die Gemälde in der Ausstellung“; Verschiebetest nur: [keine Wortfolge aus dieser Liste] · die Besucher · die Besucher betrachteten · die Gemälde in der Ausstellung · in der <span class="nb">Ausstellung.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 看句子「Die Besucher betrachteten die Gemälde in der Ausstellung」(参观者们观看了展览里的画). 对下面每种测试, (i) 选一个这种测试能正确认出来的成分; (ii) 选一串这种测试帮不上忙、会失灵的词. 失灵有两种: 这串词明明是成分, 测试却用不上 (比如删除测试里, 成分删不掉); 或者这串词不是成分, 测试却把它误认成成分. 重要前提: 「die Gemälde in der Ausstellung」(展览里的画) 要算作句子的一个成分 (此外还有更大的和更小的成分). 最好先在纸上画出满足这个前提的成分树, <span class="nb">把所有成分都看清楚.</span></p>
+  <p><b>思路</b>: 先按前提画树: 介词短语 in der Ausstellung 挂在名词短语里面 (是「展览里的画」, 不是「在展览里观看」). 这样所有成分就定下来了, 下拉框里的每个选项要么是成分, <span class="nb">要么不是:</span></p>
+  <ul>
+    <li>成分: die Besucher、betrachteten、betrachteten die Gemälde in der Ausstellung (VP)、die Gemälde in der Ausstellung、in der <span class="nb">Ausstellung.</span></li>
+    <li>不是成分: die Besucher betrachteten、betrachteten die Gemälde (前提下 die Gemälde 和 in der Ausstellung <span class="nb">不能拆开).</span></li>
+  </ul>
+  <p>然后对每种测试回到 Folie 13–22 的定义, 逐个选项实际做一遍: 换、换代词、提问、并列、挪到句首、删、劈成 Es war …, der …. 注意两处「strikt」: 移位时只插新词不算移位 (Folie 19), 删除只能在原句上直接删 (Folie 21). (ii) 里也可以选「[keine Wortfolge aus dieser Liste]」, 如果这种测试在所有选项上<span class="nb">都没出错.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看) </summary>
+  <p>按前提画出<span class="nb">的成分树:</span></p>
+  <svg class="mtree" viewBox="0 0 515 308" width="515" role="img" aria-label="Konstituentenbaum mit der Rahmenbedingung" style="max-width:100%;height:auto;display:block;margin:10px auto 4px;font-family:Avenir Next,Helvetica Neue,Arial,sans-serif"><g stroke="currentColor" stroke-opacity=".45" stroke-width="1.1" fill="none"><line x1="155.9" y1="23.0" x2="57.0" y2="51.0"/><line x1="57.0" y1="69.0" x2="28.3" y2="97.0"/><line x1="28.3" y1="115.0" x2="28.3" y2="126.9"/><line x1="57.0" y1="69.0" x2="85.8" y2="97.0"/><line x1="85.8" y1="115.0" x2="85.8" y2="126.9"/><line x1="155.9" y1="23.0" x2="254.7" y2="51.0"/><line x1="254.7" y1="69.0" x2="177.2" y2="97.0"/><line x1="177.2" y1="115.0" x2="177.2" y2="126.9"/><line x1="254.7" y1="69.0" x2="332.3" y2="97.0"/><line x1="332.3" y1="115.0" x2="276.6" y2="143.0"/><line x1="276.6" y1="161.0" x2="249.7" y2="189.0"/><line x1="249.7" y1="207.0" x2="249.7" y2="218.9"/><line x1="276.6" y1="161.0" x2="303.4" y2="189.0"/><line x1="303.4" y1="207.0" x2="303.4" y2="218.9"/><line x1="332.3" y1="115.0" x2="388.0" y2="143.0"/><line x1="388.0" y1="161.0" x2="353.4" y2="189.0"/><line x1="353.4" y1="207.0" x2="353.4" y2="218.9"/><line x1="388.0" y1="161.0" x2="422.6" y2="189.0"/><line x1="422.6" y1="207.0" x2="388.2" y2="235.0"/><line x1="388.2" y1="253.0" x2="388.2" y2="264.9"/><line x1="422.6" y1="207.0" x2="457.0" y2="235.0"/><line x1="457.0" y1="253.0" x2="457.0" y2="264.9"/></g><text x="28.3" y="139.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Die</text><text x="28.3" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Det</text><text x="85.8" y="139.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Besucher</text><text x="85.8" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">N</text><text x="57.0" y="64.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="177.2" y="139.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">betrachteten</text><text x="177.2" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">V</text><text x="249.7" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">die</text><text x="249.7" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Det</text><text x="303.4" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Gemälde</text><text x="303.4" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">N</text><text x="276.6" y="156.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="353.4" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">in</text><text x="353.4" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">P</text><text x="388.2" y="277.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">der</text><text x="388.2" y="248.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Det</text><text x="457.0" y="277.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Ausstellung</text><text x="457.0" y="248.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">N</text><text x="422.6" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="388.0" y="156.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">PP</text><text x="332.3" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="254.7" y="64.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">VP</text><text x="155.9" y="18.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">S</text></svg>
+  <div class="tablewrap"><table>
+    <tr><th>测试</th><th>(i) 正确认出的成分</th><th>(ii) 失灵的词串</th></tr>
+    <tr><td>Ersetzung</td><td class="wide"><b>die Besucher</b>: Die Kinder / Alle betrachteten …, 句子仍完整. (其他成分也都能换, 如 in der Ausstellung → im Museum.)</td><td class="wide"><b>betrachteten die Gemälde</b>: 换成 waren → Die Besucher waren in der Ausstellung, 合语法, 测试把这个非成分误认成成分. die Besucher betrachteten → Man sah 同理.</td></tr>
+    <tr><td class="wide">Pronominalisierung</td><td class="wide"><b>die Besucher</b> → Sie betrachteten …; 宾语 die Gemälde in der Ausstellung → sie (Die Besucher betrachteten sie) 也可以.</td><td class="wide"><b>betrachteten die Gemälde in der Ausstellung</b>: VP 是成分, 但不允许用课上的变体 (Das will ich auch 那种) 时没有代词能代替它, 和 Folie 15 的 möchte nach Paris fahren 一样. 动词 betrachteten 本身同理.</td></tr>
+    <tr><td>Fragetest</td><td class="wide"><b>die Gemälde in der Ausstellung</b>: Was betrachteten die Besucher? – Die Gemälde in der Ausstellung. (Wer …? – Die Besucher 也对.)</td><td class="wide"><b>betrachteten</b>: 没有一个疑问词只问限定动词, 也不能单独答「Betrachteten.」. 它是成分, 测试用不上.</td></tr>
+    <tr><td>Koordination</td><td class="wide"><b>die Besucher</b>: Die Besucher und die Kritiker betrachteten … (每个成分都能并列, 例如 betrachteten und lobten).</td><td class="wide"><b>betrachteten die Gemälde</b>: Die Besucher betrachteten die Gemälde und kauften die Kataloge in der Ausstellung 合语法, 测试误认非成分. 课件 Folie 17 也说并列测试有例外.</td></tr>
+    <tr><td class="wide">Verschiebung (strikt)</td><td class="wide"><b>die Gemälde in der Ausstellung</b>: Die Gemälde in der Ausstellung betrachteten die Besucher. 主语跟着挪到动词后面是允许的 (Folie 19).</td><td class="wide"><b>[keine Wortfolge aus dieser Liste]</b>: 可选的三个成分都能挪到句首; 唯一的非成分 die Besucher betrachteten 挪不动, 测试也正确地把它排除了. 没有出错的选项.</td></tr>
+    <tr><td class="wide">Weglassen (strikt)</td><td class="wide"><b>in der Ausstellung</b>: Die Besucher betrachteten die Gemälde. 删掉后句子完整. 这是唯一能直接删掉的选项.</td><td class="wide"><b>die Gemälde in der Ausstellung</b>: betrachten 必须带宾语, *Die Besucher betrachteten 不合语法; 严格解释不许先扩写句子, 测试失灵. 同样删不掉的还有 die Besucher、betrachteten 和整个 VP.</td></tr>
+    <tr><td>Spaltsatz</td><td class="wide"><b>die Besucher</b>: Es waren die Besucher, die die Gemälde in der Ausstellung betrachteten. (宾语也行: Es waren die Gemälde in der Ausstellung, die die Besucher betrachteten.)</td><td class="wide"><b>betrachteten</b>: *Es war betrachteten, was … 不成立. 限定动词是成分, 但不能被劈出来.</td></tr>
+  </table></div>
+  <p>表里每格先写最典型的答案, 括号里是同样说得通的其他选项. 判断的依据只有两条: 这串词在前提下是不是成分, 测试对它的结果是「通过」还是「不通过」. 成分 + 通过 → 填 (i); 成分 + 不通过, 或非成分 + 通过 → <span class="nb">填 (ii).</span></p>
+  <p><b>易错</b>: ① in der Ausstellung 在 Fragetest 和 Verschiebetest 里都能单独出来 (Wo betrachteten sie die Gemälde?), 这时它被当成了动词的状语, 是另一种分析. 但它在前提下仍然是成分 (名词短语里的介词短语), 所以测试「认出它是成分」没错, 不能放进 (ii). ② betrachteten die Gemälde 看起来像一个单位, 但前提要求 die Gemälde 和 in der Ausstellung 在一起, 它就不是成分; 替换和并列测试会上当. ③ 移位测试的 (ii) 不是一定要选一个词串: 测试没犯错时就选 [keine Wortfolge aus dieser <span class="nb">Liste].</span></p>
+</details>
+</article>
+
+<!-- ===== A5-2 ===== -->
+<article id="a4-2">
+<h3>Frage 2 · 五棵树里哪些是正确的分析<br><span class="de-title">Korrekte und inkorrekte Analysebäume</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 04 · Frage 2 · 3 Punkte</span>
+  <p>Betrachten Sie die 5 Bäume im Ordner in diesem Themenabschnitt, von denen nicht alle den Satz "Der Detektiv verfolgte den Dieb in dem Auto" korrekt analysieren. Geben Sie für jeden der Bäume an, ob er nach den Regeln der unten angegebenen PSG eine korrekte Analyse darstellt oder <span class="nb">nicht.</span></p>
+  <div class="tablewrap"><table class="nowrap">
+    <tr><th class="wide">Grammatikregeln</th><th>Lexikonregeln</th></tr>
+    <tr><td>S --&gt; NP VP</td><td class="wide">V --&gt; verfolgte</td></tr>
+    <tr><td>VP --&gt; V NP</td><td class="wide">NN --&gt; Detektiv</td></tr>
+    <tr><td class="wide">VP --&gt; VP PP</td><td>NN --&gt; Dieb</td></tr>
+    <tr><td class="wide">NP --&gt; DET NN</td><td>NN --&gt; Auto</td></tr>
+    <tr><td class="wide">NP --&gt; NP PP</td><td>DET --&gt; der</td></tr>
+    <tr><td class="wide">PP --&gt; PREP NP</td><td>DET --&gt; dem</td></tr>
+    <tr><td></td><td>DET --&gt; den</td></tr>
+    <tr><td></td><td>PREP --&gt; in</td></tr>
+  </table></div>
+  <p>Antworten:</p>
+  <p>Baum 1 ist eine [korrekte / inkorrekte] Analyse des oben stehenden Satzes.<br>Baum 2 ist eine [korrekte / inkorrekte] Analyse des oben stehenden Satzes.<br>Baum 3 ist eine [korrekte / inkorrekte] Analyse des oben stehenden Satzes.<br>Baum 4 ist eine [korrekte / inkorrekte] Analyse des oben stehenden Satzes.<br>Baum 5 ist eine [korrekte / inkorrekte] Analyse des oben stehenden Satzes.</p>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 看本单元文件夹里的 5 棵树, 它们不全是句子「Der Detektiv verfolgte den Dieb in dem Auto」(侦探在车里跟踪小偷 / 侦探跟踪车里的小偷) 的正确分析. 对每棵树, 判断它按下面这套短语结构文法 (PSG) <span class="nb">是不是正确的分析.</span></p>
+  <p><b>思路</b>: 「正确」只看形式, 不看意思: 树里每个节点和它的直接子节点, 必须正好是文法里的一条规则 (规则左边 = 父节点, 右边 = 子节点, 顺序也要一致); 根必须是 S; 叶子从左到右读出来必须正好是这句话. 先自己用这套文法把句子推导出来: 介词短语 in dem Auto 有两条规则可以挂 (VP --&gt; VP PP 和 NP --&gt; NP PP), 所以会有几棵正确的树? 再拿五棵树逐个<span class="nb">节点对照.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看) </summary>
+  <p>这套文法给这句话恰好两棵树 (用程序穷举所有推导核对过), 一棵树只要和其中之一完全相同就是 <b>korrekt</b>, 否则就是 <span class="nb"><b>inkorrekt</b>.</span></p>
+  <p><b>分析 1</b>: PP 挂在宾语 NP 上 (NP --&gt; NP PP): 被跟踪的是「车<span class="nb">里的小偷」.</span></p>
+  <svg class="mtree" viewBox="0 0 417 308" width="417" role="img" aria-label="Analyse 1: PP an NP (der Dieb sitzt im Auto)" style="max-width:100%;height:auto;display:block;margin:10px auto 4px;font-family:Avenir Next,Helvetica Neue,Arial,sans-serif"><g stroke="currentColor" stroke-opacity=".45" stroke-width="1.1" fill="none"><line x1="143.0" y1="23.0" x2="57.0" y2="51.0"/><line x1="57.0" y1="69.0" x2="28.3" y2="97.0"/><line x1="28.3" y1="115.0" x2="28.3" y2="126.9"/><line x1="57.0" y1="69.0" x2="85.8" y2="97.0"/><line x1="85.8" y1="115.0" x2="85.8" y2="126.9"/><line x1="143.0" y1="23.0" x2="229.0" y2="51.0"/><line x1="229.0" y1="69.0" x2="165.9" y2="97.0"/><line x1="165.9" y1="115.0" x2="165.9" y2="126.9"/><line x1="229.0" y1="69.0" x2="292.2" y2="97.0"/><line x1="292.2" y1="115.0" x2="248.3" y2="143.0"/><line x1="248.3" y1="161.0" x2="227.1" y2="189.0"/><line x1="227.1" y1="207.0" x2="227.1" y2="218.9"/><line x1="248.3" y1="161.0" x2="269.5" y2="189.0"/><line x1="269.5" y1="207.0" x2="269.5" y2="218.9"/><line x1="292.2" y1="115.0" x2="336.1" y2="143.0"/><line x1="336.1" y1="161.0" x2="308.1" y2="189.0"/><line x1="308.1" y1="207.0" x2="308.1" y2="218.9"/><line x1="336.1" y1="161.0" x2="364.2" y2="189.0"/><line x1="364.2" y1="207.0" x2="343.0" y2="235.0"/><line x1="343.0" y1="253.0" x2="343.0" y2="264.9"/><line x1="364.2" y1="207.0" x2="385.4" y2="235.0"/><line x1="385.4" y1="253.0" x2="385.4" y2="264.9"/></g><text x="28.3" y="139.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">der</text><text x="28.3" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">DET</text><text x="85.8" y="139.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Detektiv</text><text x="85.8" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NN</text><text x="57.0" y="64.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="165.9" y="139.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">verfolgte</text><text x="165.9" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">V</text><text x="227.1" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">den</text><text x="227.1" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">DET</text><text x="269.5" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Dieb</text><text x="269.5" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NN</text><text x="248.3" y="156.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="308.1" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">in</text><text x="308.1" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">PREP</text><text x="343.0" y="277.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">dem</text><text x="343.0" y="248.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">DET</text><text x="385.4" y="277.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Auto</text><text x="385.4" y="248.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NN</text><text x="364.2" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="336.1" y="156.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">PP</text><text x="292.2" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="229.0" y="64.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">VP</text><text x="143.0" y="18.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">S</text></svg>
+  <p><b>分析 2</b>: PP 挂在 VP 上 (VP --&gt; VP PP): 侦探「在车里」<span class="nb">跟踪小偷.</span></p>
+  <svg class="mtree" viewBox="0 0 417 262" width="417" role="img" aria-label="Analyse 2: PP an VP (der Detektiv fährt im Auto)" style="max-width:100%;height:auto;display:block;margin:10px auto 4px;font-family:Avenir Next,Helvetica Neue,Arial,sans-serif"><g stroke="currentColor" stroke-opacity=".45" stroke-width="1.1" fill="none"><line x1="164.3" y1="23.0" x2="57.0" y2="51.0"/><line x1="57.0" y1="69.0" x2="28.3" y2="97.0"/><line x1="28.3" y1="115.0" x2="28.3" y2="126.9"/><line x1="57.0" y1="69.0" x2="85.8" y2="97.0"/><line x1="85.8" y1="115.0" x2="85.8" y2="126.9"/><line x1="164.3" y1="23.0" x2="271.6" y2="51.0"/><line x1="271.6" y1="69.0" x2="207.1" y2="97.0"/><line x1="207.1" y1="115.0" x2="165.9" y2="143.0"/><line x1="165.9" y1="161.0" x2="165.9" y2="172.9"/><line x1="207.1" y1="115.0" x2="248.3" y2="143.0"/><line x1="248.3" y1="161.0" x2="227.1" y2="189.0"/><line x1="227.1" y1="207.0" x2="227.1" y2="218.9"/><line x1="248.3" y1="161.0" x2="269.5" y2="189.0"/><line x1="269.5" y1="207.0" x2="269.5" y2="218.9"/><line x1="271.6" y1="69.0" x2="336.1" y2="97.0"/><line x1="336.1" y1="115.0" x2="308.1" y2="143.0"/><line x1="308.1" y1="161.0" x2="308.1" y2="172.9"/><line x1="336.1" y1="115.0" x2="364.2" y2="143.0"/><line x1="364.2" y1="161.0" x2="343.0" y2="189.0"/><line x1="343.0" y1="207.0" x2="343.0" y2="218.9"/><line x1="364.2" y1="161.0" x2="385.4" y2="189.0"/><line x1="385.4" y1="207.0" x2="385.4" y2="218.9"/></g><text x="28.3" y="139.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">der</text><text x="28.3" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">DET</text><text x="85.8" y="139.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Detektiv</text><text x="85.8" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NN</text><text x="57.0" y="64.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="165.9" y="185.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">verfolgte</text><text x="165.9" y="156.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">V</text><text x="227.1" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">den</text><text x="227.1" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">DET</text><text x="269.5" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Dieb</text><text x="269.5" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NN</text><text x="248.3" y="156.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="207.1" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">VP</text><text x="308.1" y="185.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">in</text><text x="308.1" y="156.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">PREP</text><text x="343.0" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">dem</text><text x="343.0" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">DET</text><text x="385.4" y="231.9" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Auto</text><text x="385.4" y="202.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NN</text><text x="364.2" y="156.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP</text><text x="336.1" y="110.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">PP</text><text x="271.6" y="64.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">VP</text><text x="164.3" y="18.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">S</text></svg>
+  <p>两棵树意思不同, 但在这套文法下都合法, 这就是结构歧义 (见 <a href="EICL-01-课程概览.html#typen">EICL 01 · 歧义的类型</a>). 所以「意思讲不通」不是判 inkorrekt 的理由, <span class="nb">只有违反规则才是.</span></p>
+  <p>逐棵检查时最常<span class="nb">见的错误:</span></p>
+  <ul>
+    <li><b>扁平的三叉节点</b>: VP → V NP PP 或 NP → DET NN PP. 文法里没有这样的规则, PP 只能通过 VP --&gt; VP PP 或 NP --&gt; <span class="nb">NP PP 二分地挂上去.</span></li>
+    <li><b>缺一层</b>: PP 下面直接是 PREP DET NN, 没有中间的 NP; 或者 VP --&gt; VP PP 里下面那个 VP 只写了 V, <span class="nb">没有 V NP.</span></li>
+    <li><b>挂反了</b>: 写成 PP --&gt; NP PREP, 或 S --&gt; VP NP. 规则右边的顺序也是规则<span class="nb">的一部分.</span></li>
+    <li><b>标签不对</b>: 用了文法里没有的范畴 (N、Det、P、AdvP), 或者词的词类和词库不符 (in <span class="nb">标成 DET).</span></li>
+    <li><b>PP 挂在 S 上</b>: S --&gt; NP VP PP 或 S --&gt; S PP, <span class="nb">文法里都没有.</span></li>
+  </ul>
+  <p><b>易错</b>: 句首的 Der 是大写, 词库里写的是小写 der: 判断文法时不区分大小写, 这不算错误. 另外, 两棵正确的树里 PP 下面都是 PREP + NP, NP 下面都是 DET + NN, 如果一棵树只在 PP 的挂法上和你的答案不同, 先想想它是不是另一种<span class="nb">正确分析.</span></p>
+</details>
+</article>
+
+<!-- ===== A5-3 ===== -->
+<article id="a4-3">
+<h3>Frage 3 · 找出各个成分的中心词<br><span class="de-title">Köpfe von Konstituenten</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 04 · Frage 3 · 3 Punkte</span>
+  <p>Betrachten Sie diesen <span class="nb">Satz:</span></p>
+  <p><i>Eine Seite der Einleitung fehlt in diesem Buch.</i></p>
+  <p>Welches Wort ist jeweils der Kopf der im Folgenden angeführten Konstituenten dieses <span class="nb">Satzes?</span></p>
+  <p>Halten Sie sich an die Konventionen aus der <span class="nb">Vorlesung.</span></p>
+  <ul>
+    <li>„Eine Seite der Einleitung“ [Eine · Seite · der · <span class="nb">Einleitung]</span></li>
+    <li>„Eine Seite der Einleitung fehlt in diesem Buch“ [Eine · Seite · der · Einleitung · fehlt · in · diesem · <span class="nb">Buch]</span></li>
+    <li>„in diesem Buch“ [in · diesem · <span class="nb">Buch]</span></li>
+    <li>„fehlt in diesem Buch“ [fehlt · in · diesem · <span class="nb">Buch]</span></li>
+    <li>„der Einleitung“ [der · <span class="nb">Einleitung]</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 看句子「Eine Seite der Einleitung fehlt in diesem Buch」(这本书里缺了导言的一页). 下面列出的每个成分, 中心词 (Kopf) 是哪个词? <span class="nb">要遵守课上的约定.</span></p>
+  <p><b>思路</b>: 「课上的约定」就是 Folie 49 的中心语渗透表: head(S) = head(VP), head(NP) = head(N), head(VP) = head(V), head(PP) = head(P). 先判断每个成分是什么短语 (NP、PP、VP、S), 再顺着表往下找到那个词. 注意这里是短语结构语法的约定, <span class="nb">不是 UD 的「实词优先」.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看) </summary>
+  <div class="tablewrap"><table>
+    <tr><th>成分</th><th>类型</th><th>中心词</th><th>为什么</th></tr>
+    <tr><td class="wide">Eine Seite der Einleitung</td><td>NP</td><td><b>Seite</b></td><td class="wide">head(NP) = head(N). der Einleitung 是属格定语 (「导言的」), 修饰 Seite; 缺的是「一页」, 不是「导言」.</td></tr>
+    <tr><td class="wide">Eine Seite der Einleitung fehlt in diesem Buch</td><td>S</td><td><b>fehlt</b></td><td class="wide">head(S) = head(VP) = head(V). 整句的中心是限定动词.</td></tr>
+    <tr><td>in diesem Buch</td><td>PP</td><td><b>in</b></td><td class="wide">head(PP) = head(P). 介词决定短语类型, 也决定 Buch 用与格 (diesem).</td></tr>
+    <tr><td class="wide">fehlt in diesem Buch</td><td>VP</td><td><b>fehlt</b></td><td class="wide">head(VP) = head(V).</td></tr>
+    <tr><td>der Einleitung</td><td>NP</td><td><b>Einleitung</b></td><td class="wide">head(NP) = head(N), 冠词 der 不是中心.</td></tr>
+  </table></div>
+  <p><b>易错</b>: ① in diesem Buch 选 Buch: 这是 UD 的实词优先 (介词标 case, 挂在名词下面), 不是本讲的约定; 本讲 Folie 52 正好对比过 (to London: 成分树里 to 是中心). ② Eine Seite der Einleitung 选 Einleitung: 只看最后一个名词会选错, 属格定语永远是修饰语. ③ 整句选 Seite: 主语不是句子的中心, <span class="nb">中心从 VP 往上渗透.</span></p>
+</details>
+</article>
+
+<!-- ===== A5-4 ===== -->
+<article id="a4-4">
+<h3>Frage 4 · 文法能不能生成这句话<br><span class="de-title">Generierbar oder nicht?</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 04 · Frage 4 · 6 Punkte</span>
+  <p>Geben Sie für jeden Satz an, ob er mit der unten angegebenen Grammatik generiert werden kann oder nicht. Ignorieren Sie Groß-/Kleinschreibung und <span class="nb">Interpunktion.</span></p>
+  <div class="tablewrap"><table class="nowrap">
+    <tr><td class="wide">S ➜ NP VP<br>NP ➜ Det N<br>NP ➜ N<br>VP ➜ V S<br>VP ➜ V NP</td><td class="wide">N ➜ Bauer<br>N ➜ Hund<br>V ➜ ruft<br>Det ➜ der<br>Det ➜ seinen</td></tr>
+  </table></div>
+  <ol>
+    <li>Der Bauer ruft seinen <span class="nb">Hund.</span></li>
+    <li>Der Bauer ruft den <span class="nb">Hund.</span></li>
+    <li>*Der Bauer ruft der <span class="nb">Hund.</span></li>
+    <li>Bauer ruft <span class="nb">Hund</span></li>
+    <li>Der Hund ruft seinen <span class="nb">Bauer.</span></li>
+    <li>Ruft der Bauer seinen <span class="nb">Hund?</span></li>
+    <li>Der Bauer, der ruft seinen <span class="nb">Hund.</span></li>
+    <li>“Hund!”, ruft der <span class="nb">Bauer</span></li>
+    <li>Der Bauer <span class="nb">ruft.</span></li>
+    <li>Der Bauer ruft: “Der Bauer ruft seinen <span class="nb">Hund.”</span></li>
+  </ol>
+  <p><b>Auswahl</b> (jeweils): ja (kann generiert werden) · nein (kann nicht generiert <span class="nb">werden)</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 对每个句子, 判断它能不能用下面的文法生成. <span class="nb">不管大小写和标点.</span></p>
+  <p><b>思路</b>: 先把标点和大小写去掉, 只看词串. 然后看这套文法允许的形状: 句子一定是 NP + VP; NP 是 (Det) N; VP 是 V 后面跟一个 NP 或一个完整的句子 S (递归). 所以每个句子都必须以名词短语开头, 动词后面必须还有东西. 只看词串合不合规则, 不管德语里是否合语法, <span class="nb">也不管意思.</span></p>
+</details>
+<details class="answer"><summary>答案 (先自己做再看) </summary>
+  <div class="tablewrap"><table>
+    <tr><th>句子 (去掉标点)</th><th>答案</th><th>为什么</th></tr>
+    <tr><td class="wide">der bauer ruft seinen hund</td><td><b>ja</b></td><td class="wide">[S [NP der Bauer] [VP ruft [NP seinen Hund]]]</td></tr>
+    <tr><td class="wide">der bauer ruft den hund</td><td><b>nein</b></td><td class="wide">词库里没有 den, 再合语法也生成不了.</td></tr>
+    <tr><td class="wide">der bauer ruft der hund</td><td><b>ja</b></td><td class="wide">Det ➜ der 不管格, der Hund 照样能作宾语. 德语不合语法 (星号), 文法却能生成: 这是过度生成 (Übergenerierung, Folie 45).</td></tr>
+    <tr><td class="wide">bauer ruft hund</td><td><b>ja</b></td><td class="wide">NP ➜ N 允许不带冠词的名词短语.</td></tr>
+    <tr><td class="wide">der hund ruft seinen bauer</td><td><b>ja</b></td><td class="wide">和第 1 句结构相同, 只是两个名词换了位置. 意思怪不影响.</td></tr>
+    <tr><td class="wide">ruft der bauer seinen hund</td><td><b>nein</b></td><td class="wide">句子必须以 NP 开头, 文法里没有动词在首位的规则. 问号已被忽略, 不起作用.</td></tr>
+    <tr><td class="wide">der bauer der ruft seinen hund</td><td><b>nein</b></td><td class="wide">der Bauer 是 NP 之后, VP 必须以动词开头, 这里却是 der; der 单独也不能作 NP (NP ➜ N 只认名词).</td></tr>
+    <tr><td class="wide">hund ruft der bauer</td><td><b>ja</b></td><td class="wide">去掉引号和感叹号后是 [S [NP Hund] [VP ruft [NP der Bauer]]]: 「狗」当主语、「农民」当宾语. 和原句的意思 (农民喊「狗!」) 毫无关系, 但词串能生成.</td></tr>
+    <tr><td>der bauer ruft</td><td><b>nein</b></td><td class="wide">VP 的两条规则都要求 V 后面还有 NP 或 S, 没有 VP ➜ V.</td></tr>
+    <tr><td class="wide">der bauer ruft der bauer ruft seinen hund</td><td><b>ja</b></td><td class="wide">用 VP ➜ V S 递归: [S [NP der Bauer] [VP ruft [S der Bauer ruft seinen Hund]]].</td></tr>
+  </table></div>
+  <p>结果: ja = 1, 3, 4, 5, 8, 10; nein = 2, 6, 7, 9. 十句都用程序穷举推<span class="nb">导核对过.</span></p>
+  <p><b>易错</b>: ① 第 3 句的星号是说德语不合语法, 题目问的却是文法能不能生成, 答 ja. 这正是本讲说的文法「过度生成」. ② 第 8 句和第 10 句带引号和冒号, 看起来像直接引语, 题目说要忽略标点: 去掉以后再判断. 第 8 句碰巧能生成, 第 10 句靠递归规则生成. ③ 第 6 句的问号也被忽略, 但这句仍不行: 不能生成是因为语序 (动词在首位), <span class="nb">不是因为它是问句.</span></p>
+</details>
+</article>
+
+<!-- ===== A5-5 ===== -->
+<article id="a4-5">
+<h3>Frage 5 · 把成分树转成依存树<br><span class="de-title">Vom Konstituentenbaum zum Dependenzbaum</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 04 · Frage 5 · 4 Punkte</span>
+  <p>Wandeln Sie den folgenden Konstituentenbaum in einen Dependenzbaum um. Füllen Sie dazu die Felder in dem unvollständigen Baum durch Drag and Drop mit den richtigen <span class="nb">Inhalten.</span></p>
+  <p>Beachten Sie insbesondere die Regeln aus der Vorlesung zur Perkolation von Köpfen. Darüber hinaus soll gelten, dass bei jeder PS-Regel, die in diesem Baum angewendet wird und bei der eine VP beteiligt ist: head(VP) = <span class="nb">head(V)</span></p>
+  <p>Als Kantennamen wählen Sie die Wortart des jeweiligen <span class="nb">Dependenten.</span></p>
+  <p>Achtung: Der sich ergebende Baum unterscheidet sich von einer Analyse nach UD des <span class="nb">Stanford-Parsers!</span></p>
+  <svg class="mtree" viewBox="0 0 380 340" width="380" role="img" aria-label="leerer Dependenzbaum: 8 Wortfelder, 7 Kantenfelder" style="max-width:100%;height:auto;display:block;margin:10px auto 4px;font-family:Avenir Next,Helvetica Neue,Arial,sans-serif"><g stroke="currentColor" stroke-opacity=".45" stroke-width="1.1" fill="none"><line x1="131.0" y1="34.0" x2="60.0" y2="77.0"/><line x1="131.0" y1="34.0" x2="204.0" y2="85.0"/><line x1="204.0" y1="107.0" x2="126.0" y2="168.0"/><line x1="204.0" y1="107.0" x2="260.0" y2="156.0"/><line x1="260.0" y1="178.0" x2="186.0" y2="232.0"/><line x1="260.0" y1="178.0" x2="310.0" y2="229.0"/><line x1="186.0" y1="254.0" x2="179.0" y2="300.0"/></g><rect x="23.0" y="77.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><rect x="94.0" y="12.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><rect x="89.0" y="168.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><rect x="167.0" y="85.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><rect x="142.0" y="300.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><rect x="149.0" y="232.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><rect x="223.0" y="156.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><rect x="273.0" y="229.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><rect x="25.0" y="35.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><rect x="174.0" y="35.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><rect x="100.0" y="112.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><rect x="239.0" y="108.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><rect x="160.0" y="182.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><rect x="289.0" y="184.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><rect x="187.0" y="266.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/></svg>
+  <p><b>Wörter</b>: thought · tall · was · the · Buster · said · Chatterer · <span class="nb">tree</span></p>
+  <p><b>Kantennamen</b>: N · Adj · V · PropN <span class="nb">· Det</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 把下面的成分树转成依存树: 用拖放把空树里的格子填好. 特别要遵守课上的中心语渗透规则. 另外规定: 树里用到的每条含 VP 的规则都有 head(VP) = head(V). 边的名字用从属词的词类. 注意: 得到的树和 Stanford 分析器按 UD <span class="nb">给出的分析不一样!</span></p>
+  <p><b>思路</b>: 句子是 Buster said Chatterer thought the tree was tall (Buster 说 Chatterer 认为那棵树很高), 两层宾语从句套在一起, 成分树用的是 S → NP VP、VP → V S、VP → V Adj、NP → Det N 这类规则. 按 Folie 50 的三步做: ① 自底向上给每个节点写中心词 (head(S) = head(VP), head(VP) = head(V), head(NP) = head(N)); ② 每条规则里, 父节点的中心词 → 没有渗透上来的子节点的中心词, 连一条依存边; ③ 边的名字写从属词的词类. 空树的形状 (根下面两个、再往下两个……) <span class="nb">可以用来核对.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看) </summary>
+  <p>先给成分树的每个节点标<span class="nb">上中心词:</span></p>
+  <svg class="mtree" viewBox="0 0 420 312" width="420" role="img" aria-label="Konstituentenbaum mit Kopf-Annotation" style="max-width:100%;height:auto;display:block;margin:10px auto 4px;font-family:Avenir Next,Helvetica Neue,Arial,sans-serif"><g stroke="currentColor" stroke-opacity=".45" stroke-width="1.1" fill="none"><line x1="95.5" y1="23.0" x2="39.6" y2="45.0"/><line x1="39.6" y1="63.0" x2="39.6" y2="85.0"/><line x1="39.6" y1="103.0" x2="39.6" y2="111.0"/><line x1="95.5" y1="23.0" x2="151.3" y2="45.0"/><line x1="151.3" y1="63.0" x2="89.3" y2="85.0"/><line x1="89.3" y1="103.0" x2="89.3" y2="111.0"/><line x1="151.3" y1="63.0" x2="213.3" y2="85.0"/><line x1="213.3" y1="103.0" x2="150.3" y2="125.0"/><line x1="150.3" y1="143.0" x2="150.3" y2="165.0"/><line x1="150.3" y1="183.0" x2="150.3" y2="191.0"/><line x1="213.3" y1="103.0" x2="276.3" y2="125.0"/><line x1="276.3" y1="143.0" x2="222.6" y2="165.0"/><line x1="222.6" y1="183.0" x2="222.6" y2="191.0"/><line x1="276.3" y1="143.0" x2="329.9" y2="165.0"/><line x1="329.9" y1="183.0" x2="291.5" y2="205.0"/><line x1="291.5" y1="223.0" x2="272.3" y2="245.0"/><line x1="272.3" y1="263.0" x2="272.3" y2="271.0"/><line x1="291.5" y1="223.0" x2="310.7" y2="245.0"/><line x1="310.7" y1="263.0" x2="310.7" y2="271.0"/><line x1="329.9" y1="183.0" x2="368.3" y2="205.0"/><line x1="368.3" y1="223.0" x2="349.1" y2="245.0"/><line x1="349.1" y1="263.0" x2="349.1" y2="271.0"/><line x1="368.3" y1="223.0" x2="387.5" y2="245.0"/><line x1="387.5" y1="263.0" x2="387.5" y2="271.0"/></g><text x="39.6" y="124.0" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Buster</text><text x="39.6" y="98.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">PropN</text><text x="39.6" y="58.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP(Buster)</text><text x="89.3" y="124.0" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">said</text><text x="89.3" y="98.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">V</text><text x="150.3" y="204.0" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">Chatterer</text><text x="150.3" y="178.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">PropN</text><text x="150.3" y="138.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP(Chatterer)</text><text x="222.6" y="204.0" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">thought</text><text x="222.6" y="178.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">V</text><text x="272.3" y="284.0" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">the</text><text x="272.3" y="258.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Det</text><text x="310.7" y="284.0" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">tree</text><text x="310.7" y="258.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">N</text><text x="291.5" y="218.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">NP(tree)</text><text x="349.1" y="284.0" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">was</text><text x="349.1" y="258.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">V</text><text x="387.5" y="284.0" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic">tall</text><text x="387.5" y="258.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Adj</text><text x="368.3" y="218.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">VP(was)</text><text x="329.9" y="178.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">S(was)</text><text x="276.3" y="138.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">VP(thought)</text><text x="213.3" y="98.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">S(thought)</text><text x="151.3" y="58.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">VP(said)</text><text x="95.5" y="18.0" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">S(said)</text></svg>
+  <div class="tablewrap"><table>
+    <tr><th>规则 (中心词)</th><th>非渗透部分</th><th>依存边</th></tr>
+    <tr><td class="wide">S → NP VP (said)</td><td>NP (Buster)</td><td class="wide">said → Buster (PropN)</td></tr>
+    <tr><td class="wide">VP → V S (said)</td><td>S (thought)</td><td class="wide">said → thought (V)</td></tr>
+    <tr><td class="wide">S → NP VP (thought)</td><td>NP (Chatterer)</td><td class="wide">thought → Chatterer (PropN)</td></tr>
+    <tr><td class="wide">VP → V S (thought)</td><td>S (was)</td><td class="wide">thought → was (V)</td></tr>
+    <tr><td class="wide">S → NP VP (was)</td><td>NP (tree)</td><td>was → tree (N)</td></tr>
+    <tr><td class="wide">VP → V Adj (was)</td><td>Adj (tall)</td><td class="wide">was → tall (Adj)</td></tr>
+    <tr><td class="wide">NP → Det N (tree)</td><td>Det (the)</td><td class="wide">tree → the (Det)</td></tr>
+  </table></div>
+  <p>填好的依存树: 根 said; 第二层 Buster、thought; 第三层 Chatterer、was; 第四层 tree、tall; 最下面 the. <span class="nb">7 条边连起 8 个词.</span></p>
+  <svg class="mtree" viewBox="0 0 380 340" width="380" role="img" aria-label="Dependenzbaum (Lösung)" style="max-width:100%;height:auto;display:block;margin:10px auto 4px;font-family:Avenir Next,Helvetica Neue,Arial,sans-serif"><g stroke="currentColor" stroke-opacity=".45" stroke-width="1.1" fill="none"><line x1="131.0" y1="34.0" x2="60.0" y2="77.0"/><line x1="131.0" y1="34.0" x2="204.0" y2="85.0"/><line x1="204.0" y1="107.0" x2="126.0" y2="168.0"/><line x1="204.0" y1="107.0" x2="260.0" y2="156.0"/><line x1="260.0" y1="178.0" x2="186.0" y2="232.0"/><line x1="260.0" y1="178.0" x2="310.0" y2="229.0"/><line x1="186.0" y1="254.0" x2="179.0" y2="300.0"/></g><rect x="23.0" y="77.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><text x="60.0" y="92.5" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic" font-weight="600">Buster</text><rect x="94.0" y="12.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><text x="131.0" y="27.5" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic" font-weight="600">said</text><rect x="89.0" y="168.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><text x="126.0" y="183.5" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic" font-weight="600">Chatterer</text><rect x="167.0" y="85.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><text x="204.0" y="100.5" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic" font-weight="600">thought</text><rect x="142.0" y="300.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><text x="179.0" y="315.5" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic" font-weight="600">the</text><rect x="149.0" y="232.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><text x="186.0" y="247.5" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic" font-weight="600">tree</text><rect x="223.0" y="156.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><text x="260.0" y="171.5" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic" font-weight="600">was</text><rect x="273.0" y="229.0" width="74" height="22" rx="3" fill="var(--bg, #000)" fill-opacity=".0" stroke="currentColor" stroke-opacity=".6"/><text x="310.0" y="244.5" text-anchor="middle" font-size="13" fill="currentColor" font-style="italic" font-weight="600">tall</text><rect x="25.0" y="35.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><text x="48.0" y="49.5" text-anchor="middle" font-size="12" fill="currentColor">PropN</text><rect x="174.0" y="35.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><text x="197.0" y="49.5" text-anchor="middle" font-size="12" fill="currentColor">V</text><rect x="100.0" y="112.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><text x="123.0" y="126.5" text-anchor="middle" font-size="12" fill="currentColor">PropN</text><rect x="239.0" y="108.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><text x="262.0" y="122.5" text-anchor="middle" font-size="12" fill="currentColor">V</text><rect x="160.0" y="182.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><text x="183.0" y="196.5" text-anchor="middle" font-size="12" fill="currentColor">N</text><rect x="289.0" y="184.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><text x="312.0" y="198.5" text-anchor="middle" font-size="12" fill="currentColor">Adj</text><rect x="187.0" y="266.0" width="46" height="20" rx="3" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 2"/><text x="210.0" y="280.5" text-anchor="middle" font-size="12" fill="currentColor">Det</text></svg>
+  <p><b>易错</b>: ① 把 tall 当成 was 的上级: 题目规定 head(VP) = head(V), 所以 VP → V Adj 的中心是 was, tall 挂在 was 下面. ② 边名写成 nsubj、ccomp 这类关系名: 题目要的是从属词的词类. ③ Buster、Chatterer 选 N: 它们是专有名词, 用 PropN; <span class="nb">tree 才是 N.</span></p>
+</details>
+<div class="add"><p>「Achtung」那句说的是 UD 的不同: Stanford 分析器按 UD 会让系动词句 the tree was tall 以形容词 tall 为中心, was 用 cop 挂在 tall 下面, tree 是 tall 的 nsubj; thought 下面的从句 (ccomp) 也就挂 tall 而不是 was. 边名也不是词类, 而是 nsubj、ccomp、det、cop 这类关系. 这和 Folie 51–53 的对比是同一回事: 成分树 + 中心语表让功能词 (这里是系动词) 当中心, <span class="nb">UD 让实词当中心.</span></p></div>
 </article>
 
 </section>
