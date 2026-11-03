@@ -1163,13 +1163,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>三块内容: </p>
-  <ol>
-    <li>在 UML 里表示类之间的关系: <b>Assoziation 关联</b>; <b>Aggregation 聚合</b>、<b>Komposition 组合</b>; <b>Generalisierung/Spezialisierung 泛化/特化</b> <span class="nb">(即继承).</span> </li>
-    <li>面向对象中的继承概念: <b>Oberklasse 父类</b> 和 <b>Unterklasse 子类</b>; <b>Überschreiben 重写</b>方法; <b>dynamische Methodenbindung 动态方法绑定</b>. </li>
-    <li>Python 里的继承: 关键字 <code>super</code>; 特殊方法 <code>__str__</code>、<code>__len__</code>、<span class="nb"><code>__eq__</code>.</span> </li>
-  </ol>
+  <p>本章讲类与类之间的关系: 先用 UML 画出来, 再落到 Python 的继承. 重点是方法重写和动态绑定, 要能判断实际调用的是<span class="nb">哪个方法.</span></p>
 </div>
+
+
 
 <!-- ======================= WIEDERHOLUNG ======================= -->
 
@@ -2100,19 +2097,18 @@ True   # Seitenzahl wird nicht mit __eq__ verglichen</pre>
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li><b>解释</b>继承的概念: 父类/子类、重写方法、动态方法绑定 (运行时按对象的类找方法, <span class="nb">找不到就往父类找).</span> </li>
-    <li>在小例子上<b>应用</b> Python 的继承:
-      <ul>
-        <li><b>实现</b>子类 (<span class="nb"><code class="lc">class Sub(Ober):</code>);</span> </li>
-        <li>用 <code>super()</code> <b>实现</b>子类构造方法 (<code>super().__init__(…)</code>) 和重写方法 (<code>super().einzahlen(…)</code> <span class="nb">后再加自己的逻辑);</span> </li>
-        <li><b>说出并重写</b> __str__、__len__、<span class="nb">__eq__.</span> </li>
-      </ul></li>
-    <li><b>说出并解释</b> UML 里类之间的关系: 关联 (名字、角色、多重性)、继承、聚合、<span class="nb">组合.</span> </li>
-    <li><b>解释</b> UML 类图, 并把它<b>实现</b>成 Pyt<span class="nb">hon 类.</span> </li>
-  </ol>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Konzepte der Vererbung erklären</b>: 能讲清父类、子类、方法重写和动态绑定 (<a href="#vererbung">继承</a>、<span class="nb"><a href="#ueberschreiben">重写方法</a>).</span></li>
+    <li><b>Vererbung anwenden, Unterklassen implementieren</b>: 会在小例子里用继承, 自己写子类 (<a href="#vererbung">继承</a>、<span class="nb"><a href="#konten">银行账户</a>).</span></li>
+    <li><b>Konstruktoren und super</b>: 会用 super 调用父类的构造方法和被重写的方法 <span class="nb">(<a href="#ueberschreiben">重写方法</a>).</span></li>
+    <li><b>Spezielle Methoden überschreiben</b>: 能说出并重写 __str__、__len__、__eq__ 这类特殊方法 <span class="nb">(<a href="#spezial">重写特殊方法</a>).</span></li>
+    <li><b>Beziehungen in UML benennen und erklären</b>: 能说出并讲清关联、聚合、组合、泛化 (<a href="#beziehung">类之间的关系</a>、<span class="nb"><a href="#uml">UML 中类之间的关系</a>).</span></li>
+    <li><b>UML-Klassendiagramme implementieren</b>: 看懂类图, 并把它写成 Python 类 (<a href="#uml">UML 中类之间的关系</a>、<span class="nb"><a href="#entwurf">面向对象设计</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">

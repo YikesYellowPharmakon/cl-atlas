@@ -1161,8 +1161,10 @@
   <ul><li>Get to know the concept of decoding <span class="nb">in NLP</span></li><li>Learn about different decoding <span class="nb">strategies</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 了解 NLP 中<b>解码 (decoding)</b> 的概念; <span class="nb">认识不同的<b>解码策略</b>.</span></p>
+  <p>这一讲引入解码: 语言模型给出下一个词的分布后, 怎样真正选出词来. 重点是几类解码策<span class="nb">略的划分.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Slide 1</span>
@@ -1280,8 +1282,10 @@
   <ul><li>Get to know deterministic decoding <span class="nb">strategies</span></li><li>Learn how text is generated with greedy search and beam <span class="nb">search</span></li><li>Understand how beam search tries to fix the drawbacks of greedy <span class="nb">search</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 认识确定性解码策略; 学会用贪心搜索和束搜索生成文本; 理解束搜索怎样弥补贪心搜<span class="nb">索的缺点.</span></p>
+  <p>这一讲讲确定性解码. 重点是贪心搜索的缺陷, 以及束搜索怎样部<span class="nb">分弥补它.</span></p>
 </div>
+
+
 
 <h3 id="s82-greedy">贪心搜索<br><span class="de-title">Greedy search</span></h3>
 <div class="card de">
@@ -1433,8 +1437,10 @@
   <ul><li>Get to know different stochastic decoding <span class="nb">strategies</span></li><li>Learn about sampling with temperature, top-k sampling and top-p (nucleus) <span class="nb">sampling</span></li><li>learn about contrastive search and contrastive <span class="nb">decoding</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 认识各种随机解码策略: 带温度的采样、top-k 采样、top-p (核) 采样; 了解<b>对比搜索 (contrastive search, CS)</b> 和<b>对比解码 (contrastive decoding, CD)</b>.</p>
+  <p>这一讲讲随机解码. 重点是温度、top-k 和 top-p 三种采样怎样控制多样性, <span class="nb">以及对比搜索的思路.</span></p>
 </div>
+
+
 
 <h3 id="s83-samp">采样<br><span class="de-title">Sampling</span></h3>
 <div class="card de">
@@ -1611,8 +1617,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <ul><li>Learn how to use the generate() function of the Transformers <span class="nb">library</span></li><li>Learn how to choose from the different decoding strategies with the choice of <span class="nb">hyperparameters</span></li><li>See how hyperparameters affect the output of the generate() <span class="nb">function</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 学会用 Transformers 库的 <code>generate()</code>; 学会用超参数选择解码策略; 看超参数怎样影响输出. 这一节是 8.1–8.3 的实操版, <span class="nb">例子都来自 GPT-2.</span></p>
+  <p>这一讲落到 Transformers 库的 generate() 函数上. 重点是各个超参数分别对应哪种解码策略, <span class="nb">以及它们怎样改变输出.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Slide 1</span>
@@ -1754,8 +1762,10 @@ out = model.generate(tokenized_prompt, max_new_tokens=<span class="tk-n">50</spa
   <ul><li>Learn about evaluation metrics for open-ended text <span class="nb">generation</span></li><li>Get to know the different metrics with- and without a gold <span class="nb">reference</span></li><li>Get to know potential issues with some evaluation <span class="nb">metrics</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 开放式文本生成的评价指标; 有参考答案和没有参考答案时分别用什么指标; <span class="nb">某些指标可能的问题.</span></p>
+  <p>这一讲讲怎样评价开放式文本生成. 重点是有参考答案和没有参考答案两类指标, <span class="nb">以及它们各自的问题.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Slide 1</span>

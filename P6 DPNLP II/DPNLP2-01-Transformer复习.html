@@ -1172,8 +1172,10 @@
   <p><b>Outline</b>: From RNNs to Transformers · Positional Information · Autoregressive Models · Parameter <span class="nb">Counts</span></p>
 </div>
 <div class="zh">
-  <p>这一讲复习 Transformer, 分四部分: 从 RNN 到 Transformer; 位置信息; 自回归模型; 参数量. 对应 DPNLP I 的 2.1–2.2 节 (RNN 与注意力) 和第 3 章 (Transformer), 新增了相对位置编码、<span class="nb">ALiBi 和 RoPE.</span></p>
+  <p>这一讲复习 DPNLP I 里的 Transformer, 为后面的内容打底. 重点是位置信息、自回归建模和参数量计算这<span class="nb">几处细节.</span></p>
 </div>
+
+
 <div class="warn"><p><b>幻灯片错误:</b> 标题页的学习目标是从第 00 讲 (课程导论) 原样复制过来的 (了解课程范围、回答疑问、了解工作量), 和这一讲的内容无关; 连「question」的笔误也一起抄了过来. 按内容, 学习目标应是: 理解从 RNN 到注意力再到 Transformer 的演变; 了解各种位置编码; 理解自回归模型的掩码; 会推导 Transformer <span class="nb">的参数量.</span></p></div>
 
 <h3 id="s1-rnn">编码器–解码器 RNN 及其局限<br><span class="de-title"><span class="seg">Encoder-decoder RNNs ·</span> <span class="seg">Limitations of RNNs</span></span></h3>

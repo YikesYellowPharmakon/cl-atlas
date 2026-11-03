@@ -1164,8 +1164,10 @@
   <ul><li>comprehend the different subtleties in the space of fine-tuning and <span class="nb">prompting</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 理解「微调」和「提示」这一领域里的各种细微区别: 单任务微调、多任务微调、提示、继续预训练、指令微调, 这些词各指什么. 第 9 章的主讲是 Schütze <span class="nb">教授.</span></p>
+  <p>这一讲理清微调和提示这一片的各种说法. 重点是单任务微调、多任务微调、提示和指令微调<span class="nb">各指什么.</span></p>
 </div>
+
+
 
 <h3 id="s91-ways">用语言模型解决任务的方式<br><span class="de-title">How to solve a task with language models?</span></h3>
 <div class="card de">
@@ -1491,8 +1493,10 @@
   <ul><li>illustrate chain-of-thought few-shot prompting and point out the benefits it brings <span class="nb">to LMs</span></li><li>illustrate tree-of-thought and point out the benefits it brings <span class="nb">to LMs</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 说明<b>思维链少样本提示 (chain-of-thought few-shot prompting, 课件简写 COT-FS-P)</b> 并指出它给语言模型带来的好处; 说明<b>思维树 (tree-of-thought)</b> <span class="nb">及其好处.</span></p>
+  <p>这一讲讲两种让模型「先想再答」的提示方法. 重点是思维链少样本提示为什么有效, 以及思维树比它多<span class="nb">做了什么.</span></p>
 </div>
+
+
 
 <h3 id="s92-motiv">动机<br><span class="de-title">Motivation</span></h3>
 <div class="card de">
@@ -1740,8 +1744,10 @@
   <ul><li>Motivation for instruction <span class="nb">tuning</span></li><li>Basic RLHF idea: <span class="nb">Backflipping</span></li><li>SFT part of <span class="nb">RLHF</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 指令微调的动机; RLHF 的基本思想 (以「学后空翻」为例); RLHF 中的 <b>SFT (有监督微调)</b> 部分. 下一份课件 (9.4) 接着讲 RLHF <span class="nb">的奖励模型和 PPO.</span></p>
+  <p>这一讲解释大模型为什么需要指令微调和 RLHF. 重点是 RLHF 的整体思路, 以及第一步有监督微<span class="nb">调做什么.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Slide 1–2</span>
@@ -2120,8 +2126,10 @@
   <ul><li>How RLHF <span class="nb">works</span></li><li>How to <span class="nb">evaluate</span></li><li>Limitations</li></ul>
 </div>
 <div class="zh">
-  <p>目标: RLHF (Reinforcement Learning from Human Feedback, 基于人类反馈的强化学习) 怎样工作; 怎样评价; 有哪些局限. 本份课件接着 9.3 节的路线图 (Slide 1, 16, 25, 55 都是这张路线图, <span class="nb">分别标出讲到哪里).</span></p>
+  <p>这一讲接着讲 RLHF 的后半部分. 重点是奖励模型和强化学习两步怎样配合, <span class="nb">以及这种方法的局限.</span></p>
 </div>
+
+
 
 <h3 id="s94-hf">人类反馈<br><span class="de-title">HF (Human Feedback) of RLHF</span></h3>
 <div class="card de">
@@ -2610,8 +2618,10 @@ with \"!-- Two</pre>
   <ul><li>understand DeepSeek reasoning as an example of state-of-the-art <span class="nb">reasoning</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 以 DeepSeek 为例, 理解当今最先进的语言模型推理是怎样训<span class="nb">练出来的.</span></p>
+  <p>这一讲以 DeepSeek 为例看当前的推理模型怎样训练. 重点是它的训练流程和前面讲的 SFT、<span class="nb">RLHF 有什么不同.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Slide 1 (= Slide 19)</span>
@@ -2886,8 +2896,10 @@ Assistant: I added the ones (6+9=15), carried the 1, then added the tens (3+5+1=
   <ul><li>Understand scaling <span class="nb">laws</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 理解<b>规模定律 (scaling laws)</b>: 模型的表现怎样随参数量、数据量、计算量变化, 以及给定预算时<span class="nb">怎样分配.</span></p>
+  <p>这一讲讲规模定律: 模型表现怎样随参数量、数据量和计算量变化. 重点是给定计算预算时参数和数据该<span class="nb">怎样分配.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Slide 1</span>
@@ -3175,8 +3187,10 @@ Assistant: I added the ones (6+9=15), carried the 1, then added the tens (3+5+1=
   <ul><li>Learn about different contributions to compute <span class="nb">requirements</span></li><li>Learn how model size components influence memory <span class="nb">requirements</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 了解计算需求由哪些部分组成; 了解模型的各个组成部分怎样影响显存需求. 记号: 本节用 P 表示参数量 (9.<span class="nb">6 节用 N).</span></p>
+  <p>这一讲估算训练大模型要多少计算和显存. 重点是计算量和显存各由哪些部分组成, <span class="nb">要会做量级估算.</span></p>
 </div>
+
+
 
 <h3 id="s97-compute">计算需求<br><span class="de-title">Compute requirements</span></h3>
 <div class="card de">
@@ -3395,8 +3409,10 @@ Assistant: I added the ones (6+9=15), carried the 1, then added the tens (3+5+1=
   <ul><li>Learn about different techniques to reduce compute and <span class="nb">memory</span></li><li>Learn about distributed training with data/tensor <span class="nb">parallelism</span></li><li>Learn about <span class="nb">FlashAttention</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 了解减少计算和显存的技术; 了解用数据并行和张量并行做分布式训练; 了解 FlashAttention (3.6 节已入门, <span class="nb">这里细讲).</span></p>
+  <p>这一讲讲怎样降低计算和显存需求. 重点是数据并行和张量并行的区别, 以及 FlashAttention <span class="nb">的思路.</span></p>
 </div>
+
+
 
 <h3 id="s98-dist">分布式训练<br><span class="de-title">Distributed training</span></h3>
 <div class="card de">

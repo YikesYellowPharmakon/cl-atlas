@@ -1151,9 +1151,10 @@
   </ol>
 </div>
 <div class="zh">
-  <p>1 课程概览; 2 句法概念; 3 作为语言学分支的句法; 4 句法表达手段; 5 成分关系与依存关系; <span class="nb">6 句法结构的表示.</span></p>
-  <p>这一讲是整门课的地图: 先说清楚「句法」研究什么, 再介绍两种看句子结构的视角 (成分 vs. 依存), 最后讲怎样把结构画成树、<span class="nb">写成括号式.</span></p>
+  <p>这一讲是整门课的地图: 先说清句法研究什么, 再介绍成分和依存两种视角, 最后讲怎样表示句法结构. 重点是成分关系和依存关<span class="nb">系的区别.</span></p>
 </div>
+
+
 
 <h3>课程内容<br><span class="de-title">Inhalte</span></h3>
 <div class="card de">
@@ -1189,13 +1190,16 @@
   </ul>
 </div>
 <div class="zh">
+  <p>这门课的目标有三层: 会用语法概念描述句子, 会用几种形式文法分析句子, 会用 NLTK <span class="nb">把文法写成程序.</span></p>
   <ul>
-    <li>认识并会运用语法描述中的功能性和结构性概念: <b>Kongruenz 一致</b>、<b>Rektion 支配 (管辖)</b>、<b>Subkategorisierung 次范畴化</b>、<span class="nb"><b>Valenz 配价</b>.</span></li>
-    <li>认识语法形式体系, 并能用它分析自然语言句子: CFG (上下文无关文法: 成分结构)、FCFG (基于特征的 CFG: 对语法特征建模)、PCFG (概率 CFG: 给 CFG 规则加权重)、DG (依存文法: 依存结构)、组块分析器 (Chunk-Parser, 如 RegExpParser: 部分句法分析, <span class="nb">「把句法分析当作标注」).</span></li>
-    <li>认识并会操作一个使用语法形式体系的程序系统 → 用 NLTK 编写 CFG、FCFG、<span class="nb">PCFG 和 DG.</span></li>
+    <li><b>Kongruenz、Rektion、Subkategorisierung、Valenz</b>: 能说清这些功能性概念, 并在句子里指认出来 <span class="nb">(<a href="SNS-01-句法分析与句法测试.html">SNS 01</a>).</span></li>
+    <li><b>CFG</b>: 会写短语结构规则, 画出成分结构树 (<a href="SNS-02-短语结构文法.html">SNS 02</a>、<span class="nb"><a href="SNS-03-X-bar结构递归与歧义.html">SNS 03</a>).</span></li>
+    <li><b>FCFG、PCFG、DG、Chunk-Parser</b>: 会用特征、概率、依存关系和组块分析扩展或替代 CFG, <span class="nb">在后面各讲展开.</span></li>
+    <li><b>NLTK</b>: 会在 NLTK 里写出上面几种文法并<span class="nb">运行分析.</span></li>
   </ul>
-  <p><b>深度:</b> 动词是 Kenntnis und <b>Anwendung</b> (认识并<b>应用</b>) 和 <b>Bedienung</b> (操作): 也就是说考试不只问定义, 还会要你给一个句子写文法规则、画树, 并能在 NLTK <span class="nb">里写出来.</span></p>
 </div>
+
+
 
 <h3>NLTK<br><span class="de-title">NLTK</span></h3>
 <div class="card de">

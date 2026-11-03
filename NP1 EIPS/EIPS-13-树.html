@@ -1163,8 +1163,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p><b>Baum 树</b>和 (有序) <b>Binärbaum 二叉树</b>这种<b>verkettete 链式</b>数据结构 (结点通过引用连起来, 第 6 章); 术语: 根、父结点、子结点、叶子、深度; 应用: 莫尔斯码、Huffman 编码; 树上的递归和迭代函数; 遍历: 深度优先 (前序、中序、后序) 和广度优先; 在 (有序) 二叉树中查找及<span class="nb">其复杂度.</span> </p>
+  <p>本章讲树这种链式数据结构, 从术语到应用, 再到树上的递归函数. 重点是二叉树的遍历和插入, <span class="nb">要会写出递归实现.</span></p>
 </div>
+
+
 
 <!-- ======================= MORSE ======================= -->
 
@@ -1929,16 +1931,18 @@ a = Node(<span class="tk-n">1</span>,b,c)</code></pre>
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li><b>解释</b>树的定义 (结点、边、根、唯一父结点; 归纳定义) 和术语 (父结点、子结点、叶子、结点深度、树的深度、子树、<span class="nb">二叉树).</span> </li>
-    <li><b>说出</b>树的应用: 码树 (莫尔斯、Huffman)、数据库索引、文件系统、决策树、<span class="nb">语法树.</span> </li>
-    <li><b>会用</b> Python 的树结构: Tree / Empty / Node, <span class="nb">从下往上建树.</span> </li>
-    <li><b>解释</b>遍历顺序, 对给定的树<b>算出</b>前序、中序、后序、广度优先的顺序, <span class="nb">并用 Python <b>实现</b>.</span> </li>
-    <li>在树上<b>实现</b>递归和迭代方法 (size、depth、contains、<span class="nb">find).</span> </li>
-    <li><b>解释</b>在无序和有序二叉树中查找及其复杂度: 无序 O(n) (深度优先空间 O(t), 广度优先空间 O(2<sup>t</sup>)); 有序 O(t) (递归空间 O(t), <span class="nb">迭代 O(1)).</span> </li>
-  </ol>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Baumdefinition und Begriffe erklären</b>: 能讲清树的定义和根、叶、深度这些术语 <span class="nb">(<a href="#definition">信息学中的树</a>).</span></li>
+    <li><b>Anwendungen benennen</b>: 能说出树的应用, 比如莫尔斯码和 Huffman 编码 (<a href="#morse">莫尔斯码</a>、<span class="nb"><a href="#huffman">Huffman 编码</a>).</span></li>
+    <li><b>Baumdatenstruktur gebrauchen</b>: 会用 Python 表示二叉树 (<a href="#binaer">二叉树</a>、<span class="nb"><a href="#size">二叉树上的操作</a>).</span></li>
+    <li><b>Durchlaufreihenfolgen</b>: 能讲清前序、中序、后序遍历, 会对例子树写出顺序并用 Python 实现 <span class="nb">(<a href="#durchlauf">遍历树</a>).</span></li>
+    <li><b>Rekursive und iterative Methoden auf Bäumen</b>: 会用递归和迭代两种方式写树上的操作 <span class="nb">(<a href="#size">二叉树上的操作</a>).</span></li>
+    <li><b>Suche in Binärbäumen</b>: 能讲清无序和有序二叉树里的查找及其复杂度 (<a href="#suche">在树中查找</a>、<span class="nb"><a href="#geordnet">有序二叉树</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">

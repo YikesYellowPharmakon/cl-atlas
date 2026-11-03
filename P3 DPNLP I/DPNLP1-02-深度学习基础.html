@@ -1164,8 +1164,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解 RNN 的<b>循环 (recurrent)</b> 结构; 认识不同类型的 RNN (普通 RNN、LSTM、多层、双向); 理解 RNN 能用在哪些任务上 (标注、语言建模、<span class="nb">序列到序列).</span></p>
+  <p>这一讲讲循环神经网络. 重点是循环结构怎样处理变长序列, 以及几种 RNN <span class="nb">各适合什么任务.</span></p>
 </div>
+
+
 <div class="warn"><p><b>原文笔误:</b> 「<b>recurent</b>」应为 <span class="nb">recurrent.</span></p></div>
 
 <h3 id="s21-what">什么是 RNN<br><span class="de-title">What are RNNs?</span></h3>
@@ -2604,8 +2606,10 @@ c-10 4-16 7.7-18 11 0 8.7 6 14.3 18 17 47.3 18.7 87.8 47 121.5 85S196 441.3 208
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解<b>attention 注意力</b>机制; <span class="nb">认识不同类型的注意力.</span></p>
+  <p>这一讲引入注意力机制, 解决 RNN 只能靠一个向量传递全部信息的问题. 重点是注意力权重怎么算, <span class="nb">以及几种注意力的区别.</span></p>
 </div>
+
+
 
 <h3 id="s22-encdec">RNN 编码器-解码器及其局限<br><span class="de-title">Encoder-decoder with RNNs</span></h3>
 <div class="card de">
@@ -3083,8 +3087,10 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解词嵌入的<b>contextualization 语境化</b> (同一个词在不同句子里得到不同的向量); 建立对<b>feature-based 基于特征</b>的迁移学习的直觉 (预训练模型只用来提供特征, <span class="nb">本身不再训练).</span></p>
+  <p>这一讲讲同一个词怎样在不同语境里得到不同的向量. 重点是基于特征的迁移学习: 预训练模型只提供特征, <span class="nb">本身不再训练.</span></p>
 </div>
+
+
 
 <h3 id="s23-ctx">上下文无关与语境化嵌入<br><span class="de-title">Contextuality</span></h3>
 <div class="card de">
@@ -3434,8 +3440,10 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解文本<b>tokenization 分词 (词元化)</b> 的过程; 认识各种分词方式, 重点是子词分词 BPE 和 <span class="nb">WordPiece.</span></p>
+  <p>这一讲讲分词. 重点是子词分词的思路, 以及它为什么能兼顾词表大小和<span class="nb">未登录词.</span></p>
 </div>
+
+
 <div class="warn"><p><b>原文笔误:</b> 「Understand <b>the the</b> <span class="nb">process」多了一个 the.</span></p></div>
 
 <h3 id="s24-what">什么是分词<br><span class="de-title">Process of text tokenization</span></h3>

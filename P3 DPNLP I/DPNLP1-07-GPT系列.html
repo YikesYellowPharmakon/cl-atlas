@@ -1161,8 +1161,10 @@
   <ul><li>Use of the transformer <span class="nb">decoder</span></li><li>Input modifications (and how this is <span class="nb">useful)</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 理解 GPT 怎样使用 Transformer <b>解码器</b>; 理解它对输入的改造 (把不同任务的输入都变成一个序列) 以及为什么有用. 本章标题 <b>GPT = Generative Pre-Trained Transformer 生成式预训练 Transformer</b>.</p>
+  <p>这一讲讲 GPT 怎样只用 Transformer 解码器做预训练. 重点是微调时怎样改造输入, 让不同任务都能套进同<span class="nb">一个模型.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Slide 1</span>
@@ -1367,8 +1369,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <ul><li>Understand language models as universal task <span class="nb">solvers</span></li><li>Understand the implications of such <span class="nb">models</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 理解语言模型作为<b>通用任务求解器</b>; 理解这类模型带来的影响 (滥用风险、<span class="nb">幻觉).</span></p>
+  <p>这一讲讲 GPT-2 把语言模型当成通用的任务求解器. 重点是零样本做任务的思路, 以及这类模型带<span class="nb">来的风险.</span></p>
 </div>
+
+
 
 <h3 id="s72-contro">争议与能力<br><span class="de-title">Starting with a controversy</span></h3>
 <div class="card de">
@@ -1543,8 +1547,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <ul><li>Recap GPT and the ideas behind standard language <span class="nb">modeling</span></li><li>Understand the difference between fine-tuning and X-shot <span class="nb">learning</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 回顾 GPT 和标准语言建模背后的思想; 理解<b>微调</b>和 <b>X-shot 学习</b> (零样本、单样本、<span class="nb">少样本) 的区别.</span></p>
+  <p>这一讲回顾 GPT 的语言建模思路, 引出 GPT-3. 重点是微调和零样本、<span class="nb">少样本学习的区别.</span></p>
 </div>
+
+
 
 <h3 id="s73-recap">GPT 回顾<br><span class="de-title">GPT recap</span></h3>
 <div class="card de">
@@ -1777,8 +1783,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <ul><li>Overview on relevant tasks and <span class="nb">benchmarks</span></li><li>GPT-3’s performance in X-shot <span class="nb">settings</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 概览相关的任务和基准; 了解 GPT-3 在零样本、单样本、少样本设置下的表现. 本节所有例子和表格都出自 GPT-3 论文 (Brown et al., 2020). 例子格式统一: Context → 是输入给模型的内容, Target Completion → 是期望的续写; 多选题列出 Correct / Incorrect Answer, <span class="nb">模型按各选项的概率选.</span></p>
+  <p>这一讲用 GPT-3 论文里的基准看它在各种任务上的表现. 重点是零样本、单样本、少样本三种设置下成<span class="nb">绩的差别.</span></p>
 </div>
+
+
 
 <h3 id="s74-lm">语言建模类任务<br><span class="de-title">LAMBADA</span></h3>
 <div class="card de">
@@ -2214,8 +2222,10 @@ Incorrect Answer → soothe is to passion</pre>
   <ul><li>Understand biases inherent <span class="nb">to GPT</span></li><li>Get a feeling for the cost and environmental <span class="nb">impact</span></li></ul>
 </div>
 <div class="zh">
-  <p>目标: 理解 GPT 固有的偏见; 对训练成本和环境影响有个量级上的感觉. 课件中间还有一大段讨论 GPT-3 <span class="nb">的局限.</span></p>
+  <p>这一讲讨论 GPT-3 的偏见和代价. 重点是模型从训练数据里继承了哪些偏见, 以及训练成本和环境影<span class="nb">响的量级.</span></p>
 </div>
+
+
 
 <h3 id="s75-hist">历史与炒作<br><span class="de-title">History of GPT, GPT hype</span></h3>
 <div class="card de">

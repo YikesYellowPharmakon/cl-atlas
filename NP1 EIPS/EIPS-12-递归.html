@@ -1159,8 +1159,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p><b>Rekursion 递归</b>的原理: 基本情况和递归调用; 执行过程 (栈的增长和收缩); 终止性; 递归的几种形式. 例子: 阶乘、汉诺塔、斐波那契数、Ackermann 函数、快速排序. 最后比较迭代和递<span class="nb">归的实现.</span> </p>
+  <p>本章讲递归: 先讲原理和执行过程, 再看一串经典例子, 最后和迭代比较. 重点是基本情况和终止性, <span class="nb">要能跟踪调用栈.</span></p>
 </div>
+
+
 
 <!-- ======================= BEGRIFF ======================= -->
 
@@ -1866,17 +1868,17 @@ Sortiere beide Teillisten rekursiv mit Quicksort
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li><b>解释</b>递归的原理 (基本情况 + 递归调用, 问题必须变小) 和递归计算的过程 (栈的增长与收缩, 能画出 fac(3) <span class="nb">那样的栈图).</span> </li>
-    <li><b>说出</b>递归形式: 线性、树形、<span class="nb">嵌套.</span> </li>
-    <li><b>算出</b>递归调用的结果 (例: fac(4)、fib(6) = 13、ack(1, <span class="nb">2) = 4).</span> </li>
-    <li><b>确定</b>递归函数在哪些输入上终止 (例: fac 对 <span class="katex" data-o="n ≥ 0"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>; nonterm2 <span class="nb">对非负偶数).</span> </li>
-    <li><b>说出</b>递归算法的例子及其递归形式: fac (线性)、fib / 汉诺塔 / 快速排序 (树形)、Ackermann <span class="nb">(嵌套).</span> </li>
-    <li><b>解释</b>快速排序及其时间和空间复杂度 (最好/平均 O(n log n), 最坏 <span class="katex" data-o="O(n²)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>; 栈空间 O(log n) 到 O(n)), 并和冒泡、选择、<span class="nb">插入排序<b>区分</b>.</span> </li>
-    <li><b>编写</b>解决简单问题的递归 Python <span class="nb">程序.</span> </li>
-  </ol>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Prinzip der Rekursion erklären</b>: 能讲清递归的原理和递归调用的执行过程 (<a href="#begriff">递归算法与递归方法</a>、<span class="nb"><a href="#fakultaet">阶乘</a>).</span></li>
+    <li><b>Rekursionsformen benennen</b>: 能说出线性递归、树形递归等形式, 并给例子归类 (<a href="#hanoi">汉诺塔</a>、<span class="nb"><a href="#fibonacci">斐波那契数</a>).</span></li>
+    <li><b>Ergebnis berechnen, Terminierung bestimmen</b>: 会手算递归调用的结果, 并判断哪些输入能终止 (<a href="#fakultaet">阶乘</a>、<span class="nb"><a href="#iteration">递归与迭代</a>).</span></li>
+    <li><b>Quicksort erklären und abgrenzen</b>: 能讲清快速排序和它的复杂度, 并和前一章的排序算法比较 <span class="nb">(<a href="#quicksort">快速排序</a>).</span></li>
+    <li><b>Rekursive Programme entwickeln</b>: 会自己写递归程序 (<a href="#hanoi">汉诺塔</a>、<span class="nb"><a href="#quicksort">快速排序</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">

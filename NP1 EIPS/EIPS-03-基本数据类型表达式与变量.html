@@ -1165,13 +1165,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>三块内容: </p>
-  <ol>
-    <li><b>Grunddatentypen 基本数据类型</b>及其合法的值: 整数、小数 (德语 Kommazahl, 「带逗号的数」, 因为德语用逗号作小数点)、表示文本的字符串; 预告: 序列、<span class="nb">集合等.</span> </li>
-    <li><b>Ausdrücke 表达式</b>: 常量和变量、算术和逻辑运算、括号和运算符<span class="nb"><b>Präzedenz 优先级</b>.</span> </li>
-    <li><b>Auswertung 求值</b>: 变量是值的占位符; 按括号决定求值顺序; 类型正确性和逻<span class="nb">辑正确性.</span> </li>
-  </ol>
+  <p>本章从数据讲起: 先是 Python 的基本数据类型, 再是由常量、变量和运算符组成的表达式. 重点是表达式的类型和求值顺序, <span class="nb">要能手算出结果.</span></p>
 </div>
+
+
 
 <!-- ======================= BEISPIELE ======================= -->
 
@@ -1419,7 +1416,7 @@ SyntaxError: invalid decimal literal</code></pre>
   <p>Berechnung der Zweierkomplementdarstellung einer negativen <span class="nb">Zahl Z:</span></p>
   <ol>
     <li>Sei 0b<sub>n−1</sub> <span class="katex" data-o="… b0"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> die Binärdarstellung <span class="nb">von |Z|</span></li>
-    <li>Invertiere alle Bits von 0b<sub>n−1</sub> <span class="nb"><span class="katex" data-o="… b0"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></li>
+    <li>Invertiere alle Bits von <span class="nb">0b<sub>n−1</sub> <span class="katex" data-o="… b0"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></li>
     <li>addiere 1</li>
   </ol>
   <p>Beispiel: Zweierkomplementdarstellung von -56 als 32bit <span class="nb">Zahl</span></p>
@@ -2292,18 +2289,18 @@ u = math.max(z,<span class="tk-n">10.0</span>) // Maximum von z und <span class=
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li><b>说出并解释</b>错误类型: 语法错误、类型错误、逻辑错误; 编译期错误和运<span class="nb">行时错误.</span> </li>
-    <li><b>识别并解释</b>表达式的语法正确性和类型正确性, 以及其中的语法错误和<span class="nb">类型错误.</span> </li>
-    <li><b>算出</b>一个 (语法和类型都正确的) 表达式的<b>类型</b> (注意 / 得 float、<span class="nb">自动转换的方向).</span> </li>
-    <li><b>算出</b>赋值之后的<b>状态</b> σ <span class="nb">(写成三元组列表).</span> </li>
-    <li><b>解释</b>给定表达式的求值顺序 (按优先级补括号, <span class="nb">由内向外).</span> </li>
-    <li>在给定状态下<b>解释并算出</b>表达式的值 (每步写 <span class="nb">=<sub>σ</sub>).</span> </li>
-    <li>用 Python 表达式<b>描述</b>简单的计算 (例: <span class="nb">求根公式).</span> </li>
-  </ol>
-  <p>这一章的动词大多是 <b>berechnen 计算</b>和 <b>erkennen 识别</b>: 考试会给具体表达式和状态, 要求写出类型、<span class="nb">值和求值过程.</span> </p>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Fehlertypen benennen und erklären</b>: 能说出并讲清语法错误、类型错误、<span class="nb">逻辑错误 (<a href="#fehler">错误的类型</a>).</span></li>
+    <li><b>Syntax- und Typfehler in Ausdrücken erkennen</b>: 看到一个表达式, 能指出它有没有语法错误或类型错误, 并说出原因 (<a href="#ausdruck">表达式</a>、<span class="nb"><a href="#fehler">错误的类型</a>).</span></li>
+    <li><b>Typ eines Ausdrucks berechnen</b>: 会算出一个正确表达式的类型 <span class="nb">(<a href="#ausdruck">表达式</a>).</span></li>
+    <li><b>Zustand nach Zuweisung berechnen</b>: 会写出一串赋值之后每个变量的值 <span class="nb">(<a href="#var">变量与状态</a>).</span></li>
+    <li><b>Auswertungsreihenfolge / Wert berechnen</b>: 能讲清运算符优先级和结合性, 并在给定状态下手算出表达式的值 (<a href="#ausdruck">表达式</a>、<span class="nb"><a href="#arith">算术运算</a>).</span></li>
+    <li><b>Berechnungen mittels Ausdrücken beschreiben</b>: 会用 Python 表达式写出简单的计算 (<span class="nb"><a href="#bsp">引例: 一元二次方程</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">

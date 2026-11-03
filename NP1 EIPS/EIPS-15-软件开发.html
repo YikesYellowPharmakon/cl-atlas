@@ -1160,8 +1160,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>软件<b>开发过程</b> (瀑布模型、增量开发、迭代开发); <b>系统结构</b>: 系统架构的基本原则、用<b>包</b>组织程序、导入包、例子: <b>分层架构</b>; <b>版本管理</b>; Python 中的<b>正则表达式</b> (第 2 章的正则表达式在 Python 里怎么写、<span class="nb">怎么用).</span> </p>
+  <p>本章从写单个程序转到组织整个系统: 开发过程、架构和包, 再补上版本管理和正则表达式. 重点是分层架构和<span class="nb">包的导入.</span></p>
 </div>
+
+
 
 <!-- ======================= QUALITÄT ======================= -->
 
@@ -1909,17 +1911,17 @@ satzteil = <span class="tk-s">"6 ECTS oder 9 ECTS"
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li><b>说出、解释、区分</b>软件开发过程: 六个阶段 (Validierung 与 Verifikation 的区别); 瀑布、增量、迭代模型各自的特点和优缺点; 敏捷开发与 <span class="nb">Sprint.</span> </li>
-    <li><b>解释</b>系统架构的基本原则: 高内聚、低耦合 (无循环依赖), 以及低耦合为什么便于修<span class="nb">改和替换.</span> </li>
-    <li><b>解释</b>分层架构: 下层为上层服务; 封闭、开放架构, 客户端/服务器; OSI 七层模型、<span class="nb">三层架构各层的职责.</span> </li>
-    <li><b>会用</b>包来组织程序 (文件夹 + __init__.py), <span class="nb">能画 UML 包图.</span> </li>
-    <li><b>应用</b> Python 的包导入: import paket.modul、from paket import modul、from paket.modul import name <span class="nb">的区别.</span> </li>
-    <li><b>解释</b>版本管理的目的和任务; 集中式和分布式的区别 (commit / <span class="nb">update).</span> </li>
-    <li><b>应用</b> Python 的正则表达式: 选择、括号、字符类、预定义字符类、* + ? {m,n}; re.fullmatch、re.search、re.sub, Match 对象的 <span class="nb">start/end/group.</span> </li>
-  </ol>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Softwareentwicklungsprozesse differenzieren</b>: 能说出并区分瀑布、增量、迭代几种开发过程 <span class="nb">(<a href="#prozesse">开发过程</a>).</span></li>
+    <li><b>Grundprinzipien der Systemarchitektur, Schichtenarchitektur erklären</b>: 能讲清系统架构的基本原则和分层架构 (<a href="#architektur">系统架构的基本原则</a>、<span class="nb"><a href="#schichten">分层架构</a>).</span></li>
+    <li><b>Pakete gebrauchen, Paketimport anwenden</b>: 会用包组织程序, <span class="nb">并会导入包 (<a href="#pakete">包</a>).</span></li>
+    <li><b>Zweck von Versionskontrolle erklären</b>: 能讲清版本管理解决什么问题 <span class="nb">(<a href="#version">版本管理</a>).</span></li>
+    <li><b>Reguläre Ausdrücke in Python anwenden</b>: 会用 re 模块写正则表达式 (<span class="nb"><a href="#regex">Python 中的正则表达式</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">

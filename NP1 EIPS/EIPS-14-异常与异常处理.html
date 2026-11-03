@@ -1165,8 +1165,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>错误来源和<b>健壮</b>的程序; <b>Ausnahme 异常</b> (英语 exception): 怎样<b>抛出</b> (raise)、怎样<b>处理</b> (try、except、finally、else)、Python 已有的异常和自己定义的异常; 文件访问: 打开 (包括 with 语句)、读、写; <span class="nb">assert 语句.</span> </p>
+  <p>本章讲程序出错时怎么办: 异常的抛出和处理, 另外加上文件读写和 assert. 重点是 try、except、finally、<span class="nb">else 的执行顺序.</span></p>
 </div>
+
+
 
 <!-- ======================= FEHLERQUELLEN ======================= -->
 
@@ -2299,16 +2301,18 @@ Aber immerhin wurde ich ausgefuehrt!</pre>
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li><b>说出、解释</b>错误来源 (设计错误、逻辑编程错误、可避免的运行时错误、无法避免的外部情况), 并在例子程序里<span class="nb"><b>认出</b>它们.</span> </li>
-    <li><b>说出</b> Python 的异常类型: ValueError、TypeError、ZeroDivisionError (ArithmeticError)、IndexError、KeyError、OSError / FileNotFoundError、RecursionError 等, <span class="nb">以及它们的继承关系.</span> </li>
-    <li><b>使用</b>异常: raise 抛出; try / except / else / finally 处理 (执行顺序、多个 except 的匹配顺序、元组、as e、单独的 raise); 继承 Exception 定义自己的异常 (属性、<span class="nb">__str__).</span> </li>
-    <li><b>实现</b>健壮的程序: 读入时循环 + try, 只捕获外部错误, <span class="nb">不吞掉逻辑错误.</span> </li>
-    <li><b>使用</b>文件访问: open 和模式 (r/w/a/x, t/b)、read、readline、readlines、write、close, <span class="nb">以及 with 语句.</span> </li>
-    <li><b>使用</b> assert <span class="nb">写下程序的假设.</span> </li>
-  </ol>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Fehlerquellen benennen und erkennen</b>: 能说出程序出错的来源, 并在例子程序里指出来 (<a href="#fehlerquellen">错误来源</a>、<span class="nb"><a href="#erkennen">识别异常情况</a>).</span></li>
+    <li><b>Typen von Ausnahmen benennen</b>: 能说出 Python 常见的异常类型 <span class="nb">(<a href="#mehrere">多个异常类型</a>).</span></li>
+    <li><b>Ausnahmen auslösen, behandeln, definieren</b>: 会用 raise、try/except/else/finally, 并会自定义异常 (<a href="#try">try 和 except</a>、<a href="#eigene">自定义异常</a>、<a href="#finally">finally 块</a>、<span class="nb"><a href="#else">else 块</a>).</span></li>
+    <li><b>Robuste Programme implementieren</b>: 会写出对错误输入也不崩溃的程序 <span class="nb">(<a href="#vermeiden">避免异常</a>).</span></li>
+    <li><b>Dateizugriff</b>: 会打开、读取、写入文件, 并用 with 自动关闭 (<a href="#datei">文件访问</a>、<span class="nb"><a href="#with">with 语句</a>).</span></li>
+    <li><b>Assert verwenden</b>: 会用 assert 检查程序的假设 (<span class="nb"><a href="#assert">assert 语句</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">

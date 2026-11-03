@@ -1306,6 +1306,10 @@
   <p><b>Learning goals</b></p>
 <ul><li>Risk minimization and ERM <span class="nb">recap</span></li><li>Bayes optimal model, <span class="nb">Bayes risk</span></li><li>Bayes regret, estimation and approximation <span class="nb">error</span></li><li>Optimal constant <span class="nb">model</span></li><li>Consistency</li></ul>
 </div>
+<div class="zh">
+  <p>这一章从回顾经验风险最小化开始, 第一节给出整章的基本概念. 重点是贝叶斯最优模型和贝叶斯遗憾的分解: <span class="nb">估计误差加近似误差.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 4</span>
@@ -1602,6 +1606,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Statistical <span class="nb">properties</span></li><li>Robustness</li><li>Optimization <span class="nb">properties</span></li><li>Some fundamental <span class="nb">terminology</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讨论选损失函数时要看哪些性质. 重点是统计性质、稳健性和优化性质三个角度, 以及对称、<span class="nb">凸这些基本术语.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 18</span>
@@ -1742,10 +1750,12 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Concept of <span class="nb">pseudo-residuals</span></li><li>PRs for common <span class="nb">losses</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>伪残差把回归里「残差」的想法推广到任意可导损失: 它告诉我们每个点的预测该往哪个方向改、改多少. 这是第 8 章 <b>gradient boosting 梯度提升</b> 的核心: 每一轮用一个基学习器去拟合当前的伪残差. 封面小图就是 S. 27–28 的例子: 一条拟合直线和一个<span class="nb">点的残差.</span></p>
+  <p>这一节把回归的残差推广到任意可导损失, 为第 8 章梯度提升做准备. 重点是伪残差就是损失的负梯度, <span class="nb">要会对常见损失算出来.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 26</span>
@@ -1762,6 +1772,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+  <p>伪残差把回归里「残差」的想法推广到任意可导损失: 它告诉我们每个点的预测该往哪个方向改、改多少. 这是第 8 章 <b>gradient boosting 梯度提升</b> 的核心: 每一轮用一个基学习器去拟合当前的伪残差. 封面小图就是 S. 27–28 的例子: 一条拟合直线和一个<span class="nb">点的残差.</span></p>
+
   <p>易错: 这里是对<b>预测值</b> <span class="katex" data-o="\(f(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> 求导, 把它当成一个普通实数变量, 不是对参数 <span class="katex" data-o="\(\boldsymbol\theta\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord"><span class="mord"><span class="mord boldsymbol" style="margin-right:0.0319em;">θ</span></span></span></span></span></span> 求导. 对参数的导数在 S. <span class="nb">31 才出现.</span></p>
   <p>负号的作用: 导数指向损失上升的方向, 取负就是损失下降的方向. 为什么叫「残差」: 对 <span class="katex" data-o="\(\frac{1}{2}(y - f)^2\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>, 负导数是 <span class="katex" data-o="\(y - f\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span>, 正好是普通残差; 对图里的 <span class="katex" data-o="\((y - f)^2\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>, 得到 <span class="katex" data-o="\(2(y - f)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mclose">)</span></span></span></span>, 方向相同, <span class="nb">大小差因子 2.</span></p>
   <p>读图: 黑色抛物线是 <span class="katex" data-o="\((y - f)^2\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>, 横轴是 <span class="katex" data-o="\(y - f\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span>. 蓝线是在 <span class="katex" data-o="\(y - f = 1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 处的切线, 斜率是 2 (对 <span class="katex" data-o="\(y - f\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span> 求导). 对 f 求导要再乘 -1, 所以伪残差 = 2 > 0: <span class="nb">应当把 f 调大.</span></p>
@@ -1872,6 +1884,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v1800 v585 h43z"/></svg></span></span
   <p><b>Learning goals</b></p>
 <ul><li>L2 loss and risk <span class="nb">minimizers</span></li><li>L1 loss and risk <span class="nb">minimizers</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节推导 L2 和 L1 损失的风险最小化器. 重点是 L2 的最优解是条件期望, <span class="nb">L1 的是条件中位数.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 34</span>
@@ -2015,10 +2031,12 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v1800 v585 h43z"/></svg></span></span
   <p><b>Learning goals</b></p>
 <ul><li>Derive the risk minimizer of the <span class="nb">L1-loss</span></li><li>Derive the optimal constant model for the <span class="nb">L1-loss</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>S. 40 只给出了结论, 这一节补证明. 两个证明用的工具不同: 总体版本假设 <span class="katex" data-o="\(y\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 有密度, 对 <span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 求导, 难点是 <span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 出现在积分上下限里, 要用 Leibniz 法则; 经验版本的经验分布是离散的, 没有密度可以求导, 改用「首尾配对」的初等论证. 两条路都落在「左右各一半」这个中位数<span class="nb">的定义上.</span></p>
+  <p>这一节补上 L1 风险最小化器的证明. 重点是两种证明的工具不同, 但都落到中位数「左右各一半」<span class="nb">的定义上.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 42</span>
@@ -2032,6 +2050,8 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v1800 v585 h43z"/></svg></span></span
 </div>
 
 <div class="zh">
+  <p>S. 40 只给出了结论, 这一节补证明. 两个证明用的工具不同: 总体版本假设 <span class="katex" data-o="\(y\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 有密度, 对 <span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 求导, 难点是 <span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 出现在积分上下限里, 要用 Leibniz 法则; 经验版本的经验分布是离散的, 没有密度可以求导, 改用「首尾配对」的初等论证. 两条路都落在「左右各一半」这个中位数<span class="nb">的定义上.</span></p>
+
   <p>第一步拆绝对值: <span class="katex" data-o="\(y \lt c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7335em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 时 <span class="katex" data-o="\(|y-c| = -(y-c)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mclose">)</span></span></span></span>, <span class="katex" data-o="\(y \ge c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8304em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 时 <span class="katex" data-o="\(|y-c| = y-c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span>, 所以按 <span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 把积分区间切成两段. 求导那一步的细节在下一页: 边界项为 0, 只剩被积函数对 <span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 的偏导, 左段 <span class="katex" data-o="\(\partial_c[-(y-c)] = +1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0556em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">[</span><span class="mord">−</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mclose">)]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">1</span></span></span></span>, 右段 <span class="katex" data-o="\(\partial_c[(y-c)] = -1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord" style="margin-right:0.0556em;">∂</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0556em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">[(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mclose">)]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1</span></span></span></span>. 结果有清楚的含义: 导数 = 「<span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 左边的概率」减「<span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 右边的概率」, 和 S. <span class="nb">40 的挪动直觉一致.</span></p>
   <p>为什么是最小值 (课件没说): 导数 <span class="katex" data-o="\(2F(c) - 1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord mathnormal">c</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> (<span class="katex" data-o="\(F\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span> 是分布函数) 随 <span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 单调不减, 从 −1 增到 +1, 先负后正, 所以驻点是最小点. 这也说明 <span class="katex" data-o="\(\mathbb{E}|y-c|\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">E</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mord">∣</span></span></span></span> 是 <span class="katex" data-o="\(c\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> 的凸函数. 条件版本把 <span class="katex" data-o="\(p(y)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span> 换成 <span class="katex" data-o="\(p(y \mid \mathbf{x} = \tilde{\mathbf{x}})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4444em;"></span><span class="mord mathbf">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6813em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathbf">x</span></span><span style="top:-3.3634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>, 证明一字不改, <span class="nb">得到条件中位数.</span></p>
 </div>
@@ -2167,10 +2187,12 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Huber <span class="nb">loss</span></li><li>Log-Cosh <span class="nb">loss</span></li><li>Cauchy <span class="nb">loss</span></li><li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ϵ</span></span></span></span>-Insensitive <span class="nb">loss</span></li><li>Quantile <span class="nb">loss</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>这五种损失都是在 L2 和 L1 之间做取舍或改造. Huber 和 log-cosh 想同时要 L2 的光滑和 L1 的稳健; Cauchy 比 L1 更稳健, 代价是不凸; <span class="katex" data-o="\(\epsilon\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ϵ</span></span></span></span>-不敏感损失让小误差完全不计; 分位数损失让高估和低估的代价不对称, 从而预测分位数而不是中心. 读每一种时都可以问三件事: 大残差处增长多快 (稳健性), 是否凸、是否可导 (好不好优化), 风险最小化器是什么 (模型到底在<span class="nb">估计什么).</span></p>
+  <p>这一节介绍五种更高级的回归损失. 重点是每一种怎样在 L2 和 L1 之间取舍, 尤其是分位数损<span class="nb">失的用途.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 48</span>
@@ -2185,6 +2207,8 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
 </div>
 
 <div class="zh">
+  <p>这五种损失都是在 L2 和 L1 之间做取舍或改造. Huber 和 log-cosh 想同时要 L2 的光滑和 L1 的稳健; Cauchy 比 L1 更稳健, 代价是不凸; <span class="katex" data-o="\(\epsilon\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ϵ</span></span></span></span>-不敏感损失让小误差完全不计; 分位数损失让高估和低估的代价不对称, 从而预测分位数而不是中心. 读每一种时都可以问三件事: 大残差处增长多快 (稳健性), 是否凸、是否可导 (好不好优化), 风险最小化器是什么 (模型到底在<span class="nb">估计什么).</span></p>
+
   <p>第二点的意思是: 每个损失都对应一个误差分布, 用这个损失做 ERM 等价于在这个分布下做最大似然 (L2 对正态, L1 对 Laplace, 见 <a href="#c1-mle">最大似然与经验风险最小化</a>). 换损失就是换噪声假设. 第四点的例子是分位数损失: 目标不再是条件均值, <span class="nb">而是条件分位数.</span></p>
   <p>读图: 横轴是残差, 范围 −2 到 2. 分位数损失 (<span class="katex" data-o="\(\alpha = 0.7\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.7</span></span></span></span>, 黄绿实线) 左右斜率不同, 右边 2 处为 1.4, 左边 −2 处为 0.6; <span class="katex" data-o="\(\epsilon\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ϵ</span></span></span></span>-不敏感损失 (<span class="katex" data-o="\(\epsilon = 0.8\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ϵ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.8</span></span></span></span>) 在 <span class="katex" data-o="\([-0.8, 0.8]\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">−</span><span class="mord">0.8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.8</span><span class="mclose">]</span></span></span></span> 上为 0, 2 处为 1.2; Cauchy (深紫) 增长最慢, 2 处约 0.8; log-cosh 在 2 处约 1.32. 图中 Huber 那条点线的数值和图例不符, <span class="nb">见下面红框.</span></p>
 </div>
@@ -2375,6 +2399,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>0-1 loss</li><li>Risk minimizer(s) / Optim. <span class="nb">predictions</span></li><li>Bayes error <span class="nb">rate</span></li><li>Generative approach in <span class="nb">classification</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节转到分类, 从最直接的 0-1 损失开始. 重点是它的最优预测就是取后验概率最大的类, 以及贝叶斯错误<span class="nb">率的含义.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 59</span>
@@ -2504,15 +2532,21 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Bernoulli (log, logistic, binomial, cross-entropy) <span class="nb">loss</span></li><li>Risk <span class="nb">minimizer</span></li><li>Optimal <span class="nb">constant</span></li><li>Complete separation <span class="nb">problem</span></li></ul>
 </div>
-
 <div class="zh">
-<p>这一节的主角是二分类里最常用的损失. 名字多是因为它从不同角度都能推出来: 从 Bernoulli 似然 (统计), 从 logistic 回归 (模型), 从 <b>cross-entropy 交叉熵</b> (信息论). 后面会看到同一个损失可以写在概率 <span class="katex" data-o="\(\pi(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> 上、分数 <span class="katex" data-o="\(f(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> 上和间隔 <span class="katex" data-o="\(y f(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> 上, 三种写法完全等价. <b>complete separation 完全可分</b>指训练数据能被一个超平面完全分开, 这时 logistic 回归反而找不到最优解 (S. <span class="nb">73).</span></p>
+  <p>这一节讲二分类最常用的 Bernoulli 损失. 重点是它的几种写法其实是同一个损失, 以及数据完全可分时出<span class="nb">现的问题.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 66</span>
   <p><b>On probabilities</b></p>
 </div>
+<div class="zh">
+<p>这一节的主角是二分类里最常用的损失. 名字多是因为它从不同角度都能推出来: 从 Bernoulli 似然 (统计), 从 logistic 回归 (模型), 从 <b>cross-entropy 交叉熵</b> (信息论). 后面会看到同一个损失可以写在概率 <span class="katex" data-o="\(\pi(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> 上、分数 <span class="katex" data-o="\(f(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> 上和间隔 <span class="katex" data-o="\(y f(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> 上, 三种写法完全等价. <b>complete separation 完全可分</b>指训练数据能被一个超平面完全分开, 这时 logistic 回归反而找不到最优解 (S. <span class="nb">73).</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 67</span>
@@ -2682,6 +2716,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Derive the gradient of the logistic <span class="nb">regression</span></li><li>Derive the Hessian of the logistic <span class="nb">regression</span></li><li>Show that the logistic regression is a convex <span class="nb">problem</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节深入推导逻辑回归. 重点是梯度和 Hessian 的推导, 以及由此证明它<span class="nb">是凸问题.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 76</span>
@@ -2792,10 +2830,12 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Scoring rules on prob. <span class="nb">predictions</span></li><li>First order condition <span class="nb">of SRs</span></li><li>Log loss and Brier are strictly <span class="nb">proper</span></li><li>L1 on probs <span class="nb">is not</span></li><li>0/1 is proper but not <span class="nb">strict</span></li></ul>
 </div>
-
 <div class="zh">
-<p>这一节回答一个问题: 什么样的概率损失, 在训练时会把预测推向真实概率? 前面已经算出 log 损失的风险最小化器是 <span class="katex" data-o="\(\eta(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> (S. 70); 这里把这个性质抽象成 <b>proper 适当</b>, 并给出判断和构造这类损失的方法. 一阶条件指期望损失对 <span class="katex" data-o="\(\pi\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span></span></span></span> 求导在 <span class="nb"><span class="katex" data-o="\(\pi=\eta\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span></span></span></span> 处为 0.</span></p>
+  <p>这一节讨论什么样的损失能让概率预测说真话. 重点是对数损失和 Brier 分数是严格适当的, 而概率上的 L1 <span class="nb">损失不是.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 82</span>
@@ -2813,6 +2853,8 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+<p>这一节回答一个问题: 什么样的概率损失, 在训练时会把预测推向真实概率? 前面已经算出 log 损失的风险最小化器是 <span class="katex" data-o="\(\eta(\mathbf{x})\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> (S. 70); 这里把这个性质抽象成 <b>proper 适当</b>, 并给出判断和构造这类损失的方法. 一阶条件指期望损失对 <span class="katex" data-o="\(\pi\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span></span></span></span> 求导在 <span class="nb"><span class="katex" data-o="\(\pi=\eta\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span></span></span></span> 处为 0.</span></p>
+
 <p>记号: <span class="katex" data-o="\(Q\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span> 是真实的标签分布 (二分类时由 <span class="katex" data-o="\(\eta=\mathbb{P}(y=1)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 决定), <span class="katex" data-o="\(P\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span></span></span></span> 是我们给出的预测分布 (由 <span class="katex" data-o="\(\pi\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span></span></span></span> 决定). <span class="katex" data-o="\(S(Q,P)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="mopen">(</span><span class="mord mathnormal">Q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mclose">)</span></span></span></span> 回答「如果标签真的按 <span class="katex" data-o="\(Q\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span> 产生, 我报 <span class="katex" data-o="\(P\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span></span></span></span> 平均要付多少损失」. 二分类时具体写出来就是 <span class="katex" data-o="\(\eta L(1,\pi)+(1-\eta)L(0,\pi)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mord mathnormal">L</span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">η</span><span class="mclose">)</span><span class="mord mathnormal">L</span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mclose">)</span></span></span></span>, 正是 S. 70 证明里被逐点最小化的那个式子. 所以「最小化 <span class="katex" data-o="\(S\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0576em;">S</span></span></span></span>」和「求风险最小化器」是同一件事, 只是换了统计学文<span class="nb">献的语言.</span></p>
 </div>
 
@@ -2966,6 +3008,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Brier score / L2 loss on <span class="nb">probabilities</span></li><li>Derivation of risk <span class="nb">minimizer</span></li><li>Optimal constant <span class="nb">model</span></li><li>L1 loss on <span class="nb">probabilities</span></li><li>Calibration</li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲直接在概率上用 L2 和 L1 损失. 重点是 Brier 分数的风险最小化器, <span class="nb">以及它和校准的关系.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 90</span>
@@ -3066,6 +3112,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>(squared) Hinge <span class="nb">loss</span></li><li>L2 loss defined on <span class="nb">scores</span></li><li>Exponential <span class="nb">loss</span></li><li>AUC loss</li></ul>
 </div>
+<div class="zh">
+  <p>这一节介绍几种定义在分数上的分类损失. 重点是 hinge 损失和指数损失各是 0-1 <span class="nb">损失的哪种光滑近似.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 97</span>
@@ -3169,10 +3219,12 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Derive the optimal constant model for the binary empirical log loss <span class="nb">risk</span></li><li>Derive the optimal constant model for the empirical multiclass log loss <span class="nb">risk</span></li></ul>
 </div>
-
 <div class="zh">
-  <p><b>optimal constant model 最优常数模型</b>指不看特征 <span class="katex" data-o="\(x\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>、对所有观测都给同一个预测的模型. 对概率型损失, 这个「预测」是一个概率 (二分类) 或一个概率向量 (多分类). 它有两个用处: 一是作为最朴素的基线, 任何真正用到特征的模型都应该比它好; 二是决策树的叶节点本身就是常数模型, 下一节 (<a href="#c1-trees">1.14</a>) 用到这里的结论. 答案很直观: 最优概率就是训练集里各类的比例; 这一节用求导把它证出来, <span class="nb">并检查确实是最小点.</span></p>
+  <p>这一节推导对数损失下的最优常数模型. 重点是二分类和多分类的结果都是训练集里的<span class="nb">类别比例.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 103–104</span>
@@ -3185,6 +3237,8 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+  <p><b>optimal constant model 最优常数模型</b>指不看特征 <span class="katex" data-o="\(x\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>、对所有观测都给同一个预测的模型. 对概率型损失, 这个「预测」是一个概率 (二分类) 或一个概率向量 (多分类). 它有两个用处: 一是作为最朴素的基线, 任何真正用到特征的模型都应该比它好; 二是决策树的叶节点本身就是常数模型, 下一节 (<a href="#c1-trees">1.14</a>) 用到这里的结论. 答案很直观: 最优概率就是训练集里各类的比例; 这一节用求导把它证出来, <span class="nb">并检查确实是最小点.</span></p>
+
   <p>推导逐步看: 第一步逐项求导, 用 <span class="katex" data-o="\((\log\theta)&#x27; = 1/\theta\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span> 和 <span class="katex" data-o="\((\log(1-\theta))&#x27; = -1/(1-\theta)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mclose">)</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mord">1/</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mclose">)</span></span></span></span>. 第二步两边乘以正数 <span class="katex" data-o="\(\theta(1-\theta)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mclose">)</span></span></span></span> 去分母, 零点不变. 第三步展开括号: <span class="katex" data-o="\(y-y\theta-\theta+\theta y = y-\theta\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span>, 交叉项抵消, 所以条件变成 <span class="katex" data-o="\(n\theta = \sum_i y^{(i)}\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">n</span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1877em;vertical-align:-0.2997em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2997em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight">i</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span></span>, <span class="nb">解就是正类的比例.</span></p>
   <p>为什么要「两种标签都出现」: 如果全是 1, 比例是 1, 不在开区间 <span class="katex" data-o="\((0,1)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 里, <span class="katex" data-o="\(\log(1-\theta)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mclose">)</span></span></span></span> 在那里无定义; 此时风险随 <span class="katex" data-o="\(\theta\to 1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 单调下降到 0, 没有可达到的最小点 (和 S. 73 完全可分是同<span class="nb">一个现象).</span></p>
   <p>例子: <span class="katex" data-o="\(y=(1,1,0,1,0)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span></span></span></span>, <span class="katex" data-o="\(\hat\theta=0.6\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9579em;"></span><span class="mord katex-accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.6</span></span></span></span>. 算几个值: <span class="katex" data-o="\(\theta=0.5\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span></span></span></span> 时风险 3.466, <span class="katex" data-o="\(\theta=0.6\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.6</span></span></span></span> 时 3.365, <span class="katex" data-o="\(\theta=0.7\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.7</span></span></span></span> 时 3.478, <span class="nb">最小点确实在 0.6.</span></p>
@@ -3281,10 +3335,12 @@ l0,-3144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
   <p><b>Learning goals</b></p>
 <ul><li>Tree splitting loss vs <span class="nb">impurity:</span></li><li>Bernoulli loss <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">∼</span></span></span></span> entropy <span class="nb">splitting</span></li><li>Brier score <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.3669em;"></span><span class="mrel">∼</span></span></span></span> gini <span class="nb">splitting</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>CART 选分裂时通常用 <b>impurity 不纯度</b> (熵或 Gini 指数), 这看起来是一套和「损失函数 + 风险最小化」无关的启发式规则. 这一节说明两者其实是同一件事: 在每个子节点里用某个损失拟合最优常数, 把损失加起来, 选总损失最小的分裂, 结果和用对应的不纯度选出的完全相同. 证明要用到上一节 (<a href="#c1-logconst">1.13</a>) 的结论: <span class="nb">最优常数是类别比例.</span></p>
+  <p>这一节把损失函数和决策树的分裂准则联系起来. 重点是 Bernoulli 损失对应熵, Brier <span class="nb">分数对应基尼系数.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 110</span>
@@ -3299,6 +3355,8 @@ l0,-3144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
 </div>
 
 <div class="zh">
+  <p>CART 选分裂时通常用 <b>impurity 不纯度</b> (熵或 Gini 指数), 这看起来是一套和「损失函数 + 风险最小化」无关的启发式规则. 这一节说明两者其实是同一件事: 在每个子节点里用某个损失拟合最优常数, 把损失加起来, 选总损失最小的分裂, 结果和用对应的不纯度选出的完全相同. 证明要用到上一节 (<a href="#c1-logconst">1.13</a>) 的结论: <span class="nb">最优常数是类别比例.</span></p>
+
   <p>两种汇总方式不一样: 不纯度是「平均」量, 要按节点大小加权; 风险是「总和」量, 节点大的自然贡献多, 直接相加即可. 后面两页要证明的是: 对熵和对数损失、Gini 和 Brier 分数这两对, 都有 <span class="katex" data-o="\(\mathcal{R}(N) = n_N\,\text{Imp}(N)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">R</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.109em;">N</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">Imp</span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mclose">)</span></span></span></span>. 一旦这成立, <span class="katex" data-o="\(\mathcal{R}(\text{split}) = n_0\,\text{Imp(split)}\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal">R</span><span class="mopen">(</span><span class="mord text"><span class="mord">split</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">Imp(split)</span></span></span></span></span>, 而 <span class="katex" data-o="\(n_0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 对同一个父节点的所有候选分裂都相同, 两种做法选出的最佳<span class="nb">分裂一样.</span></p>
   <p>易错: 子节点不相交且并起来是父节点, 意思是每个观测恰好进一个子节点, 所以 <span class="katex" data-o="\(n_1+n_2=n_0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, 权重 <span class="katex" data-o="\(n_1/n_0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>、<span class="katex" data-o="\(n_2/n_0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 加<span class="nb">起来为 1.</span></p>
 </div>
@@ -3384,10 +3442,12 @@ l0,-144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
   <p><b>Learning goals</b></p>
 <ul><li>Max. lik. and ERM are the <span class="nb">same</span></li><li>Gaussian errors = L2 <span class="nb">loss</span></li><li>Laplace errors = L1 <span class="nb">loss</span></li><li>Bernoulli targets vs. <span class="nb">log loss</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>到目前为止, 损失函数被当作「人为选择」的东西. 这一节从统计学的角度给它一个来源: 先假设 <span class="katex" data-o="\(y\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 给定 <span class="katex" data-o="\(x\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 的条件分布, 再用 <b>maximum likelihood 最大似然</b>估计参数; 把负对数似然当作损失, 最大似然就变成 <b>ERM 经验风险最小化</b>. 由此每个常见损失都对应一个噪声分布. 反过来, 选损失时其实就隐含地在假设噪<span class="nb">声的形状.</span></p>
+  <p>这一节说明最大似然和经验风险最小化其实是同一件事. 重点是误差分布和损失的对应: 高斯对 L2, <span class="nb">拉普拉斯对 L1.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 117</span>
@@ -3406,6 +3466,8 @@ l0,-144c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
 </div>
 
 <div class="zh">
+  <p>到目前为止, 损失函数被当作「人为选择」的东西. 这一节从统计学的角度给它一个来源: 先假设 <span class="katex" data-o="\(y\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 给定 <span class="katex" data-o="\(x\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 的条件分布, 再用 <b>maximum likelihood 最大似然</b>估计参数; 把负对数似然当作损失, 最大似然就变成 <b>ERM 经验风险最小化</b>. 由此每个常见损失都对应一个噪声分布. 反过来, 选损失时其实就隐含地在假设噪<span class="nb">声的形状.</span></p>
+
   <p>读图: 黑线是线性的 <span class="katex" data-o="\(f_{\text{true}}\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">true</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, 灰点是观测. 在 <span class="katex" data-o="\(x=-2, 0, 2\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">−</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span></span></span></span> 三处画了竖直虚线, 旁边的橙色曲线是该处 <span class="katex" data-o="\(y\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 的条件密度, 一个以 <span class="katex" data-o="\(f_{\text{true}}(x)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">true</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> 为中心、方差为 1 的高斯分布. 点就是从这些竖直方向的分布里<span class="nb">抽出来的.</span></p>
   <p>两个假设的作用: <span class="katex" data-o="\(\mathbb{E}[\epsilon]=0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">E</span><span class="mopen">[</span><span class="mord mathnormal">ϵ</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 让 <span class="katex" data-o="\(\mathbb{E}[y\mid x] = f_{\text{true}}(x)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathbb">E</span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">x</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">true</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span>, 即真实函数就是条件均值; <span class="katex" data-o="\(\epsilon\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">ϵ</span></span></span></span> 与 <span class="katex" data-o="\(x\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 独立让噪声的形状和大小在每个 <span class="katex" data-o="\(x\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 处都一样 (同方差). 于是 <span class="katex" data-o="\(y\mid x\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 的分布就是噪声分布平移 <span class="katex" data-o="\(f_{\text{true}}(x)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">true</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span>, 只要知道噪声分布, 就能写出每个观<span class="nb">测的似然.</span></p>
 </div>
@@ -3611,6 +3673,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v0 v585 h43z"/></svg></span></span></
   <p><b>Learning goals</b></p>
 <ul><li>Decompose GE of learner into: bias of learner, variance of learner, inherent noise of <span class="nb">data</span></li><li>Simulation study <span class="nb">demo</span></li><li>Capacity and <span class="nb">overfitting</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节把学习器的泛化误差拆成三部分. 重点是偏差、方差和噪声各自的含义, 以及模型容量怎样影<span class="nb">响前两者.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 128</span>
@@ -3894,6 +3960,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v1200 v585 h43z"/></svg></span></span
   <p><b>Learning goals</b></p>
 <ul><li>Decomposing excess <span class="nb">risk</span></li><li>Into estimation, approx. and optim. <span class="nb">error</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节换一个角度分解超额风险. 重点是估计误差、近似误差和优化误差各来自哪里, 以及它们怎样随模型<span class="nb">容量变化.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 143</span>
@@ -4076,6 +4146,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Understand how to decompose the generalization error of a learner under L2 loss into: Bias of the learner, Variance, Inherent noise in the <span class="nb">data</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节在 L2 损失下严格推导偏差–方差分解. 重点是推导中哪几项交叉项为零, <span class="nb">要会自己推一遍.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 148</span>
@@ -4240,6 +4314,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know what multiclass means and which types of classifiers <span class="nb">exist</span></li><li>Know the MC <span class="nb">0-1-loss</span></li><li>Know the MC brier <span class="nb">score</span></li><li>Know the MC logarithmic <span class="nb">loss</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一章从二分类推广到多分类, 先定义多分类的损失. 重点是 0-1 损失、Brier 分数和对数损失在多分类<span class="nb">下的写法.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 154</span>
@@ -4410,6 +4488,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know softmax <span class="nb">regression</span></li><li>Understand that softmax regression is a generalization of logistic <span class="nb">regression</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节把逻辑回归推广成 softmax 回归. 重点是 softmax 函数的形式, 以及两类时它退化成<span class="nb">逻辑回归.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 167</span>
@@ -4573,6 +4655,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Reduce a multiclass problem to multiple binary problems in a <span class="nb">model-agnostic way</span></li><li>Know one-vs-rest <span class="nb">reduction</span></li><li>Know one-vs-one <span class="nb">reduction</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节用另一种思路: 把多分类拆成若干个二分类问题. 重点是一对其余和一对一两种拆<span class="nb">法的区别.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 178</span>
@@ -4728,10 +4814,12 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know what a <span class="nb">codebook is</span></li><li>Understand that codebooks generalize one-vs-one and <span class="nb">one-vs-rest</span></li><li>Know how to define a good codebook and error-correcting output codes <span class="nb">(ECOC)</span></li><li>Know how randomized hill-climbing algorithm is used to find good <span class="nb">codebooks</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>这一节接着前面的多分类归约: 把 <span class="katex" data-o="\(g\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span> 类问题拆成若干个二分类问题. 一对其余和一对一是两种固定的拆法, <b>codebook 编码本</b> 把「怎么拆」写成一张表, 于是可以设计任意拆法. 后半节问哪张表最好, 答案借用通信里纠错码的思想: 让各类的编码彼此离得远, 个别二分类器出错时仍能解码出正确的类, 这就是 <b>error-correcting output codes (ECOC) 纠错输出码</b>.</p>
+  <p>这一节用编码本统一描述各种拆法. 重点是好编码本的标准, 以及纠错输出码为什么能纠正个别分类<span class="nb">器的错误.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 189–190</span>
@@ -4753,6 +4841,8 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
 </div>
 
 <div class="zh">
+  <p>这一节接着前面的多分类归约: 把 <span class="katex" data-o="\(g\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span> 类问题拆成若干个二分类问题. 一对其余和一对一是两种固定的拆法, <b>codebook 编码本</b> 把「怎么拆」写成一张表, 于是可以设计任意拆法. 后半节问哪张表最好, 答案借用通信里纠错码的思想: 让各类的编码彼此离得远, 个别二分类器出错时仍能解码出正确的类, 这就是 <b>error-correcting output codes (ECOC) 纠错输出码</b>.</p>
+
   <p>怎么读这张表: 列 <span class="katex" data-o="\(f_j\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 是一个二分类任务. 某类在这一列上是 1, 这一类的样本在训练 <span class="katex" data-o="\(f_j\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 时当正类; 是 <span class="katex" data-o="\(-1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1</span></span></span></span> 就当负类; 是 0 就不参与 <span class="katex" data-o="\(f_j\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 的训练. 第 <span class="katex" data-o="\(k\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 行 (<b>codeword 码字</b>) 是类 <span class="katex" data-o="\(k\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 在所有分类器上的「<span class="nb">期望输出」.</span></p>
   <ul>
     <li>左表 (一对其余): 对角线是 1, 其余是 <span class="katex" data-o="\(-1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">1</span></span></span></span>. <span class="katex" data-o="\(f_1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 就是「类 1 对其余」, 每个分类器都用<span class="nb">全部数据.</span></li>
@@ -4957,10 +5047,12 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Entropy measures expected information for <span class="nb">discrete RVs</span></li><li>Know entropy and its <span class="nb">properties</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>S. 201 是课程目录页, 高亮第 3 章 Information Theory. 这一章为后面打基础: 熵、交叉熵、KL 散度、互信息会反复出现在损失函数 (对数损失就是交叉熵)、决策树的分裂准则 (信息增益) 和最大似然的解释里. 本节只处理离散变量, 连续情形的微分熵后<span class="nb">面单独讲.</span></p>
+  <p>这一章引入信息论, 先讲离散随机变量的熵. 重点是熵作为「平均意外程度」的含义和它的<span class="nb">基本性质.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 203</span>
@@ -4974,6 +5066,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+  <p>S. 201 是课程目录页, 高亮第 3 章 Information Theory. 这一章为后面打基础: 熵、交叉熵、KL 散度、互信息会反复出现在损失函数 (对数损失就是交叉熵)、决策树的分裂准则 (信息增益) 和最大似然的解释里. 本节只处理离散变量, 连续情形的微分熵后<span class="nb">面单独讲.</span></p>
+
   <p>「获得的信息」和「减少的不确定性」是一回事: 观测之前我们对结果不确定, 观测之后不确定性消失, 消失的那部分就是得到的信息. 越难猜中的结果, <span class="nb">揭晓时带来的信息越多.</span></p>
   <p>「存储和传输」的一面是 Shannon 的原始动机: 熵恰好是无损压缩时平均每个符号至少需要的比特数. 例如一枚公平硬币的结果至少要 1 比特来记录, 一枚总是正面的硬币不需要<span class="nb">任何比特.</span></p>
 </div>
@@ -5149,10 +5243,12 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Further properties of entropy and joint <span class="nb">entropy</span></li><li>Understand that uniqueness theorem justifies choice of entropy <span class="nb">formula</span></li><li>Maximum entropy <span class="nb">principle</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>上一节的性质在这一节继续: 先补上「独立时可加」. 然后反过来问: 满足这些性质的度量是不是只有熵一种? 唯一性定理回答「是」, 所以熵的公式不是随手选的. 最后的最大熵原理把熵用作建模工具: 已知条件下选最不确定的分布, <span class="nb">它会推出指数族的形式.</span></p>
+  <p>这一节继续讲熵的性质和联合熵. 重点是唯一性定理为什么支持这个公式, <span class="nb">以及最大熵原理.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 214</span>
@@ -5164,6 +5260,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+  <p>上一节的性质在这一节继续: 先补上「独立时可加」. 然后反过来问: 满足这些性质的度量是不是只有熵一种? 唯一性定理回答「是」, 所以熵的公式不是随手选的. 最后的最大熵原理把熵用作建模工具: 已知条件下选最不确定的分布, <span class="nb">它会推出指数族的形式.</span></p>
+
   <p>读图: 左图是 <b>binary entropy function 二元熵函数</b> <span class="katex" data-o="\(H(s)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mclose">)</span></span></span></span>, 关于 <span class="katex" data-o="\(s = 0.5\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span></span></span></span> 对称, 顶点 <span class="katex" data-o="\((0.5, 1)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">0.5</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span>, 红线标出 <span class="katex" data-o="\(s = 0.3\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.3</span></span></span></span>; <span class="nb">右图是对应的 pmf.</span></p>
   <p>重算: <span class="katex" data-o="\(-\log_2 0.3 ≈ 1.737\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.3</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1.737</span></span></span></span>, <span class="katex" data-o="\(-\log_2 0.7 ≈ 0.515\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.7</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.515</span></span></span></span>, <span class="katex" data-o="\(H = 0.3 \times 1.737 + 0.7 \times 0.515 ≈ 0.881\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.3</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1.737</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">0.7</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.515</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.881</span></span></span></span>, <span class="nb">和图一致.</span></p>
   <p>为什么最大在 0.5: 求导 <span class="katex" data-o="\(H&#x27;(s) = \log_2 \frac{1-s}{s}\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">s</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight">s</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>, 在 <span class="katex" data-o="\(s = 0.5\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span></span></span></span> 处为 0, <span class="katex" data-o="\(s \lt 0.5\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span></span></span></span> 时为正, <span class="katex" data-o="\(s \gt 0.5\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span></span></span></span> 时为负. 这就是上一节「均匀最大」在 <span class="katex" data-o="\(g = 2\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 时的特例. 对称性 <span class="katex" data-o="\(H(s) = H(1-s)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">s</span><span class="mclose">)</span></span></span></span> 也就是 S. 208 的性质: <span class="nb">把两个概率对调熵不变.</span></p>
@@ -5303,10 +5401,12 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know that the entropy expresses expected information for <span class="nb">continuous RVs</span></li><li>Know the basic properties of the differential <span class="nb">entropy</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>连续变量没有「取某个值的概率」, 只有密度, 所以这一节把求和换成积分、概率换成密度, 得到 <b>differential entropy 微分熵</b>, 记号用小写 <span class="katex" data-o="\(h\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span> 和离散熵区分. 读这一节要盯住它和离散熵的不同: 可以为负, 会随变量缩放而改变, 也不是离散熵在 <span class="katex" data-o="\(\Delta \to 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Δ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 时的直接极限. 这些差别决定了它只能比较「同一单位下哪个分布更分散」, 不能当成「还需要多少比特」<span class="nb">的绝对量.</span></p>
+  <p>这一节把熵推广到连续随机变量. 重点是微分熵和离散熵的差别, <span class="nb">比如它可以是负的.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 222</span>
@@ -5323,6 +5423,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+  <p>连续变量没有「取某个值的概率」, 只有密度, 所以这一节把求和换成积分、概率换成密度, 得到 <b>differential entropy 微分熵</b>, 记号用小写 <span class="katex" data-o="\(h\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span> 和离散熵区分. 读这一节要盯住它和离散熵的不同: 可以为负, 会随变量缩放而改变, 也不是离散熵在 <span class="katex" data-o="\(\Delta \to 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Δ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 时的直接极限. 这些差别决定了它只能比较「同一单位下哪个分布更分散」, 不能当成「还需要多少比特」<span class="nb">的绝对量.</span></p>
+
   <p>为什么会负: 离散熵里 <span class="katex" data-o="\(p(x) \le 1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>, 每一项 <span class="katex" data-o="\(-\log p(x) \ge 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>. 密度没有这个上限, 分布越集中, 密度峰越高; 峰高过 1 的地方 <span class="katex" data-o="\(-\log f(x) \lt 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, 这些负的惊奇度加权后可以压过<span class="nb">其他部分.</span></p>
   <p>读图: 左图是 Beta(2,5) 的密度, 峰值约 2.46, 大部分质量在 <span class="katex" data-o="\(f \gt 1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的区间; 中图是惊奇度 <span class="katex" data-o="\(-\log f(x)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span>, 两端趋于无穷, 中间为负; 右图是被积函数 <span class="katex" data-o="\(f\log f\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span>, 阴影面积 (带负号) 就是 <span class="katex" data-o="\(h\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span>. 用闭式 <span class="katex" data-o="\(h = \ln B(a,b) - (a-1)\psi(a) - (b-1)\psi(b) + (a+b-2)\psi(a+b)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">ln</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0359em;">ψ</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0359em;">ψ</span><span class="mopen">(</span><span class="mord mathnormal">b</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mclose">)</span><span class="mord mathnormal" style="margin-right:0.0359em;">ψ</span><span class="mopen">(</span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">b</span><span class="mclose">)</span></span></span></span> (<span class="katex" data-o="\(\psi\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">ψ</span></span></span></span> 是 digamma 函数) 重算得 −0.4845 奈特, 和课件的 −0.<span class="nb">48 一致.</span></p>
   <p>「积分不一定存在」的例子: 密度在某点附近像 <span class="katex" data-o="\(1/(x\ln^2 x)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1484em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">ln</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8984em;"><span style="top:-3.1473em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> 那样极尖时, <span class="katex" data-o="\(-\int f\log f\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1111em;vertical-align:-0.3061em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-symbol small-op" style="margin-right:0.1945em;position:relative;top:-0.0006em;">∫</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span></span></span></span> <span class="nb">可以发散.</span></p>
@@ -5539,10 +5641,12 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know the KL divergence as distance between <span class="nb">distributions</span></li><li>Understand KL as expected <span class="nb">log-difference</span></li><li>Understand how KL can be used as <span class="nb">loss</span></li><li>Understand that KL is equivalent to the expected likelihood <span class="nb">ratio</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>这一节引入 <b>Kullback-Leibler divergence KL 散度</b>, 并从三个角度看它: 两条对数密度之差的平均 (S. 236–237), 拟合时要最小化的损失 (S. 238), 对数似然比的期望 (S. 239). 中间证明它非负 (S. 235). 「距离」要打引号: KL 不对称, 也不满足三角不等式. 后面 3.5、3.6 节会把 KL 和交叉熵、最大似然、对数损失连起来, 这里的定义和非负性是那些等价关<span class="nb">系的基础.</span></p>
+  <p>这一节用 KL 散度衡量两个分布的差距. 重点是它可以写成对数比值的期望, <span class="nb">并能当作损失使用.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 230</span>
@@ -5553,6 +5657,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+  <p>这一节引入 <b>Kullback-Leibler divergence KL 散度</b>, 并从三个角度看它: 两条对数密度之差的平均 (S. 236–237), 拟合时要最小化的损失 (S. 238), 对数似然比的期望 (S. 239). 中间证明它非负 (S. 235). 「距离」要打引号: KL 不对称, 也不满足三角不等式. 后面 3.5、3.6 节会把 KL 和交叉熵、最大似然、对数损失连起来, 这里的定义和非负性是那些等价关<span class="nb">系的基础.</span></p>
+
   <p>约定的理由: <span class="katex" data-o="\(\lim_{t\to 0^+} t\log t = 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop"><span class="mop">lim</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3419em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mrel mtight">→</span><span class="mord mtight"><span class="mord mtight">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7027em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="katex-sizing reset-size3 size1 mtight"><span class="mbin mtight">+</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, 所以 p 为 0 的点不贡献任何东西, 无论 q 在那里是多少. 反过来, p 有质量而 q 说「不可能」时, <span class="nb">对数比是 <span class="katex" data-o="\(+\infty\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">∞</span></span></span></span>.</span></p>
   <p>例子: p 是公平硬币 (0.5, 0.5), q 认为只会出正面 (1, 0). 反面那一项 <span class="katex" data-o="\(0.5\log(0.5/0) = \infty\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mopen">(</span><span class="mord">0.5/0</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span>, 所以 <span class="katex" data-o="\(D_{KL}(p\|q) = \infty\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">K</span><span class="mord mathnormal mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span>. 反方向 <span class="katex" data-o="\(D_{KL}(q\|p) = 1\cdot\log(1/0.5) + 0 = \log 2\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0715em;">K</span><span class="mord mathnormal mtight">L</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mord">∥</span><span class="mord mathnormal">p</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mopen">(</span><span class="mord">1/0.5</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span></span></span></span>, 有限. 所以用 q 近似 p 时, q 的支撑必须盖住 p <span class="nb">的支撑.</span></p>
   <p>易错: 「same support」并不是定义的前提, 只要 <span class="katex" data-o="\(p\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span> 的支撑包含在 <span class="katex" data-o="\(q\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span></span></span></span> 的支撑里, KL 就有限; <span class="nb">反过来的包含不要求.</span></p>
@@ -5733,10 +5839,12 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know the <span class="nb">cross-entropy</span></li><li>Understand the connection between entropy, cross-entropy, and KL <span class="nb">divergence</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>本节的核心只有一个恒等式: 交叉熵 = 熵 + KL. 熵是 p 本身的不确定性, 与 q 无关; KL 是用 q 代替 p 付出的额外代价. 先讲离散情形 (S. 241–242), 再讲连续情形 (S. 243), 然后用 3.4 节的正态和 Laplace 例子画出三者 (S. 244–245), 最后用 KL 非负证明 3.3 节留下的「方差给定时正态的微分熵最大」(S. 246–247). 下一节会说明, 机器学习里的交叉熵损失就<span class="nb">是这个量.</span></p>
+  <p>这一节引入交叉熵. 重点是熵、交叉熵和 KL <span class="nb">散度之间的恒等式.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 241</span>
@@ -5753,6 +5861,8 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+  <p>本节的核心只有一个恒等式: 交叉熵 = 熵 + KL. 熵是 p 本身的不确定性, 与 q 无关; KL 是用 q 代替 p 付出的额外代价. 先讲离散情形 (S. 241–242), 再讲连续情形 (S. 243), 然后用 3.4 节的正态和 Laplace 例子画出三者 (S. 244–245), 最后用 KL 非负证明 3.3 节留下的「方差给定时正态的微分熵最大」(S. 246–247). 下一节会说明, 机器学习里的交叉熵损失就<span class="nb">是这个量.</span></p>
+
   <p>编码直觉: 最优码给事件 x 分配约 <span class="katex" data-o="\(-\log p(x)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> 比特. 如果误以为分布是 q, 就会分配 <span class="katex" data-o="\(-\log q(x)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> 比特; 但事件实际按 p 出现, 所以平均码长是按 p 加权的 <span class="katex" data-o="\(-\log q\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span></span></span></span>, 即 <span class="nb"><b>cross-entropy 交叉熵</b>.</span></p>
   <p>例子: p = (0.5, 0.25, 0.25), 熵 1.5 比特; 若用 q = (0.25, 0.25, 0.5) 编码, 交叉熵 <span class="katex" data-o="\(0.5\cdot 2 + 0.25\cdot 2 + 0.25\cdot 1 = 1.75\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.25</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.25</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1.75</span></span></span></span> 比特, 多出的 0.<span class="nb">25 比特就是 KL.</span></p>
   <p>易错: 有的书写 <span class="katex" data-o="\(H(p, q)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span></span>, 容易和联合熵 <span class="katex" data-o="\(H(X, Y)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0785em;">X</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">Y</span><span class="mclose">)</span></span></span></span> 混淆; 课件用 <span class="katex" data-o="\(H(p\|q)\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0813em;">H</span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mord">∥</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span></span></span></span> <span class="nb">正是为了避开这一点.</span></p>
@@ -5877,10 +5987,12 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Minimizing KL = maximizing <span class="nb">log-likelihood</span></li><li>Minimizing KL = minimizing <span class="nb">cross-entropy</span></li><li>Minimizing CE between modeled and observed probabilities = log-loss <span class="nb">minimization</span></li></ul>
 </div>
-
 <div class="zh">
-  <p>这一节把信息论的量和前面学过的训练准则对上号. 链条是: 用模型 <span class="katex" data-o="\(q_\theta\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 逼近数据分布 p 时, 最小化 KL 与最大似然估计等价 (S. 249); 由于交叉熵 = 熵 + KL, 而熵不依赖参数, 也等价于最小化交叉熵 (S. 250–251); 分类问题里把标签看成 one-hot 分布, 交叉熵又恰好是对数损失 (S. 252–254). 最后反过来看, 熵本身就是只预测类别频率的常数模型的对数损失风险 (S. <span class="nb">255).</span></p>
+  <p>这一节把信息论和机器学习连起来. 重点是最小化 KL、最小化交叉熵、最大化对数似然和最小化对数损失其实是<span class="nb">同一件事.</span></p>
 </div>
+
+
+
 
 <div class="card de">
   <span class="folie">S. 249</span>
@@ -5895,6 +6007,8 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 </div>
 
 <div class="zh">
+  <p>这一节把信息论的量和前面学过的训练准则对上号. 链条是: 用模型 <span class="katex" data-o="\(q_\theta\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0278em;">θ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 逼近数据分布 p 时, 最小化 KL 与最大似然估计等价 (S. 249); 由于交叉熵 = 熵 + KL, 而熵不依赖参数, 也等价于最小化交叉熵 (S. 250–251); 分类问题里把标签看成 one-hot 分布, 交叉熵又恰好是对数损失 (S. 252–254). 最后反过来看, 熵本身就是只预测类别频率的常数模型的对数损失风险 (S. <span class="nb">255).</span></p>
+
   <p>每一步: 拆对数比用期望的线性; 去掉与 <span class="katex" data-o="\(\theta\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">θ</span></span></span></span> 无关的常数不改变 argmin; 最小化一个量的相反数等于最大化它. 最后一步是蒙特卡洛近似, 等价于把 p <span class="nb">换成经验分布.</span></p>
   <p>「等价于风险最小化」的意思: 右边是平均对数似然, 乘 −1 就是以 <b>negative log-likelihood 负对数似然</b> 为损失的经验风险. 所以「最大似然 = 最小化 KL = 以 NLL 为损失的 ERM」. S. 238 里对 <span class="katex" data-o="\(\sigma\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span></span></span></span> 求最优, 本质上就是在做总体意义下的<span class="nb">最大似然.</span></p>
 </div>
@@ -6023,6 +6137,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know the joint <span class="nb">entropy</span></li><li>Know conditional entropy as remaining <span class="nb">uncertainty</span></li><li>Know mutual information as the amount of information of an RV obtained by <span class="nb">another</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲两个变量之间的信息. 重点是条件熵表示剩下的不确定性, 互信息表示一个变量从另一个变量得到<span class="nb">的信息量.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 257</span>
@@ -6175,6 +6293,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know mutual information as the amount of information of an RV obtained by <span class="nb">another</span></li><li>Know properties <span class="nb">of MI</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节继续讲互信息. 重点是它非负、独立时为零这些性质, 以及它和相关系<span class="nb">数的区别.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 267</span>
@@ -6282,6 +6404,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know that source coding is about encoding messages <span class="nb">efficiently</span></li><li>Know how to compute the average length of a <span class="nb">code</span></li><li>Know that the entropy of the source distribution is the lower bound for the average code <span class="nb">length</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节从编码的角度理解熵. 重点是会算一个编码的平均码长, <span class="nb">并知道熵是它的下界.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 273</span>
@@ -6430,6 +6556,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know connection between source coding and <span class="nb">(cross-)entropy</span></li><li>Know that the entropy of the source distribution is the lower bound for the average code <span class="nb">length</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节把信源编码和交叉熵连起来. 重点是用错的分布去编码时, <span class="nb">平均码长就是交叉熵.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 282</span>
@@ -6501,6 +6631,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Understand why MI is invariant under certain <span class="nb">reparametrizations</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节证明互信息在某些重参数化下不变. 重点是哪类变换不改变互信息, <span class="nb">以及证明的关键一步.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 287–288</span>
@@ -6539,6 +6673,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Understand that our intuition about geometry fails in high-dimensional <span class="nb">spaces</span></li><li>Understand the effects of the curse of <span class="nb">dimensionality</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一章讲维度诅咒: 高维空间里的几何直觉会失效. 重点是数据在高维下变得稀疏, <span class="nb">距离也变得没有区分度.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 291</span>
@@ -6908,6 +7046,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>See how the performance of k-NN and the linear model deteriorates in high-dimensional <span class="nb">spaces</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节用 k-NN 和线性模型的例子说明维度诅咒的后果. 重点是维度上去以后, 两种模型的表现分别<span class="nb">怎样变差.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 310</span>
@@ -7363,6 +7505,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Overfitting</li><li>Motivation of <span class="nb">regularization</span></li><li>First overview of <span class="nb">techniques</span></li><li>Pattern of regularized ERM <span class="nb">formula</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一章讲正则化, 先回顾过拟合并给出总体思路. 重点是正则化经验风险最小化的公式结构: <span class="nb">风险加惩罚项.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 328</span>
@@ -7522,6 +7668,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Regularized linear <span class="nb">model</span></li><li>Ridge regression / L2 <span class="nb">penalty</span></li><li>Understand parameter <span class="nb">shrinkage</span></li><li>Understand correspondence to constrained <span class="nb">optimization</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲最常用的 L2 正则化: 岭回归. 重点是系数怎样被收缩, 以及它和带约束优<span class="nb">化的对应.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 338</span>
@@ -7696,6 +7846,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Lasso regression / L1 <span class="nb">penalty</span></li><li>Know that lasso selects <span class="nb">features</span></li><li>Support <span class="nb">recovery</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲 L1 正则化: lasso. 重点是 lasso 会把一部分系数压到正好为零, <span class="nb">因而能选特征.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 349</span>
@@ -7824,6 +7978,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Properties of ridge vs. <span class="nb">lasso</span></li><li>Coefficient <span class="nb">paths</span></li><li>What happens with corr. <span class="nb">features</span></li><li>Why we need feature <span class="nb">scaling</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节比较岭回归和 lasso. 重点是两者的几何解释、系数路径, 以及为什么要先做<span class="nb">特征缩放.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 358</span>
@@ -7998,6 +8156,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Compromise between L1 <span class="nb">and L2</span></li><li>Regularized logistic <span class="nb">regression</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲弹性网, 它把 L1 和 L2 结合起来, 并把正则化用到逻辑回归上. 重点是特征高度相关时弹性<span class="nb">网的好处.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 367</span>
@@ -8117,6 +8279,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>L1/L2 regularization induces <span class="nb">bias</span></li><li>Lq (quasi-)norm <span class="nb">regularization</span></li><li>L0 <span class="nb">regularization</span></li><li>SCAD <span class="nb">and MCP</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节介绍 L1、L2 之外的正则项. 重点是 L1 和 L2 都会带来偏差, 以及 SCAD、MCP <span class="nb">怎样减小这种偏差.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 372</span>
@@ -8258,6 +8424,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v600 v585 h43z"/></svg></span></span>
   <p><b>Learning goals</b></p>
 <ul><li>Regularization even more important in non-linear <span class="nb">models</span></li><li>Norm penalties applied <span class="nb">similarly</span></li><li>Structural risk <span class="nb">minimization</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节把正则化推广到非线性模型. 重点是结构风险最小化的思路: 在一串越来越复杂的模型里挑合<span class="nb">适的一个.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 379</span>
@@ -8444,6 +8614,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>RRM is same as MAP in <span class="nb">Bayes</span></li><li>Gaussian/Laplace prior corresponds to L2/L1 <span class="nb">penalty</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节从贝叶斯角度看正则化. 重点是正则化风险最小化等价于最大后验估计, 高斯先验对应 L2, <span class="nb">拉普拉斯先验对应 L1.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 397</span>
@@ -8554,6 +8728,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>L2 regularization with GD is equivalent to weight <span class="nb">decay</span></li><li>Understand how weight decay changes the optimization <span class="nb">trajectory</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节说明梯度下降里的 L2 正则化就是权重衰减. 重点是它怎样改变优<span class="nb">化的轨迹.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 403</span>
@@ -8651,6 +8829,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Approximate transformation of unregularized minimizer to <span class="nb">regularized</span></li><li>Principal components of Hessian influence where parameters are <span class="nb">decayed</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节用二次近似分析 L2 正则化的效果. 重点是 Hessian 的主成分方向决定了哪些参数被<span class="nb">衰减得多.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 408</span>
@@ -8769,6 +8951,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Approximate transformation of unregularized minimizer to <span class="nb">regularized</span></li><li>Soft-Thresholding</li></ul>
 </div>
+<div class="zh">
+  <p>这一节用同样的方法分析 L1 正则化. 重点是它会得到软阈值的形式, 这就是 lasso <span class="nb">能把系数压成零的原因.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 416</span>
@@ -8840,6 +9026,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know how early stopping <span class="nb">works</span></li><li>Understand how early stopping acts as a <span class="nb">regularizer</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲提前停止. 重点是它为什么也起正则化作用, 以及它和 L2 <span class="nb">正则化的近似对应.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 421</span>
@@ -8943,6 +9133,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Interpretation of L2 regularization as <span class="nb">row-augmentation</span></li><li>Interpretation of L2 regularization as minimizing risk under feature <span class="nb">noise</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节从两个新角度理解岭回归. 重点是它等价于往数据里加几行, 也等价于在特征带噪声时最<span class="nb">小化风险.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 427</span>
@@ -9064,6 +9258,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Understand the relationship between soft-thresholding and L1 <span class="nb">regularization</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节详细推导软阈值和 L1 正则化的关系. 重点是分情况讨论最小点<span class="nb">落在哪里.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 431</span>
@@ -9154,6 +9352,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know that the hard-margin SVM maximizes the margin between data points and <span class="nb">hyperplane</span></li><li>Know that this is a quadratic <span class="nb">program</span></li><li>Know that support vectors are the data points closest to the separating <span class="nb">hyperplane</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一章讲支持向量机, 先从数据线性可分的情形开始. 重点是硬间隔 SVM 在最大化间隔, 以及支持向量是离分界面<span class="nb">最近的点.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 438</span>
@@ -9359,6 +9561,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know how to derive the SVM dual <span class="nb">problem</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节推导硬间隔 SVM 的对偶问题. 重点是从拉格朗日函数一步步得到对偶形式, <span class="nb">要会推一遍.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 450</span>
@@ -9466,6 +9672,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Understand that the hard-margin SVM problem is only solvable for linearly separable <span class="nb">data</span></li><li>Know that the soft-margin SVM problem therefore allows margin <span class="nb">violations</span></li><li>The degree to which margin violations are tolerated is controlled by a <span class="nb">hyperparameter</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节处理数据线性不可分的情形. 重点是软间隔允许部分点越界, 越界的容忍程度由超参数 C <span class="nb">控制.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 457</span>
@@ -9606,6 +9816,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know why the SVM problem can be understood as (regularized) empirical risk minimization <span class="nb">problem</span></li><li>Know that the corresponding loss is the hinge <span class="nb">loss</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节把 SVM 重新写成正则化经验风险最小化. 重点是对应的损失正是 hinge <span class="nb">损失.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 466</span>
@@ -9713,6 +9927,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know that the SVM problem is not <span class="nb">differentiable</span></li><li>Know how to optimize the SVM problem in the primal via subgradient <span class="nb">descent</span></li><li>Know how to optimize SVM in the dual formulation via pairwise coordinate <span class="nb">ascent</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲怎样实际训练 SVM. 重点是原问题不可导, 要用次梯度下降, 对偶问题则用成对<span class="nb">坐标上升.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 472</span>
@@ -9863,6 +10081,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Understand how nonlinearity can be introduced via feature maps in <span class="nb">SVMs</span></li><li>Know the limitation of feature <span class="nb">maps</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一章讲非线性 SVM, 先用特征映射把数据抬到高维. 重点是这种做法的思路和它在计算<span class="nb">上的局限.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 482</span>
@@ -9962,6 +10184,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know how to efficiently introduce non-linearity via the kernel <span class="nb">trick</span></li><li>Know common kernel functions (linear, polynomial, <span class="nb">radial)</span></li><li>Know how to compute predictions of the <span class="nb">kernel SVM</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲核技巧: 不显式算特征映射, 只算内积. 重点是常用核函数, 以及核 SVM <span class="nb">怎样做预测.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 490</span>
@@ -10201,6 +10427,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know the homogeneous and non-homogeneous polynomial <span class="nb">kernel</span></li><li>Understand the influence of the choice of the degree on the decision <span class="nb">boundary</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲多项式核. 重点是齐次和非齐次两种形式, 以及次数怎样影响<span class="nb">决策边界.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 504</span>
@@ -10392,6 +10622,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Know that for every kernel there is an associated feature map and space (Mercer’s <span class="nb">Theorem)</span></li><li>Know that this feature map is not unique, and the reproducing kernel Hilbert space (RKHS) is a reference <span class="nb">space</span></li><li>Know the representation of the solution of a SVM is given by the representer <span class="nb">theorem</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节给核方法打理论基础. 重点是每个核都对应一个特征空间, 而 SVM 的解可以写成训练点上核函<span class="nb">数的组合.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 511</span>
@@ -10531,6 +10765,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know the Gaussian (RBF) <span class="nb">kernel</span></li><li>Understand that all data sets are separable with this <span class="nb">kernel</span></li><li>Understand the effect of the kernel <span class="nb">hyperparameter <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span></span></span></span></span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲高斯径向基核. 重点是用它任何数据都能分开, 以及超参数 <span class="katex" data-o="\(\sigma\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">σ</span></span></span></span> 怎样控制边界的<span class="nb">平滑程度.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 520</span>
@@ -10624,6 +10862,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know that the SVM is sensitive to hyperparameter <span class="nb">choices</span></li><li>Understand the effect of different (kernel) <span class="nb">hyperparameters</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讨论 SVM 的调参. 重点是 C 和核参数各起什么作用, 以及它们对结果的影<span class="nb">响有多大.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 532</span>
@@ -10738,6 +10980,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Know that SVMs are non-parameteric <span class="nb">models</span></li><li>Understand the concept of universal <span class="nb">consistency</span></li><li>Know that SVMs with an universal kernel (e.g. Gaussian kernel) are universally <span class="nb">consistent</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲 SVM 的一些理论性质. 重点是 SVM 是非参数模型, 而用高斯核时具有普<span class="nb">遍一致性.</span></p>
+</div>
+
 
 <div class="warn">
   <p><b>原文笔误: </b>「non-parameteric」应为 non-parametric; 「an universal」应为 a <span class="nb">universal.</span></p>
@@ -10847,6 +11093,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   <p><b>Learning goals</b></p>
 <ul><li>Understand general idea of <span class="nb">boosting</span></li><li>Learn AdaBoost <span class="nb">algorithm</span></li><li>Understand difference between bagging and <span class="nb">boosting</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一章讲 boosting, 先从最早的 AdaBoost 讲起. 重点是 boosting 和 bagging 的区别: 一个按顺序修正错误, <span class="nb">一个并行平均.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 549</span>
@@ -11131,6 +11381,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Understand idea of forward stagewise <span class="nb">modelling</span></li><li>Understand fitting process of gradient boosting for regression <span class="nb">problems</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节把 boosting 写成前向分步加法建模, 得到梯度提升. 重点是每一轮怎样用基学习器拟<span class="nb">合伪残差.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 562</span>
@@ -11365,6 +11619,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>See simple visualizations of boosting in <span class="nb">regression</span></li><li>Understand impact of different losses and base <span class="nb">learners</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节用图示看梯度提升在回归上怎样逐轮推进. 重点是换用不同损失和基学习器时, <span class="nb">拟合过程有什么不同.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 578</span>
@@ -11481,6 +11739,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Learn about three main regularization options: number of iterations, tree depth and <span class="nb">shrinkage</span></li><li>Understand how regularization influences <span class="nb">model fit</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲梯度提升怎样防止过拟合. 重点是迭代次数、树深和学习率三个旋钮各起<span class="nb">什么作用.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 591</span>
@@ -11592,6 +11854,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>GB for binary classification simply uses Bernoulli or exponential <span class="nb">loss</span></li><li>For multiclass we fit <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span> discriminant functions in <span class="nb">parallel</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节把梯度提升用到分类上. 重点是二分类换成 Bernoulli 或指数损失, 多分类则并行拟合 g <span class="nb">个判别函数.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 597</span>
@@ -11764,6 +12030,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Examples for GB with <span class="nb">trees</span></li><li>Understand relationship between model structure and interaction <span class="nb">depth</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲以树为基学习器的梯度提升. 重点是树的深度决定了模型能表达几阶<span class="nb">交互作用.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 613</span>
@@ -11947,6 +12217,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   <p><b>Learning goals</b></p>
 <ul><li>Loss optimal terminal <span class="nb">coefficients</span></li><li>GB with trees for multiclass <span class="nb">problems</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节继续讲树提升的细节. 重点是叶子上的系数怎样按损失重新优化, <span class="nb">以及多分类时怎么做.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 626</span>
@@ -12068,6 +12342,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v600 v585 h43z"/></svg></span></span>
   <p><b>Learning goals</b></p>
 <ul><li>Overview <span class="nb">over XGB</span></li><li>Regularization <span class="nb">in XGB</span></li><li>Approximate split <span class="nb">finding</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节介绍 XGBoost. 重点是它额外的正则项和近似找切<span class="nb">点的方法.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 633</span>
@@ -12238,6 +12516,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v600 v585 h43z"/></svg></span></span>
   <p><b>Learning goals</b></p>
 <ul><li>Concept <span class="nb">of CWB</span></li><li>Which base learners do <span class="nb">we use</span></li><li>Built-in feature <span class="nb">selection</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲分量式梯度提升: 每一轮只更新一个特征对应的基学习器. <span class="nb">重点是它自带特征选择.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 642</span>
@@ -12357,6 +12639,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v600 v585 h43z"/></svg></span></span>
   <p><b>Learning goals</b></p>
 <ul><li>Handling of categorical <span class="nb">features</span></li><li>Intercept <span class="nb">handling</span></li><li>Practical <span class="nb">example</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲分量式提升的实际细节. 重点是类别特征和截距<span class="nb">怎样处理.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 653</span>
@@ -12472,6 +12758,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v600 v585 h43z"/></svg></span></span>
   <p><b>Learning goals</b></p>
 <ul><li>Understand relationship of CWB <span class="nb">and GLM</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节说明分量式提升和广义线性模型的关系. 重点是用线性基学习器时, <span class="nb">它会收敛到 GLM 的解.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 677</span>
@@ -12551,6 +12841,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v600 v585 h43z"/></svg></span></span>
   <p><b>Learning goals</b></p>
 <ul><li>Details of nonlinear BLs and <span class="nb">splines</span></li><li>Decomposition for <span class="nb">splines</span></li><li>Fair base learner <span class="nb">selection</span></li><li>Feature importance and <span class="nb">PDPs</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲分量式提升的进阶用法. 重点是样条基学习器, 以及怎样公平地在不同基学习器<span class="nb">之间选择.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 682</span>
@@ -12734,6 +13028,10 @@ c-10,0,-16.667,5,-20,15z M188 15 H145 v585 v600 v585 h43z"/></svg></span></span>
     <li>Know how to derive the posterior distribution for a <span class="nb">Bayesian LM</span></li>
   </ul>
 </div>
+<div class="zh">
+  <p>这一章讲高斯过程, 先回顾贝叶斯线性模型. 重点是它给出的是参数的后验分布, <span class="nb">而不是一个点估计.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 711–712</span>
@@ -12975,6 +13273,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
     <li>GPs are indexed <span class="nb">families</span></li>
   </ul>
 </div>
+<div class="zh">
+  <p>这一节换一个视角: 直接在函数上放分布. 重点是边缘化性质让这种分布容易计算, 而高斯过程完全由均值函数和协方差<span class="nb">函数决定.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 727</span>
@@ -13517,6 +13819,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
     <li>Know common covariance functions like squared exponential and <span class="nb">Matérn</span></li>
   </ul>
 </div>
+<div class="zh">
+  <p>这一节讲协方差函数. 重点是它编码了对函数形状的假设, 以及平方指数核和 Matérn <span class="nb">核各假设了什么.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 778</span>
@@ -13793,6 +14099,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
     <li>Model noise via a nugget <span class="nb">term</span></li>
   </ul>
 </div>
+<div class="zh">
+  <p>这一节推导高斯过程的后验和预测. 重点是后验均值会穿过观测点, 以及加噪声项后不再<span class="nb">严格插值.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 792–793</span>
@@ -14150,6 +14460,10 @@ l0,-1944c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
     <li>Computational complexity is governed by matrix inversion of the covariance <span class="nb">matrix</span></li>
   </ul>
 </div>
+<div class="zh">
+  <p>这一节讲怎样训练高斯过程. 重点是用最大似然估计超参数, 而计算代价主要来自协方差<span class="nb">矩阵求逆.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 821</span>
@@ -14301,6 +14615,10 @@ l0,-1944c-2,-159.3,-10,-310.7,-24,-454c-53.3,-528,-210,-949.7,
   <p><b>Learning goals</b></p>
 <ul><li>Trends can be modeled via specification of the mean <span class="nb">function</span></li></ul>
 </div>
+<div class="zh">
+  <p>这一节讲均值函数. 重点是它可以用来表达数据<span class="nb">中的趋势.</span></p>
+</div>
+
 
 <div class="card de">
   <span class="folie">S. 833</span>

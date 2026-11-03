@@ -1165,8 +1165,16 @@
   </ul>
 </div>
 <div class="zh">
-  <p>这一讲的三个目标: 了解课程覆盖的范围; 回答大家关于课程的所有疑问; 对工作量有个印象. 课名 <b>Deep Learning for NLP 自然语言处理中的深度学习</b>, 简称 DL4NLP (练习材料的文件名里都用<span class="nb">这个缩写).</span></p>
+  <p>这门课从 NLP 和深度学习的基础出发, 经过 Transformer、BERT 和 GPT, 一直讲到当代大语言模型的训练、<span class="nb">评估和可解释性.</span></p>
+  <ul>
+    <li><b>基础</b>: 学习范式、NLP 任务、语言模型、词嵌入和深度学习基础 (<a href="#s12">1.2–1.5</a>、<span class="nb"><a href="DPNLP1-02-深度学习基础.html">DPNLP I 02</a>).</span></li>
+    <li><b>Transformer 与编码器模型</b>: Transformer、BERT 及其后继和压缩 (<a href="DPNLP1-03-Transformer.html">03</a>、<a href="DPNLP1-04-BERT.html">04</a>、<a href="DPNLP1-05-后BERT时代-BERTology与蒸馏.html">05</a>、<span class="nb"><a href="DPNLP1-06-后BERT时代-ELECTRA-XLNet与T5.html">06</a>).</span></li>
+    <li><b>生成模型</b>: GPT 系列、解码策略和大语言模型 (<a href="DPNLP1-07-GPT系列.html">07</a>、<a href="DPNLP1-08-解码策略.html">08</a>、<span class="nb"><a href="DPNLP1-09-大语言模型.html">09</a>).</span></li>
+    <li><b>大模型专题</b>: 预训练、后训练、多语言、评估、可解释性和文本检测 (<a href="DPNLP1-10-预训练.html">10</a>、<a href="DPNLP1-11-后训练.html">11</a>、<a href="DPNLP1-12-多语言与跨语言迁移.html">12</a>、<a href="DPNLP1-13-评估大语言模型.html">13</a>、<a href="DPNLP1-14-可解释性.html">14</a>、<span class="nb"><a href="DPNLP1-15-AI文本检测与水印.html">15</a>).</span></li>
+  </ul>
 </div>
+
+
 <div class="warn"><p><b>原文笔误:</b> 「Answers to all open <b>question</b>」应为复数 <span class="nb">questions.</span></p></div>
 
 <!-- ===== PEOPLE ===== -->
@@ -1364,8 +1372,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解不同的<b>learning paradigm 学习范式</b>; 把学习方式和它需要多少<b>labeled data 标注数据</b>联系起来. 第二条是这一讲的主线: 从「每个任务都要大量标注」到「预训练 + 少量标注微调」再到「零样本/少样本提示」, 对标注数据的需求<span class="nb">越来越少.</span></p>
+  <p>这一讲梳理几种学习范式. 重点是每种范式需要多少标注数据, 这是从「每个任务大量标注」走到「预训练加微调<span class="nb">」的主线.</span></p>
 </div>
+
+
 
 <!-- ===== CAT ===== -->
 <h3 id="s12-cat">学习范式的分类<br><span class="de-title">Categorization of learning</span></h3>
@@ -1730,8 +1740,10 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解不同类型的任务, 分清<b>低层 (low-level)</b> 和<b>高层 (high-level)</b> 任务; 区分纯语言学任务 (词性、句法分析) 和更一般的分类任务 (垃圾邮件、<span class="nb">情感).</span></p>
+  <p>这一讲给 NLP 任务分类. 重点是低层和高层任务的区分, 以及纯语言学任务和一般分类任<span class="nb">务的不同.</span></p>
 </div>
+
+
 
 <h3 id="s13-cat">NLP 任务的分类<br><span class="de-title">Categorization of NLP tasks</span></h3>
 <div class="card de">
@@ -2075,8 +2087,10 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解「<b>look-up table 查找表</b>」(也就是 <b>embedding layer 嵌入层</b>) 的重要性; 理解语言建模在计算上的后果 (主要是 softmax <span class="nb">太贵).</span></p>
+  <p>这一讲讲神经概率语言模型. 重点是嵌入层就是查找表, 以及 softmax <span class="nb">在大词表上的计算代价.</span></p>
 </div>
+
+
 
 <h3 id="s14-lm">什么是语言模型<br><span class="de-title">What is a language model?</span></h3>
 <div class="card de">
@@ -2247,8 +2261,10 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解什么是<b>word embedding 词嵌入</b>; 学会构造词嵌入的主要方法 (word2vec 的 skip-gram 和 CBOW、negative sampling、<span class="nb">fastText).</span></p>
+  <p>这一讲讲怎样构造词嵌入. 重点是 word2vec 的两种训练方式和负采样, 要能说清它们各在<span class="nb">预测什么.</span></p>
 </div>
+
+
 
 <h3 id="s15-motiv">动机<br><span class="de-title">Motivation</span></h3>
 <div class="card de">

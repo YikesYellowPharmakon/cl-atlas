@@ -1154,8 +1154,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>测试的基本术语; 测试在<b>Qualitätssicherung 质量保证</b>中的位置; 编写 (单元) 测试; <b>testgetriebene Entwicklung 测试驱动开发</b>; 用 <b>pytest</b> 框架做自动化测试; 用 coverage.py 测量<span class="nb"><b>Codeabdeckung 代码覆盖率</b>.</span> </p>
+  <p>本章讲怎样用测试保证程序质量, 从概念一直到 pytest 实操. 重点是会写单元测试, 并能看懂 coverage.<span class="nb">py 的覆盖率报告.</span></p>
 </div>
+
+
 
 <!-- ======================= WARUM ======================= -->
 
@@ -2023,13 +2025,15 @@ prim.py       7      0      4      1    91%   6-&gt;5</pre>
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li><b>设计</b>测试用例和测试套件: 面向需求 (等价类 + 边界值) 和面向代码覆盖 (每条语句、每个分支); 知道测试用例的组成部分; 分清 Fehlhandlung / Fehlerzustand / <span class="nb">Fehlerwirkung.</span> </li>
-    <li>用 pytest <b>编写</b>自动化测试: <code>test_</code> 开头的函数、<code>assert</code>、<code>pytest.raises</code>、<span class="nb"><code>pytest.main</code>.</span> </li>
-    <li>用 coverage 模块<b>测量</b>覆盖率: <code class="lc">coverage run [--branch]</code>、<code class="lc">coverage report</code>、<code>coverage html</code>, <span class="nb">并能读懂报告.</span> </li>
-  </ol>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Testfälle und Test Suites entwickeln</b>: 会根据需求和代码覆盖设计测试用例 (<a href="#testfall">测试用例</a>、<span class="nb"><a href="#maximum">列表的最大值</a>).</span></li>
+    <li><b>Tests mit Pytest</b>: 会用 pytest 写自动化测试 (<span class="nb"><a href="#pytest">pytest 模块</a>).</span></li>
+    <li><b>Abdeckungsmessung mit Coverage</b>: 会用 coverage.py 测覆盖率并看懂报告 <span class="nb">(<a href="#coverage">测量代码覆盖率</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">

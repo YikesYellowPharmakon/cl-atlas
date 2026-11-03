@@ -1159,8 +1159,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解 Transformer 最初的用途 (机器翻译); 了解它此后扩展到的其他领域 (视觉、<span class="nb">多模态).</span></p>
+  <p>这一讲交代 Transformer 最初用在机器翻译上, 之后扩展到很多领域. <span class="nb">重点是它为什么能取代 RNN.</span></p>
 </div>
+
+
 
 <h3 id="s31-mt">机器翻译<br><span class="de-title">Machine translation</span></h3>
 <div class="card de">
@@ -1309,8 +1311,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解<b>self-attention 自注意力</b>和<b>位置嵌入</b>的作用; 理解并行化的<span class="nb"><b>多头注意力</b>的细节.</span></p>
+  <p>这一讲拆开 Transformer 编码器的核心. 重点是自注意力的计算、位置嵌入的作用, 以及多头注意力<span class="nb">怎样并行.</span></p>
 </div>
+
+
 
 <h3 id="s32-arch">Transformer 架构总览<br><span class="de-title">The Transformer architecture</span></h3>
 <div class="card de">
@@ -3331,8 +3335,10 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解<b>masked self-attention 掩码自注意力</b>, 以及<b>因果性 (causality)</b> 在解码中的作用 (只能看过去, 不能看未来); 理解编码器和解码器<span class="nb">如何连接.</span></p>
+  <p>这一讲讲解码器. 重点是掩码自注意力怎样保证只看过去, 以及编码器和解码器之间<span class="nb">怎样连接.</span></p>
 </div>
+
+
 
 <h3 id="s33-cheat">自注意力会「作弊」<br><span class="de-title">Self-attention for autoregressive LM &amp; decoding</span></h3>
 <div class="card de">
@@ -3897,8 +3903,10 @@ M1001 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 搞清 Transformer 的哪些部件贡献了参数; 学会计算模型的总参数量. <span class="nb">这类计算题很适合考试.</span></p>
+  <p>这一讲算 Transformer 的参数量. 重点是各部件各贡献多少参数, <span class="nb">要会算出总数.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Slide 1</span>
@@ -4146,8 +4154,10 @@ c-4-3.333-8.333-7.667-13 -13l-13-13l77-155 77-156c66 199.333 139 419.667
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解 Transformer 处理长序列的局限; 理解 Transformer-XL 的<b>片段循环 (segment recurrence)</b> 机制; <span class="nb">理解<b>相对位置编码</b>.</span></p>
+  <p>这一讲讨论 Transformer 处理长序列的局限和 Transformer-XL 的改进. 重点是片段循环机制和相对<span class="nb">位置编码.</span></p>
 </div>
+
+
 
 <h3 id="s35-limit">Transformer 的局限<br><span class="de-title">Limitation of the Transformer</span></h3>
 <div class="card de">
@@ -4390,8 +4400,10 @@ c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14
   </ul>
 </div>
 <div class="zh">
-  <p>目标: 理解基于 Transformer 的模型的效率问题和短板; 了解缓解它们的<span class="nb">几种策略.</span></p>
+  <p>这一讲讨论 Transformer 的效率问题. 重点是注意力为什么随序列长度平方增长, 以及几种缓解策<span class="nb">略的思路.</span></p>
 </div>
+
+
 
 <h3 id="s36-n2">O(n²) 问题<br><span class="de-title">The O(n²) problem</span></h3>
 <div class="card de">

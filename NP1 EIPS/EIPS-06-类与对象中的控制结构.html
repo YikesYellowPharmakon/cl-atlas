@@ -1164,8 +1164,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p>内容: 回顾类 (方法、属性、创建对象、类型正确性); 用堆和指针描述<b>状态的变化</b>, 包括创建对象和<b>Aliasing 别名</b>; <b>Garbage Collection 垃圾回收</b>; <b>Parameterübergabe 参数传递</b>. <span class="nb">新内容主要是后三项.</span> </p>
+  <p>本章在第 5 章的类之上, 用堆和指针解释对象在内存里怎样变化. 重点是别名和参数传递, 要能画出调用前后的<span class="nb">指向关系.</span></p>
 </div>
+
+
 <div class="warn"><p><b>原文笔误: </b>标题「Lerninahlte」字母顺序错, <span class="nb">应为「Lerninhalte」.</span> </p></div>
 
 <!-- ======================= WIEDERHOLUNG ======================= -->
@@ -1321,7 +1323,7 @@ c5.3,-9.3,12,-14,20,-14
 H400000v40H845.2724
 s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1744em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5.0</span></span></span></span> (勾股数 3-4-5). 结果是 float, <span class="nb">所以显示 5.0.</span> </p>
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1744em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">5.0</span></span></span></span> (勾股数 3-4-5). 结果是 float, 所以显示 5.0. </p>
 </div>
 
 <div class="card de">
@@ -2129,16 +2131,17 @@ Flug-Id: F303</pre>
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li>用 Python <b>实现</b>类 (包括根据 UML <span class="nb">类图写出类).</span> </li>
-    <li><b>会用</b>类的对象. </li>
-    <li><b>解释</b>怎样处理垃圾: 什么时候一个对象成为垃圾 (没有任何引用), <span class="nb">由垃圾回收器自动删除.</span> </li>
-    <li><b>解释</b>别名: 什么是 aliasing、为什么危险、基本类型为什么没有<span class="nb">这个问题.</span> </li>
-    <li><b>解释</b>创建对象和方法调用语句的执行步骤 (Folie 29 和 Folie 37 <span class="nb">的规则).</span> </li>
-    <li>在有别名和函数/方法调用的程序里<b>算出</b>栈 + 堆的状态, 并<b>画图</b>和<b>用文字</b>写出来 (包括调用期间临时出现在栈上的 self <span class="nb">和形参).</span> </li>
-  </ol>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Klassen implementieren und gebrauchen</b>: 会写类、创建对象并调用方法 (<a href="#erzeugung">创建对象</a>、<span class="nb"><a href="#methode">方法调用</a>).</span></li>
+    <li><b>Umgang mit Datenmüll erklären</b>: 能讲清没有引用的对象怎样变成垃圾并被回收 <span class="nb">(<a href="#muell">垃圾</a>).</span></li>
+    <li><b>Aliasing erklären</b>: 能讲清两个变量指向同一个对象时, 改一个为什么另一个也变 <span class="nb">(<a href="#alias">别名</a>).</span></li>
+    <li><b>Wirkung von Objekterzeugung und Methodenaufruf erklären</b>: 能讲清创建对象和调用方法时状态怎样变化 (<a href="#erzeugung">创建对象</a>、<span class="nb"><a href="#methode">方法调用</a>).</span></li>
+    <li><b>Zustand (Heap+Stack) berechnen</b>: 在有别名和函数调用时, 会画出并写出栈和堆的状态 (<a href="#zustand">语句与状态变化</a>、<span class="nb"><a href="#alias">别名</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">

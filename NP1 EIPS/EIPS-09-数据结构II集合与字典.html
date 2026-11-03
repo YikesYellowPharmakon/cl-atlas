@@ -1157,8 +1157,10 @@
   </ul>
 </div>
 <div class="zh">
-  <p><b>Menge 集合</b>及其运算; <b>Wörterbuch 字典</b> (也叫 Abbildung 映射, Python 的 dict) 及其操作; 集合、列表、字典的<b>推导式</b> <span class="nb">(Comprehension).</span> </p>
+  <p>第二部分接着讲集合和字典, 最后是三种推导式写法. 重点是什么时候该用集合或字典代替列表, <span class="nb">以及推导式的读和写.</span></p>
 </div>
+
+
 
 <div class="card de">
   <span class="folie">Folie 3</span>
@@ -1680,7 +1682,7 @@ A2 = []
   <ul>
     <li>Bereits markierte Elemente können übersprungen <span class="nb">werden</span></li>
     <li>Da für k &gt; 0 gilt i &lt; j impliziert i ∗ k &lt; j ∗ k, sind für Primzahl k bereits alle Vielfachen kleiner k ∗ k <span class="nb">markiert</span></li>
-    <li>Falls j keine Primzahl ist, ist mindestens ein Teiler von j <span class="nb">kleiner <span class="katex" data-o="√j"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.2225em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8175em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span><span style="top:-2.7775em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
+    <li>Falls j keine Primzahl ist, ist mindestens ein Teiler von j kleiner <span class="katex" data-o="√j"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.2225em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8175em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span><span style="top:-2.7775em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
 c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
 c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
 c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
@@ -1691,7 +1693,7 @@ c5.3,-9.3,12,-14,20,-14
 H400000v40H845.2724
 s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2225em;"><span></span></span></span></span></span></span></span></span></span></li>
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2225em;"><span></span></span></span></span></span></span></span></span></li>
   </ul>
   <p>Optimierter <span class="nb">Algorithmus</span></p>
   <ol>
@@ -1739,7 +1741,7 @@ c5.3,-9.3,12,-14,20,-14
 H400000v40H845.2724
 s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1133em;"><span></span></span></span></span></span></span></span></span> 之后不用再划; <span class="nb">没被划掉的都是素数.</span> </li>
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1133em;"><span></span></span></span></span></span></span></span></span> 之后不用再划; 没被划掉的都是素数. </li>
   </ol>
 </div>
 <div class="warn"><p><b>幻灯片小错: </b>第三条应为「mindestens ein Teiler von j <b>kleiner oder gleich</b> <span class="katex" data-o="√j"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.04em;vertical-align:-0.2225em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8175em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal" style="margin-right:0.0572em;">j</span></span></span><span style="top:-2.7775em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
@@ -1775,7 +1777,7 @@ c5.3,-9.3,12,-14,20,-14
 H400000v40H845.2724
 s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1133em;"><span></span></span></span></span></span></span></span></span> (包含) 也是基于「≤」. 另外第二条的推理比较跳跃, 真正的理由是上面讲解里写的「小于 <span class="katex" data-o="k²"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span> 的倍数都有更<span class="nb">小的因子」.</span> </p></div>
+M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1133em;"><span></span></span></span></span></span></span></span></span> (包含) 也是基于「≤」. 另外第二条的推理比较跳跃, 真正的理由是上面讲解里写的「小于 <span class="katex" data-o="k²"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span> 的倍数都有更小的因子」. </p></div>
 
 <div class="card de">
   <span class="folie">Folie 36</span>
@@ -2305,17 +2307,18 @@ Das Wort dort kommt <span class="tk-n">3 </span>vor</code></pre>
   </ul>
 </div>
 <div class="zh">
-  <p>学完这一章, <span class="nb">应当能够:</span> </p>
-  <ol>
-    <li><b>说出并解释</b>集合运算: 子集/真子集、交、并、差、对称差 (能画韦恩图、<span class="nb">写出定义).</span> </li>
-    <li><b>会用</b> Python 的集合: <code>set()</code> (不是 {})、in、&lt;= &lt; &gt;= &gt;、&amp; | - ^、add; 知道集合无序、无下标、<span class="nb">去重.</span> </li>
-    <li><b>应用</b>集合、列表、字典的推导式, 包括带 if 和多个 for 的写法, 并知道集合推导<span class="nb">式会去重.</span> </li>
-    <li><b>解释</b>字典: 键-值对、键唯一且必须不可变、<span class="nb">按键访问.</span> </li>
-    <li><b>算出</b>使用字典的程序的状态 (栈 + 堆) 并画图/文字表示 <span class="nb">(字典里按键存引用).</span> </li>
-    <li><b>应用</b>字典的操作: <code>d[k]</code>、<code>d[k] = v</code>、len、in <span class="nb">(查键)、keys/values/items.</span> </li>
-    <li>用集合和字典<b>编写</b>解决简单问题的程序 (去重、计数、素数筛、<span class="nb">按编号查找).</span> </li>
-  </ol>
+  <p>逐条对应本笔<span class="nb">记的位置:</span></p>
+  <ul>
+    <li><b>Mengenoperationen benennen und erklären</b>: 能说出并讲清并、交、差、<span class="nb">对称差 (<a href="#mathe">数学中的集合</a>).</span></li>
+    <li><b>Mengen in Python gebrauchen</b>: 会用 Python 的 set 和它的运算 (<a href="#set">Python 的集合</a>、<span class="nb"><a href="#sieb">埃拉托色尼筛法</a>).</span></li>
+    <li><b>Comprehension anwenden</b>: 会写集合、列表、<span class="nb">字典的推导式 (<a href="#comprehension">推导式</a>).</span></li>
+    <li><b>Wörterbücher erklären, Operationen anwenden</b>: 能讲清字典的键值结构, 并会用它的各种操作 <span class="nb">(<a href="#dict">字典</a>).</span></li>
+    <li><b>Zustand (Heap+Stack) berechnen</b>: 在有字典的程序里, 会画出并写出栈和堆的状态 <span class="nb">(<a href="#dict">字典</a>).</span></li>
+    <li><b>Programme über Mengen und Wörterbücher entwickeln</b>: 会用集合和字典写出解决简单问题的程序 (<a href="#sieb">埃拉托色尼筛法</a>、<span class="nb"><a href="#dict">字典</a>).</span></li>
+  </ul>
 </div>
+
+
 
 </main>
 <script id="glass-js">
