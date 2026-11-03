@@ -1316,7 +1316,7 @@
 </div>
 <div class="zh">
   <p>所有计算过程都可以归结为两种: 判定一个字符串是否属于某个集合 (<b>membership 成员关系</b>), 或在字符串集合之间做<b>映射</b> <span class="nb">(mapping).</span> </p>
-  <p>两者密切相关、可以互相代替. 例: 不直接计算 3 + 5, 而是定义语言 L = {所有正确的等式 "<span class="katex" data-o="a+b=c"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span>"}, 然后依次问: "3+5=0" ∈ L 吗? "3+5=1" ∈ L 吗? …… 直到 "3+5=8" ∈ L 为真, 就知道答案是 8. 用 Python 模拟, 第 9 次成员测试才找到 8 <span class="nb">(实测).</span> </p>
+  <p>两者密切相关、可以互相代替. 例: 不直接计算 3 + 5, 而是定义语言 L = {所有正确的等式 "<span class="katex" data-o="a+b=c"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span>"}, 然后依次问: <span class="katex" data-o="\(\text{&quot;3+5=0&quot;} \in L\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">&quot;3+5=0&quot;</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> 吗? <span class="katex" data-o="\(\text{&quot;3+5=1&quot;} \in L\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">&quot;3+5=1&quot;</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> 吗? …… 直到 <span class="katex" data-o="\(\text{&quot;3+5=8&quot;} \in L\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">&quot;3+5=8&quot;</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> 为真, 就知道答案是 8. 用 Python 模拟, 第 9 次成员测试才找到 8 <span class="nb">(实测).</span> </p>
   <p>这说明: 两种方法虽然等价, 速度可能差很多. 直接相加一步完成; 逐个试候选答案, 答案越大试得越多. 反过来, 有些问题检查一个答案容易, 直接算出答案却难 (例如数独: 验证一个填好的格子很快, <span class="nb">从头解却慢).</span> </p>
 </div>
 <div class="warn"><p><b>原文笔误: </b>「test the correctness <b>of</b> all the possible input-output pairs」少了 <span class="nb">of.</span> </p></div>
@@ -1359,7 +1359,7 @@
     <li><b>图灵测试</b> (1950): 机器真的有智能吗? → 一位人类评判者用自然语言同时和一个人、一台机器对话, <span class="nb">能否分辨出哪个是机器.</span> </li>
   </ul>
 </div>
-<div class="add"><p>「the first formalisation」有争议: 几乎同时 (1936), Alonzo Church 用 λ 演算给出了另一种形式化, 发表还略早于图灵. 两种模型后来被证明能力相同, 合称 <b>Church–Turing 论题</b>: 凡是直观上「能算」的, 图灵机都能算. 生卒年 1912–1954 <span class="nb">无误.</span> </p></div>
+<div class="add"><p>「the first formalisation」有争议: 几乎同时 (1936), Alonzo Church 用 <span class="katex" data-o="\(\lambda\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">λ</span></span></span></span> 演算给出了另一种形式化, 发表还略早于图灵. 两种模型后来被证明能力相同, 合称 <b>Church–Turing 论题</b>: 凡是直观上「能算」的, 图灵机都能算. 生卒年 1912–1954 <span class="nb">无误.</span> </p></div>
 
 <div class="card de">
   <span class="folie">Slide 11</span>
@@ -1471,13 +1471,13 @@
   </ol>
 </div>
 <div class="zh">
-  <p>这门课要学会: </p>
-  <ol>
-    <li><b>识别并解决</b>能用形式语言处<span class="nb">理的问题;</span> </li>
-    <li><b>设计</b>自动机、文法和正则表达式来<b>定义</b>形式语言 (要会动手构造, <span class="nb">不只是认识);</span> </li>
-    <li><b>分析</b>问题及其<span class="nb">计算解法;</span> </li>
-    <li>认识到计算过程存在<b>内在的极限</b>及其后果: 有些问题无论用多快的计算机都无法解决 (例如停机问题, EIPS 第 1 章提过), 有些语言用某一类工具 (如正则表达式) <span class="nb">原理上就描述不了.</span> </li>
-  </ol>
+  <p>这门课围绕形式语言展开: 会用自动机、文法和正则表达式定义语言, 也要知道计算本<span class="nb">身有极限.</span></p>
+  <ul>
+    <li><b>Identifying and resolving problems</b>: 能识别哪些问题可以用形式<span class="nb">语言处理.</span></li>
+    <li><b>Designing automata, grammars, regular expressions</b>: 要会动手构造, <span class="nb">不只是认识 (<a href="FS-合集-练习单.html">练习单</a>).</span></li>
+    <li><b>Analysing problems and solutions</b>: 能分析问题和它的<span class="nb">计算解法.</span></li>
+    <li><b>Intrinsic limits</b>: 知道有些问题原理上无法计算, 有些语言某类工具<span class="nb">描述不了.</span></li>
+  </ul>
 </div>
 
 <h2 id="lesen">阅读材料与扩展<br><span class="de-title">Reading List &amp; Extra</span></h2>

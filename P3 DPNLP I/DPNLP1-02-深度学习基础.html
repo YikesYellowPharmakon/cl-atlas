@@ -1231,7 +1231,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
 -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
 H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span></span> (通常是第 j 个词的嵌入); 用同一个更新函数 f 把「新输入 + 上一步的状态」变成新状态. 关键在于参数 θ 在所有时间步<b>共享</b>: 不管句子多长, 参数量都不变, 这正好解决了 <a href="#s14-cost">1.4 节</a>「上下文窗口要人为指定」的问题, 因为状态可以携带任意远的历史信息.</p>
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span></span> (通常是第 j 个词的嵌入); 用同一个更新函数 f 把「新输入 + 上一步的状态」变成新状态. 关键在于参数 θ 在所有时间步<b>共享</b>: 不管句子多长, 参数量都不变, 这正好解决了 <a href="DPNLP1-01-基础.html#s14-cost">1.4 节</a>「上下文窗口要人为指定」的问题, 因为状态可以携带任意远的历史信息.</p>
 </div>
 
 <h3 id="s21-vanilla">普通 RNN<br><span class="de-title">Vanilla RNN</span></h3>
@@ -3103,7 +3103,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </ul>
 </div>
 <div class="zh">
-  <p>回顾 (图同 <a href="#s12-emb">1.2 Slide 5</a>): 预训练的词嵌入里编码了信息 (性别、时态、国家-首都等关系); 这些嵌入被用到训练语料之外的任务上, <span class="nb">这就是迁移.</span></p>
+  <p>回顾 (图同 <a href="DPNLP1-01-基础.html#s12-emb">1.2 Slide 5</a>): 预训练的词嵌入里编码了信息 (性别、时态、国家-首都等关系); 这些嵌入被用到训练语料之外的任务上, <span class="nb">这就是迁移.</span></p>
 </div>
 
 <div class="card de">
@@ -3459,7 +3459,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   </ul>
 </div>
 <div class="zh">
-  <p>分词就是把文本切成更小的单位, 叫 <b>token 词元</b>: 字母、词等离散的文本单位, 是自然语言的构件. 每个词元编码成一个唯一的 ID (整数); 对整个语料做一遍, 就得到语料的<b>词表 (vocabulary)</b>. 大多数 NLP 任务都必须先做这一步, 因为神经网络的嵌入层要的输入就是这些 ID (见 <span class="nb"><a href="#s15-motiv">1.5 节</a>).</span></p>
+  <p>分词就是把文本切成更小的单位, 叫 <b>token 词元</b>: 字母、词等离散的文本单位, 是自然语言的构件. 每个词元编码成一个唯一的 ID (整数); 对整个语料做一遍, 就得到语料的<b>词表 (vocabulary)</b>. 大多数 NLP 任务都必须先做这一步, 因为神经网络的嵌入层要的输入就是这些 ID (见 <span class="nb"><a href="DPNLP1-01-基础.html#s15-motiv">1.5 节</a>).</span></p>
 </div>
 
 <div class="card de">
@@ -3562,7 +3562,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
   <p class="src">(Inhalt identisch mit 1.5 Slide 19: Character n-grams von &lt;example&gt; für <span class="katex" data-o="n = 3"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> und <span class="katex" data-o="2 ≤ n"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7804em;vertical-align:-0.136em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> <span class="nb">≤ 4.)</span></p>
 </div>
 <div class="zh">
-  <p>回顾 <a href="#s15-ft">1.5 Slide 19</a> 的 fastText: 把词拆成字符 n-gram 也是一种子词思路, 不过 fastText 是在词向量层面用 n-gram, 分词本身仍按词. 下面的 BPE 则直接把文本切成<span class="nb">子词词元.</span></p>
+  <p>回顾 <a href="DPNLP1-01-基础.html#s15-ft">1.5 Slide 19</a> 的 fastText: 把词拆成字符 n-gram 也是一种子词思路, 不过 fastText 是在词向量层面用 n-gram, 分词本身仍按词. 下面的 BPE 则直接把文本切成<span class="nb">子词词元.</span></p>
 </div>
 
 <h3 id="s24-bpe">字节对编码 BPE<br><span class="de-title">Byte Pair Encoding (BPE)</span></h3>

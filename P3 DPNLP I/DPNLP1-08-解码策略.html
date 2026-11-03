@@ -1207,7 +1207,7 @@
   </ul>
 </div>
 <div class="zh">
-  <p>图同 <a href="#s41-arlm">4.1 Slide 2</a>. 每一步模型给出一个分布; 解码策略从中选一个词元, 加进上下文; <span class="nb">满足停止条件时结束.</span></p>
+  <p>图同 <a href="DPNLP1-04-BERT.html#s41-arlm">4.1 Slide 2</a>. 每一步模型给出一个分布; 解码策略从中选一个词元, 加进上下文; <span class="nb">满足停止条件时结束.</span></p>
 </div>
 
 <div class="card de">
@@ -1466,7 +1466,7 @@
   </ul>
 </div>
 <div class="zh">
-  <p><b>采样</b>: 按条件概率分布随机抽下一个词元 (概率 0.3 的词就有 30% 的机会被选中). 用<b>温度</b>控制随机程度: softmax 之前把 logits 除以温度 (同 <a href="#s53-dist">5.3 节</a>蒸馏的温度). 温度 → <span class="katex" data-o="∞"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span>: 分布趋于均匀, 完全随机; 温度 → 0: 全部概率集中在最大的那个词上, 等于贪心搜索. 温度 = 1 <span class="nb">就是模型原本的分布.</span></p>
+  <p><b>采样</b>: 按条件概率分布随机抽下一个词元 (概率 0.3 的词就有 30% 的机会被选中). 用<b>温度</b>控制随机程度: softmax 之前把 logits 除以温度 (同 <a href="DPNLP1-05-后BERT时代-BERTology与蒸馏.html#s53-dist">5.3 节</a>蒸馏的温度). 温度 → <span class="katex" data-o="∞"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span>: 分布趋于均匀, 完全随机; 温度 → 0: 全部概率集中在最大的那个词上, 等于贪心搜索. 温度 = 1 <span class="nb">就是模型原本的分布.</span></p>
 </div>
 
 <div class="card de">
@@ -1778,7 +1778,7 @@ out = model.generate(tokenized_prompt, max_new_tokens=<span class="tk-n">50</spa
   </ul>
 </div>
 <div class="zh">
-  <p>怎样选指标? 任务有<b>标准参考答案 (gold reference)</b> 时 (翻译、摘要): BLEU、ROUGE. 开放式生成, 没有参考答案时 (讲故事、续写): 多样性、连贯性、MAUVE. 有条件的话, 选人工评价. 前一类在 <span class="nb"><a href="#s42-gen">4.2 节</a>见过.</span></p>
+  <p>怎样选指标? 任务有<b>标准参考答案 (gold reference)</b> 时 (翻译、摘要): BLEU、ROUGE. 开放式生成, 没有参考答案时 (讲故事、续写): 多样性、连贯性、MAUVE. 有条件的话, 选人工评价. 前一类在 <span class="nb"><a href="DPNLP1-04-BERT.html#s42-gen">4.2 节</a>见过.</span></p>
 </div>
 
 <h3 id="s85-ref">有参考答案: BLEU 与 ROUGE<br><span class="de-title">BLEU, ROUGE</span></h3>
@@ -1790,7 +1790,7 @@ out = model.generate(tokenized_prompt, max_new_tokens=<span class="tk-n">50</spa
   <p>Five out of eight 1-grams are correctly predicted:<br>→ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">5/8</span></span></span></span></p>
 </div>
 <div class="zh">
-  <p><b>BLEU</b> (见 <a href="#s31-mt">3.1 Slide 3</a>): 参考句「The guard arrived late because it was raining」, 生成句「The guard arrived late because of the rain」. 生成句有 8 个 1-gram, 其中 The, guard, arrived, late, because 这 5 个出现在参考句里 (第二个 「the」 不算, 因为参考句只有一个 the, 计数被截断), <span class="nb"><span class="mt"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">5/8</span></span></span></span>.</span><!--/mt--></span></p>
+  <p><b>BLEU</b> (见 <a href="DPNLP1-03-Transformer.html#s31-mt">3.1 Slide 3</a>): 参考句「The guard arrived late because it was raining」, 生成句「The guard arrived late because of the rain」. 生成句有 8 个 1-gram, 其中 The, guard, arrived, late, because 这 5 个出现在参考句里 (第二个 「the」 不算, 因为参考句只有一个 the, 计数被截断), <span class="nb"><span class="mt"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">5/8</span></span></span></span>.</span><!--/mt--></span></p>
 </div>
 
 <div class="card de">
@@ -1987,7 +1987,7 @@ out = model.generate(tokenized_prompt, max_new_tokens=<span class="tk-n">50</spa
   </ul>
 </div>
 <div class="zh">
-  <p>为什么需要人工评价: 质量是主观的, 幽默、创意、相关性这些细微之处自动指标抓不住. 要考虑: 评估者 (按任务难度选领域专家或众包工人); 评价标准 (流畅: 语法正确、自然; 连贯: 逻辑通顺; 多样: 用词丰富). 挑战: 主观性 (评估者意见不一致, 通常要算评估者间一致性); 成本和时间; 评估者自己的偏见会影响结果. 同 <span class="nb"><a href="#s42-gen">4.2 Slide 20</a>.</span></p>
+  <p>为什么需要人工评价: 质量是主观的, 幽默、创意、相关性这些细微之处自动指标抓不住. 要考虑: 评估者 (按任务难度选领域专家或众包工人); 评价标准 (流畅: 语法正确、自然; 连贯: 逻辑通顺; 多样: 用词丰富). 挑战: 主观性 (评估者意见不一致, 通常要算评估者间一致性); 成本和时间; 评估者自己的偏见会影响结果. 同 <span class="nb"><a href="DPNLP1-04-BERT.html#s42-gen">4.2 Slide 20</a>.</span></p>
 </div>
 
 </main>

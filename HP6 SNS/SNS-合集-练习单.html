@@ -2182,7 +2182,7 @@ Fischers     Fritz fischt die     frischen Fische aus dem     Fluss</pre>
 <div class="zh">
   <p><b>翻译:</b> 给定上面这个简单的上下文无关文法. (a) 运行下面的 Python 脚本, 用这个文法分析句子 <i>Maria kennt Moritz</i> (Maria 认识 Moritz), 并用注释解释代码怎么工作. (b) 运行代码之前先想一想: 这个文法一共能生成多少个句子? (c) 给文法加上句法规则和词汇规则, 覆盖状语成分 <i>(sehr) gut</i> (「(很) 好」), 用下面两个例句测试文法能否推<span class="nb">导出它们.</span></p>
   <p><b>思路:</b> (a) 逐行说清楚: 句子按空格切成词表; ChartParser 用文法建分析器; <code>parse</code> 返回的是<b>可迭代</b>的若干棵树, 因为句子可能有歧义. (b) 数组合: S → NP VP, VP → V NP, 两个 NP 位置各有 2 个人名, 动词只有 1 个, 而且没有递归规则, 所以是有限的. (c) gut 是形容词作状语 (SNS 02 dt · Folie 5), sehr 是程度小品词, 组成 ADJP → PRT ADJ (dt · <span class="nb">Folie 21).</span></p>
-</details>
+</div>
 <details class="answer"><summary>答案 (先自己做再看)</summary>
   <p>(a) <span class="nb">加上注释的代码:</span></p>
 <pre data-lang="python"><span class="tk-c"># Der zu parsende Satz:
@@ -2303,7 +2303,7 @@ a/det_stone/noun</pre>
 <div class="zh">
   <p><b>翻译:</b> 看下面两句: ①「他喜欢下象棋.」②「他象棋下得好.」讨论第 1 句的 gerne 是副词还是形容词. 第 2 句的词位 gut 是什么词类? 讨论这里确定词类时遇到的问题. 如果不按形态、而按语义给副词下定义 (副词 = 修饰动词所表达的事件的词类), 第 2 句的 gut <span class="nb">可以认为是什么词类?</span></p>
   <p><b>思路:</b> 三个标准逐个试 (SNS 02 第 1 节和 dt · Folie 5–6): 语义 (表示什么)、句法功能 (在句中作什么成分)、形态 (能不能屈折变化). 关键测试: 能不能作定语并变格? <i>der gute Spieler</i> 可以, <i>*der gerne Spieler</i> <span class="nb">不行.</span></p>
-</details>
+</div>
 <details class="answer"><summary>答案 (先自己做再看)</summary>
   <p><b>gerne:</b> 语义上表示动作的具体情况 (怎样下棋: 乐意地); 句法上作状语; 形态上不能变格, 不能作定语 (<i>*ein gerner Spieler</i>). <span class="nb">三条都指向<b>副词</b>.</span></p>
   <p><b>gut:</b> 语义和句法功能与 gerne 完全一样 (修饰「下棋」, 作状语), 但形态上能变格: <i>ein guter Spieler</i>、<i>das gute Spiel</i>. 按形态标准 (德语语法的传统做法) 它是<b>形容词</b>, 在这里作状语用 (SNS 02 dt · Folie 5 的「adverbialer Gebrauch」). 问题在于: 不同的标准给出不同的结论, 同一个词在句子里的功能和它的词<span class="nb">类不一致.</span></p>
@@ -2324,7 +2324,7 @@ a/det_stone/noun</pre>
 <div class="zh">
   <p><b>翻译:</b> 以下面句子里的 <i>Verloren</i> 为例, 说明成分 (Konstituente) 和短语 (Phrase) 的区别. 句子: 「弄丢, 他的钥匙串倒是从来没弄丢过, 不过放错地方是<span class="nb">常有的事.」</span></p>
   <p><b>思路:</b> 回顾 SNS 02 第 2 节: 成分是句子结构里的一个单位 (能通过移位等测试); 短语是以某个中心语为核心、<b>完整</b>的成分, 包含中心语的全部补足语. 问自己: verloren 能被移到句首 (前场), 所以是什么? verloren 的宾语 seinen Schlüsselbund <span class="nb">跟它一起移了吗?</span></p>
-</details>
+</div>
 <details class="answer"><summary>答案 (先自己做再看)</summary>
   <p>verloren 是<b>成分</b>, 因为它能单独移位: 被放到了句首的<b>Vorfeld 前场</b> (限定动词 hat 前面的位置). 但它<b>不是短语</b>: 过去分词 verloren 是一个更大的复合 VP 的一部分, 正常语序是 <i>er hat seinen Schlüsselbund zwar noch nie verloren</i>; verloren 的宾语 seinen Schlüsselbund 留在原处, 只有分词本身被抽出来放进前场. 一个短语应当包括中心语和它的补足语, 这里只有光杆的中心语, 所以 verloren 不是完整的 <span class="nb">VP.</span></p>
   <p>这个例子还说明: 前场里不一定只能放句子成分 (Satzglied, 如主语、宾语、状语). 复合谓语 hat … verloren 是一个句子成分, 它的一部分 (分词) 也可以单独进入由限定动词 hat 决定的前场. 后半句 <i>aber oft genug verlegt</i> 和前面共用 hat 和宾语, 形成对比: 不是「丢」, 而是「放错地方」, 这也是把 verloren 放到句首加以强<span class="nb">调的原因.</span></p>

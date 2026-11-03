@@ -2014,7 +2014,7 @@
 <div class="zh">
   <p><b>翻译</b>: 对每个句子, 判断它能不能用下面的文法生成. <span class="nb">不管大小写和标点.</span></p>
   <p><b>思路</b>: 先把标点和大小写去掉, 只看词串. 然后看这套文法允许的形状: 句子一定是 NP + VP; NP 是 (Det) N; VP 是 V 后面跟一个 NP 或一个完整的句子 S (递归). 所以每个句子都必须以名词短语开头, 动词后面必须还有东西. 只看词串合不合规则, 不管德语里是否合语法, <span class="nb">也不管意思.</span></p>
-</details>
+</div>
 <details class="answer"><summary>答案 (先自己做再看) </summary>
   <div class="tablewrap"><table>
     <tr><th>句子 (去掉标点)</th><th>答案</th><th>为什么</th></tr>

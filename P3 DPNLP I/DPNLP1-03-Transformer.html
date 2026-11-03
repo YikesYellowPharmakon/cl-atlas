@@ -1180,7 +1180,7 @@
   </ul>
 </div>
 <div class="zh">
-  <p>机器翻译是序列到序列任务, 当初正是它促使 Bahdanau 等人提出「普通的」注意力机制 (<a href="#s22-bahdanau">2.2 节</a>). 关键在于解码器要能访问<b>整个</b>输入序列, 这一点用<b>cross-attention 交叉注意力</b> (下一节讲) <span class="nb">解决得很好.</span></p>
+  <p>机器翻译是序列到序列任务, 当初正是它促使 Bahdanau 等人提出「普通的」注意力机制 (<a href="DPNLP1-02-深度学习基础.html#s22-bahdanau">2.2 节</a>). 关键在于解码器要能访问<b>整个</b>输入序列, 这一点用<b>cross-attention 交叉注意力</b> (下一节讲) <span class="nb">解决得很好.</span></p>
   <p>编码器的语境化做得越好, 翻译质量越高. 双向 RNN/LSTM 其实只是把两个<b>单向</b>网络拼接起来, 每个方向在计算时只看到一侧. Transformer 编码器层<b>天生就是双向的</b>: 每个位置在每一层都同时看左右两边的所有词. 把多层叠起来, 这种双向语境化<span class="nb">就更「深」.</span></p>
 </div>
 
@@ -1327,7 +1327,7 @@
   <p><b>读图:</b></p>
   <ul>
     <li><b>左边: 编码器</b>, 输入源序列 X. 词嵌入 (Input Embedding) 加上位置编码 (Positional Encoding, ⊕), 然后经过 N 个相同的块 <span class="katex" data-o="(N×)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mord">×</span><span class="mclose">)</span></span></span></span>. 每块两个子层: 多头 (自) 注意力 (Multi-Head Attention), 前馈网络 (Feed Forward); 每个子层后面都有「Add &amp; Norm」= 残差连接 + <span class="nb">层归一化.</span></li>
-    <li><b>右边: 解码器</b>, 输入目标序列 Y (shifted right = 右移一位, 前面加开始符, 和 <a href="#s21-apps">2.1 Slide 14</a> 的自回归一样). 每块三个子层: <b>掩码</b>多头自注意力 (Masked, 不能看未来的词), 对编码器输出的多头<b>交叉</b>注意力 (编码器的箭头从左边伸进来), <span class="nb">前馈网络.</span></li>
+    <li><b>右边: 解码器</b>, 输入目标序列 Y (shifted right = 右移一位, 前面加开始符, 和 <a href="DPNLP1-02-深度学习基础.html#s21-apps">2.1 Slide 14</a> 的自回归一样). 每块三个子层: <b>掩码</b>多头自注意力 (Masked, 不能看未来的词), 对编码器输出的多头<b>交叉</b>注意力 (编码器的箭头从左边伸进来), <span class="nb">前馈网络.</span></li>
     <li><b>顶上</b>: Linear + Softmax 输出下一个词的概率, <span class="nb">训练时用 NLL.</span></li>
   </ul>
   <p>括号里的说明: 分类、标注这类较简单的问题, 只用编码器就够了 (BERT 就是只有编码器的 Transformer). 这一节讲编码器, 3.<span class="nb">3 节讲解码器.</span></p>
@@ -1533,7 +1533,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
 H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
 c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span></span></span></span> 各有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0962em;">J</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0962em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 行 (每个源词元一个键、一个值).</p>
-  <p>和 <a href="#s22-recipe">2.2 节</a>的基本配方对照: 那里查询、键、值是给定的, 这里它们都是<b>输入乘以可学习矩阵</b>, 所以模型能自己学「什么样的查询该匹配什<span class="nb">么样的键」.</span></p>
+  <p>和 <a href="DPNLP1-02-深度学习基础.html#s22-recipe">2.2 节</a>的基本配方对照: 那里查询、键、值是给定的, 这里它们都是<b>输入乘以可学习矩阵</b>, 所以模型能自己学「什么样的查询该匹配什<span class="nb">么样的键」.</span></p>
 </div>
 
 <div class="card de">
@@ -3364,7 +3364,7 @@ c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></spa
 -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
 -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
 H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span></span> 只依赖第 1 到 j 个输入, 结构上就看不到未来, 所以不会「作弊」. 图与 <a href="#s21-apps">2.1 Slide 14</a> 相同: 输入 BOS a great book !, 目标 a great book ! EOS, 虚线箭头表示目标就是下一步的输入.</p>
+c-16-25.333-24-45-24-59z"/></svg></span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span></span></span></span> 只依赖第 1 到 j 个输入, 结构上就看不到未来, 所以不会「作弊」. 图与 <a href="DPNLP1-02-深度学习基础.html#s21-apps">2.1 Slide 14</a> 相同: 输入 BOS a great book !, 目标 a great book ! EOS, 虚线箭头表示目标就是下一步的输入.</p>
 </div>
 
 <div class="card de">
