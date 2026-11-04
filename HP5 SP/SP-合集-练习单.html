@@ -1123,6 +1123,7 @@
     <nav>
       <a href="#u1">练习 1 · Python 基础</a>
       <a href="#u2">练习 2 · 面向对象与正则</a>
+      <a href="#u3">练习 3 · NLTK 语料库</a>
     </nav>
   </div>
 </header>
@@ -2297,6 +2298,416 @@ Amount: 15</pre>
   <p><code>\d+</code> 是贪婪的, 但遇到点就停, 所以金额是 <code>15</code> 而不是 <code>15.</code>. 同样的组也能按编号取: <code>match.group(1)</code> 是 <code>'$'</code>, <code>match.group(2)</code> 是 <code>'15'</code>; <code>match.groupdict()</code> 一次返回 <code class="lc">{'currency': '$', 'amount': '15'}</code>. 组里取到的永远是字符串, <span class="nb">要计算得先 <code>int(...)</code>.</span></p>
   <p><b>易错:</b> 模式里有分组时, <code>re.findall</code> 返回的是各组的内容 (多个组就是元组列表), 不再是整个匹配: <code class="lc">re.findall(pattern, text)</code> 得到 <span class="nb"><code>[('$', '15')]</code>.</span></p>
 </details>
+</article>
+</section>
+
+
+<!-- ======================= U3 ======================= -->
+<section class="part" id="u3">
+<h2>练习 3: NLTK 与语料库语言学<br><span class="de-title">Exercise Session 3: NLTK: Corpus Linguistics</span><small><span class="rl">对应 <a href="SP-05-NLTK语料库语言学与文档表示.html#korpora">SP 05 · 在 NLTK 中访问语料</a>、<a href="SP-05-NLTK语料库语言学与文档表示.html#konkordanz">索引</a>、<a href="SP-05-NLTK语料库语言学与文档表示.html#statistik">基础文本统计</a>、<a href="SP-05-NLTK语料库语言学与文档表示.html#cfd">条件频率分布</a>;</span><span class="rl">源文件 Symprog Exercise 3 Slides.pdf;</span><span class="rl">练习课幻灯片;</span><span class="rl">语言猜测题对应作业 Homework 04 的 Task 3.1、3.2 (作业单本身不在这份材料里).</span></small></h2>
+
+<article id="u3-1">
+<h3>环境变量与 PYTHONPATH<br><span class="de-title"><span class="seg">Overview ·</span> <span class="seg">Environment Variables</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 3–4</span>
+  <p><b>Overview</b></p>
+  <ul>
+    <li>Environment variables and <span class="nb">PYTHONPATH</span></li>
+    <li>NLTK <span class="nb">Basics</span></li>
+    <li>Concordances</li>
+    <li>Basic Text <span class="nb">Statistics</span></li>
+    <li>Lexical <span class="nb">Resources</span></li>
+    <li>(Conditional) Frequency <span class="nb">Distributions</span></li>
+    <li>Language Guesser <span class="nb">Task</span></li>
+  </ul>
+  <p><b>Environment Variables</b></p>
+  <ul>
+    <li>Environment variables are like variables for your whole <span class="nb">system</span></li>
+    <li>Usually hold the path to some folder that is required by some software or by the OS <span class="nb">itself</span></li>
+    <li>PYTHONPATH is an example:
+      <ul>
+        <li>Holds one or more paths where python should search for custom libraries and <span class="nb">modules</span></li>
+        <li>Helpful if you want to import python modules, that are in multiple files if they are not all in the same <span class="nb">folder</span></li>
+      </ul></li>
+    <li>The python error “ModuleNotFoundError” can happen if you are trying to import:
+      <ul>
+        <li>A python module that doesn’t exist; <span class="nb">or</span></li>
+        <li>A custom module that is not in <span class="nb">PYTHONPATH.</span></li>
+      </ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 这次练习课的内容: 环境变量与 PYTHONPATH、NLTK 基础、索引 (concordance)、基础文本统计、词汇资源、(条件) 频率分布、语言猜测任务. <b>environment variable 环境变量</b>就像整个系统范围的变量, 通常存着某个软件或操作系统本身需要的文件夹路径. PYTHONPATH 就是一个: 它存着一个或多个路径, Python 会在这些路径里找自定义的库和模块; 当要导入的模块分散在几个文件夹里时很有用. 报 <code>ModuleNotFoundError</code> 有两种可能: 要导入的模块根本不存在, 或者是自己写的模块, 但它所在的文件夹不在 PYTHONP<span class="nb">ATH 里.</span></p>
+  <p><b>思路:</b> <code>import</code> 时 Python 按 <code>sys.path</code> 列表依次找模块: 第一项是被运行的脚本所在的文件夹, 然后是 PYTHONPATH 里的路径, 最后是标准库和已安装的包. 所以同一个文件夹里的模块总能找到, 别的文件夹里的就要靠 PYTHONPATH <span class="nb">(或把包装好).</span></p>
+</div>
+<div class="warn"><p><b>幻灯片小错:</b> 封面 (Slide 1) 写的学期是 WS2025/2026, 这套幻灯片是上一学年的版本沿用过来的; 本课是 <span class="nb">WS2026/2027.</span></p></div>
+</article>
+
+<article id="u3-2">
+<h3>ModuleNotFoundError 的例子<br><span class="de-title">Module Not Found Example</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 5</span>
+<pre data-lang="python"><span class="tk-c"># File folderA/sample_function.py
+</span><span class="tk-k">def </span><span class="tk-f">functionA</span>()
+  <span class="tk-b">print</span>(<span class="tk-s">'Hello World!'</span>)
+
+<span class="tk-c"># File folderB/test_sample_function.py
+</span><span class="tk-k">from </span>sample_function <span class="tk-k">import </span>functionA
+
+functionA()</pre>
+<pre data-lang="text">&gt;&gt;&gt;   File "PATH_TO_FOLDERB/folderB/test_sample_function.py",
+&gt;&gt;&gt;  line 1, in &lt;module&gt;
+&gt;&gt;&gt;    from sample_function import functionA
+&gt;&gt;&gt; ModuleNotFoundError: No module named 'sample_function'</pre>
+<pre data-lang="python"><span class="tk-k">import </span>os <span class="tk-c"># Debug: inspect your current PYTHONPATH variable
+</span><span class="tk-b">print</span>(os.environ[<span class="tk-s">'PYTHONPATH'</span>])</pre>
+  <p><b>Add</b> folderA to the PYTHONPATH (Linux / <span class="nb">macOS):</span></p>
+<pre data-lang="shell"><span class="tk-b">export </span>PYTHONPATH=<span class="tk-s">"/full/path/to/folderA:</span>$PYTHONPATH<span class="tk-s">"</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 函数定义在 folderA 的 <code>sample_function.py</code> 里, 测试脚本在 folderB 里导入它. 在 folderB 里运行测试脚本, 第 1 行就报 <code class="lc">ModuleNotFoundError: No module named 'sample_function'</code>. 调试: 用 <code>os.environ['PYTHONPATH']</code> 看当前的 PYTHONPATH. 解决: 在 Linux / macOS 的终端里用 <code>export</code> 把 folderA 加到 PYTHONPATH <span class="nb">前面.</span></p>
+  <p><b>思路:</b> 运行 <code class="lc">folderB/test_sample_function.py</code> 时, <code>sys.path</code> 的第一项是 folderB, folderA 不在搜索路径里. <code>export</code> 的写法: 新路径 + 冒号 + 原来的 <code>$PYTHONPATH</code>, 这样原有的路径不会丢. 它只对当前终端会话有效, 要长期生效就写进 <code>~/.zshrc</code> 或 <span class="nb"><code>~/.bashrc</code>.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>按幻灯片建好两个文件夹 (函数文件照抄, 包括少了的冒号), 在它们上一层实际运行三次. 第一次直接运行, 得到幻灯片上的错误 (Python 3.<span class="nb">15 还会多给一句猜测):</span></p>
+<pre data-lang="output">Traceback (most recent call last):
+  File ".../folderB/test_sample_function.py", line 1, in &lt;module&gt;
+    from sample_function import functionA
+ModuleNotFoundError: No module named 'sample_function'. Did you mean: 'test_sample_function'?</pre>
+  <p>第二次用 <code class="lc">PYTHONPATH=folderA python3 folderB/test_sample_function.py</code> (只对这一条命令设置变量, 效果和先 <code>export</code> 一样): 模块找到了, 但读到幻灯片里少冒号<span class="nb">的那一行:</span></p>
+<pre data-lang="output">  File ".../folderA/sample_function.py", line 1
+    def functionA()
+                   ^
+SyntaxError: expected ':'</pre>
+  <p>第三次补上冒号再运行, 输出 <span class="nb"><code>Hello World!</code>.</span></p>
+  <p>调试那两行有一个坑: 如果 PYTHONPATH 根本没设置, <code>os.environ['PYTHONPATH']</code> 会报 <code class="lc">KeyError: 'PYTHONPATH'</code>. 更稳的写法是 <code class="lc">os.environ.get('PYTHONPATH')</code> (没设置时返回 None), 或者直接 <code class="lc">import sys; print(sys.path)</code> <span class="nb">看完整的搜索路径.</span></p>
+</details>
+<div class="warn"><p><b>幻灯片错误:</b> <code class="lc">def functionA()</code> 少了冒号, 应为 <code class="lc">def functionA():</code>. 设好 PYTHONPATH 以后, 导入时报的就是 <code class="lc">SyntaxError: expected ':'</code> (见答案里的第二次运行). 另外报错信息前面的 <code>&gt;&gt;&gt;</code> 不是交互提示符, 只是幻灯片用来标出输出, 真实的 traceback 没有它, 而且第一行是 <code class="lc">Traceback (most recent call last):</code>.</p></div>
+</article>
+
+<article id="u3-3">
+<h3>NLTK 基础与语料<br><span class="de-title"><span class="seg">NLTK Basics ·</span> <span class="seg">Corpora</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 6–9</span>
+  <ul>
+    <li>NLTK (Natural Language Toolkit) is one of the most important and well-known computational linguistic modules in <span class="nb">Python.</span></li>
+    <li>NLTK consists of various modules for solving various computational linguistic <span class="nb">tasks.</span></li>
+  </ul>
+  <p>Some important modules and their <span class="nb">function:</span></p>
+  <ul>
+    <li><code>nltk.corpus</code>: provides access to a variety of text <span class="nb">corpora</span></li>
+    <li><code>nltk.tokenize</code>: contains a set of tokenizers that work at word or sentence level (<code>word_tokenize</code>, <span class="nb"><code>sent_tokenize</code>)</span></li>
+    <li><code>nltk.metrics</code>: contains functions for calculating precision, <span class="nb">recall...</span></li>
+    <li><code>nltk.classify</code>: contains e.g. Naive Bayes <span class="nb">classifier</span></li>
+  </ul>
+  <p><b>What is a corpus?</b></p>
+  <p>A corpus (plural: corpora) is a collection of linguistic data, often <span class="nb">documents.</span></p>
+  <p>NLTK provides access to corpora in English (and other languages), <span class="nb">for example:</span></p>
+  <ul>
+    <li><b>Brown Corpus</b>: American English texts from different genres (e.g. news, fiction, <span class="nb">etc).</span></li>
+    <li><b>Inaugural Address Corpus</b>: US presidential inaugural speeches, useful for exploring language changes over <span class="nb">time.</span></li>
+    <li><b>Project Gutenberg Corpus</b>: A selection of literary works in English, including texts by Austen and <span class="nb">Shakespeare.</span></li>
+    <li><b>UDHR Corpus</b>: The Universal Declaration of Human Rights in hundreds of languages, useful for comparing <span class="nb">languages.</span></li>
+  </ul>
+  <p>Corpus <span class="nb">Features:</span></p>
+  <ul>
+    <li><code>raw()</code>: returns the entire text in raw <span class="nb">form</span></li>
+    <li><code>words()</code>: creates a list of all words from the <span class="nb">body</span></li>
+    <li><code>sents()</code>: for each sentence, creates a list of the words in the sentence. These sentence lists are in turn combined into one large <span class="nb">list</span></li>
+    <li><code>categories()</code>: returns list of text categories present in the <span class="nb">corpus</span></li>
+    <li><code>fileids()</code>: returns list of files in <span class="nb">corpus</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> NLTK (自然语言工具包) 是 Python 里最重要、最有名的计算语言学模块之一, 由解决各种任务的子模块组成: <code>nltk.corpus</code> 访问各种语料; <code>nltk.tokenize</code> 词级和句级的分词器; <code>nltk.metrics</code> 计算准确率、召回率等指标; <code>nltk.classify</code> 分类器, 如朴素贝叶斯. <b>corpus 语料库</b> (复数 corpora) 是语言数据的集合, 通常由文档组成. NLTK 带的语料: Brown (不同体裁的美国英语)、Inaugural (美国总统就职演说, 适合看语言随时间的变化)、Gutenberg (英语文学作品, 有 Austen、Shakespeare)、UDHR (《世界人权宣言》的几百种语言版本, 适合比较语言). 语料对象的方法: <code>raw()</code> 原始文本; <code>words()</code> 所有词的列表; <code>sents()</code> 每句一个词列表, 再合成一个大列表; <code>categories()</code> 体裁类别; <code>fileids()</code> <span class="nb">文件名列表.</span></p>
+  <p><b>思路:</b> 这四页是 SP 05 第 2–3 节的复习. 记住返回值的形状: <code>raw()</code> 是一个字符串, <code>words()</code> 是词的列表, <code>sents()</code> 是列表的列表. 只有分了类的语料 (如 Brown) 才有有意义的 <span class="nb"><code>categories()</code>.</span></p>
+</div>
+</article>
+
+<article id="u3-4">
+<h3>索引: 词在上下文中<br><span class="de-title">Concordances</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 10</span>
+  <p><b>What is a concordance?</b></p>
+  <p>A concordance shows occurrences of a word together with its surrounding <span class="nb">context.</span></p>
+<pre data-lang="python"><span class="tk-k">from </span>nltk <span class="tk-k">import </span>Text
+<span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>gutenberg
+text = Text(gutenberg.words(<span class="tk-s">"melville-moby_dick.txt"</span>))</pre>
+  <ul>
+    <li>Show a word in context: <code class="lc">text.concordance("whale")</code></li>
+    <li>Find words used in similar contexts: <span class="nb"><code>text.similar("whale")</code></span></li>
+    <li>Find contexts shared by two words: <code class="lc">text.common_contexts(["whale", "ship"])</code></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> <b>concordance 索引</b> (语词索引) 列出一个词的每一次出现和它周围的上下文. 把《白鲸》的词列表包成 <code>Text</code> 对象以后: <code>concordance</code> 显示 whale 的上下文; <code>similar</code> 找出现在相似上下文里的词; <code>common_contexts</code> <span class="nb">找两个词共有的上下文.</span></p>
+  <p><b>思路:</b> 三个方法都是直接打印, 返回 None. <code>similar</code> 的依据是分布相似性: 两个词左右邻居相同 (比如都出现在 the _ is 里) 的次数越多, 越相似. <code>common_contexts</code> 的输出写成 <span class="nb"><code>左邻_右邻</code>.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>在 NLTK 3.10 上实际运行 (concordance 加了 <code>lines=5</code> 只显示前 5 <span class="nb">行):</span></p>
+<pre data-lang="output">Displaying 5 of 1226 matches:
+s , and to teach them by what name a whale - fish is to be called in our tongue
+t which is not true ." -- HACKLUYT " WHALE . ... Sw . and Dan . HVAL . This ani
+ulted ." -- WEBSTER ' S DICTIONARY " WHALE . ... It is more immediately from th
+ISH . WAL , DUTCH . HWAL , SWEDISH . WHALE , ICELANDIC . WHALE , ENGLISH . BALE
+HWAL , SWEDISH . WHALE , ICELANDIC . WHALE , ENGLISH . BALEINE , FRENCH . BALLE</pre>
+<pre data-lang="output">ship boat sea time captain world man deck pequod other whales air
+water head crew line thing side way body</pre>
+<pre data-lang="output">the_s the_and the_is the_in the_the the_as the_was the_which the_i
+a_in the_has the_when the_had the_with the_to the_by the_so the_that
+the_would the_a</pre>
+  <p>concordance 不分大小写 (WHALE 也算), 共 1226 处. similar 给出的 ship、boat、sea 和 whale 一样常出现在「the ___ was」这类位置上: 分布相似不等于意思相近, 它们大多只是同样的名词. <code>the_s</code> 来自 the whale's 这类所有格: 语料把撇号切成单独的 token (whale <code>'</code> s), 而 similar 和 common_contexts 只看全由字母组成的 token, 撇号被滤掉, <span class="nb">右邻就成了 s.</span></p>
+</details>
+</article>
+
+<article id="u3-5">
+<h3>基础文本统计与词汇资源<br><span class="de-title"><span class="seg">Basic Text Statistics ·</span> <span class="seg">Lexical Resources</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 11–12</span>
+  <p>Some numbers we might want to know about a <span class="nb">text:</span></p>
+<pre data-lang="python">text = <span class="tk-s">"the cat chased the mouse"
+</span>tokens = text.split()</pre>
+  <ul>
+    <li><b>Number of tokens</b>: all tokens, including repetitions. <span class="nb"><code class="lc">len(tokens) # 5</code></span></li>
+    <li><b>Number of types</b>: distinct tokens. <span class="nb"><code class="lc">len(set(tokens)) # 4</code></span></li>
+    <li><b>Lexical diversity</b>: Shows how strong the relationship between tokens and types is. Gives an indication of vocabulary variety. <code class="lc">len(set(tokens)) / len(tokens) # 0.8</code></li>
+  </ul>
+  <p><b>Lexical Resources</b></p>
+  <ul>
+    <li>Collection of words/phrases tagged with specific meta information that provides additional information about the <span class="nb">text.</span></li>
+    <li>Examples:
+      <ul>
+        <li>Vocabulary: alphabetically sorted list of distinct <span class="nb">tokens.</span></li>
+        <li>Frequency Distribution: maps each token to its number of <span class="nb">occurrences.</span></li>
+        <li>Conditional Frequency Distribution: counts tokens separately for each condition, e.g. text <span class="nb">category.</span></li>
+      </ul></li>
+  </ul>
+<pre data-lang="python"><span class="tk-k">from </span>nltk <span class="tk-k">import </span>FreqDist
+tokens = <span class="tk-s">"the cat chased the mouse"</span>.split()
+<span class="tk-b">sorted</span>(<span class="tk-b">set</span>(tokens)) <span class="tk-c"># ['cat', 'chased', 'mouse', 'the']
+</span>fd = FreqDist(tokens) <span class="tk-c"># {'the':2, 'cat':1, 'chased':1, 'mouse':1}
+</span>fd[<span class="tk-s">"the"</span>] <span class="tk-c"># 2</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 一段文本常用的几个数: <b>token 形符</b>数 (所有词, 重复的也算) 是 5; <b>type 类符</b>数 (不同的词) 是 4; <b>lexical diversity 词汇多样性</b> = 类符数 / 形符数 = 0.8, 反映词汇的丰富程度. <b>lexical resource 词汇资源</b>是带有元信息的词或短语的集合, 为文本提供附加信息. 例子: 词表 (不同 token 按字母排序)、频率分布 (每个 token 映射到出现次数)、条件频率分布 (按条件分别计数, <span class="nb">如按体裁).</span></p>
+  <p><b>思路:</b> 自己数一遍: the 出现 2 次, 其余各 1 次. 词汇多样性在 0 到 1 之间, 越接近 1 重复越少; 它和文本长度有关, 长文本几乎一定更低, 所以只能比较长度相近的文本 (SP 05 · <span class="nb"><a href="SP-05-NLTK语料库语言学与文档表示.html#ttr">类符形符比</a>).</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实际运行: <code>len(tokens)</code> 是 5, <code>len(set(tokens))</code> 是 4, 比值 <code>0.8</code>; <code>sorted(set(tokens))</code> 是 <code class="lc">['cat', 'chased', 'mouse', 'the']</code>; <code>fd["the"]</code> 是 2. <span class="nb">注释里的数字都对.</span></p>
+  <p>只有一处写法上的简化: 在交互模式下显示 <code>fd</code>, 得到的是 <code class="lc">FreqDist({'the': 2, 'cat': 1, 'chased': 1, 'mouse': 1})</code>. FreqDist 是 <code>collections.Counter</code> 的子类, 用起来像字典, <span class="nb">但不是普通的 dict.</span></p>
+</details>
+</article>
+
+<article id="u3-6">
+<h3>条件频率分布 (例 1)<br><span class="de-title"><span class="seg">Conditional Frequency Distributions ·</span> <span class="seg">Example 1: ConditionalFreqDist</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 13–15</span>
+  <ul>
+    <li>A collection of frequency distributions: one distribution per <span class="nb">condition.</span></li>
+    <li>Example: count words separately in news and <span class="nb">fiction.</span></li>
+    <li>Input: pairs of (condition, event). In our example: (category, <span class="nb">word).</span></li>
+  </ul>
+<pre data-lang="python">(<span class="tk-s">"news"</span>, <span class="tk-s">"the"</span>)
+(<span class="tk-s">"fiction"</span>, <span class="tk-s">"cat"</span>)</pre>
+  <p>Think of a nested dictionary: Category → word → <span class="nb">count</span></p>
+  <p>The condition identifies which group to count in; the event identifies what to <span class="nb">count.</span></p>
+  <p><b>Example 1:</b> We want to count words separately for each text <span class="nb">category.</span></p>
+  <ol>
+    <li>Start with tokens from each category:
+<pre data-lang="python">news = <span class="tk-s">"the minister met the reporter"</span>.split()
+fiction = <span class="tk-s">"the cat chased the mouse"</span>.split()</pre></li>
+    <li>Create one (category, word) pair per token occurrence:
+<pre data-lang="python">pairs = [(<span class="tk-s">"news"</span>, word) <span class="tk-k">for </span>word <span class="tk-k">in </span>news]
+pairs += [(<span class="tk-s">"fiction"</span>, word) <span class="tk-k">for </span>word <span class="tk-k">in </span>fiction]
+<span class="tk-c"># Starts with: [('news', 'the'), ('news', 'minister'), ...]</span></pre></li>
+    <li>Create the conditional frequency distribution:
+<pre data-lang="python"><span class="tk-k">from </span>nltk <span class="tk-k">import </span>ConditionalFreqDist
+cfd = ConditionalFreqDist(pairs)
+cfd[<span class="tk-s">"news"</span>][<span class="tk-s">"the"</span>] <span class="tk-c"># 2
+</span>cfd[<span class="tk-s">"fiction"</span>][<span class="tk-s">"cat"</span>] <span class="tk-c"># 1</span></pre></li>
+  </ol>
+  <p>Using cfd from the previous <span class="nb">slide:</span></p>
+  <ul>
+    <li>List the conditions: <code class="lc">cfd.conditions() # ['news', 'fiction']</code>, <code class="lc">sorted(cfd.conditions()) # ['fiction', 'news']</code>. <code>cfd.keys()</code> also returns the <span class="nb">conditions.</span></li>
+    <li>Get one condition’s frequency distribution: <span class="nb"><code class="lc">news_fd = cfd["news"]</code></span></li>
+    <li>Look up a word’s count under a condition: <code class="lc">cfd["news"]["the"] # 2</code>, <span class="nb"><code class="lc">cfd["news"]["cat"] # 0</code></span></li>
+    <li>Plot counts for selected words: <code class="lc">cfd.plot(samples=["the", "cat", "minister"])</code></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> <b>conditional frequency distribution 条件频率分布</b>是一组频率分布, 每个条件一个. 例: 分别统计新闻和小说里的词. 输入是 (条件, 事件) 对, 这里是 (类别, 词). 可以把它想成嵌套字典: 类别 → 词 → 次数. 条件决定「在哪一组里计数」, 事件决定「数什么」. 步骤: ① 每个类别的 token; ② 每出现一个 token 生成一个 (类别, 词) 对; ③ 把对的列表交给 <code>ConditionalFreqDist</code>. 用法: <code>conditions()</code> 列出条件 (<code>keys()</code> 也一样); <code>cfd["news"]</code> 取出一个条件下的 FreqDist; <code>cfd["news"]["the"]</code> 查一个词在某条件下的次数; <code>plot</code> <span class="nb">画出指定词的计数.</span></p>
+  <p><b>思路:</b> 逐个核对注释里的值: news 里 the 出现几次? 一个没在 news 里出现的词 (cat) 查出来是多少? <span class="nb">条件的顺序按什么排?</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实际运行全部符合注释: <code>pairs[:2]</code> 是 <code class="lc">[('news', 'the'), ('news', 'minister')]</code>; <code>cfd["news"]["the"]</code> 2, <code>cfd["fiction"]["cat"]</code> 1, <code>cfd["news"]["cat"]</code> 0; <code>cfd.conditions()</code> 是 <code class="lc">['news', 'fiction']</code> (按第一次出现的顺序), 排序后是 <span class="nb"><code class="lc">['fiction', 'news']</code>.</span></p>
+  <p>查不到的词得 0 而不是 KeyError, 因为 FreqDist 是 Counter. 但要注意: 查一个<b>不存在的条件</b> (<code>cfd["sport"]</code>) 也不报错, 它会悄悄新建一个空的 FreqDist, 之后 <code>conditions()</code> 里就多了 sport. ConditionalFreqDist 是 <code>defaultdict</code> 的子类, 这和例 2 里能直接写 <code class="lc">cfdist[condition][word] += 1</code> <span class="nb">是同一个原因.</span></p>
+</details>
+</article>
+
+<article id="u3-7">
+<h3>条件频率分布 (例 2): 按词长计数<br><span class="de-title">Example 2: ConditionalFreqDist</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 16</span>
+<pre data-lang="python repl"><span class="tk-p">&gt;&gt;&gt; </span><span class="tk-k">from </span>nltk <span class="tk-k">import </span>ConditionalFreqDist
+<span class="tk-p">&gt;&gt;&gt; </span><span class="tk-k">from </span>nltk.tokenize <span class="tk-k">import </span>word_tokenize
+<span class="tk-p">&gt;&gt;&gt; </span>sent = <span class="tk-s">"""
+</span>the the the dog dog some other words
+that we do not care about
+"""
+<span class="tk-p">&gt;&gt;&gt; </span><span class="tk-s">cfdist = ConditionalFreqDist()
+</span><span class="tk-p">&gt;&gt;&gt; </span><span class="tk-s">for word in word_tokenize(sent):
+</span><span class="tk-p">... </span><span class="tk-s">    condition = len(word)
+</span>...     cfdist[condition][word] += 1</pre>
+  <p>Src: https://www.nltk.org/api/nltk.probability.ConditionalFreqDist.<span class="nb">html</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 这个例子来自 NLTK 的官方文档: 不先准备 (条件, 事件) 对, 而是建一个空的 ConditionalFreqDist, 在循环里逐词计数, <span class="nb">条件是词的长度.</span></p>
+  <p><b>思路:</b> 先分词, 再按长度分组数一数: 长度 2、3、4、5 各有哪些词, 各几次? 想想 <code>cfdist[3].freq("the")</code> <span class="nb">是多少.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实际运行后各条件<span class="nb">下的分布:</span></p>
+<pre data-lang="output">2 {'we': 1, 'do': 1}
+3 {'the': 3, 'dog': 2, 'not': 1}
+4 {'some': 1, 'that': 1, 'care': 1}
+5 {'other': 1, 'words': 1, 'about': 1}</pre>
+  <p>显示 <code>cfdist</code> 本身得到 <code class="lc">&lt;ConditionalFreqDist with 4 conditions&gt;</code>. 长度 3 的词共 6 个, the 占 3 个, 所以 <code>cfdist[3].freq("the")</code> 是 <code>0.5</code>: <code>freq</code> 是相对频率 = 次数 / 这个分布的总数 <code>N()</code>. 下面语言猜测题的打分用<span class="nb">的就是它.</span></p>
+</details>
+</article>
+
+<article id="u3-8">
+<h3>练习: 语言猜测器<br><span class="de-title">Exercise: Language Guesser Task</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 17</span>
+  <p>Implement a language guesser that takes a given text and outputs the language it thinks the text is <span class="nb">written in</span></p>
+  <ul>
+    <li><code>build_language_models()</code> should calculate a conditional frequency distribution where
+      <ul>
+        <li>the languages are the <span class="nb">conditions</span></li>
+        <li>the values are the frequency distributions of the lowercase word <span class="nb">bigrams</span></li>
+        <li>→ Homework 04, <span class="nb">Task 3.1</span></li>
+      </ul></li>
+  </ul>
+<pre data-lang="python repl"><span class="tk-p">&gt;&gt;&gt; </span>languages = [<span class="tk-s">'English'</span>,<span class="tk-s">'German_Deutsch'</span>,<span class="tk-s">'French_Francais'</span>]
+
+# udhr corpus contains the Universal Declaration of
+# Human Rights in over 300 languages
+<span class="tk-p">&gt;&gt;&gt; </span>language_base = <span class="tk-b">dict</span>((language, udhr.words(language +
+'-Latin1')) for language in languages)
+
+# build the language models
+<span class="tk-p">&gt;&gt;&gt; </span>langModeler = LangModeler(languages, language_base)
+&gt;&gt;&gt; language_model_cfd = langModeler.build_language_models()</pre>
+</div>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 18–19</span>
+  <ul>
+    <li><code class="lc">guess_language(language_model_cfd,text)</code> returns the most likely language for a given text by comparing the text with each language <span class="nb">model.</span></li>
+  </ul>
+<pre data-lang="python">text1 = <span class="tk-s">"Peter had been to the office before they arrived."
+</span>text2 = <span class="tk-s">"Si tu finis tes devoirs, je te donnerai des bonbons."
+</span>text3 = <span class="tk-s">"Das ist ein schon recht langes deutsches Beispiel."
+
+</span><span class="tk-c"># guess the language by comparing the frequency distributions
+</span><span class="tk-b">print</span>(<span class="tk-s">"guess for english text: "</span>,
+        guess_language(language_model_cfd, text1))
+<span class="tk-b">print</span>(<span class="tk-s">"guess for french text: "</span>,
+        guess_language(language_model_cfd, text2))
+<span class="tk-b">print</span>(<span class="tk-s">"guess for german text: "</span>,
+        guess_language(language_model_cfd, text3))</pre>
+  <p>Implementation of <code class="lc">guess_language(language_model_cfd,text)</code>:</p>
+  <ol>
+    <li>calculate the overall score of a given text based on the frequency of bigrams:
+<pre data-lang="python"><span class="tk-k">for </span>language <span class="tk-k">in </span>language_model_cfd.conditions():
+    freqdist = language_model_cfd[language]
+    score = <span class="tk-n">0
+    </span><span class="tk-c"># TODO: compute bigrams
+    </span><span class="tk-k">for </span>bigram <span class="tk-k">in </span>bigrams:
+        score += freqdist.freq(bigram)</pre></li>
+    <li>return the most likely language with the maximum <span class="nb">score</span></li>
+    <li>Hint: look up what freqdust.freq() does and how it can help you obtaining a <span class="nb">score</span></li>
+  </ol>
+  <p>→ Homework 04, <span class="nb">Task 3.2</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 实现一个语言猜测器: 输入一段文本, 输出它认为文本是哪种语言. <code>build_language_models()</code> (作业 04 的 Task 3.1) 算出一个条件频率分布: 条件是语言, 值是该语言里<b>小写的词二元组</b> (相邻两个词) 的频率分布. 训练数据是 UDHR 语料 (《世界人权宣言》, 300 多种语言) 里英语、德语、法语的 Latin-1 编码版本. <code>guess_language()</code> (Task 3.2) 把文本和每个语言模型比较, 返回最可能的语言: 对每种语言, 把文本里每个二元组在该语言中的相对频率 <code>freq</code> 加起来作为得分, <span class="nb">取得分最高的语言.</span></p>
+  <p><b>思路:</b> 两个 TODO: ① 建模: 对每种语言, 把词小写, 用 <code>nltk.bigrams</code> 生成相邻词对, 逐个计数 (例 2 的写法). ② 打分: 文本先分词、小写、生成二元组, 再按幻灯片的循环求和; 记下最大得分的语言. 用相对频率而不是次数, 是为了让语料长度不同的语言<span class="nb">可以比较.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python"><span class="tk-k">from </span>nltk <span class="tk-k">import </span>ConditionalFreqDist, bigrams <span class="tk-k">as </span>nltk_bigrams
+<span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>udhr
+<span class="tk-k">from </span>nltk.tokenize <span class="tk-k">import </span>word_tokenize
+
+<span class="tk-k">class </span><span class="tk-f">LangModeler</span>:
+    <span class="tk-k">def </span><span class="tk-f">__init__</span>(<span class="tk-b">self</span>, languages, words):
+        <span class="tk-b">self</span>.languages = languages
+        <span class="tk-b">self</span>.words = words
+
+    <span class="tk-k">def </span><span class="tk-f">build_language_models</span>(<span class="tk-b">self</span>):
+        cfd = ConditionalFreqDist()
+        <span class="tk-k">for </span>language <span class="tk-k">in </span><span class="tk-b">self</span>.languages:
+            tokens = [w.lower() <span class="tk-k">for </span>w <span class="tk-k">in </span><span class="tk-b">self</span>.words[language]]
+            <span class="tk-k">for </span>bigram <span class="tk-k">in </span>nltk_bigrams(tokens):
+                cfd[language][bigram] += <span class="tk-n">1
+        </span><span class="tk-k">return </span>cfd
+
+<span class="tk-k">def </span><span class="tk-f">guess_language</span>(language_model_cfd, text):
+    tokens = [w.lower() <span class="tk-k">for </span>w <span class="tk-k">in </span>word_tokenize(text)]
+    bigrams = <span class="tk-b">list</span>(nltk_bigrams(tokens))
+    best_language, best_score = <span class="tk-n">None</span>, -<span class="tk-n">1
+    </span><span class="tk-k">for </span>language <span class="tk-k">in </span>language_model_cfd.conditions():
+        freqdist = language_model_cfd[language]
+        score = <span class="tk-n">0
+        </span><span class="tk-k">for </span>bigram <span class="tk-k">in </span>bigrams:
+            score += freqdist.freq(bigram)
+        <span class="tk-k">if </span>score &gt; best_score:
+            best_language, best_score = language, score
+    <span class="tk-k">return </span>best_language</pre>
+  <p>用幻灯片的三句话实际运行, <span class="nb">输出:</span></p>
+<pre data-lang="output">guess for english text:  English
+guess for french text:  English
+guess for german text:  English</pre>
+  <p>每种语言的得分 <span class="nb">(另外打印出来看的):</span></p>
+  <div class="tablewrap"><table>
+    <tr><th>句子</th><th>English</th><th>German_Deutsch</th><th class="wide">French_Francais</th></tr>
+    <tr><td>text1 (英语)</td><td>0.003933</td><td>0</td><td>0</td></tr>
+    <tr><td>text2 (法语)</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>text3 (德语)</td><td>0</td><td>0</td><td>0</td></tr>
+  </table></div>
+  <p>只有英语猜对了, 而且是碰巧: 三句话一共只有一个二元组 <code>('to', 'the')</code> 在训练语料里出现过. UDHR 每种语言只有 1500–1900 个词, 词二元组太稀疏, 法语句和德语句的二元组一个也没出现过, 三种语言都得 0 分, 平局时程序返回第一个条件 English. 程序本身按要求实现没有错, <span class="nb">是模型选得不好.</span></p>
+  <p>换成幻灯片下一页说的<b>字符二元组</b> (每个词内部相邻的两个字母), 同样的打分方法三句<span class="nb">全部猜对:</span></p>
+<pre data-lang="output">{'English': 0.332, 'German_Deutsch': 0.2351, 'French_Francais': 0.1528}  → English
+{'English': 0.2311, 'German_Deutsch': 0.2358, 'French_Francais': 0.3621} → French_Francais
+{'English': 0.2547, 'German_Deutsch': 0.4481, 'French_Francais': 0.2511} → German_Deutsch</pre>
+  <p>字符二元组只有几百种, 几千个词的语料就能把它们数得很全, 而 th、sch、ou 这些组合在不同语言里频率<span class="nb">差别很大.</span></p>
+  <p><b>易错</b>: ① 忘了小写: 句首的 Peter、Das 就和语料里的词对不上. ② 在 <code>guess_language</code> 里变量名 <code>bigrams</code> 会遮住 <code>nltk.bigrams</code> 函数, 所以上面导入时改名为 <code>nltk_bigrams</code>. ③ 得分用 <code>freqdist[bigram]</code> (次数) 而不是 <code>freq</code>: 语料越长的语言<span class="nb">越占便宜.</span></p>
+</details>
+<div class="warn"><p><b>原文笔误:</b> Slide 19 的提示「look up what <b>freqdust</b>.freq() does」应为 freqdist.freq(); 同一句的「help you obtaining」应为 help you obtain 或 help you in <span class="nb">obtaining.</span></p></div>
+</article>
+
+<article id="u3-9">
+<h3>语言模型的几种类型<br><span class="de-title">Types of Language Models</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 3 · Slide 20–21</span>
+  <p>Language models with <span class="nb">ConditionalFreqDist:</span></p>
+  <ul>
+    <li>the languages are the <span class="nb">conditions</span></li>
+    <li>the values can be:
+      <ul>
+        <li>FreqDist of the lower case characters → character level unigram <span class="nb">model</span></li>
+        <li>FreqDist of bigrams of characters → character level bigram <span class="nb">model</span></li>
+        <li>FreqDist of words → word level unigram <span class="nb">model</span></li>
+        <li>FreqDist of bigrams of words → word level bigram <span class="nb">model</span></li>
+      </ul></li>
+  </ul>
+  <ul>
+    <li>The distribution of characters in languages of the same language family is usually not very <span class="nb">different.</span></li>
+    <li>Thus, it is difficult to differentiate between those languages using a unigram character <span class="nb">model.</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 用 ConditionalFreqDist 建语言模型时, 条件都是语言, 值可以是四种频率分布: 小写字符 → 字符级一元模型; 字符二元组 → 字符级二元模型; 词 → 词级一元模型; 词二元组 → 词级二元模型. 同一语系的语言, 字符分布通常差别不大, 所以只用字符一元模型很难把它<span class="nb">们区分开.</span></p>
+  <p><b>思路:</b> 四种模型之间是取舍: 单位越大 (词、词二元组) 越有区分力, 但越稀疏, 需要的训练数据越多; 单位越小 (字符) 数据少也能估计得准, 但区分力弱. 上一题的实测正好说明: 在 UDHR 这么小的语料上, 词二元组太稀疏, 字符二元组效果最好. 英语、德语、法语的字母频率都以 e 居首, 只看单个字母确实难分; 二元组能捕捉 th、ch、<span class="nb">qu 这类组合.</span></p>
+</div>
 </article>
 </section>
 

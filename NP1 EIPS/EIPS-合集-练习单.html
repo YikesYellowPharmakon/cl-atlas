@@ -1143,6 +1143,8 @@
       <a href="#b2">Blatt 2 · EBNF 文法</a>
       <a href="#z2">ZÜ 2 · 类型与表达式</a>
       <a href="#b3">Blatt 3 · 表达式求值</a>
+      <a href="#z3">ZÜ 3 · 控制结构</a>
+      <a href="#b4">Blatt 4 · 存储与条件</a>
     </nav>
   </div>
 </header>
@@ -2337,6 +2339,635 @@ False</pre>
 </article>
 </section>
 
+
+
+<!-- ======================= Z3 ======================= -->
+<section class="part" id="z3">
+<h2>Zentralübung 3<br><span class="de-title">Kontrollstrukturen</span><small><span class="rl">对应 <a href="EIPS-04-语句与控制结构.html#zuweisung">EIPS 04 · 赋值</a>、<a href="EIPS-04-语句与控制结构.html#block">块</a>、<a href="EIPS-04-语句与控制结构.html#if">条件语句</a>、<a href="EIPS-04-语句与控制结构.html#elif">多个条件</a>;</span><span class="rl">源文件 Zentraluebung04.pdf;</span><span class="rl">中心练习课 (Zentralübung) 的讲义, 文件名的 04 对应讲义第 4 章;</span><span class="rl">选择题的答案页和题目页合并成一题.</span></small></h2>
+
+<article id="z3-1">
+<h3>1. 交换两个数 (错误的写法)<br><span class="de-title">Aufgabe 1a: Zahlen vertauschen</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 2–3</span>
+  <p>Gegeben seien zwei Variablen <b>x</b> und <b>y</b> vom Typ int. Vertausche die Werte dieser beiden <span class="nb">Variablen.</span></p>
+<pre data-lang="python">x = <span class="tk-n">2
+</span>y = <span class="tk-n">4
+
+</span>x = y
+y = x</pre>
+  <p>Welchen Wert haben die Variablen <b>x</b> und <b>y</b> am Ende des <span class="nb">Codefragments?</span></p>
+  <ol type="a">
+    <li>x = 2, y = 2</li>
+    <li>x = 2, y = 4</li>
+    <li>x = 4, y = 2</li>
+    <li>x = 4, y = 4</li>
+  </ol>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 有两个 int 类型的变量 x 和 y, 要交换它们的值. 这段代码执行完以后, <span class="nb">x 和 y 各是多少?</span></p>
+  <p><b>思路</b>: 赋值 <code>x = y</code> 用 y 当前的值<b>覆盖</b> x 原来的值, 旧值就没有了. 一行一行地画出存储的变化 (每行代码后各变量的值和类型), <span class="nb">看最后一列.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>答案是 <b>d</b>: x = 4, y = 4. 存储的变化 (每一列是执行完这一行之后的状态, Folie 3 用的是同样的图示, 方框里写「值, <span class="nb">类型」):</span></p>
+  <div class="tablewrap"><table>
+    <tr><th>变量</th><th><code>x = 2</code></th><th><code>y = 4</code></th><th><code>x = y</code></th><th><code>y = x</code></th></tr>
+    <tr><td>y</td><td></td><td>4, int</td><td>4, int</td><td>4, int</td></tr>
+    <tr><td>x</td><td>2, int</td><td>2, int</td><td><b>4, int</b></td><td>4, int</td></tr>
+  </table></div>
+  <p>第 3 行把 x 的 2 覆盖掉以后, 已经没有任何变量存着 2 了; 第 4 行 <code>y = x</code> 只是把 4 再抄给 y 一次. Folie 3 的图在最后画了一道红色闪电, <span class="nb">表示交换失败.</span></p>
+</details>
+</article>
+
+<article id="z3-2">
+<h3>2. 用临时变量交换<br><span class="de-title">Aufgabe 1b: Zahlen vertauschen</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 4</span>
+  <p>Gegeben seien zwei Variablen <b>x</b> und <b>y</b> vom Typ int. Vertausche die Werte dieser beiden <span class="nb">Variablen.</span></p>
+<pre data-lang="python">x = <span class="tk-n">2
+</span>y = <span class="tk-n">4
+</span><span class="tk-c"># definiere eine temporaere Variable tmp:
+</span>tmp = x
+x = y
+<span class="tk-c"># der gespeicherte Wert kann abgerufen werden:
+</span>y = tmp</pre>
+  <p>Veränderung des <span class="nb">Speichers:</span></p>
+  <div class="tablewrap"><table>
+    <tr><th>CZ:</th><th>x = 2</th><th>y = 4</th><th>tmp = x</th><th>x = y</th><th>y = tmp</th></tr>
+    <tr><td>tmp</td><td></td><td></td><td>2, int</td><td>2, int</td><td>2, int</td></tr>
+    <tr><td>y</td><td></td><td>4, int</td><td>4, int</td><td>4, int</td><td>2, int</td></tr>
+    <tr><td>x</td><td>2, int</td><td>2, int</td><td>2, int</td><td>4, int</td><td>4, int</td></tr>
+  </table></div>
+</div>
+<div class="zh">
+  <p>正确的交换先用一个<b>临时变量</b> (temporäre Variable) <code>tmp</code> 把 x 的旧值存起来 (注释: 「定义一个临时变量 tmp」), 再让 x 取 y 的值, 最后从 tmp 里取回存着的值 (注释: 「存着的值可以取回来」) 给 y. CZ 是 Codezeile (代码行) 的缩写. 幻灯片的图里用虚线箭头标出每一步是哪个值被抄到哪里: tmp ← x 的 2, x ← y 的 4, <span class="nb">y ← tmp 的 2.</span></p>
+  <p>结果 x = 4, y = 2, tmp 留在存储里, 值仍是 2. 三步赋值的顺序不能换: 先存、再覆盖、<span class="nb">最后取回.</span></p>
+</div>
+<div class="add"><p>Python 还能写成一行 <code>x, y = y, x</code>: 右边先算出一个元组 (4, 2), 再分别赋给 x 和 y, 不需要临时变量. 这个写法要等讲到元组 (序列类型) 才算讲过, 这一章的练习和考试按临时变量<span class="nb">的写法来.</span></p></div>
+</article>
+
+<article id="z3-3">
+<h3>3. Python 的条件语句<br><span class="de-title">Fallunterscheidung in Python</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 5</span>
+<pre data-lang="grammar">IfStatement = "if" Expression: Block
+              [ "elif:" Expression Block ]
+              [ "else:" Block ]
+
+Block       = { Statement }
+Statement   = Assignment
+            | Conditional
+            | Iteration
+Conditional = IfStatement</pre>
+  <p>(Hinweis an Expression: <span class="nb">vom Typ <b>bool</b>)</span></p>
+</div>
+<div class="zh">
+  <p>条件语句的 EBNF: <code>if</code> 后面跟一个表达式 (类型是 bool, 幻灯片用一个标注框指着它), 冒号, 再跟一个块; 之后可以有 <code>elif</code> 分支和 <code>else</code> 分支. 块是任意多条语句; 语句可以是赋值、条件语句或循环. 所以块里还能再放条件语句, 这就是后面第 6 <span class="nb">题的嵌套.</span></p>
+</div>
+<div class="warn"><p><b>幻灯片错误:</b> 这个文法和真正的 Python 语法有三处出入. ① 冒号的位置: 写成了 <code class="lc">"elif:" Expression Block</code>, 但 Python 是 <code>elif 条件:</code>, 冒号在表达式<b>后面</b>; 应为 <code class="lc">"elif" Expression ":" Block</code>. ② 第一行的冒号没加引号, 作为终结符应写 <code>":"</code>. ③ elif 分支可以出现任意多次, 应该用花括号 <code class="lc">{ "elif" Expression ":" Block }</code>, 方括号只表示「0 或 1 次」, 那样就写不出第 8 题那种有三个 elif 的程序. 讲义 (<a href="EIPS-04-语句与控制结构.html#elif">EIPS 04 · 多个条件</a>) <span class="nb">里的写法是对的.</span></p></div>
+</article>
+
+<article id="z3-4">
+<h3>4. 简单的条件语句<br><span class="de-title">Einfache Fallunterscheidungen</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 6</span>
+  <ul>
+    <li>
+<pre data-lang="python">alter = ? <span class="tk-c"># ? geeignet ersetzen
+</span>volljaehrig = <span class="tk-n">False
+</span><span class="tk-k">if </span>alter &gt;= <span class="tk-n">18</span>:
+    volljaehrig = <span class="tk-n">True</span></pre></li>
+    <li>
+<pre data-lang="python">alter = ? <span class="tk-c"># ? geeignet ersetzen
+</span><span class="tk-k">if </span>alter &gt;= <span class="tk-n">18</span>:
+    volljaehrig = <span class="tk-n">True
+</span><span class="tk-k">else</span>:
+    volljaehrig = <span class="tk-n">False</span></pre></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>两种写法效果相同 (<code>?</code> 要换成一个具体的年龄, 注释「? geeignet ersetzen」= 把 ? 换成合适的值): 第一种先给 <code>volljaehrig</code> (成年) 一个默认值 False, 只在 alter ≥ 18 时改成 True; 第二种用 if–else 在两个分支里各赋一次值. 两种写法执行完后 <code>volljaehrig</code> <span class="nb">都一定有值.</span></p>
+  <p>更短的写法是 <code class="lc">volljaehrig = alter &gt;= 18</code>: 比较的结果本身就是 <span class="nb">bool.</span></p>
+</div>
+</article>
+
+<article id="z3-5">
+<h3>5. 多条语句与缩进 (a)<br><span class="de-title">Aufgabe 2a: Mehrere Statements</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 7</span>
+  <p>Welchen Wert haben die Variablen <b>volljaehrig</b> und <b>anrede</b> am Ende dieses <span class="nb">Codefragments?</span></p>
+<pre data-lang="python">alter = <span class="tk-n">4
+</span>volljaehrig = <span class="tk-n">False
+</span>anrede = <span class="tk-s">"du"
+
+</span><span class="tk-k">if </span>alter &gt;= <span class="tk-n">18</span>:
+    volljaehrig = <span class="tk-n">True
+  </span>anrede = <span class="tk-s">"Sie"</span></pre>
+  <ol type="a">
+    <li>volljaehrig = False, <span class="nb">anrede = "du"</span></li>
+    <li>volljaehrig = False, anrede <span class="nb">= "Sie"</span></li>
+    <li>volljaehrig = True, <span class="nb">anrede = "du"</span></li>
+    <li>volljaehrig = true, anrede <span class="nb">= "Sie"</span></li>
+    <li>Syntaktischer <span class="nb">Fehler</span></li>
+  </ol>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 这段代码执行完以后, <code>volljaehrig</code> 和 <code>anrede</code> (称呼: 用 du 还是 Sie) 各是什么值? <span class="nb">选项 e 是「语法错误」.</span></p>
+  <p><b>思路</b>: 先别急着算值, 看最后两行的缩进: 一行缩进 4 格, 一行缩进 2 格. Python 用缩进划分块, 同一块里的语句缩进必须<span class="nb">完全相同.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>答案是 <b>e</b>, 程序根本不会运行. <span class="nb">实际运行的报错:</span></p>
+<pre data-lang="output">  File "z2a.py", line 7
+    anrede = "Sie"
+                  ^
+IndentationError: unindent does not match any outer indentation level</pre>
+  <p>第 7 行缩进 2 格: 比 if 块 (4 格) 少, 说明块结束了 (unindent); 可是外层是 0 格, 2 格也对不上. 这一行不属于任何块, 所以是语法层面的错误, 和 alter 的值无关. 幻灯片的答案框写的就是这一点: IndentationError, 第 2 行因为缩进错了不属<span class="nb">于任何块.</span></p>
+  <p>选项 d 的 <code>true</code> 是小写, Python 里没有这个名字 (会是 NameError), <span class="nb">所以 d 不管怎样都不对.</span></p>
+</details>
+<div class="warn"><p><b>幻灯片小错:</b> 答案框的第一条「Nach if Expression: muss ein Block folgen」(if 表达式: 后面必须跟一个块) 不是这里的问题: if 后面<b>有</b>块 (<code class="lc">volljaehrig = True</code>). 出错的是 if 块之后那一行的缩进既不等于块内, 也不等于块外, 和后两条说的一样. 第一条描述的是 if 后面完全没有缩进行时的错误 (<code class="lc">IndentationError: expected an indented block</code>).</p></div>
+</article>
+
+<article id="z3-6">
+<h3>6. 多条语句与缩进 (b)<br><span class="de-title">Aufgabe 2b: Mehrere Statements</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 8</span>
+  <p>Welchen Wert haben die Variablen <b>volljaehrig</b> und <b>anrede</b> am Ende dieses <span class="nb">Codefragments?</span></p>
+<pre data-lang="python">alter = <span class="tk-n">4
+</span>volljaehrig = <span class="tk-n">False
+</span>anrede = <span class="tk-s">"du"
+
+</span><span class="tk-k">if </span>alter &gt;= <span class="tk-n">18</span>:
+    volljaehrig = <span class="tk-n">True
+    </span>anrede = <span class="tk-s">"Sie"</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 同上一题, <span class="nb">只是现在两行缩进一样.</span></p>
+  <p><b>思路</b>: 两行同属 if 块. 条件 <code>4 &gt;= 18</code> 是 False, <span class="nb">整个块都跳过.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>volljaehrig = False, anrede = "du" (上一题的选项 a). 在末尾加 <code class="lc">print(volljaehrig, anrede)</code> 实际运行, <span class="nb">输出 <code>False du</code>.</span></p>
+  <p>和上一题对照: 只差两个空格, 一个是语法错误, 一个能正常运行. 如果第 7 行缩进 0 格, 它就不属于 if 块, 无论如何都会执行, 结果是 False <span class="nb">和 "Sie".</span></p>
+</details>
+</article>
+
+<article id="z3-7">
+<h3>7. 嵌套的条件语句 (a)<br><span class="de-title">Aufgabe 3a: Geschachtelte Fallunterscheidungen</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 9</span>
+  <p>Wir wollen überdurchschnittliche Studierende loben und "Durchfaller" zum Lernen <span class="nb">anregen.</span></p>
+<pre data-lang="python"><span class="tk-c"># ? geeignet ersetzen
+</span>durchgefallen = ?
+note = ?
+
+<span class="tk-k">if not </span>durchgefallen:
+  <span class="tk-k">if </span>note &lt;= <span class="tk-n">1.3</span>:
+    nachricht = <span class="tk-s">":-)"
+  </span><span class="tk-k">else</span>:
+    nachricht = <span class="tk-s">":-("</span></pre>
+  <p>Welche Studierende erhalten die Nachricht ":<span class="nb">-( "?</span></p>
+  <ol type="a">
+    <li>Alle <span class="nb">Studierenden</span></li>
+    <li>Alle Studierenden mit Note 1.3 oder <span class="nb">besser</span></li>
+    <li>Alle Studierenden, die mit Note 1.7 oder schlechter bestanden <span class="nb">haben</span></li>
+    <li>Alle durchgefallenen <span class="nb">Studierenden</span></li>
+  </ol>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 我们想表扬成绩优秀的学生, 并督促「挂科的人」(Durchfaller) 多学习. 哪些学生会收到 ":-(" 这条消息? 德国的分数 1.0 最好, 4.0 及格, 1.3 <span class="nb">之后的下一档是 1.7.</span></p>
+  <p><b>思路</b>: 看 <code>else</code> 和哪个 <code>if</code> 对齐: 它跟在缩进相同的那个 if 后面, <span class="nb">属于同一个块.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>答案是 <b>c</b>: 通过了、但分数是 1.7 或更差的学生. 这里的 else 缩进 2 格, 和内层的 <code class="lc">if note &lt;= 1.3</code> 对齐, 所以它是内层 if 的另一半, 只在「没挂科」的前提下才会走到. 幻灯片的原话: else 总是属于同一缩进 (同一块) 里最后一个 <span class="nb">if.</span></p>
+  <p>用三组值实际运行: (没挂, 1.0) → ":-)", (没挂, 2.0) → ":-(", (挂了, 5.0) → 一条消息都没有, <code>nachricht</code> 根本没被赋值. 之后要是用到它, 会报 <span class="nb">NameError.</span></p>
+</details>
+<div class="warn"><p><b>原文笔误:</b> 问句「Welche <b>Studierende</b> erhalten …」在 welche 之后应用弱变化, 写 Studierenden (Folie 10、11 就是这样写的). 另外问句里的 ":-( " 引号里多了一个空格, 代码里的字符串是 <span class="nb"><code>":-("</code>.</span></p></div>
+</article>
+
+<article id="z3-8">
+<h3>8. 嵌套的条件语句 (b)<br><span class="de-title">Aufgabe 3b: Geschachtelte Fallunterscheidungen</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 10</span>
+<pre data-lang="python"><span class="tk-c"># ? geeignet ersetzen
+</span>durchgefallen = ?
+note = ?
+
+<span class="tk-k">if not </span>durchgefallen:
+  <span class="tk-k">if </span>note &lt;= <span class="tk-n">1.3</span>:
+    nachricht = <span class="tk-s">":-)"
+</span><span class="tk-k">else</span>:
+  nachricht = <span class="tk-s">":-("</span></pre>
+  <p>Welche Studierenden erhalten die Nachricht ":<span class="nb">-("?</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 代码和上一题只差一处: else 往左移到了 0 格. 现在哪些学生收到 ":<span class="nb">-("?</span></p>
+  <p><b>思路</b>: else 现在和外层的 <code class="lc">if not durchgefallen</code> <span class="nb">对齐.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>所有挂科的学生 (上一题的选项 d). else 属于外层 if, 外层条件 <code class="lc">not durchgefallen</code> 为 False, 也就是挂科时才走 <span class="nb">else.</span></p>
+  <p>实际运行: (没挂, 1.0) → ":-)", (没挂, 2.0) → 没有消息, (挂了, 5.0) → ":-(". 和上一题比, 文字一样, 只有 else 的缩进不同, <span class="nb">意思完全变了.</span></p>
+</details>
+</article>
+
+<article id="z3-9">
+<h3>9. 嵌套的条件语句 (c)<br><span class="de-title">Aufgabe 3c: Geschachtelte Fallunterscheidungen</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 11</span>
+<pre data-lang="python"><span class="tk-c"># ? geeignet ersetzen
+</span>durchgefallen = ?
+note = ?
+
+<span class="tk-k">if </span>durchgefallen:
+  nachricht = <span class="tk-s">":-("
+</span><span class="tk-k">else</span>:
+  <span class="tk-k">if </span>note &lt;= <span class="tk-n">1.3</span>:
+    nachricht = <span class="tk-s">":-)"</span></pre>
+  <p>Welche Studierenden erhalten die Nachricht ":<span class="nb">-("?</span></p>
+  <ol type="a">
+    <li>Alle <span class="nb">Studierenden</span></li>
+    <li>Alle Studierenden mit Note 1.3 oder <span class="nb">besser</span></li>
+    <li>Alle Studierenden, die mit Note 1.7 oder schlechter bestanden <span class="nb">haben</span></li>
+    <li>Alle durchgefallenen <span class="nb">Studierenden</span></li>
+  </ol>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 条件反过来写: 先判断挂科, 再在 else 里判断分数. 哪些学生收到 ":<span class="nb">-("?</span></p>
+  <p><b>思路</b>: 和第 8 题比较: 条件取反 (<code class="lc">not durchgefallen</code> → <code>durchgefallen</code>), <span class="nb">两个分支也对调.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>答案是 <b>d</b>: 所有挂科的学生. 这段程序和第 8 题等价, 实际运行三组值的结果和第 8 题完全相同. 写法上第 9 题更好读: 简单的情况 (挂科) 先处理掉, <span class="nb">不用在条件前面加 not.</span></p>
+  <p>两段程序共同的毛病: 通过了但分数在 1.7 及以下的学生没有任何消息. 下一题就是把所有<span class="nb">情况补全.</span></p>
+</details>
+</article>
+
+<article id="z3-10">
+<h3>10. 给每个学生发消息: else if 与 elif<br><span class="de-title">Aufgabe 3d / 3e: Geschachtelte Fallunterscheidungen</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 12</span>
+  <p>Wir wollen allen Studierenden eine entsprechende Nachricht <span class="nb">schicken.</span></p>
+<pre data-lang="python"><span class="tk-c"># ? geeignet ersetzen
+</span>durchgefallen = ?
+note = ?
+
+<span class="tk-k">if </span>durchgefallen:
+    nachricht = <span class="tk-s">"Lern mehr!"
+</span><span class="tk-k">else</span>: <span class="tk-k">if </span>note &lt;= <span class="tk-n">1.3</span>:
+    nachricht = <span class="tk-s">"Sehr gut!"
+</span><span class="tk-k">else</span>: <span class="tk-k">if </span>note &lt;= <span class="tk-n">2.3</span>:
+    nachricht = <span class="tk-s">"Gut!"
+</span><span class="tk-k">else</span>: <span class="tk-k">if </span>note &lt;= <span class="tk-n">3.3</span>:
+    nachricht = <span class="tk-s">"Befriedigend!"
+</span><span class="tk-k">else</span>:
+    nachricht = <span class="tk-s">"Ausreichend!"</span></pre>
+</div>
+<div class="card de">
+  <span class="folie">Zentralübung 3 · Folie 13</span>
+  <p>Wir wollen allen Studierenden eine entsprechende Nachricht <span class="nb">schicken.</span></p>
+<pre data-lang="python"><span class="tk-c"># ? geeignet ersetzen
+</span>durchgefallen = ?
+note = ?
+
+<span class="tk-k">if </span>durchgefallen:
+    nachricht = <span class="tk-s">"Lern mehr!"
+</span><span class="tk-k">elif </span>note &lt;= <span class="tk-n">1.3</span>:
+    nachricht = <span class="tk-s">"Sehr gut!"
+</span><span class="tk-k">elif </span>note &lt;= <span class="tk-n">2.3</span>:
+    nachricht = <span class="tk-s">"Gut!"
+</span><span class="tk-k">elif </span>note &lt;= <span class="tk-n">3.3</span>:
+    nachricht = <span class="tk-s">"Befriedigend!"
+</span><span class="tk-k">else</span>:
+    nachricht = <span class="tk-s">"Ausreichend!"</span></pre>
+</div>
+<div class="zh">
+  <p>现在给每个学生都发一条合适的消息: 挂科「多学点!」, ≤ 1.3「非常好!」, ≤ 2.3「好!」, ≤ 3.3「良好 (Befriedigend)!」, 其余 (3.7、4.0)「及格 (Ausreichend)!」. 这正是德国的分数档: sehr gut、gut、befriedigend、ausreichend.</p>
+  <p>Folie 12 想表达的是「else 里再套一个 if」, Folie 13 把每个 <code>else: if</code> 合成一个 <code>elif</code>. 条件从上往下依次检查, 第一个为 True 的分支执行, 后面的都跳过; 所以第三个分支只写 <code>note &lt;= 2.3</code> 就够了, 不用再写 <code>note &gt; 1.3</code>. 每种情况都落到某一个分支, 执行完以后 <code>nachricht</code> <span class="nb">一定有值.</span></p>
+</div>
+<div class="warn"><p><b>幻灯片错误:</b> Folie 12 的代码不是合法的 Python. 冒号后面写在同一行的只能是简单语句 (如赋值), <code>if</code> 这种复合语句不能跟在 <code>else:</code> 后面写在同一行. 实际运行报 <code class="lc">SyntaxError: invalid syntax</code>, 箭头指向第一个 <code>else: if</code> 里的 if. 想按「else 里套 if」来写, 每个 if 都要另起一行并多<span class="nb">缩进一层:</span></p>
+<pre data-lang="python"><span class="tk-k">if </span>durchgefallen:
+    nachricht = <span class="tk-s">"Lern mehr!"
+</span><span class="tk-k">else</span>:
+    <span class="tk-k">if </span>note &lt;= <span class="tk-n">1.3</span>:
+        nachricht = <span class="tk-s">"Sehr gut!"
+    </span><span class="tk-k">else</span>:
+        <span class="tk-k">if </span>note &lt;= <span class="tk-n">2.3</span>:
+            nachricht = <span class="tk-s">"Gut!"
+        </span><span class="tk-k">else</span>:
+            ...</pre>
+<p>层层右移, 很难读, 这正是 elif 存在的原因. Folie 12 的写法只能当作示意, 能运行的是 <span class="nb">Folie 13.</span></p></div>
+</article>
+</section>
+
+<!-- ======================= B4 ======================= -->
+<section class="part" id="b4">
+<h2>Übungsblatt 4<br><span class="de-title">Aufgabe 4-1 bis 4-6 · Speicher, einfache Anweisungen und Bedingungen in Python</span><small><span class="rl">对应 <a href="EIPS-04-语句与控制结构.html#zuweisung">EIPS 04 · 赋值</a>、<a href="EIPS-04-语句与控制结构.html#if">条件语句</a>、<a href="EIPS-04-语句与控制结构.html#elif">多个条件</a>、<a href="EIPS-03-基本数据类型表达式与变量.html#konv">EIPS 03 · 类型转换</a>, 以及上面的 <a href="#z3">Zentralübung 3</a>;</span><span class="rl">源文件 angabe04.pdf;</span><span class="rl">4-1、4-3、4-5 是课堂题 (Präsenz, 在 06. 和 09.11.2026 的练习课上做), 4-2、4-4、4-6 是家庭作业 (Hausaufgabe, 18.11.2026 14:00 前通过 GATE 提交).</span></small></h2>
+
+<article id="b4-0">
+<h3>总说明<br><span class="de-title">Allgemeine Hinweise</span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 4 · Allgemeine Hinweise</span>
+  <ul>
+    <li>Dieses Übungsblatt bezieht sich auf Kapitel 4 der Vorlesung und die dazugehörige <span class="nb">Zentralübung.</span></li>
+    <li>Die Präsenzaufgaben werden in den Übungen am 06. und 09. November 2026 bearbeitet. Die Hausaufgaben können bis zum 18.11.2026 um 14:00 Uhr über GATE abgegeben <span class="nb">werden.</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 本练习单对应讲义第 4 章和配套的中心练习课. 课堂题在 2026 年 11 月 6 日和 9 日的练习课上做; 家庭作业在 2026 年 11 月 18 日 14:00 前通过 GATE 提交. 提交格式 (单独的 .py 文件、ZIP) 和 <a href="#b3-0">Übungsblatt 3</a> <span class="nb">相同.</span></p>
+</div>
+</article>
+
+<article id="b4-1">
+<h3>Aufgabe 4-1: 存储的变化 (课堂题)<br><span class="de-title"><span class="seg">Speicher ·</span> <span class="seg">Präsenz</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 4 · Aufgabe 4-1</span>
+  <p>Gegeben sei folgender <span class="nb">Python-Codeblock:</span></p>
+<pre data-lang="python">m = <span class="tk-n">13
+</span>n = <span class="tk-n">2
+</span>z = <span class="tk-n">0
+</span>m = m + n
+x = m / n
+i = <span class="tk-b">int </span>(x)
+z = i - n
+n = <span class="tk-n">3.0
+</span>h = n + <span class="tk-n">1</span></pre>
+  <p><b>a)</b> Zeigen Sie die Veränderung des Speichers während der Ausführung des gesamten Codeblocks in grafischer <span class="nb">Notation.</span></p>
+  <p><b>b)</b> Geben Sie den Endzustand des Programms in textueller <span class="nb">Notation an.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: a) 用图示法画出整个代码块执行过程中存储的变化. b) 用文字记法写出程序的<span class="nb">终止状态.</span></p>
+  <p><b>思路</b>: 图示法就是 <a href="#z3-2">Zentralübung 3 第 2 题</a> 那种: 每执行一行画一列, 每个变量一个方框, 写「值, 类型」; 新变量在上面加一格, 被重新赋值的变量只改它自己的方框. 文字记法是讲义的 σ = [(名字, 值, 类型), …]. 要特别注意三处类型变化: <code>/</code> 一定得 float; <code>int()</code> 截掉小数; 把 3.0 赋给 n 以后, <span class="nb">n 的类型也变了.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p><b>a)</b> 每一列是执行完该行后的存储 (加粗的是这一行改动的方框), 用 Python <span class="nb">逐行执行核对过:</span></p>
+  <div class="tablewrap"><table class="nowrap">
+    <tr><th>变量</th><th>m = 13</th><th>n = 2</th><th>z = 0</th><th>m = m + n</th><th>x = m / n</th><th>i = int (x)</th><th>z = i - n</th><th>n = 3.0</th><th>h = n + 1</th></tr>
+    <tr><td>h</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><b>4.0, float</b></td></tr>
+    <tr><td>i</td><td></td><td></td><td></td><td></td><td></td><td><b>7, int</b></td><td>7, int</td><td>7, int</td><td>7, int</td></tr>
+    <tr><td>x</td><td></td><td></td><td></td><td></td><td><b>7.5, float</b></td><td>7.5, float</td><td>7.5, float</td><td>7.5, float</td><td>7.5, float</td></tr>
+    <tr><td>z</td><td></td><td></td><td><b>0, int</b></td><td>0, int</td><td>0, int</td><td>0, int</td><td><b>5, int</b></td><td>5, int</td><td>5, int</td></tr>
+    <tr><td>n</td><td></td><td><b>2, int</b></td><td>2, int</td><td>2, int</td><td>2, int</td><td>2, int</td><td>2, int</td><td><b>3.0, float</b></td><td>3.0, float</td></tr>
+    <tr><td>m</td><td><b>13, int</b></td><td>13, int</td><td>13, int</td><td><b>15, int</b></td><td>15, int</td><td>15, int</td><td>15, int</td><td>15, int</td><td>15, int</td></tr>
+  </table></div>
+  <p><b>b)</b> σ = [(m, 15, int), (n, 3.0, float), (z, 5, int), (x, 7.5, float), (i, 7, int), (h, 4.0, <span class="nb">float)]</span></p>
+  <p>逐步: <code>m + n</code> = 13 + 2 = 15; <code>15 / 2</code> = 7.5 (float, 虽然两边都是 int); <code>int(7.5)</code> = 7, 截断; <code>7 - 2</code> = 5; <code>3.0 + 1</code> = 4.0, <span class="nb">1 自动转成 float.</span></p>
+  <p><b>易错</b>: 第 8 行以后 n 是 3.0, float; Python 的变量没有固定类型, 类型跟着值走. 还有 <code>int (x)</code> 里函数名和括号之间的空格不<span class="nb">影响结果.</span></p>
+</details>
+</article>
+
+<article id="b4-2">
+<h3>Aufgabe 4-2: 存储的变化 (家庭作业)<br><span class="de-title"><span class="seg">Speicher ·</span> <span class="seg">Hausaufgabe</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 4 · Aufgabe 4-2</span>
+  <p>Gegeben sei folgender <span class="nb">Python-Codeblock:</span></p>
+<pre data-lang="python">a = <span class="tk-n">2.0
+</span>b = <span class="tk-n">3.4
+</span>a = a + b * <span class="tk-n">2 </span>- <span class="tk-n">1
+</span>c = <span class="tk-b">int </span>(a)
+a = c // <span class="tk-n">2
+</span>a -= <span class="tk-n">1
+</span>d = a / b + c &lt; <span class="tk-n">4.0 </span><span class="tk-k">or </span>a &lt; b
+t = a != d</pre>
+  <p><b>a)</b> Zeigen Sie die Veränderung des Speichers während der Ausführung des gesamten Codeblocks in grafischer <span class="nb">Notation.</span></p>
+  <p><b>b)</b> Geben Sie den Endzustand des Programms in textueller <span class="nb">Notation an.</span></p>
+  <p><b>c)</b> Welche Operatorprioritäten haben das Ergebnis beeinflusst und welche Typänderungen sind während der Ausführung <span class="nb">auftreten?</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: a)、b) 同 4-1. c) 哪些运算符优先级影响了结果? 执行过程中发生了哪些<span class="nb">类型变化?</span></p>
+  <p><b>思路</b>: 第 3 行和第 7 行要按优先级加括号再算: 算术 (* / // 先于 + −) 先于比较 (&lt; !=), 比较先于 <code>or</code>. <code>a -= 1</code> 就是 <code>a = a - 1</code>. 最后一行把 int 和 bool 比较: bool 参与运算时 Tr<span class="nb">ue 当 1.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p><b>a)</b></p>
+  <div class="tablewrap"><table class="nowrap">
+    <tr><th>变量</th><th>a = 2.0</th><th>b = 3.4</th><th class="wide">a = a + b * 2 - 1</th><th>c = int (a)</th><th>a = c // 2</th><th>a -= 1</th><th>d = …</th><th>t = a != d</th></tr>
+    <tr><td>t</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><b>True, bool</b></td></tr>
+    <tr><td>d</td><td></td><td></td><td></td><td></td><td></td><td></td><td><b>True, bool</b></td><td>True, bool</td></tr>
+    <tr><td>c</td><td></td><td></td><td></td><td><b>7, int</b></td><td>7, int</td><td>7, int</td><td>7, int</td><td>7, int</td></tr>
+    <tr><td>b</td><td></td><td><b>3.4, float</b></td><td>3.4, float</td><td>3.4, float</td><td>3.4, float</td><td>3.4, float</td><td>3.4, float</td><td>3.4, float</td></tr>
+    <tr><td>a</td><td><b>2.0, float</b></td><td>2.0, float</td><td><b>7.8, float</b></td><td>7.8, float</td><td><b>3, int</b></td><td><b>2, int</b></td><td>2, int</td><td>2, int</td></tr>
+  </table></div>
+  <p><b>b)</b> σ = [(a, 2, int), (b, 3.4, float), (c, 7, int), (d, True, bool), (t, True, <span class="nb">bool)]</span></p>
+  <p>第 3 行实际算出的是 <code>7.800000000000001</code>: 3.4 在二进制里不能精确表示, 3.4 · 2 = 6.8 再加减以后带了一点舍入误差. 手写时写 7.8 即可, <span class="nb">不影响后面的 <code>int()</code>.</span></p>
+  <p><b>c)</b> <span class="nb">影响结果的优先级:</span></p>
+  <ul>
+    <li>第 3 行: <code>*</code> 先于 <code>+</code> 和 <code>-</code>, 即 <code class="lc">(a + (b * 2)) - 1</code> = (2.0 + 6.8) − 1 = 7.8; 要是从左往右算会得 (2.0 + 3.4) · 2 − 1 <span class="nb">= 9.8.</span></li>
+    <li>第 7 行: <code>/</code> 先于 <code>+</code>, 算术先于比较 <code>&lt;</code>, 比较先于 <code>or</code>: <code class="lc">((a / b) + c &lt; 4.0) or (a &lt; b)</code> = (0.588… + 7 &lt; 4.0) or (2 &lt; 3.4) = False or True = <span class="nb">True.</span></li>
+    <li>第 8 行: <code>!=</code> 比 <code>=</code> 先算, 即 <span class="nb"><code>t = (a != d)</code>.</span></li>
+  </ul>
+  <p>类型变化:</p>
+  <ul>
+    <li>第 3 行 <code>b * 2</code>: int 2 隐式转成 <span class="nb">float.</span></li>
+    <li>第 4 行 <code>int(a)</code>: 显式 float → int, 7.<span class="nb">8 截断成 7.</span></li>
+    <li>第 5 行 <code>c // 2</code>: 两个 int 的整除得 int 3, <span class="nb"><b>a 的类型从 float 变成 int</b>.</span></li>
+    <li>第 7 行 <code>a / b</code>: a 转成 float; <code>+ c</code>: c 转成 float; 比较得 bool, <span class="nb">d 是新的 bool 变量.</span></li>
+    <li>第 8 行 <code>a != d</code>: d 的 True 隐式转成 int 1 再比较, 2 != 1, <span class="nb">所以 t = True.</span></li>
+  </ul>
+  <p><b>易错</b>: 最后一行很多人会说「int 和 bool 类型不同, 所以不相等」. 结论碰巧也是 True, 但理由不对: 要是 a 是 1, <code>1 != True</code> 就是 <span class="nb">False.</span></p>
+</details>
+<div class="warn"><p><b>原文笔误:</b> c) 的「welche Typänderungen <b>sind</b> während der Ausführung <b>auftreten</b>」混了两种说法, 应为「welche Typänderungen sind … aufgetreten」或「… treten <span class="nb">… auf」.</span></p></div>
+</article>
+
+<article id="b4-3">
+<h3>Aufgabe 4-3: 油耗计算 (课堂题)<br><span class="de-title"><span class="seg">Einfache Anweisungen in Python ·</span> <span class="seg">Präsenz</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 4 · Aufgabe 4-3</span>
+  <p>Ein KFZ-Besitzer möchte ein Pythonprogramm erstellen, das ihm vor jeder Fahrt den entstehenden Benzin- und Ölverbrauch berechnet. Der Benzinverbrauch des Fahrzeugs beträgt 6.7 Liter pro 100 km, der Ölverbrauch beträgt 0.6 Liter pro 1000 km. Schreiben Sie ein Pythonprogramm <code>benzinverbrauch.py</code>, das für eine eingegebene Fahrtstrecke den entstehenden Benzin- und Ölverbrauch berechnet und ausgibt. Testen Sie Ihr Programm mit den Fahrtstrecken 0.1 km, 3 km und 100.13 km. Bestimmen Sie zunächst, welche lokalen Variablen Sie benötigen und von welchem Typ die jeweiligen Werte sein <span class="nb">sollten!</span></p>
+  <p>Damit Ihr Programm von den automatischen Tests auf GATE geprüft werden kann, geben Sie die beiden Verbräuche jeweils in einer eigenen Zeile aus, in der zuerst das Wort <b>Benzinverbrauch</b> bzw. <b>Ölverbrauch</b> und dann die jeweilige Zahl vorkommen soll. Groß-/Kleinschreibung und Umlaute spielen keine <span class="nb">Rolle.</span></p>
+  <p>Beispielausgabe:</p>
+<pre data-lang="output">Bitte Fahrtstrecke eingeben: 0.1
+Der heutige Benzinverbrauch ist: 0.0067
+Der heutige Oelverbrauch ist: 5.9999999999999995e-05</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 一位车主想写个程序, 每次出车前算出这趟要耗多少汽油和机油. 汽油 6.7 升 / 100 km, 机油 0.6 升 / 1000 km. 写程序 <code>benzinverbrauch.py</code>: 输入行驶距离, 算出并输出两种消耗. 用 0.1 km、3 km、100.13 km 测试. 先想好需要哪些局部变量、各是什么类型. 为了 GATE 自动测试: 两种消耗各占一行, 行里先出现 Benzinverbrauch 或 Ölverbrauch, 再出现数字; 大小写和变音字母无所谓 (所以示例写成 <span class="nb">Oelverbrauch).</span></p>
+  <p><b>思路</b>: 变量: 距离 <code>strecke</code> (float, 因为可以输入 0.1), 两种消耗 (float). <code>input()</code> 返回的永远是 str, 要用 <code>float()</code> 转换 (EIPS 03 讲过的 input 和类型转换). 公式: 汽油 = 距离 · 6.7 / 100, 机油 = 距离 · 0.<span class="nb">6 / 1000.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">strecke = <span class="tk-b">float</span>(<span class="tk-b">input</span>(<span class="tk-s">"Bitte Fahrtstrecke eingeben: "</span>))
+benzin = strecke * <span class="tk-n">6.7 </span>/ <span class="tk-n">100
+</span>oel = strecke * <span class="tk-n">0.6 </span>/ <span class="tk-n">1000
+</span><span class="tk-b">print</span>(<span class="tk-s">"Der heutige Benzinverbrauch ist:"</span>, benzin)
+<span class="tk-b">print</span>(<span class="tk-s">"Der heutige Oelverbrauch ist:"</span>, oel)</pre>
+  <p>三次测试的实际运行结果 (输入的数字<span class="nb">是手打的):</span></p>
+<pre data-lang="output">Bitte Fahrtstrecke eingeben: 0.1
+Der heutige Benzinverbrauch ist: 0.0067
+Der heutige Oelverbrauch ist: 5.9999999999999995e-05
+
+Bitte Fahrtstrecke eingeben: 3
+Der heutige Benzinverbrauch ist: 0.201
+Der heutige Oelverbrauch ist: 0.0017999999999999997
+
+Bitte Fahrtstrecke eingeben: 100.13
+Der heutige Benzinverbrauch ist: 6.70871
+Der heutige Oelverbrauch ist: 0.06007799999999999</pre>
+  <p>第一组和题目的示例输出完全一致. <code>5.9999999999999995e-05</code> 是科学计数法, 等于 0.00006 (带一点二进制舍入误差); 很小的 float, Python 自动这样显示. 输入 3 时也要用 <code>float()</code> 转: 题目要求能输入 0.1, 用 <code>int()</code> 会对 "0.1" 报 <span class="nb">ValueError.</span></p>
+  <p><b>易错</b>: 忘了转换, 直接写 <code class="lc">input(...) * 6.7</code>: str 乘 float 报 TypeError. 乘除的顺序可以随意 (<code class="lc">strecke / 100 * 6.7</code> 也对), 只是末几位舍入误差可能不同, GATE 的测试只看数字<span class="nb">所在的行.</span></p>
+</details>
+</article>
+
+<article id="b4-4">
+<h3>Aufgabe 4-4: 披萨价格 (家庭作业)<br><span class="de-title"><span class="seg">Einfache Anweisungen in Python ·</span> <span class="seg">Hausaufgabe</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 4 · Aufgabe 4-4</span>
+  <p>Ein Pizza-Service berechnet den Preis einer Pizza nach folgendem Schema: Der Grundpreis einer Pizza ist 10.90 Euro und jeder Belag, den ein Kunde auswählt, kostet weitere 1.50 Euro. Schreiben Sie ein Pythonprogramm <code>pizzaservice.py</code>, das für eine eingegebene Anzahl an Belagsorten den Gesamtpreis der Pizza berechnet und ausgibt. Testen Sie Ihr Programm mit 1, 5 und 23 Belagsorten. Bestimmen Sie zunächst, welche lokalen Variablen Sie benötigen und von welchem Typ die jeweiligen Werte sein <span class="nb">sollten!</span></p>
+  <p>Damit Ihr Programm von den automatischen Tests auf GATE geprüft werden kann, geben Sie den Preis der Pizza in einer Zeile aus, in der zuerst eines der Wortteile <b>Preis</b> oder <b>kost</b> vorkommen soll und dann die Antwortzahl. Groß-/Kleinschreibung spielt keine <span class="nb">Rolle.</span></p>
+  <p>Beispielausgabe:</p>
+<pre data-lang="output">Bitte geben Sie Anzahl der Belagsorten an: 1
+Die Pizza kostet: 12.4 Euro</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 披萨店的定价: 底价 10.90 欧元, 顾客每选一种配料 (Belag) 加 1.50 欧元. 写程序 <code>pizzaservice.py</code>: 输入配料种数, 算出并输出总价. 用 1、5、23 种测试. 输出的那一行里先出现词干 Preis 或 kost, <span class="nb">再出现数字.</span></p>
+  <p><b>思路</b>: 配料种数是整数, 用 <code>int()</code> 转换; 价格是 float. 总价 = 10.90 + 种数 · 1.<span class="nb">50.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">anzahl = <span class="tk-b">int</span>(<span class="tk-b">input</span>(<span class="tk-s">"Bitte geben Sie Anzahl der Belagsorten an: "</span>))
+preis = <span class="tk-n">10.90 </span>+ anzahl * <span class="tk-n">1.50
+</span><span class="tk-b">print</span>(<span class="tk-s">"Die Pizza kostet:"</span>, preis, <span class="tk-s">"Euro"</span>)</pre>
+  <p>实际运行:</p>
+<pre data-lang="output">Bitte geben Sie Anzahl der Belagsorten an: 1
+Die Pizza kostet: 12.4 Euro
+
+Bitte geben Sie Anzahl der Belagsorten an: 5
+Die Pizza kostet: 18.4 Euro
+
+Bitte geben Sie Anzahl der Belagsorten an: 23
+Die Pizza kostet: 45.4 Euro</pre>
+  <p>float 输出时去掉了末尾的 0, 所以是 12.4 而不是 12.40. 这三个值碰巧没有舍入误差; 要固定显示两位小数可以写 <code class="lc">round(preis, 2)</code>, 不过讲义还没讲格式化输出, <span class="nb">这里不需要.</span></p>
+  <p><b>易错</b>: 写成 <code class="lc">(10.90 + anzahl) * 1.50</code> 就把底价也乘进去了. <code>*</code> 本来就先于 <code>+</code>, <span class="nb">不用加括号.</span></p>
+</details>
+</article>
+
+<article id="b4-5">
+<h3>Aufgabe 4-5: 给三个整数排序 (课堂题)<br><span class="de-title"><span class="seg">Bedingungen in Python ·</span> <span class="seg">Präsenz</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 4 · Aufgabe 4-5</span>
+  <p>Schreiben Sie ein Pythonprogramm <code>int_sortierung.py</code>, in dem zunächst drei Variablen <code>x</code>, <code>y</code> und <code>z</code> mit Werten vom Typ int initialisiert werden. Das Pythonprogramm soll die Werte in den Variablen aufsteigend sortieren und auf dem Bildschirm ausgeben. Testen Sie Ihr Programm für die Werte x = 5, <span class="nb">y = 3 und z = 1.</span></p>
+  <p>Damit Ihr Programm von den automatischen Tests auf GATE geprüft werden kann, benutzen Sie die Reihenfolge x, y und z sowohl für die Eingabe als auch die Ausgabe und geben Sie jeweils den Namen der Variablen <span class="nb">dabei an.</span></p>
+  <p>Beispielausgabe:</p>
+<pre data-lang="output">Eingabe: x = 5
+Eingabe: y = 3
+Eingabe: z = 1
+Die richtige Reihenfolge ist:
+x = 1
+y = 3
+z = 5</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 写程序 <code>int_sortierung.py</code>: 先给三个变量 x、y、z 赋 int 值, 然后把三个变量里的值按升序重新排好 (排完以后 x ≤ y ≤ z) 并输出. 用 x = 5、y = 3、z = 1 测试. 为了自动测试: 输入和输出都按 x、y、z 的顺序, <span class="nb">并写出变量名.</span></p>
+  <p><b>思路</b>: 只用这一章的工具 (赋值、if): 两个变量顺序不对就交换, 交换用 <a href="#z3-2">Zentralübung 3 第 2 题</a> 的临时变量. 三个数要比几次? 先比 x、y, 再比 y、z (之后最大的一定在 z), 最后再比一次 <span class="nb">x、y.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">x = <span class="tk-b">int</span>(<span class="tk-b">input</span>(<span class="tk-s">"Eingabe: x = "</span>))
+y = <span class="tk-b">int</span>(<span class="tk-b">input</span>(<span class="tk-s">"Eingabe: y = "</span>))
+z = <span class="tk-b">int</span>(<span class="tk-b">input</span>(<span class="tk-s">"Eingabe: z = "</span>))
+<span class="tk-c"># groesster Wert nach z
+</span><span class="tk-k">if </span>x &gt; y:
+    tmp = x
+    x = y
+    y = tmp
+<span class="tk-k">if </span>y &gt; z:
+    tmp = y
+    y = z
+    z = tmp
+<span class="tk-c"># jetzt ist z das Maximum; x und y noch vergleichen
+</span><span class="tk-k">if </span>x &gt; y:
+    tmp = x
+    x = y
+    y = tmp
+<span class="tk-b">print</span>(<span class="tk-s">"Die richtige Reihenfolge ist:"</span>)
+<span class="tk-b">print</span>(<span class="tk-s">"x ="</span>, x)
+<span class="tk-b">print</span>(<span class="tk-s">"y ="</span>, y)
+<span class="tk-b">print</span>(<span class="tk-s">"z ="</span>, z)</pre>
+  <p>实际运行 (输入 <span class="nb">5、3、1):</span></p>
+<pre data-lang="output">Eingabe: x = 5
+Eingabe: y = 3
+Eingabe: z = 1
+Die richtige Reihenfolge ist:
+x = 1
+y = 3
+z = 5</pre>
+  <p>追踪 5, 3, 1: 第一次比较交换 x、y → 3, 5, 1; 第二次交换 y、z → 3, 1, 5; 第三次交换 x、y → 1, 3, 5. 用脚本把 1–3 的全部 27 种输入 (含相等的值) 都跑了一遍, <span class="nb">结果都是升序.</span></p>
+  <p>这三个 if 必须是三个<b>独立</b>的 if, 不能写成 if–elif: 每一次比较都要做. 三次比较是「冒泡」的思路, EIPS 10 的排序算法会把它推广到任<span class="nb">意多个数.</span></p>
+  <p><b>易错</b>: 只比较两次 (x 和 y、y 和 z) 不够: 输入 3, 2, 1 时第二次交换后变成 2, 1, 3, <span class="nb">x 和 y 又乱了.</span></p>
+</details>
+<div class="add"><p>题目说的「先用 int 值初始化三个变量」也可以直接写 <code>x = 5</code> 之类的赋值, 不用 input; 不过示例输出里有「Eingabe:」, 说明 GATE 的测试是通过输入给值的, 所以上面用了 input. 两种写法排序部分<span class="nb">完全相同.</span></p></div>
+</article>
+
+<article id="b4-6">
+<h3>Aufgabe 4-6: 幻想国的所得税 (家庭作业)<br><span class="de-title"><span class="seg">Bedingungen in Python ·</span> <span class="seg">Hausaufgabe</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 4 · Aufgabe 4-6</span>
+  <p>Im fiktiven Land Fantasia wird für das Jahr 2026 auf Basis folgender Tabelle die Einkommensteuer berechnet; in der Tabelle sind die Bruttogehälter (d.h. vor Steuerabzug) <span class="nb">angegeben.</span></p>
+  <div class="tablewrap"><table>
+    <tr><th>Steuersatz</th><th>Ledige</th><th>Verheiratete</th></tr>
+    <tr><td>10%</td><td>$0 - $9 275</td><td>$0 - $18 550</td></tr>
+    <tr><td>15%</td><td class="wide">$9 276 - $37 650</td><td class="wide">$18 551 - $75 300</td></tr>
+    <tr><td>25%</td><td class="wide">$37 651 - $91 150</td><td class="wide">$75 301 - $151 900</td></tr>
+    <tr><td>28%</td><td class="wide">$91 151 - $190 150</td><td class="wide">$151 901 - $231 450</td></tr>
+    <tr><td>33%</td><td class="wide">$190 151 - $413 350</td><td class="wide">$231 451 - $413 350</td></tr>
+    <tr><td>35%</td><td class="wide">$413 351 - $415 050</td><td class="wide">$413 351 - $466 950</td></tr>
+    <tr><td>39.6%</td><td>ab $415 051</td><td>ab 466 951</td></tr>
+  </table></div>
+  <p>Schreiben Sie ein Pythonprogramm <code>steuerfantasia.py</code>, das das Netto-Gehalt (d.h. nach Steuerabzug) für ein eingegebenes Brutto-Gehalt in Fantasia berechnet und ausgibt. Bestimmen Sie zunächst, welche lokalen Variablen Sie benötigen und von welchem Typ der jeweils zugewiesene Wert ist! Ob eine Person verheiratet ist oder nicht, kann mit einer Variable vom Typ bool ausgedrückt werden. Testen Sie Ihr Programm für eine verheiratete Person mit einem Brutto-Gehalt von $123 456.<span class="nb">78.</span></p>
+  <p>Damit Ihr Programm von den automatischen Tests auf GATE geprüft werden kann, fragen Sie zuerst das Brutto-Gehalt und dann den Heiratsstatus ab. Für letzteres soll das Programm die Eingaben <b>ja</b> und <b>nein</b> akzeptieren. Geben Sie das Netto-Gehalt in einer Zeile aus, in der zuerst das Wort <b>Netto</b> <span class="nb">vorkommt.</span></p>
+  <p>Beispielausgabe:</p>
+<pre data-lang="output">Brutto-Gehalt: 123456.78
+Verheiratet? ja
+Ihr Jahresgehalt nach Steuern (netto) ist: 92592.58499999999</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 虚构的国家 Fantasia 按上表计算 2026 年的所得税, 表里是税前的毛收入 (Brutto); 单身 (Ledige) 和已婚 (Verheiratete) 各一列. 写程序 <code>steuerfantasia.py</code>: 输入毛收入, 算出并输出税后净收入 (Netto). 是否已婚用一个 bool 变量表示. 用「已婚、毛收入 123 456.78 美元」测试. 先问毛收入, 再问婚姻状况, 输入 ja 或 nein; 输出的那一行里先出现 <span class="nb">Netto.</span></p>
+  <p><b>思路</b>: 按示例反推税怎么算: 123 456.78 落在已婚的 25% 档, 123 456.78 · 0.75 = 92 592.585, 正好是示例输出. 所以是<b>整笔收入按所在档的税率</b>计税, 不是分段累进. 程序结构: 外层 if 按婚姻状况分两支, 每支里用 if–elif–else 按收入从低到高找税率 (和 <a href="#z3-10">Zentralübung 3 第 10 题</a> 的分数档同一个写法). 表里相邻两档之间有 1 美元的空隙 (9 275 和 9 276), 收入可以带小数, 所以条件一律写成「≤ 本档上限」, 不要写「≥ 下限 and ≤ <span class="nb">上限」.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">brutto = <span class="tk-b">float</span>(<span class="tk-b">input</span>(<span class="tk-s">"Brutto-Gehalt: "</span>))
+antwort = <span class="tk-b">input</span>(<span class="tk-s">"Verheiratet? "</span>)
+verheiratet = antwort == <span class="tk-s">"ja"
+
+</span><span class="tk-k">if </span>verheiratet:
+    <span class="tk-k">if </span>brutto &lt;= <span class="tk-n">18550</span>:
+        steuersatz = <span class="tk-n">0.10
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">75300</span>:
+        steuersatz = <span class="tk-n">0.15
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">151900</span>:
+        steuersatz = <span class="tk-n">0.25
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">231450</span>:
+        steuersatz = <span class="tk-n">0.28
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">413350</span>:
+        steuersatz = <span class="tk-n">0.33
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">466950</span>:
+        steuersatz = <span class="tk-n">0.35
+    </span><span class="tk-k">else</span>:
+        steuersatz = <span class="tk-n">0.396
+</span><span class="tk-k">else</span>:
+    <span class="tk-k">if </span>brutto &lt;= <span class="tk-n">9275</span>:
+        steuersatz = <span class="tk-n">0.10
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">37650</span>:
+        steuersatz = <span class="tk-n">0.15
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">91150</span>:
+        steuersatz = <span class="tk-n">0.25
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">190150</span>:
+        steuersatz = <span class="tk-n">0.28
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">413350</span>:
+        steuersatz = <span class="tk-n">0.33
+    </span><span class="tk-k">elif </span>brutto &lt;= <span class="tk-n">415050</span>:
+        steuersatz = <span class="tk-n">0.35
+    </span><span class="tk-k">else</span>:
+        steuersatz = <span class="tk-n">0.396
+
+</span>netto = brutto - brutto * steuersatz
+<span class="tk-b">print</span>(<span class="tk-s">"Ihr Jahresgehalt nach Steuern (netto) ist:"</span>, netto)</pre>
+  <p>变量和类型: <code>brutto</code> float, <code>antwort</code> str, <code>verheiratet</code> bool (比较 <code class="lc">antwort == "ja"</code> 的结果), <code>steuersatz</code> float, <code>netto</code> float. <span class="nb">实际运行:</span></p>
+<pre data-lang="output">Brutto-Gehalt: 123456.78
+Verheiratet? ja
+Ihr Jahresgehalt nach Steuern (netto) ist: 92592.58499999999
+
+Brutto-Gehalt: 123456.78
+Verheiratet? nein
+Ihr Jahresgehalt nach Steuern (netto) ist: 88888.8816</pre>
+  <p>已婚的结果和示例逐位相同. 单身时同样的收入落在 28% 档: 123 456.78 · 0.72 = 88 888.8816. <code>92592.58499999999</code> 而不是 92592.585, 是二进制浮点的舍入误差; 写 <code>brutto * 0.75</code> 或 <code class="lc">brutto * (1 - steuersatz)</code> <span class="nb">得到的末位也一样.</span></p>
+  <p><b>易错</b>: ① 把 <code class="lc">input("Verheiratet? ")</code> 直接当 bool 用: 非空字符串都是真值, 输入 nein 也会被当成已婚. ② 税率写成 25 而不是 0.25. ③ 每一档写成 <code class="lc">brutto &gt;= 9276 and brutto &lt;= 37650</code>: 输入 9275.5 时哪一档都不匹配, <code>steuersatz</code> 没有值, 最后一行报 <span class="nb">NameError.</span></p>
+</details>
+<div class="add"><p>这张表的数字和 2016 年美国联邦所得税表完全一样, 但美国是<b>累进</b>的: 每一档的税率只用于落在这一档里的那部分收入. 按本题「整笔收入按一个税率」的算法, 跨过档的边界时净收入会下降: 单身 9 275 美元税后 8 347.50, 多挣 1 美元 (9 276) 税后反而只剩 7 884.60 (两个都实际运行过). 累进制就不会出现这种情况. 题目明确用的是简化版, <span class="nb">照题目做.</span></p></div>
+<div class="warn"><p><b>原文笔误:</b> 表格最后一格「ab 466 951」少了美元符号, 其他格都写 $. 题目本身还有一个没说清的地方: 只说「接受 ja 和 nein」, 没说输入别的内容时怎么办; 上面的程序把 ja 以外的所有输入都<span class="nb">当作未婚.</span></p></div>
+</article>
+</section>
 
 
 </main>

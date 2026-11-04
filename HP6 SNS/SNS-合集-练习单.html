@@ -1138,6 +1138,8 @@
       <a href="#u1">练习 1 · 成分测试</a>
       <a href="#a2">作业单 2 · 短语结构</a>
       <a href="#u2">练习 2 · 短语与词类</a>
+      <a href="#a3">作业单 3 · X-bar 文法</a>
+      <a href="#u3">练习 3 · 歧义与 X-bar</a>
     </nav>
   </div>
 </header>
@@ -2329,6 +2331,1025 @@ a/det_stone/noun</pre>
   <p>verloren 是<b>成分</b>, 因为它能单独移位: 被放到了句首的<b>Vorfeld 前场</b> (限定动词 hat 前面的位置). 但它<b>不是短语</b>: 过去分词 verloren 是一个更大的复合 VP 的一部分, 正常语序是 <i>er hat seinen Schlüsselbund zwar noch nie verloren</i>; verloren 的宾语 seinen Schlüsselbund 留在原处, 只有分词本身被抽出来放进前场. 一个短语应当包括中心语和它的补足语, 这里只有光杆的中心语, 所以 verloren 不是完整的 <span class="nb">VP.</span></p>
   <p>这个例子还说明: 前场里不一定只能放句子成分 (Satzglied, 如主语、宾语、状语). 复合谓语 hat … verloren 是一个句子成分, 它的一部分 (分词) 也可以单独进入由限定动词 hat 决定的前场. 后半句 <i>aber oft genug verlegt</i> 和前面共用 hat 和宾语, 形成对比: 不是「丢」, 而是「放错地方」, 这也是把 verloren 放到句首加以强<span class="nb">调的原因.</span></p>
 </details>
+</article>
+</section>
+
+
+<!-- ======================= A3 ======================= -->
+<section class="part" id="a3">
+<h2>作业单 3<br><span class="de-title">Aufgabenblatt 3</span><small><span class="rl">对应 <a href="SNS-03-X-bar结构递归与歧义.html#schema">SNS 03 · X-bar 短语结构图式</a>、<a href="SNS-03-X-bar结构递归与歧义.html#np">NP 规则</a>、<a href="SNS-03-X-bar结构递归与歧义.html#vp">VP 规则</a>、<a href="SNS-03-X-bar结构递归与歧义.html#amb">句法歧义</a>;</span><span class="rl">源文件 03-aufgaben-solution.ipynb (「03 - Aufgabenblatt (Lösung)」);</span><span class="rl">代码用 NLTK 3.10 实际运行过.</span></small></h2>
+
+<article id="a3-1">
+<h3>题 1: 把扁平文法改写成 X-bar 结构 (起点)<br><span class="de-title">Aufgabe 1: Phrasenstrukturgrammatik in X-Bar-Struktur</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabenblatt 3 · Aufgabe 1</span>
+  <p><b>Wandeln Sie die gegebene minimale CFG mit flachen Regeln gemäß den folgenden Anweisungen schrittweise in X-Bar-Struktur um. Kopieren Sie jeweils die Grammatik von der vorherigen Teilaufgabe.</b></p>
+<pre data-lang="python"><span class="tk-k">import </span>nltk
+<span class="tk-k">from </span>nltk.tree <span class="tk-k">import </span>Tree
+<span class="tk-k">from </span>nltk <span class="tk-k">import </span>CFG, Production, Nonterminal
+<span class="tk-k">import </span>copy
+
+sent = <span class="tk-s">'der Hund jagt den langsamen Briefträger'
+
+</span>grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S   -&gt; NP VP
+    VP  -&gt; V NP
+    NP  -&gt; DET N
+    NP  -&gt; DET ADJ N
+
+    DET -&gt; "der" | "den"
+    N   -&gt; "Hund" | "Briefträger"
+    ADJ -&gt; "langsamen"
+    V   -&gt; "jagt"
+"""</span>)
+
+parser = nltk.ChartParser(grammar)
+<span class="tk-k">for </span>tree <span class="tk-k">in </span>parser.parse(sent.split()):
+    tree.pretty_print(unicodelines=<span class="tk-n">True</span>)</pre>
+<pre data-lang="tree">              S
+     ┌────────┴────────┐
+     │                 VP
+     │        ┌────────┴──────┐
+     NP       │               NP
+ ┌───┴───┐    │    ┌──────────┼──────────┐
+DET      N    V   DET        ADJ         N
+ │       │    │    │          │          │
+der     Hund jagt den     langsamen Briefträger</pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 按下面各小题的要求, 把给出的这个扁平规则的最小 CFG 一步一步改写成 X-bar 结构. 每一小题都从上一小题的文法复制<span class="nb">过来再改.</span></p>
+  <p><b>思路:</b> 起点文法的 NP 是扁平的: <code>NP -&gt; DET N</code>、<code class="lc">NP -&gt; DET ADJ N</code>, 想多加一个形容词就要再写一条规则. X-bar 图式 (SNS 03 · 2.2) 有三种规则: 指示语规则 XP → Spez X′ (短语封顶)、附加语规则 X′ → Adj X′ 或 X′ → X′ Adj (可递归)、补足语规则 X′ → X Komp (中心语和它的补足语). 本题里 NP 的中间层叫 NOM, VP 的中间层叫 VERBAL. 上面的树是起点文法的<span class="nb">实际输出.</span></p>
+</div>
+</article>
+
+<article id="a3-2">
+<h3>题 1a: NP 的附加语 (ADJ) 和指示语 (DET)<br><span class="de-title">a) NP-Adjunkt (ADJ) und NP-Spezifizierer (DET)</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabenblatt 3 · Aufgabe 1a</span>
+  <p><b>Wandeln Sie die NP-Regeln in X-Bar-Struktur um, um rekursive Erweiterung um Adjektive zu ermöglichen.</b></p>
+<pre data-lang="python">sent = <span class="tk-s">'der Hund jagt den langsamen schreienden Briefträger'</span></pre>
+  <p><b>Gleichzeitig sollen (durch Verwendung einer nominalen X-Bar-Zwischenebene NOM) Überproduktionen folgender Art vermieden werden:</b></p>
+<pre data-lang="python">neg_sent = <span class="tk-s">'der Hund jagt den langsamen schreienden den Briefträger'</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 把 NP 规则改成 X-bar 结构, 让 NP 可以递归地加任意多个形容词. 同时要借助名词性的 X-bar 中间层 NOM, 避免下面这种过度生成: <span class="nb">两个形容词之后又出现一个冠词 den.</span></p>
+  <p><b>思路:</b> 如果写成 <code class="lc">NP -&gt; ADJ NP</code> 这样直接递归, NP 里每一层都能再带一个冠词, 就会生成负例 (SNS 03 · 2.1 的问题). 办法是把递归放在中间层: 冠词只在最上面出现一次 (NP → DET NOM), 形容词在 NOM 上递归 (NOM → ADJ NOM), <span class="nb">最后 NOM → N 结束.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S  -&gt; NP VP
+    VP -&gt; V NP
+
+#NP-SPEZIFIZIERER:
+    NP  -&gt; DET NOM
+#NP-ADJUNKT:
+    NOM -&gt; ADJ NOM
+#NP-KOMPLEMENT-REGEL (ohne Komplement, nur Kopf):
+    NOM -&gt; N
+
+    DET -&gt; "der" | "den"
+    N   -&gt; "Hund" | "Briefträger"
+    ADJ -&gt; "langsamen" | "schreienden"
+    V   -&gt; "jagt"
+"""</span>)
+
+parser = nltk.ChartParser(grammar)
+trees = <span class="tk-b">list</span>(parser.parse(sent.split()))
+<span class="tk-k">if </span>trees: [tree.pretty_print(unicodelines=<span class="tk-n">True</span>) <span class="tk-k">for </span>tree <span class="tk-k">in </span>trees]
+<span class="tk-k">else</span>: <span class="tk-b">print</span>(<span class="tk-s">f"no parse found for: {</span>sent<span class="tk-s">}"</span>)</pre>
+  <p>实际运行输出:</p>
+<pre data-lang="tree">                   S
+     ┌─────────────┴──────┐
+     │                    VP
+     │        ┌───────────┴──────┐
+     │        │                  NP
+     │        │    ┌─────────────┴───────┐
+     │        │    │                    NOM
+     │        │    │      ┌──────────────┴───────┐
+     NP       │    │      │                     NOM
+ ┌───┴───┐    │    │      │              ┌───────┴───────┐
+ │      NOM   │    │      │              │              NOM
+ │       │    │    │      │              │               │
+DET      N    V   DET    ADJ            ADJ              N
+ │       │    │    │      │              │               │
+der     Hund jagt den langsamen     schreienden     Briefträger</pre>
+  <p>负例用同一个文法测试, 输出 <code class="lc">no parse found for: der Hund jagt den langsamen schreienden den Briefträger</code>: NOM 里只能是 ADJ 或 N, 没有任何规则能让 DET 出现在 NOM <span class="nb">里面.</span></p>
+  <p>三条规则正好对应 X-bar 的三种规则: NP → DET NOM 是指示语规则, 也是 NP 的封顶; NOM → ADJ NOM 是附加语规则, 左右两边都是 NOM, 所以可以无限递归; NOM → N 是补足语规则, 这里中心语没有补足语, 只有中心语本身. 树里两个形容词各占一层 NOM, <span class="nb">层层嵌套.</span></p>
+</details>
+</article>
+
+<article id="a3-3">
+<h3>题 1b: VP 的补足语 (宾语 NP) 和 NP 的补足语 (二格 NP)<br><span class="de-title">b) VP-Komplement (Objekt-NP) und NP-Komplement (Genitiv-NP)</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabenblatt 3 · Aufgabe 1b</span>
+  <p><b>Wandeln Sie die VP-Regeln in X-Bar-Struktur um.</b></p>
+  <p><b>Ergänzen Sie außerdem eine NP-Regel in X-Bar-Struktur für eine Genitiv-NP als Komplement der NP.</b></p>
+<pre data-lang="python">sent = <span class="tk-s">'der Hund jagt den Briefträger der Stadt der Briefträger'</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 把 VP 规则改成 X-bar 结构; 另外加一条 X-bar 形式的 NP 规则, 让二格 NP 作 NP 的补足语. 例句: 「狗追那个城市的邮递员们的邮递员」(der Stadt 是 Briefträger 的二格, der Briefträger (复数二格) 又是 Stadt <span class="nb">的二格).</span></p>
+  <p><b>思路:</b> VP 也分三层: VP → (指示语) VERBAL, VERBAL → V NP (宾语是动词的补足语, 和中心语 V 是姐妹). 二格定语是名词的补足语, 所以和中心语 N 组成 NOM: NOM → N NP. 因为补足语本身是一个完整的 NP, <span class="nb">二格可以一层套一层.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S   -&gt; NP VP
+
+#VP-SPEZIFIZIERER (ohne Spez.):
+    VP  -&gt; VERBAL
+#VP-KOMPLEMENT (transitives Verb):
+    VERBAL -&gt; V NP
+
+    NP  -&gt; DET NOM
+    NOM -&gt; ADJ NOM
+    NOM -&gt; N
+#neue NP-KOMPLEMENT-Regel (Genititv-NP):
+    NOM -&gt; N NP
+
+    DET -&gt; "der" | "den"
+    N   -&gt; "Hund" | "Briefträger" | "Stadt"
+    ADJ -&gt; "langsamen" | "schreienden"
+    V   -&gt; "jagt"
+"""</span>)</pre>
+  <p>实际运行输出 <span class="nb">(只有一棵树):</span></p>
+<pre data-lang="tree">         S
+     ┌───┴──────────┐
+     │              VP
+     │              │
+     │            VERBAL
+     │        ┌─────┴─────────────────┐
+     │        │                       NP
+     │        │     ┌─────────────────┴────┐
+     │        │     │                     NOM
+     │        │     │         ┌────────────┴────┐
+     │        │     │         │                 NP
+     │        │     │         │       ┌─────────┴───┐
+     │        │     │         │       │            NOM
+     │        │     │         │       │    ┌────────┴───┐
+     NP       │     │         │       │    │            NP
+ ┌───┴───┐    │     │         │       │    │        ┌───┴───────┐
+ │      NOM   │     │         │       │    │        │          NOM
+ │       │    │     │         │       │    │        │           │
+DET      N    V    DET        N      DET   N       DET          N
+ │       │    │     │         │       │    │        │           │
+der     Hund jagt  den   Briefträger der Stadt     der     Briefträger</pre>
+  <p>VP → VERBAL 是指示语规则, 这里没有指示语, 只是把中间层封顶成短语. NOM → N NP 是 NP 的补足语规则: 二格 NP 和中心语 N 是姐妹. 二格 der Stadt der Briefträger 自己又是 DET + NOM(N + NP), 所以树向右下一<span class="nb">层层递归.</span></p>
+</details>
+<div class="warn"><p><b>原文笔误:</b> 参考答案的注释「Genit<b>it</b>v-NP」多了一个 t, 应为 <span class="nb">Genitiv-NP.</span></p></div>
+</article>
+
+<article id="a3-4">
+<h3>题 1c: 更多 VP 补足语 (直接宾语和间接宾语)<br><span class="de-title">c) mehr VP-Komplemente (Objekt und indirektes Objekt)</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabenblatt 3 · Aufgabe 1c</span>
+  <p><b>Ergänzen Sie eine VP-Komplement-Regel für das (fakultativ) ditransitive Verb <i>jemandem etwas übergeben</i>.</b></p>
+  <p>Beachten Sie, dass die hier auftretende Ambiguität (<i>der Stadt</i> als Dativ-VP-Komplement bzw. als Genitiv-NP-Komplement) auch in Ihrem Parsingresultat sichtbar wird (2 <span class="nb">Ableitungsbäume).</span></p>
+<pre data-lang="python">sent = <span class="tk-s">'der Briefträger übergibt den Hund der Stadt'</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 给 (可选的) 双及物动词 jemandem etwas übergeben (把某物交给某人) 加一条 VP 补足语规则. 注意: 这里会出现歧义 (der Stadt 可以是 VP 的三格补足语, 也可以是 NP 的二格补足语), 这个歧义在解析结果里也要看得到, <span class="nb">即两棵推导树.</span></p>
+  <p><b>思路:</b> 双及物动词有两个补足语, 都和 V 是姐妹: VERBAL → V NP NP. der Stadt 在形态上既是三格 (「交给城市」) 也是二格 (「城市的狗」), 文法里没有格的信息, 所以两种分析都<span class="nb">能推出来.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S   -&gt; NP VP
+
+    VP  -&gt; VERBAL
+    VERBAL -&gt; V NP
+#neue VP-KOMPLEMENT-Regel (ditransitives Verb = 2 Komplemente):
+    VERBAL -&gt; V NP NP
+
+    NP  -&gt; DET NOM
+    NOM -&gt; ADJ NOM
+    NOM -&gt; N
+    NOM -&gt; N NP
+
+    DET -&gt; "der" | "den"
+    N   -&gt; "Hund" | "Briefträger" | "Stadt"
+    ADJ -&gt; "langsamen" | "schreienden"
+    V   -&gt; "jagt" | "übergibt"
+"""</span>)</pre>
+  <p>实际运行得到两棵树. 第一棵: der Stadt 是三格宾语 (邮递员把狗<span class="nb">交给城市):</span></p>
+<pre data-lang="tree">                              S
+     ┌────────────────────────┴────────┐
+     │                                 VP
+     │                                 │
+     │                               VERBAL
+     │                 ┌──────────┬────┴─────────┐
+     NP                │          NP             NP
+ ┌───┴───────┐         │      ┌───┴────┐     ┌───┴────┐
+ │          NOM        │      │       NOM    │       NOM
+ │           │         │      │        │     │        │
+DET          N         V     DET       N    DET       N
+ │           │         │      │        │     │        │
+der     Briefträger übergibt den      Hund  der     Stadt</pre>
+  <p>第二棵: der Stadt 是 Hund 的二格补足语, übergibt 只带一个宾语 (邮递员交出了城市的狗), 用的是 VERBAL → <span class="nb">V NP:</span></p>
+<pre data-lang="tree">                              S
+     ┌────────────────────────┴────┐
+     │                             VP
+     │                             │
+     │                           VERBAL
+     │                 ┌───────────┴─────┐
+     │                 │                 NP
+     │                 │      ┌──────────┴───┐
+     │                 │      │             NOM
+     │                 │      │    ┌─────────┴───┐
+     NP                │      │    │             NP
+ ┌───┴───────┐         │      │    │         ┌───┴────┐
+ │          NOM        │      │    │         │       NOM
+ │           │         │      │    │         │        │
+DET          N         V     DET   N        DET       N
+ │           │         │      │    │         │        │
+der     Briefträger übergibt den  Hund      der     Stadt</pre>
+  <p>「可选的双及物」就是说 übergeben 也可以只带一个宾语; 文法里两条 VERBAL 规则都保留, <span class="nb">第二种分析才可能出现.</span></p>
+</details>
+</article>
+
+<article id="a3-5">
+<h3>题 1d: VP 的指示语 (助动词) 和倒装的补足语<br><span class="de-title">d) VP-Spezifizierer (AUX) mit Zusatzregel für invertiertes Komplement</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabenblatt 3 · Aufgabe 1d</span>
+  <p><b>Ergänzen Sie Regeln für ein Auxiliar als Spezifizierer der VP sowie für die dann notwendige invertierte Wortstellung von Objekt-NP und Vollverb.</b></p>
+<pre data-lang="python">sent = <span class="tk-s">'der Briefträger hat den Hund übergeben'</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 加规则: 助动词作 VP 的指示语; 再加上因此需要的宾语 NP <span class="nb">和实义动词倒装的语序.</span></p>
+  <p><b>思路:</b> 德语完成时里, 变位的助动词 hat 在第二位, 过去分词 übergeben 到句末, 宾语夹在中间 (句框). 助动词按 X-bar 放在指示语位置: VP → AUX VERBAL; 句末的分词要求补足语在中心语前面: VERBAL → NP V. 词汇里加上 hat 和 <span class="nb">übergeben.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S   -&gt; NP VP
+
+    VP  -&gt; VERBAL
+    VERBAL -&gt; V NP
+    VERBAL -&gt; V NP NP
+#neuer VP-SPEZIFIZIERER (Auxiliar):
+    VP -&gt; AUX VERBAL
+#neue VP-KOMPLEMENT-REGEL mit invertierter Wortstellung:
+    VERBAL -&gt; NP V
+
+    NP  -&gt; DET NOM
+    NOM -&gt; ADJ NOM
+    NOM -&gt; N
+    NOM -&gt; N NP
+
+    DET -&gt; "der" | "den"
+    N   -&gt; "Hund" | "Briefträger" | "Stadt"
+    ADJ -&gt; "langsamen" | "schreienden" | "ganzen"
+    V   -&gt; "jagt" | "übergibt"
+#neue lexikalische Regeln für AUX:
+    AUX -&gt; "hat"
+    V -&gt; "übergeben"
+"""</span>)</pre>
+  <p>实际运行输出:</p>
+<pre data-lang="tree">                     S
+     ┌───────────────┴───────┐
+     │                       VP
+     │               ┌───────┴────┐
+     │               │          VERBAL
+     │               │       ┌────┴────────┐
+     NP              │       NP            │
+ ┌───┴───────┐       │   ┌───┴────┐        │
+ │          NOM      │   │       NOM       │
+ │           │       │   │        │        │
+DET          N      AUX DET       N        V
+ │           │       │   │        │        │
+der     Briefträger hat den      Hund  übergeben</pre>
+  <p>这个文法还会过度生成: 词汇里 V 不分变位形式和分词, 所以 *der Briefträger hat den Hund jagt 也能解析 (VP → AUX VERBAL, VERBAL → NP V), *der Briefträger übergeben den Hund 也能 (VERBAL → V NP). 要排除它们, 得把 V 细分成 V<sub>fin</sub> 和 V<sub>part</sub>, 或者用特征文法. 参考答案加进去的 ganzen 这个形容词在本题<span class="nb">没有用到.</span></p>
+</details>
+</article>
+
+<article id="a3-6">
+<h3>题 2a: 把作业单 2 的名词性部分改写成 X-bar 结构<br><span class="de-title">Aufgabe 2: Transformation in X-Bar-Struktur · a)</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabenblatt 3 · Aufgabe 2a</span>
+  <p><b>Transformieren Sie die Grammatik von Aufgabenblatt 02 im nominale Bereich in X-Bar-Struktur und testen Sie anschließend mit den Positiv- und Negativ-Sätzen. Geben Sie dabei jeweils den X-Bar-Regeltyp an.</b></p>
+  <p>HINWEIS: Alle PP-Attribute (inkl. <i>von</i>-PPs, die man - analog zu den Genitiv-NPs - auch als Komplement auffassen kann) sollen hier vereinfacht als rekursive Adjunkte modelliert <span class="nb">werden.</span></p>
+<pre data-lang="python">sents = [
+    <span class="tk-s">"die Studierende schenkte ihnen ein Buch"</span>,
+    <span class="tk-s">"Maria schenkte ihnen ein Buch von Noam Chomsky"
+</span>]
+neg_sents = [
+    <span class="tk-s">"Studierende schenkte ihnen ein Buch"</span>,
+    <span class="tk-s">"die Maria schenkte ihnen ein Buch"
+</span>]</pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 把作业单 2 的文法在名词性部分改成 X-bar 结构, 再用正例句和负例句测试; 每条规则都要注明是哪一种 X-bar 规则. 提示: 所有介词定语 (包括 von 短语, 它其实和二格 NP 一样也可以看作补足语) 这里都简化成递归<span class="nb">的附加语.</span></p>
+  <p><b>思路:</b> 作业单 2 的 NP 规则是扁平的 <code>NP -&gt; DET N</code> 和 <code>NP -&gt; NP PP</code> (见 <a href="#a2-3">作业单 2 题 3</a>). 改法同题 1a: NP → DET NOM (指示语), NOM → NOM PP (附加语, PP 在右边), NOM → N (中心语). 专有名词和代词本身就是完整的 NP, 不加冠词, 保持 NP → PROPN、NP → PRON. 负例: 光杆的 Studierende 前面没有冠词 (单数可数名词不行), die Maria 带冠词 (标准语里专有名词<span class="nb">不带冠词).</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S -&gt; NP VP
+    VP -&gt; V NP NP
+    PP -&gt; P NP
+    NP -&gt; PROPN | PROPN PROPN
+    NP -&gt; PRON
+
+# geändert (Spezifizierer-Regel = Phrasenabschluss):
+    NP -&gt; DET NOM
+# geändert (rekursive PP-Adjunkt-Regel = nominale Zwischenebene):
+    NOM -&gt; NOM PP
+# neu (Kopfregel = Phrasenkern):
+    NOM -&gt; N
+
+    DET -&gt; "die" | "ein"
+    PROPN -&gt; "Chomsky" | "Noam" | "Maria" | "Moritz"
+    N -&gt; "Studierende" | "Buch"
+    PRON -&gt; "ihnen"
+    V -&gt; "schenkte"
+    P -&gt; "von"
+"""</span>)</pre>
+  <p>两个正例各得<span class="nb">到一棵树:</span></p>
+<pre data-lang="tree">                       S
+     ┌─────────────────┴───────┐
+     │                         VP
+     │                 ┌───────┼────────┐
+     NP                │       │        NP
+ ┌───┴───────┐         │       │    ┌───┴───┐
+ │          NOM        │       NP   │      NOM
+ │           │         │       │    │       │
+DET          N         V      PRON DET      N
+ │           │         │       │    │       │
+die     Studierende schenkte ihnen ein     Buch</pre>
+<pre data-lang="tree">                      S
+  ┌───────────────────┴───┐
+  │                       VP
+  │      ┌───────┬────────┴────┐
+  │      │       │             NP
+  │      │       │    ┌────────┴───┐
+  │      │       │    │           NOM
+  │      │       │    │   ┌────────┴────┐
+  │      │       │    │   │             PP
+  │      │       │    │   │    ┌────────┴────┐
+  NP     │       NP   │  NOM   │             NP
+  │      │       │    │   │    │        ┌────┴─────┐
+PROPN    V      PRON DET  N    P      PROPN      PROPN
+  │      │       │    │   │    │        │          │
+Maria schenkte ihnen ein Buch von      Noam     Chomsky</pre>
+  <p>两个负例都输出 <code>no parse found</code>: Studierende 前没有 DET, 而 N 只能经 NOM 进入 NP → DET NOM; Maria 是 PROPN, 不能放进 NOM, 所以 die Maria <span class="nb">推不出来.</span></p>
+  <p>VP 仍是扁平的 VP → V NP NP: 题目只要求改名<span class="nb">词性部分.</span></p>
+</details>
+<div class="warn"><p><b>原文笔误:</b>「im <b>nominale</b> Bereich」应为 im nominalen Bereich (im 后面形容词弱变化, <span class="nb">要加 -n).</span></p></div>
+</article>
+
+<article id="a3-7">
+<h3>题 2b: 多个 PP 附加语和歧义<br><span class="de-title">b) mehrere PP-Adjunkte</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabenblatt 3 · Aufgabe 2b</span>
+  <p><b>Ergänzen Sie die lexikalischen Regeln für einen entsprechenden Beispielsatz mit mehreren PP-Adjunkten. Erklären Sie die Ambiguität des Parsing-Ergebnisses.</b></p>
+  <p>Wählen Sie die PPs in Ihrem Beispielsatz so, dass die aus den syntaktischen Regeln folgende Ambiguität auch eine semantisch sinnvolle <span class="nb">Interpretation hat.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 自己造一个带多个 PP 附加语的例句, 把需要的词汇规则补进文法, 然后解释解析结果里的歧义. 选 PP 时要让文法规则带来的歧义在语义上<span class="nb">也说得通.</span></p>
+  <p><b>思路:</b> 在 NOM → NOM PP 下, 名词后面跟两个 PP 时, 第二个 PP 可以修饰整个 [名词 + 第一个 PP], 也可以只修饰第一个 PP 里的名词. 选两个 PP, 让两种挂法都有意义. 新词用 <code>Production</code> 对象加到原文法的规则列表里, <span class="nb">再建一个新的 CFG.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">sent = <span class="tk-s">"Maria schenkte ihnen ein Buch aus dem Buchladen ohne einen Namen"
+</span><span class="tk-c"># Erläuterung:
+# im Beispielsatz liegt PP-Attachment-Ambiguität im nominalen Bereich vor:
+# das Buch bzw. der Buchladen hat keinen Namen
+
+</span>new_productions = [
+    Production(Nonterminal(<span class="tk-s">'P'</span>), [<span class="tk-s">'aus'</span>]),
+    Production(Nonterminal(<span class="tk-s">'DET'</span>), [<span class="tk-s">'dem'</span>]),
+    Production(Nonterminal(<span class="tk-s">'N'</span>), [<span class="tk-s">'Buchladen'</span>]),
+    Production(Nonterminal(<span class="tk-s">'P'</span>), [<span class="tk-s">'ohne'</span>]),
+    Production(Nonterminal(<span class="tk-s">'DET'</span>), [<span class="tk-s">'einen'</span>]),
+    Production(Nonterminal(<span class="tk-s">'N'</span>), [<span class="tk-s">'Namen'</span>]),
+]
+
+productions = copy.copy(grammar.productions())
+
+<span class="tk-k">for </span>new_production <span class="tk-k">in </span>new_productions:
+    productions.append(new_production)
+    grammar_b = nltk.grammar.CFG(grammar.start(), productions)
+
+<span class="tk-b">print</span>(grammar_b)</pre>
+  <p><code>print(grammar_b)</code> 输出 <code class="lc">Grammar with 26 productions (start state = S)</code> 和全部规则 (20 条原有的 + 6 条新的). 解析例句得到两棵树. 第一棵: ohne einen Namen 挂在最上层的 NOM 上, 修饰「书店里的那本书」, <span class="nb">即书没有名字:</span></p>
+<pre data-lang="tree">                 S
+  ┌──────────────┴─────────────┐
+  │                            VP
+  │      ┌───────┬─────────────┴───────┐
+  │      │       │                     NP
+  │      │       │    ┌────────────────┴──────────┐
+  │      │       │    │                          NOM
+  │      │       │    │            ┌──────────────┴────────────┐
+  │      │       │    │           NOM                          │
+  │      │       │    │   ┌────────┴───┐                       │
+  │      │       │    │   │            PP                      PP
+  │      │       │    │   │    ┌───────┴───┐             ┌─────┴────┐
+  │      │       │    │   │    │           NP            │          NP
+  │      │       │    │   │    │       ┌───┴──────┐      │     ┌────┴────┐
+  NP     │       NP   │  NOM   │       │         NOM     │     │        NOM
+  │      │       │    │   │    │       │          │      │     │         │
+PROPN    V      PRON DET  N    P      DET         N      P    DET        N
+  │      │       │    │   │    │       │          │      │     │         │
+Maria schenkte ihnen ein Buch aus     dem     Buchladen ohne einen     Namen</pre>
+  <p>第二棵: ohne einen Namen 挂在 Buchladen 的 NOM 上, <span class="nb">即书店没有名字:</span></p>
+<pre data-lang="tree">         S
+  ┌──────┴───────┐
+  │              VP
+  │      ┌───────┼────────┐
+  │      │       │        NP
+  │      │       │    ┌───┴────┐
+  │      │       │    │       NOM
+  │      │       │    │   ┌────┴──────────┐
+  │      │       │    │   │               PP
+  │      │       │    │   │    ┌──────────┴──────┐
+  │      │       │    │   │    │                 NP
+  │      │       │    │   │    │   ┌─────────────┴────┐
+  │      │       │    │   │    │   │                 NOM
+  │      │       │    │   │    │   │      ┌───────────┴────┐
+  │      │       │    │   │    │   │      │                PP
+  │      │       │    │   │    │   │      │      ┌─────────┴────┐
+  │      │       │    │   │    │   │      │      │              NP
+  │      │       │    │   │    │   │      │      │         ┌────┴────┐
+  NP     │       NP   │  NOM   │   │     NOM     │         │        NOM
+  │      │       │    │   │    │   │      │      │         │         │
+PROPN    V      PRON DET  N    P  DET     N      P        DET        N
+  │      │       │    │   │    │   │      │      │         │         │
+Maria schenkte ihnen ein Buch aus dem Buchladen ohne     einen     Namen</pre>
+  <p>这就是名词性领域里的 <b>PP-Attachment-Ambiguität PP 附着歧义</b>: 规则 NOM → NOM PP 可以在任何一个 NOM 上用, 第二个 PP 有两个 NOM 可挂. 再加第三个 PP, 树的数量会按卡塔兰数增长 (2, 5, <span class="nb">14 …).</span></p>
+  <p>循环里每加一条规则就重建一次 <code>grammar_b</code>, 只有最后一次有用; 把 <code>grammar_b = …</code> 放到循环外面更清楚, 结果相同. <code>copy.copy</code> 复制规则列表, 保证原来的 <code>grammar</code> <span class="nb">不被改动.</span></p>
+</details>
+</article>
+
+<article id="a3-8">
+<h3>题 2c: VP 上的递归 PP 附加语<br><span class="de-title">c) rekursive PP-Adjunkte an die VP</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabenblatt 3 · Aufgabe 2c</span>
+  <p><b>Erweitern Sie die Grammatik abschließend um Regeln für rekursive PP-Adjunkte an die VP, um folgenden Beispielsatz parsen zu können. Halten Sie sich dabei an das X-Bar-Schema.</b></p>
+<pre data-lang="python">sent = <span class="tk-s">"Maria schickte ihnen ein Buch aus München"</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 最后给文法加上 VP 的递归 PP 附加语规则, 让下面的例句能解析; 要遵守 X-bar 图式. 例句: 「Maria 从慕尼黑给他们寄了一本书」/「Maria 给他们寄了一本来自慕<span class="nb">尼黑的书」.</span></p>
+  <p><b>思路:</b> VP 也要三层: VP → VERBAL (封顶, 没有指示语)、VERBAL → VERBAL PP (附加语, 可递归)、VERBAL → V NP NP (补足语). aus München 既能挂在 VERBAL 上 (从慕尼黑寄出), 也能挂在 Buch 的 NOM 上 (慕尼黑的书), <span class="nb">应该得到两棵树.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">new_productions = [
+    Production(Nonterminal(<span class="tk-s">'V'</span>), [<span class="tk-s">'schickte'</span>]),
+    Production(Nonterminal(<span class="tk-s">'P'</span>), [<span class="tk-s">'aus'</span>]),
+    Production(Nonterminal(<span class="tk-s">'PROPN'</span>), [<span class="tk-s">'München'</span>]),
+    Production(Nonterminal(<span class="tk-s">'VP'</span>), [Nonterminal(<span class="tk-s">'VERBAL'</span>)]), <span class="tk-c"># Phrasenabschluss (hier ohne Spezifizierer)
+    </span>Production(Nonterminal(<span class="tk-s">'VERBAL'</span>), [Nonterminal(<span class="tk-s">'VERBAL'</span>), Nonterminal(<span class="tk-s">'PP'</span>)]), <span class="tk-c"># rekursive PP-Adjunkt-Regel
+    </span>Production(Nonterminal(<span class="tk-s">'VERBAL'</span>), [Nonterminal(<span class="tk-s">'VERBAL'</span>), Nonterminal(<span class="tk-s">'NP'</span>), Nonterminal(<span class="tk-s">'NP'</span>)]), <span class="tk-c"># Komplement-Regel
+    </span>Production(Nonterminal(<span class="tk-s">'VERBAL'</span>), [Nonterminal(<span class="tk-s">'V'</span>)]), <span class="tk-c"># Kopfregel
+</span>]
+
+productions = copy.copy(grammar_b.productions())
+
+<span class="tk-k">for </span>new_production <span class="tk-k">in </span>new_productions:
+    productions.append(new_production)
+    grammar_c = nltk.grammar.CFG(grammar.start(), productions)</pre>
+  <p>文法变成 33 条规则. 实际运行解析例句, 得到<b>三</b>棵树. 第一棵: PP 挂在 VERBAL 上 <span class="nb">(从慕尼黑寄出):</span></p>
+<pre data-lang="tree">         S
+  ┌──────┴──────────────┐
+  │                     VP
+  │                     │
+  │                   VERBAL
+  │              ┌──────┴──────────────────┐
+  │            VERBAL                      │
+  │      ┌───────┼────────────┐            │
+  │      │       │            NP           PP
+  │      │       │      ┌─────┴───┐    ┌───┴─────┐
+  NP   VERBAL    NP     │        NOM   │         NP
+  │      │       │      │         │    │         │
+PROPN    V      PRON   DET        N    P       PROPN
+  │      │       │      │         │    │         │
+Maria schickte ihnen   ein       Buch aus     München</pre>
+  <p>第二棵: PP 挂在 NOM 上 (来自慕尼黑的书), 走的仍是新的 VERBAL <span class="nb">规则:</span></p>
+<pre data-lang="tree">         S
+  ┌──────┴─────────────┐
+  │                    VP
+  │                    │
+  │                  VERBAL
+  │      ┌───────┬─────┴──────────┐
+  │      │       │                NP
+  │      │       │     ┌──────────┴───┐
+  │      │       │     │             NOM
+  │      │       │     │     ┌────────┴───┐
+  │      │       │     │     │            PP
+  │      │       │     │     │        ┌───┴─────┐
+  NP   VERBAL    NP    │    NOM       │         NP
+  │      │       │     │     │        │         │
+PROPN    V      PRON  DET    N        P       PROPN
+  │      │       │     │     │        │         │
+Maria schickte ihnen  ein   Buch     aus     München</pre>
+  <p>第三棵和第二棵意思一样, 但走的是作业单 2 留下来的扁平规则 VP → V <span class="nb">NP NP:</span></p>
+<pre data-lang="tree">         S
+  ┌──────┴────────────┐
+  │                   VP
+  │      ┌───────┬────┴────────┐
+  │      │       │             NP
+  │      │       │    ┌────────┴───┐
+  │      │       │    │           NOM
+  │      │       │    │   ┌────────┴───┐
+  │      │       │    │   │            PP
+  │      │       │    │   │        ┌───┴─────┐
+  NP     │       NP   │  NOM       │         NP
+  │      │       │    │   │        │         │
+PROPN    V      PRON DET  N        P       PROPN
+  │      │       │    │   │        │         │
+Maria schickte ihnen ein Buch     aus     München</pre>
+  <p>两种意思 (寄出地 / 书的来源) 是真正的 PP 附着歧义; 第三棵是多余的, 原因是旧规则没有删. <span class="nb">下面红框里给出改法.</span></p>
+</details>
+<div class="warn"><p><b>参考答案的问题:</b> ① 题目要求遵守 X-bar 图式, 但补足语规则写成了 <code class="lc">VERBAL -&gt; VERBAL NP NP</code> 再加 <code>VERBAL -&gt; V</code>: 补足语应该和中心语 V 是姐妹 (VERBAL → V NP NP, 和题 1c 一样), 现在它们挂在一个 VERBAL 上, 和附加语的结构没有区别了. ② 旧的扁平规则 <code class="lc">VP -&gt; V NP NP</code> 没有删掉, 所以产生了上面多余的第三棵树. ③ <code>P -&gt; 'aus'</code> 在题 2b 已经加过, 这里又加了一次, 文法里出现两条一模一样的规则 (这一次没有造成重复的树). 改正后的 VP 部分是 <code class="lc">VP -&gt; VERBAL</code>、<code class="lc">VERBAL -&gt; VERBAL PP</code>、<code class="lc">VERBAL -&gt; V NP NP</code>, 删掉 <code class="lc">VP -&gt; V NP NP</code>; 实际运行这样改过的文法, <span class="nb">例句恰好得到前两棵树.</span></p></div>
+</article>
+</section>
+
+<!-- ======================= U3 ======================= -->
+<section class="part" id="u3">
+<h2>练习 3<br><span class="de-title">Übung 3</span><small><span class="rl">对应 <a href="SNS-03-X-bar结构递归与歧义.html#amb">SNS 03 · 句法歧义</a>、<a href="SNS-03-X-bar结构递归与歧义.html#np">X-bar 图式中的 NP 规则</a>、<a href="SNS-03-X-bar结构递归与歧义.html#vp">VP 规则</a>;</span><span class="rl">源文件 03-uebung-solution.ipynb (「03 - Übung (Lösung)」);</span><span class="rl">代码用 NLTK 3.10 实际运行过.</span></small></h2>
+
+<article id="u3-1">
+<h3>题 1: 句法歧义<br><span class="de-title">Aufgabe 1 - Syntaktische Ambiguität</span></h3>
+<div class="card de">
+  <span class="folie">Übung 3 · Aufgabe 1a</span>
+  <p><b>a) Gegeben sei folgende CFG-Grammatik für einen bekannten Beispielsatz aus einem Film der Marx Brothers (vgl. https://www.nltk.org/book/ch08.html#ex-marx-elephant). Führen Sie das Skript aus und beantworten Sie im Anschluss die untenstehenden Fragen.</b></p>
+<pre data-lang="python">sent = <span class="tk-s">"I shot an elephant in my pajamas"
+
+</span>grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S -&gt; NP VP
+    NP -&gt; DET N | DET N PP | PRON
+    VP -&gt; V NP | VP PP
+    PP -&gt; P NP
+    PRON -&gt; 'I'
+    DET -&gt; 'an' | 'my'
+    N -&gt; 'elephant' | 'pajamas'
+    V -&gt; 'shot'
+    P -&gt; 'in'
+"""</span>)
+
+parser = nltk.ChartParser(grammar)
+trees = <span class="tk-b">list</span>(parser.parse(sent.split()))
+<span class="tk-b">print</span>(<span class="tk-s">"\nLänge der vom Parser wiedergegebenen Sequenz: "</span>, <span class="tk-b">len</span>(trees), <span class="tk-s">"\n"</span>)
+
+<span class="tk-k">for </span>tree <span class="tk-k">in </span>trees:
+    tree.pretty_print(unicodelines=<span class="tk-n">True</span>)</pre>
+  <ol>
+    <li>Warum gibt die parse-Funktion des Skripts eine Sequenz <span class="nb">zurück?</span></li>
+    <li>Worin liegen die Unterschiede zwischen den ausgegebenen <span class="nb">Bäumen?</span></li>
+    <li>Warum ist der gegebene Satz <i>I shot an elephant in my pajamas</i> syntaktisch <span class="nb">ambig?</span></li>
+    <li>Welche Regeln ermöglichen die beiden Analysen? Wie unterscheiden sich die beiden <span class="nb">Regeln?</span></li>
+  </ol>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 下面是马克思兄弟电影里一个著名例句的 CFG (NLTK 书第 8 章). 运行脚本, 然后回答: ① parse 函数为什么返回的是一个序列? ② 输出的几棵树区别在哪里? ③ 这个句子为什么在句法上有歧义? ④ 哪些规则造成了两种分析? 这两条规则有什么不同? 例句: 「我穿着睡衣射中了一头大象」/「我射中了一头穿着我睡衣的大象」(电影里的台词接着说: How he got into my pajamas I don't <span class="nb">know).</span></p>
+  <p><b>思路:</b> 运行后数一数树的个数, 对比两棵树里 PP <i>in my pajamas</i> 挂在哪个结点下. 再找文法里所有右边出现 PP <span class="nb">的规则.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实际运行打印 <code class="lc">Länge der vom Parser wiedergegebenen Sequenz:  2</code>, <span class="nb">然后是两棵树:</span></p>
+<pre data-lang="tree">      S
+ ┌────┴──────────────┐
+ │                   VP
+ │         ┌─────────┴──────────┐
+ │         VP                   PP
+ │    ┌────┴───┐            ┌───┴───┐
+ NP   │        NP           │       NP
+ │    │    ┌───┴─────┐      │   ┌───┴─────┐
+PRON  V   DET        N      P  DET        N
+ │    │    │         │      │   │         │
+ I   shot  an     elephant  in  my     pajamas</pre>
+<pre data-lang="tree">      S
+ ┌────┴──────────┐
+ │               VP
+ │    ┌──────────┴──────┐
+ │    │                 NP
+ │    │    ┌─────┬──────┴───┐
+ │    │    │     │          PP
+ │    │    │     │      ┌───┴───┐
+ NP   │    │     │      │       NP
+ │    │    │     │      │   ┌───┴─────┐
+PRON  V   DET    N      P  DET        N
+ │    │    │     │      │   │         │
+ I   shot  an elephant  in  my     pajamas</pre>
+  <p><b>1.</b> 一个输入按文法通常可以有多棵解析树 (多种分析), 所以 parse 不返回一棵树, 而是返回所有找到的树. 严格地说 <code>parse()</code> 返回的是一个<b>生成器</b> (实测类型 <code>generator</code>), 要用 <code>list()</code> 转成列表才能取长度; 脚本第 3 <span class="nb">行做的就是这一步.</span></p>
+  <p><b>2.</b> PP <i>in my pajamas</i> 的位置不同: 第一棵树里它挂在 VP 上 (VP → VP PP), 修饰「射」这个动作; 第二棵树里它在 NP 里 (NP → DET N PP), <span class="nb">修饰 elephant.</span></p>
+  <p><b>3.</b> 这是 PP 附着歧义: 从表层的词序看不出 PP 担任哪种句法功能. 第一种是状语 (Adverbial, 我穿着睡衣开枪), 第二种是名词的定语 (Attribut, 穿着我睡衣的大象). 两种读法的词序完全相同, <span class="nb">只有结构不同.</span></p>
+  <p><b>4.</b> <code>VP -&gt; VP PP</code> 是递归规则, 把作状语的 PP 附加到 VP 上, 可以重复使用 (附加任意多个 PP); <code class="lc">NP -&gt; DET N PP</code> 是扁平的、不递归的规则, 只能在 NP 里附加恰好一个作定语的 PP. 这种不对称正是扁平规则的问题, 下一题用 X-bar 把两边都改成递归的附<span class="nb">加语规则.</span></p>
+</details>
+<div class="warn"><p><b>参考答案的小问题:</b> 第 1 问的答案说 parse() 的返回对象「enthält eine Liste」, 实际上是生成器 (见上). 另外答案注释里有两处笔误: 「ausgedr<b>ü</b>ck<b>e</b>te」应为 ausgedrückte, 「syntak<b>i</b>sche」应为 <span class="nb">syntaktische.</span></p></div>
+</article>
+
+<article id="u3-2">
+<h3>题 1 (续): 同一个例句的 X-bar 文法<br><span class="de-title"><span class="seg">Aufgabe 1 ·</span> <span class="seg">X-Bar-Variante</span></span></h3>
+<div class="card de">
+  <span class="folie">Übung 3 · Aufgabe 1</span>
+  <p>(Lösungszelle ohne eigenen Aufgabentext: dieselbe Grammatik, flache NP- und VP-Regeln durch X-Bar-Regeln <span class="nb">ersetzt.)</span></p>
+</div>
+<div class="zh">
+  <p>参考答案在题 1 后面多给了一个代码单元 (没有题目文字): 把同一个文法的 NP、VP 规则换成 X-bar 规则, 再解析一次例句. 先想想: 换成 X-bar 以后还是两棵树吗? <span class="nb">PP 分别挂在哪里?</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S -&gt; NP VP
+    NP -&gt; PRON
+    PP -&gt; P NP
+    PRON -&gt; 'I'
+    DET -&gt; 'an' | 'my'
+    N -&gt; 'elephant' | 'pajamas'
+    V -&gt; 'shot'
+    P -&gt; 'in'
+
+# entfernt:
+#    NP -&gt; DET N | DET N PP
+#    VP -&gt; V NP | VP PP
+
+# NP-X-BAR:
+   NP -&gt; DET NOM
+   NOM -&gt; NOM PP
+   NOM -&gt; N
+
+# VP-X-BAR:
+   VP -&gt; VERBAL
+   VERBAL -&gt; VERBAL PP
+   VERBAL -&gt; V | V NP
+    """</span>)</pre>
+  <p>实际运行仍是两棵树: PP 挂在 VERBAL 上 (状语), 或挂在 elephant 的 NOM 上 <span class="nb">(定语).</span></p>
+<pre data-lang="tree">      S
+ ┌────┴─────────────────┐
+ │                      VP
+ │                      │
+ │                    VERBAL
+ │          ┌───────────┴──────────┐
+ │        VERBAL                   PP
+ │    ┌─────┴─────┐            ┌───┴───┐
+ │    │           NP           │       NP
+ │    │     ┌─────┴─────┐      │   ┌───┴─────┐
+ NP   │     │          NOM     │   │        NOM
+ │    │     │           │      │   │         │
+PRON  V    DET          N      P  DET        N
+ │    │     │           │      │   │         │
+ I   shot   an       elephant  in  my     pajamas</pre>
+<pre data-lang="tree">      S
+ ┌────┴──────────┐
+ │               VP
+ │               │
+ │             VERBAL
+ │    ┌──────────┴──────┐
+ │    │                 NP
+ │    │    ┌────────────┴───┐
+ │    │    │               NOM
+ │    │    │     ┌──────────┴───┐
+ │    │    │     │              PP
+ │    │    │     │      ┌───────┴───┐
+ │    │    │     │      │           NP
+ │    │    │     │      │       ┌───┴─────┐
+ NP   │    │    NOM     │       │        NOM
+ │    │    │     │      │       │         │
+PRON  V   DET    N      P      DET        N
+ │    │    │     │      │       │         │
+ I   shot  an elephant  in      my     pajamas</pre>
+  <p>歧义没有消失 (它本来就是句子的真实歧义), 但两边的规则现在是对称的: NOM → NOM PP 和 VERBAL → VERBAL PP 都是递归的附加语规则, 名词也能带任意多个 PP <span class="nb">定语了.</span></p>
+</details>
+</article>
+
+<article id="u3-3">
+<h3>题 2: 改写成 X-bar 结构并扩展<br><span class="de-title">Aufgabe 2 - Transformation in X-Bar-Struktur</span></h3>
+<div class="card de">
+  <span class="folie">Übung 3 · Aufgabe 2</span>
+  <p><b>Transformieren Sie die gegebene CFG in X-Bar-Struktur und fügen Sie weitere Regeln hinzu, um folgenden Satz linguistisch korrekt zu parsen:</b></p>
+<pre data-lang="python">sent = <span class="tk-s">"I had shot a very very big elephant in my pajamas"</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 把题 1 给出的 CFG 改写成 X-bar 结构, 再加规则, 让下面这个句子得到语言学上正确的分析. 新增成分: 助动词 had、程度小品词 very (可重复)、<span class="nb">形容词 big.</span></p>
+  <p><b>思路:</b> 助动词作 VP 的指示语 (VP → AUX VERBAL, 同 <a href="#a3-5">作业单 3 题 1d</a>). 形容词带程度词构成形容词短语 ADJP, very 可以叠加, 所以 ADJP 自己也要递归 (ADJP → PRT ADJP). ADJP 作名词的附加语: NOM → ADJP NOM. <span class="nb">预测一下会有几棵树.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S -&gt; NP VP
+
+    NP -&gt; DET NOM | PRON
+    NOM -&gt; ADJP NOM | NOM PP
+    NOM -&gt; N
+
+    ADJP -&gt; PRT ADJP
+    ADJP -&gt; ADJ
+
+    VP -&gt; AUX VERBAL
+    VERBAL -&gt; VERBAL PP
+    VERBAL -&gt; V NP
+
+    PP -&gt; P NP
+
+    PRON -&gt; 'I'
+    DET -&gt; 'a' | 'my'
+    N -&gt; 'elephant' | 'pajamas'
+    V -&gt; 'shot'
+    P -&gt; 'in'
+    PRT -&gt; 'very'
+    ADJ -&gt; 'big'
+    AUX -&gt; 'had'
+"""</span>)</pre>
+  <p>实际运行得到三棵树. 第一棵: PP 挂在 VERBAL 上 <span class="nb">(穿着睡衣开枪):</span></p>
+<pre data-lang="tree">          S
+ ┌────────┴───────────────┐
+ │                        VP
+ │    ┌───────────────────┴──────────┐
+ │    │                            VERBAL
+ │    │             ┌────────────────┴──────────────────┐
+ │    │           VERBAL                                │
+ │    │   ┌─────────┴─────┐                             │
+ │    │   │               NP                            │
+ │    │   │    ┌──────────┴────┐                        │
+ │    │   │    │              NOM                       │
+ │    │   │    │          ┌────┴─────────────┐          │
+ │    │   │    │         ADJP                │          PP
+ │    │   │    │    ┌─────┴────┐             │      ┌───┴───┐
+ │    │   │    │    │         ADJP           │      │       NP
+ │    │   │    │    │     ┌────┴─────┐       │      │   ┌───┴─────┐
+ NP   │   │    │    │     │         ADJP    NOM     │   │        NOM
+ │    │   │    │    │     │          │       │      │   │         │
+PRON AUX  V   DET  PRT   PRT        ADJ      N      P  DET        N
+ │    │   │    │    │     │          │       │      │   │         │
+ I   had shot  a   very  very       big   elephant  in  my     pajamas</pre>
+  <p>第二棵: PP 挂在 NOM 上, 而且在 ADJP 之外: [[very very big elephant] in my <span class="nb">pajamas]:</span></p>
+<pre data-lang="tree">      S
+ ┌────┴───┐
+ │        VP
+ │    ┌───┴─────────┐
+ │    │           VERBAL
+ │    │   ┌─────────┴───────────────┐
+ │    │   │                         NP
+ │    │   │    ┌────────────────────┴──────┐
+ │    │   │    │                          NOM
+ │    │   │    │               ┌───────────┴──────────┐
+ │    │   │    │              NOM                     │
+ │    │   │    │          ┌────┴───────────┐          │
+ │    │   │    │         ADJP              │          PP
+ │    │   │    │    ┌─────┴────┐           │      ┌───┴───┐
+ │    │   │    │    │         ADJP         │      │       NP
+ │    │   │    │    │     ┌────┴────┐      │      │   ┌───┴─────┐
+ NP   │   │    │    │     │        ADJP   NOM     │   │        NOM
+ │    │   │    │    │     │         │      │      │   │         │
+PRON AUX  V   DET  PRT   PRT       ADJ     N      P  DET        N
+ │    │   │    │    │     │         │      │      │   │         │
+ I   had shot  a   very  very      big  elephant  in  my     pajamas</pre>
+  <p>第三棵: PP 也挂在名词上, 但在 ADJP 之内: [very very big [elephant in my <span class="nb">pajamas]]:</span></p>
+<pre data-lang="tree">      S
+ ┌────┴───┐
+ │        VP
+ │    ┌───┴─────────┐
+ │    │           VERBAL
+ │    │   ┌─────────┴───────────────┐
+ │    │   │                         NP
+ │    │   │    ┌────────────────────┴──────┐
+ │    │   │    │                          NOM
+ │    │   │    │          ┌────────────────┴──────────┐
+ │    │   │    │          │                          NOM
+ │    │   │    │          │                ┌──────────┴───┐
+ │    │   │    │         ADJP              │              PP
+ │    │   │    │    ┌─────┴────┐           │      ┌───────┴───┐
+ │    │   │    │    │         ADJP         │      │           NP
+ │    │   │    │    │     ┌────┴────┐      │      │       ┌───┴─────┐
+ NP   │   │    │    │     │        ADJP   NOM     │       │        NOM
+ │    │   │    │    │     │         │      │      │       │         │
+PRON AUX  V   DET  PRT   PRT       ADJ     N      P      DET        N
+ │    │   │    │    │     │         │      │      │       │         │
+ I   had shot  a   very  very      big  elephant  in      my     pajamas</pre>
+  <p>参考答案说这里有两种歧义: ① PP 附着 (树 1 对树 2、3); ② 形容词短语的辖域 (树 2 对树 3: very very big 修饰的是「大象」还是「穿着睡衣的大象」). 第二种是文法允许 NOM → ADJP NOM 和 NOM → NOM PP 以两种顺序组合造成的; 语义上两种读法几乎没有差别 (都是一头穿着睡衣的大象很大), 所以常被看作「伪歧义」(spurious <span class="nb">ambiguity).</span></p>
+  <p>ADJP 内部只有一种结构: very (very big), 程度词从左向右逐层包住后面的 <span class="nb">ADJP.</span></p>
+</details>
+</article>
+
+<article id="u3-4">
+<h3>题 3a: 一个简单的 CFG<br><span class="de-title">Aufgabe 3 - Phrasenstrukturgrammatik mit X-Bar-Regeln · a)</span></h3>
+<div class="card de">
+  <span class="folie">Übung 3 · Aufgabe 3a</span>
+  <p><b>a) Schreiben Sie zunächst eine einfache kontextfreie Grammatik, die die folgenden beiden Sätze erkennt:</b></p>
+<pre data-lang="python">sents = [
+    <span class="tk-s">"der Mann gibt der Frau das Buch"</span>,
+    <span class="tk-s">"die Frau schenkt der Frau das Buch"
+</span>]</pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 先写一个简单的上下文无关文法, 能识别这两个句子 (「那个男人把书给那个女人」「那个女人把书送给<span class="nb">那个女人」).</span></p>
+  <p><b>思路:</b> 两个动词都是双及物: VP → V NP NP; 每个 NP 都是冠词 + 名词. 词汇规则写出出现的所有冠词、名词、<span class="nb">动词.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S -&gt; NP VP
+    NP -&gt; DET N
+    VP -&gt; V NP NP
+
+    DET -&gt; "der" | "die" | "das"
+    N -&gt; "Mann" | "Frau" | "Buch"
+    V -&gt; "gibt" | "schenkt"
+"""</span>)</pre>
+  <p>两个句子各得到一棵树, <span class="nb">结构相同:</span></p>
+<pre data-lang="tree">                   S
+     ┌─────────────┴───────┐
+     │                     VP
+     │        ┌────────┬───┴────────┐
+     NP       │        NP           NP
+ ┌───┴───┐    │    ┌───┴───┐    ┌───┴───┐
+DET      N    V   DET      N   DET      N
+ │       │    │    │       │    │       │
+der     Mann gibt der     Frau das     Buch</pre>
+  <p>文法不管格和性: *das Mann gibt die Buch der Frau 也能识别. 本题只要求识别给定的句子, 下面几小题也一直不<span class="nb">处理一致.</span></p>
+</details>
+</article>
+
+<article id="u3-5">
+<h3>题 3b: 一价和二价动词<br><span class="de-title">b) Erweiterung für ein- und zweistellige Verben</span></h3>
+<div class="card de">
+  <span class="folie">Übung 3 · Aufgabe 3b</span>
+  <p><b>Bis jetzt akzeptiert die Grammatik lediglich dreistellige Verben. Erweitern Sie sie so, dass auch Verben mit weniger als zwei Objekten korrekte Verbalphrasen bilden können.</b></p>
+  <p>Folgende Sätze sollten akzeptiert <span class="nb">werden:</span></p>
+<pre data-lang="python">sents = [
+    <span class="tk-s">"der Mann schläft"</span>,
+    <span class="tk-s">"das Buch gefällt der Frau"</span>,
+    <span class="tk-s">"die Frau kennt das Buch"
+</span>]</pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 现在文法只接受三价动词 (主语 + 两个宾语). 扩展它, 让宾语少于两个的动词也能构成正确的 VP. 要接受的句子: 「那个男人在睡觉」(一价)、「那本书让那个女人喜欢」(二价, 三格宾语)、「那个女人认识那本书」(二价, <span class="nb">四格宾语).</span></p>
+  <p><b>思路:</b> 给 VP 加两条规则: VP → V NP 和 VP → V. <span class="nb">新动词加进词汇.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S -&gt; NP VP
+    NP -&gt; DET N
+# neu:
+    VP -&gt; V NP NP | V NP | V
+
+    DET -&gt; "der" | "die" | "das"
+    N -&gt; "Mann" | "Frau" | "Buch"
+    V -&gt; "gibt" | "schenkt" | "schläft" | "gefällt" | "kennt"
+"""</span>)</pre>
+  <p>三个句子各得到一棵树 (实测). 例如 das Buch gefällt der <span class="nb">Frau:</span></p>
+<pre data-lang="tree">                S
+     ┌──────────┴─────┐
+     │                VP
+     │          ┌─────┴───┐
+     NP         │         NP
+ ┌───┴───┐      │     ┌───┴───┐
+DET      N      V    DET      N
+ │       │      │     │       │
+das     Buch gefällt der     Frau</pre>
+  <p><b>易错:</b> 所有动词都在同一个 V 类里, 所以文法也接受 *der Mann schläft das Buch 或 *die Frau gibt. 要排除这些, 得按配价把动词分成 V<sub>1</sub>、V<sub>2</sub>、V<sub>3</sub> (次范畴化), 每类只配自己的 VP <span class="nb">规则.</span></p>
+</details>
+</article>
+
+<article id="u3-6">
+<h3>题 3c: 递归的形容词附加语<br><span class="de-title">c) Erweiterung für rekursive Adjektiv-Adjunkte</span></h3>
+<div class="card de">
+  <span class="folie">Übung 3 · Aufgabe 3c</span>
+  <p><b>Erweitern Sie die Grammatik nun derart, dass Nominalphrasen auch Adjektive enthalten dürfen – und zwar beliebig viele. Beachten Sie dabei, dass andererseits nur genau ein Determinierer in der NP-Phrase enthalten sein darf (und zwar als erstes Element).</b></p>
+  <p><b>Verwenden Sie <code>NOM</code> als Label für die nominale Zwischenebene (X' in X-Bar-Schema).</b></p>
+  <p>Folgende Sätze sollten akzeptiert <span class="nb">werden:</span></p>
+<pre data-lang="python">sents = [
+    <span class="tk-s">"die kluge schöne Frau kennt das Buch"</span>,
+    <span class="tk-s">"der schöne kluge Mann gibt der Frau das dicke Buch"</span>,
+    <span class="tk-s">"das dicke schöne kluge Buch schläft"
+</span>]</pre>
+  <p><b>Erweiterte Negativtests:</b> Testen Sie auch, ob Ihre Grammatik für die folgenden (ungrammatischen) Sätze keine Ableitung <span class="nb">liefert:</span></p>
+<pre data-lang="python">neg_sents = [
+    <span class="tk-s">"der der dicke der Mann gibt der Frau das Buch"
+</span>]</pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 扩展文法, 让名词短语可以带形容词, 而且是任意多个; 但另一方面, 一个 NP 里只能恰好有一个限定词, 而且必须是第一个成分. 名词性中间层 (X-bar 图式里的 X′) 用 NOM 作标签. 正例三句要接受, 负例 (冠词出现三次) <span class="nb">要拒绝.</span></p>
+  <p><b>思路:</b> 和 <a href="#a3-2">作业单 3 题 1a</a> 完全一样: NP → DET NOM, NOM → ADJ NOM | N. 扁平的写法 (NP → DET ADJ N | DET ADJ ADJ N …) 每多一个形容词就要多一条规则, <span class="nb">永远写不完.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S -&gt; NP VP
+
+# neu (rekursiv):
+    NP -&gt; DET NOM
+    NOM -&gt; ADJ NOM | N
+
+# anstatt flach:
+#    NP -&gt; DET N | DET ADJ N | DET ADJ ADJ N | DET ADJ ADJ ADJ N
+
+    VP -&gt; V NP NP | V NP | V
+
+    DET -&gt; "der" | "die" | "das"
+    N -&gt; "Mann" | "Frau" | "Buch"
+    V -&gt; "gibt" | "schenkt" | "schläft" | "gefällt" | "kennt"
+    ADJ -&gt; "kluge" | "schöne" | "dicke"
+"""</span>)</pre>
+  <p>三个正例各一棵树 (实测), <span class="nb">例如第一句:</span></p>
+<pre data-lang="tree">                          S
+           ┌──────────────┴──────────┐
+           NP                        │
+ ┌─────────┴────┐                    │
+ │             NOM                   VP
+ │    ┌─────────┴─────┐         ┌────┴───┐
+ │    │              NOM        │        NP
+ │    │         ┌─────┴───┐     │    ┌───┴───┐
+ │    │         │        NOM    │    │      NOM
+ │    │         │         │     │    │       │
+DET  ADJ       ADJ        N     V   DET      N
+ │    │         │         │     │    │       │
+die kluge     schöne     Frau kennt das     Buch</pre>
+  <p>负例输出 <code class="lc">no parse found for: der der dicke der Mann gibt der Frau das Buch</code>.</p>
+  <p>参考答案还给了一个反面例子: 不用 NOM, 直接让 NP 递归 (<code class="lc">NP -&gt; N | ADJ NP | DET NP</code>). 这个文法能解析负例, 因为每一层 NP <span class="nb">都能再带一个冠词:</span></p>
+<pre data-lang="tree">                           S
+          ┌────────────────┴─────────────────┐
+          NP                                 │
+ ┌────────┴────┐                             │
+ │             NP                            │
+ │   ┌─────────┴───┐                         │
+ │   │             NP                        VP
+ │   │    ┌────────┴───┐        ┌────────┬───┴────────┐
+ │   │    │            NP       │        NP           NP
+ │   │    │        ┌───┴───┐    │    ┌───┴───┐    ┌───┴───┐
+ │   │    │        │       NP   │    │       NP   │       NP
+ │   │    │        │       │    │    │       │    │       │
+DET DET  ADJ      DET      N    V   DET      N   DET      N
+ │   │    │        │       │    │    │       │    │       │
+der der dicke     der     Mann gibt der     Frau das     Buch</pre>
+  <p>这正是 SNS 03 · 2.1 讲的过度生成: 递归要放在中间层 NOM 上, 冠词只在 NP <span class="nb">层出现一次.</span></p>
+</details>
+<div class="warn"><p><b>原文笔误:</b> 参考答案的注释「ist insofern <b>keine</b> korrektes Modell」应为 kein korrektes Modell (Modell <span class="nb">是中性名词).</span></p></div>
+</article>
+
+<article id="u3-7">
+<h3>题 3d: 介词短语<br><span class="de-title">d) Erweiterung um Präpositionalphrasen</span></h3>
+<div class="card de">
+  <span class="folie">Übung 3 · Aufgabe 3d</span>
+  <p><b>Erweitern Sie die Grammatik nun derart, dass sowohl Nominalphrasen als auch Verbalphrasen durch Präpositionalphrasen modifiziert werden können.</b></p>
+  <p>Folgende Sätze sollten akzeptiert werden. Stellen Sie zudem sicher, dass für den 2. Satz zwei Analysen generiert werden (PP-Attachment-Ambiguität).</p>
+<pre data-lang="python">sents = [
+    <span class="tk-s">"der Mann schläft neben dem Buch"</span>,
+    <span class="tk-s">"die Frau schenkt dem Mann das Buch auf der Tanzfläche"
+</span>]</pre>
+  <p><b>Testen Sie abschließend, ob Ihre Grammatik weiterhin für alle Sätze eine korrekte Analyse liefert:</b></p>
+<pre data-lang="python">all_sents = [
+    <span class="tk-s">"der Mann gibt der Frau das Buch"</span>,
+    <span class="tk-s">"die Frau schenkt der Frau das Buch"</span>,
+    <span class="tk-s">"der Mann schläft"</span>,
+    <span class="tk-s">"das Buch gefällt der Frau"</span>,
+    <span class="tk-s">"die Frau kennt das Buch"</span>,
+    <span class="tk-s">"die kluge schöne Frau kennt das Buch"</span>,
+    <span class="tk-s">"der schöne kluge Mann gibt der Frau das dicke Buch"</span>,
+    <span class="tk-s">"das dicke schöne kluge Buch schläft"</span>,
+    <span class="tk-s">"der Mann schläft neben dem Buch"</span>,
+    <span class="tk-s">"die Frau schenkt dem Mann das Buch auf der Tanzfläche"
+</span>]</pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 扩展文法, 让名词短语和动词短语都能被介词短语修饰. 要接受两个新句子 (「那个男人睡在书旁边」「那个女人在舞池上把书送给那个男人」), 而且第二句要得到两种分析 (PP 附着歧义). 最后检查文法对前面所有句子仍然给出正<span class="nb">确的分析.</span></p>
+  <p><b>思路:</b> 三条新规则: NOM → NOM PP (名词的 PP 附加语)、VP → VP PP (动词的 PP 附加语)、PP → P NP; 词汇加 dem、Tanzfläche、neben、auf. 第二句的 auf der Tanzfläche 可以修饰「送」(在舞池上送), 也可以修饰 Buch <span class="nb">(舞池上的那本书).</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">grammar = nltk.CFG.fromstring(<span class="tk-s">"""
+    S -&gt; NP VP
+    NP -&gt; DET NOM
+    NOM -&gt; ADJ NOM | N
+#neu:
+    NOM -&gt; NOM PP
+
+    VP -&gt; V NP NP | V NP | V
+#neu (hier ohne X-Bar-Zwischenebene VERBAL):
+    VP -&gt; VP PP
+
+#neu:
+    PP -&gt; P NP
+
+    DET -&gt; "der" | "die" | "das" | "dem" | "der"
+    N -&gt; "Mann" | "Frau" | "Buch" | "Tanzfläche"
+    V -&gt; "gibt" | "schenkt" | "schläft" | "gefällt" | "kennt"
+    ADJ -&gt; "kluge" | "schöne" | "dicke"
+    P -&gt; "neben" | "auf"
+"""</span>)</pre>
+  <p>实际运行: 第一句一棵树, 第二句两棵. PP 挂在 VP 上 <span class="nb">(在舞池上送书):</span></p>
+<pre data-lang="tree">                              S
+     ┌────────────────────────┴────┐
+     │                             VP
+     │                        ┌────┴────────────────┐
+     │                        VP                    PP
+     │          ┌─────────┬───┴────────┐        ┌───┴───┐
+     NP         │         NP           NP       │       NP
+ ┌───┴───┐      │     ┌───┴───┐    ┌───┴───┐    │   ┌───┴──────┐
+ │      NOM     │     │      NOM   │      NOM   │   │         NOM
+ │       │      │     │       │    │       │    │   │          │
+DET      N      V    DET      N   DET      N    P  DET         N
+ │       │      │     │       │    │       │    │   │          │
+die     Frau schenkt dem     Mann das     Buch auf der     Tanzfläche</pre>
+  <p>PP 挂在 Buch 的 NOM 上 <span class="nb">(舞池上的那本书):</span></p>
+<pre data-lang="tree">                              S
+     ┌────────────────────────┴────┐
+     │                             VP
+     │          ┌─────────┬────────┴────────┐
+     │          │         │                 NP
+     │          │         │        ┌────────┴───┐
+     │          │         │        │           NOM
+     │          │         │        │   ┌────────┴───┐
+     │          │         │        │   │            PP
+     │          │         │        │   │    ┌───────┴───┐
+     NP         │         NP       │   │    │           NP
+ ┌───┴───┐      │     ┌───┴───┐    │   │    │       ┌───┴──────┐
+ │      NOM     │     │      NOM   │  NOM   │       │         NOM
+ │       │      │     │       │    │   │    │       │          │
+DET      N      V    DET      N   DET  N    P      DET         N
+ │       │      │     │       │    │   │    │       │          │
+die     Frau schenkt dem     Mann das Buch auf     der     Tanzfläche</pre>
+  <p>最后的总测试: 10 个句子全部能解析, 共得到 11 棵树 (只有最后一句有两棵), 前面各小题的分析不受影响. VP 这里没有用 X-bar 中间层 (参考答案的注释也写明了), VP → VP PP 直接递归; 想和 NP 一致可以照 <a href="#u3-2">题 1 的 X-bar 版</a> 改成 <span class="nb">VERBAL.</span></p>
+</details>
+<div class="warn"><p><b>参考答案小错:</b> DET 的词汇规则里 <code>"der"</code> 写了两次 (<code class="lc">"der" | "die" | "das" | "dem" | "der"</code>). NLTK 读入时会多出一条一模一样的规则 DET → 'der'; 实测这一次没有产生重复的树, <span class="nb">但多余的那一项应删掉.</span></p></div>
 </article>
 </section>
 
