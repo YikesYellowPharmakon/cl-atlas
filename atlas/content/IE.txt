@@ -1,0 +1,252 @@
+# IE · 读笔记后整理的知识网和术语. 课件英语, 外文写英语 (笔记加粗的德语写法放进别名). 字段说明见 SMIS.txt.
+# 依据 IE 01、03、04、06 (2026-11-06). IE 02 研讨课与评分、IE 05 如何写研究论文不是知识点, 整讲跳过 (candidates_rules.NONK_FILE). 后面的讲次笔记更新后按 docs/extraction-rules.md 第 14 节补.
+L EN
+H 从非结构化文本里抽出实体、关系和事件: 先准备和清洗数据, 用信息检索的指标评估, 再用规则和机器学习做命名实体识别.
+
+B ie | 信息抽取概览 | Information extraction (IE) | 把非结构化文本变成结构化记录; 任务的复杂程度、四代方法和主要应用.
+B data | 数据来源与清洗 | Obtaining Data for Information Extraction | 信息检索与信息抽取的区别, 把网络当语料, 去垃圾、去样板、去重和识别语言.
+B eval | 评估指标 | Evaluation for Information Extraction | 精确率、召回率和 F 值, 排序检索的指标, 灵敏度、ROC 和相似度指标.
+B rule | 基于规则的命名实体识别 | Rule-Based NER | 正则和地名词典, 规则的写法和策略, 自底向上和自顶向下地自动学规则.
+B ml | 机器学习方法与决策树 | Methods of Information Extraction | 把 NER 表述成分类问题: 滑动窗口和特征, 决策树的分裂标准和剪枝.
+
+N iedef | ie | 信息抽取 | Information extraction | 01:def | 从非结构化或半结构化文本中自动抽取结构化信息: 实体、关系和事件. | 结果能放进数据库表格的行和列 ;; 主要依赖切分、形态和句法分析, 目标在语义层
+N docstruct | ie | 文档的结构化程度 | Not all documents are created equal | 01:def | 自然文本几乎没有结构, 部分结构化文本有固定格式, 高度结构化文本通常是自动生成的. | 越结构化, 抽取越容易 ;; 越自然, 越需要语言分析和统计方法
+N iepipe | ie | IE 的处理流程 | Information Extraction (pipeline) | 01:def | 来源选择 → 切分与规范化 → 命名实体识别 → 实例抽取 → 事实抽取 → 本体信息抽取. | 日期 05/01/67 规范化成 1967-05-01 ;; 事实是实体之间的关系
+N landscape | ie | IE 任务的全景 | Landscape of IE Tasks | 01:landscape | 按要抽取的东西有多难分: 封闭集合、正则集合、复杂模式、有歧义的模式. | 抽取单位: 单个实体、二元关系、N 元记录 ;; Hope 可以是城市也可以是人名
+N methods | ie | IE 方法的演变 | Methods for IE | 03:methods | 基于规则、传统机器学习、深度学习与预训练模型、大语言模型四代. | 部分监督: 从种子例子自举出模式 ;; 大模型: 用提示零样本或少样本抽取
+N apps | ie | IE 的应用 | PART-II: Applications | 01:apps | 命名实体识别、关系抽取、事件抽取、事实抽取、基于方面的情感抽取、问答和对话. | 事件要把时间表达式规范化成具体日期 ;; 对话系统靠意图抽取和槽位填充
+N advanced | ie | 进阶主题 | PART-III: Advanced topics | 01:adv | 多模态信息抽取、IE 的可解释性、用大语言模型做 IE 和检索增强生成. | 多模态: 把图像中的物体和文本实体对齐 ;; RAG 先检索可靠资料再回答
+N tradie | ie | 传统信息抽取 | IE Scenarios | 03:scen | 一切预先定义: 模板、实例类型、关系类型, 然后在语料上运行. | 先说清楚想要什么数据库, 再找语料 ;; 地名词典和关系模式填出一张表
+
+N irie | data | 信息检索与信息抽取 | Information Retrieval & Information Extraction | 03:ir | 信息检索按查询返回文档的排序列表, 信息抽取处理整个语料、输出数据库记录. | 检索是反复迭代的过程 ;; 评测 IR 要文档集合、主题和相关性判断
+N qa | data | 问答与结构化摘要 | Question answering · Structured Summarization | 03:qa | 问答可以看成即时的信息抽取: 有问题时才去抽. | 事实型、列表型、定义型问题 ;; 事实型 QA = IR + 命名实体识别
+N openie | data | 开放信息抽取 | Open IE | 03:ie | 不预先定义模板和关系类型, 从文本中抽出任意的 (主语, 关系, 宾语) 三元组. | 和传统 IE 的预先定义相对
+N sources | data | 为信息抽取获取数据 | Obtaining Data for Information Extraction | 03:sources | 文档集合事先给定、从整个网络抽取, 或由系统自己找源文档. | 语料库是在自然语境中产生的语言样本 ;; 网络语料规模大、更新快, 但噪声多、难控制构成
+N webcorp | data | 把网络当语料的三种方法 | Classical Approaches to the Web as a linguistic corpus | 03:web | 用搜索引擎的命中数估计频率、通过搜索引擎查询建语料、自己做语言学爬取. | 命中数随时间变化, 无法复现 ;; BootCaT 从种子词自举建语料
+N clean | data | 数据清洗 | Cleaning up the data | 03:clean | 过滤垃圾网页 → 预处理 HTML → 抽取正文 → 去重 → 清理内容 → 识别语言. | 去除样板文字: 导航、页眉、广告 ;; LLM 时代还要过滤 AI 生成的内容
+N dedup | data | 去重 | Duplicate removal · Near-duplicate detection | 03:dup | 完全重复、近似重复和部分重复; 网络规模下不能两两比较所有文档. | 瓦片算法: k 个连续词的指纹 ;; 只比较共享超级瓦片的文档 | J(A, B) = |A ∩ B| / |A ∪ B|
+N textclean | data | 文本内容的清洗 | Cleaning up text contents for NLP | 03:text | 恢复大小写和句子边界, 处理表情符号和缩写, 以及拼写、编码和 OCR 错误. | 仅靠频率阈值区分不了错拼和正确词 ;; 错拼在词型中很多, 在词例中很少
+N lid | data | 语言识别与字符编码 | Language identification · Char Encoding | 03:lang | 判断文本是什么语言; 用 Unicode 和 UTF-8 表示世界上所有文字. | 代码页必须知道用的是哪一张 ;; UTF-8 每个字符 1 到 4 个字节
+N formats | data | 数据源的类型 | Converting from Structured Sources | 03:formats | 结构化 (TSV、CSV)、半结构化 (XML、YAML)、非结构化 (HTML、纯文本) 和混合. | 越往下抽取越难 ;; 非结构化才需要真正的 IE
+
+N match | eval | 精确匹配与部分匹配 | Exact and Partial Matches | 04:met | 精确匹配要字符串完全一致, 部分匹配按词元的重叠计分. | Steve J. 按精确匹配算错, 按部分匹配对一半
+N pr | eval | 精确率与召回率 | Precision, Recall | 04:met | 精确率: 检索到的结果里有多少相关; 召回率: 相关的里有多少被检索到. | 两者此消彼长 ;; 全部返回时召回率为 1 | P = TP / (TP + FP) ; R = TP / (TP + FN)
+N confusion | eval | 混淆矩阵 | Confusion matrix | 04:met | 真阳性、真阴性、假阳性 (第 I 类错误)、假阴性 (第 II 类错误). | 第二个词是系统的判断, 第一个词说判断对不对
+N acc | eval | 为什么不用准确率 | Why not Accuracy? | 04:met | 绝大多数文档不相关时, 什么都不返回也能得到很高的准确率. | 10 000 篇里 10 篇相关: 准确率 99.9%, 召回率 0 | Accuracy = (TP + TN) / N
+N fscore | eval | F 值 | F1-Score | 04:met | 精确率和召回率的调和平均; β 调节两者的相对权重. | 调和平均被较小的那个数拉住 ;; F2 重召回, F0.5 重精确 | F1 = 2PR / (P + R)
+N topk | eval | Top-k 精确率与召回率 | Top-k Precision & Recall | 04:rank | 只看排序结果的前 k 个: 前 k 个里有多少相关, 所有相关的里有多少在前 k 个. | k 越大召回率不降, 精确率一般下降 ;; 不管相关文档排在前面还是后面
+N mrr | eval | 平均倒数排名 | Mean Reciprocal Rank | 04:rank | 对每个查询取第一篇相关文档名次的倒数, 再对所有查询求平均. | 适合只要一个正确答案的任务, 如问答 | MRR = 1/N Σ 1/rankᵢ
+N sensspec | eval | 灵敏度、特异度与 FDR | Sensitivity, Specificity, FDR | 04:more | 灵敏度就是召回率; 特异度是不相关的里正确排除的比例; FDR 是判为正的结果里错的比例. | FDR = 1 − 精确率 ;; IE 里特异度很少用 | Specificity = TN / (TN + FP)
+N roc | eval | ROC 曲线与 AUC | ROC and AUC-ROC | 04:more | 把阈值从 0 调到 1, 画出真阳性率对假阳性率的曲线; AUC 是曲线下的面积. | 随机猜测 AUC = 0.5, 完美分类器 AUC = 1 ;; AUC 是相关文档得分更高的概率
+N simm | eval | 相似度指标 | Similarity Measures | 04:more | 量化结果和目标有多接近: 余弦相似度、BLEU、ROUGE-L、BERTScore. | 余弦只看夹角不看长度 | cos(a, b) = a·b / (‖a‖‖b‖)
+N llmeval | eval | 大模型的结构化抽取 | LLM Structured Extractions | 04:more | JSON 有效率、模式符合率、字段完整率和幻觉率. | 幻觉: 原文里没有依据的结果
+N ieeval | eval | 信息抽取的评估 | Evaluation for Information Extraction | 06:eval | 和人工标注的金标准比对, 用 P、R、F; 需要训练语料、评分工具和单独的测试语料. | 边界对、类型错在多类别评估里算两个错误 ;; 测试语料必须和训练语料不同
+
+N netypes | rule | 命名实体的类别 | Typical list of Named Entities | 04:rule | 人名、机构名、地点、日期、时间、金额、百分比、序数, 可以按需增减. | 用现成系统先查它的标签集 ;; spaCy 英语 18 个标签, 德语 4 个
+N rulemeth | rule | 基于规则的典型方法 | Typical Method for Ruled-based | 04:rule | 正则表达式按形式结构识别实体; 基于词典的方法用地名词典查表. | 日期 \d{1,2}\.\d{1,2}\.\d{4} ;; Ludwig-Maximilians-Universität 查表标为 ORG
+N ruleproscons | rule | 规则方法的优缺点 | Advantages & Limitations of Rule-Based NER | 04:rule | 精确率高、可解释; 但难以扩展, 难处理歧义. | 适合法律、医学这类规范的领域 ;; Apple 是水果还是公司
+N tagging | rule | 实体标注的三种方式 | Types of Entity Tagging | 04:types | 整体实体识别、边界识别 (逐词 B-/E-/O) 和多实体识别. | 边界标注把找实体变成给每个词分类
+N ruleform | rule | 规则的形式 | Basic Rules | 04:types | 「上下文模式 → 动作」: 左上下文 + 实体本身 (filler) + 右上下文. | GATE 的 JAPE 规则 ;; 词元特征: 字符串、拼写类型、词性、是否在地名词典里
+N policy | rule | 组织规则集合的策略 | Policy: Organizing Rule Collections | 04:types | 多条规则同时匹配时听谁的: 无序规则加临时策略, 或按精确率排好序的有序规则. | 常见策略: 优先选更长的片段 ;; John F. Kennedy International Airport 是地点
+N rulehist | rule | 基于规则的 NER 的发展 | Rule-based NER | 04:types | 2000 年前后手写规则更好, 之后统计方法主导学术界; 工业界要高精确率用规则. | 调统计系统提精确率比调规则系统提召回率省力 ;; 规则又被写进提示里引导大模型
+N rulelearn | rule | 自动学习规则 | Automatically Learning Rules | 04:learn | 从金标准标注语料学到一个最小的规则集, 以高精确率覆盖所有标注的实体. | 贪心爬山: 一次学一条规则 ;; 难点是怎样造出泛化好又不冗余的规则
+N overfit | rule | 过拟合与过度泛化 | Overfitting and Overgeneralization | 04:learn | 过拟合是从一个例子记住太多, 过度泛化是规则太宽. | 过拟合损害召回率, 过度泛化损害精确率
+N bottomup | rule | 自底向上构造规则 | Bottom-up Rule Formation | 04:bu | 从只覆盖一个例子的具体规则出发, 逐步去掉条件让它泛化. | 每一步都要检查精确率 ;; 覆盖算法: 去掉已被覆盖的例子
+N topdown | rule | 自顶向下构造规则 | Top-down rule formation | 04:td | 从没有条件的空规则出发, 逐步加约束提高精确率, 开始过拟合时停止. | (LP)² 的搜索空间 ;; 子规则的覆盖可以用父规则覆盖列表的交集算出
+N hybrid | rule | 混合方法 | Hybrid method | 04:td | 先从标注数据找出种子规则, 再由人和系统交互修改规则或补充例子. | 人在回路中 ;; 当前: 规则抽高置信度实体, 大模型抽有歧义的, 再用裁判模型检查
+
+N nerml | ml | NER 作为机器学习任务 | NER as a ML Task | 06:methods | 训练数据是标好答案的文档, 从每个词周围抽特征, 把问题当成分类. | 二分类器每类一个, 或一个多分类器 ;; 方法分类: 规则、无监督、基于特征、神经网络、大模型
+N window | ml | 滑动窗口与特征 | Information Extraction by Sliding Window · Features | 06:window | 在每个位置问「当前窗口是不是实体」, 特征取自候选内容、前缀和后缀. | 正负例极不平衡 ;; 特征工程决定传统方法的效果
+N wordrep | ml | 词的向量表示 | Word representations | 06:window | 从 one-hot、基于频率的模型, 到静态词向量和深度上下文表示. | word2vec 每个词一个固定向量 ;; BERT 同一个词在不同句子里向量不同
+N dtree | ml | 决策树 | Decision Trees | 06:dt | 内部节点判断属性, 分支是判断结果, 叶节点是类别; 从根往下走到叶节点. | 可解释, 能转成 if-then 规则 ;; 对训练数据敏感, 容易过拟合
+N asm | ml | 属性选择度量 | Attribute Selection Measures | 06:asm | 选哪个属性分裂: 列联表、熵、信息增益、Gini 指数、卡方. | 熵: 纯时为 0, 两类各半时为 1 ;; 选信息增益最大的属性 | H(S) = −Σ pᵢ log₂ pᵢ
+N dtover | ml | 训练误差、测试误差与过拟合 | Training and Test Set Errors · Overfitting | 06:overfit | 不剪枝的树训练误差可以降到 0, 测试误差却很高. | 留出开发集检测泛化 ;; 用卡方检验去掉不显著的分裂
+N pruning | ml | 剪枝 | Pruning | 06:mpg | 先把树长完整, 再从底部删掉偶然概率大于阈值的分裂. | MaxPchance 越小剪得越多 ;; 训练误差略升, 测试误差应该下降
+
+E iedef > docstruct | 文档的结构化程度不同.
+E iedef > iepipe | IE 的处理流程.
+E iedef > landscape | 要抽取的东西有多复杂.
+E iedef > methods | 怎样抽取: 四代方法.
+E iedef > apps | IE 的主要应用.
+E methods > advanced | 大模型时代的进阶主题.
+E iepipe > apps | 流程里的命名实体识别和事实抽取就是主要应用.
+E landscape > tradie | 传统 IE 预先定义模板和类型.
+E tradie > openie | 开放 IE 不预先定义模板.
+E iedef > irie | 和信息检索对比.
+E irie > qa | 问答是 IR 加命名实体识别.
+E apps ~ qa | 问答也是 IE 的应用.
+E iepipe > sources | 流程的第一步是来源选择.
+E sources > webcorp | 把网络当语料.
+E webcorp > clean | 网络数据要先清洗.
+E clean > dedup | 清洗的一步是去重.
+E clean > textclean | 再清理文本内容.
+E clean > lid | 最后识别语言.
+E docstruct ~ formats | 数据源按结构化程度分类.
+E sources > formats | 不同类型的数据源.
+E irie > pr | IE 借用信息检索的评估指标.
+E confusion > pr | 用混淆矩阵定义精确率和召回率.
+E confusion > acc | 准确率也用混淆矩阵算.
+E pr > fscore | 把精确率和召回率合成一个数.
+E acc ~ pr | 不相关文档占多数时用 P 和 R.
+E match ~ pr | 实体层面先要决定怎样算抽对.
+E pr > topk | 排序检索只看前 k 个.
+E topk > mrr | Top-k 召回率区分不了排名先后.
+E confusion > sensspec | 特异度看实际为负的那一列.
+E sensspec > roc | ROC 的横轴是 1 − 特异度.
+E pr ~ sensspec | 灵敏度就是召回率.
+E simm ~ llmeval | 大模型输出的其他评估方式.
+E advanced > llmeval | 大模型抽取的专门指标.
+E pr > ieeval | 评估 IE 系统用 P、R、F.
+E apps > netypes | 命名实体识别要先定类别.
+E netypes > rulemeth | 用规则识别这些类别.
+E rulemeth > ruleproscons | 规则方法的优缺点.
+E rulemeth > tagging | 规则可以识别整体、边界或多个实体.
+E tagging > ruleform | 每种标注方式有对应的规则图式.
+E ruleform > policy | 多条规则同时匹配时要有策略.
+E ruleproscons > rulehist | 精确率高、召回率难提高.
+E ruleform > rulelearn | 规则也可以从例子中学.
+E rulelearn > overfit | 学规则要在过拟合和过度泛化之间平衡.
+E overfit > bottomup | 自底向上从过拟合出发.
+E overfit > topdown | 自顶向下从过度泛化出发.
+E bottomup ~ topdown | 两种构造规则的方向.
+E topdown > hybrid | 自动学规则再加人工修改.
+E rulelearn ~ ieeval | 学规则需要金标准语料.
+E tagging ~ nerml | 边界标注是序列标注的基础.
+E methods > nerml | 传统机器学习方法.
+E nerml > window | 用滑动窗口生成候选.
+E window > wordrep | 从人工特征到学出来的表示.
+E nerml > dtree | 决策树是传统机器学习的一种.
+E dtree > asm | 每层选一个属性分裂.
+E dtree > dtover | 决策树容易过拟合.
+E dtover > pruning | 用剪枝避免过拟合.
+E overfit ~ dtover | 规则学习和决策树都会过拟合.
+E rulemeth ~ window | 地名词典也是窗口特征.
+
+T information extraction |  |  | 信息抽取 | ie | Automatic extraction of structured information such as entities, relations and events from unstructured or semi-structured text. | 从文本中自动抽取结构化信息. | information retrieval | 01:def | IE
+T unstructured |  |  | 非结构化 | ie | Text without explicit structure, such as news or email bodies. | 没有明显结构的文本. | structured | 01:def | unstrukturiert
+T structured |  |  | 结构化 | ie | Information that fits into the rows and columns of a database table. | 能放进数据库表格的信息. | unstructured | 01:def | strukturiert
+T entity |  |  | 实体 | ie | Real-world object mentioned in a text, such as a person or an organisation. | 文本中提到的现实世界对象. | relation | 01:def | Entität
+T relation |  |  | 关系 | ie | Semantic relation between entities. | 实体之间的语义关系. | entity | 01:def | Relation
+T event |  |  | 事件 | ie | Something happening at a point in time in which entities take part. | 实体参与的、处在时间中的事情. |  | 01:def | Ereignis
+T source selection |  |  | 来源选择 | ie | Choosing the documents from which information is extracted. | 选从哪些文档里抽. |  | 01:def | Source Selection
+T named entity recognition |  |  | 命名实体识别 | ie | Identifying named entities in a text and classifying them into categories. | 认出命名实体并分类. |  | 01:apps | NER; Named Entity Recognition; NER (Named Entity Recognition)
+T instance extraction |  |  | 实例抽取 | ie | Assigning entities to classes, e.g. Elvis Presley is a musician. | 判断实体属于哪个类别. |  | 01:def | Instance Extraction
+T fact extraction |  |  | 事实抽取 | ie | Extracting relations between entities, or checking whether a document supports a claim. | 抽取实体之间的关系. |  | 01:apps | Fact Extraction
+T ontological information extraction |  |  | 本体信息抽取 | ie | Placing extracted facts into an ontology or knowledge base. | 把事实放进本体. |  | 01:def | Ontological Information Extraction
+T n-ary record |  |  | N 元记录 | ie | Event structure with several roles, corresponding to a whole table row (template filling). | 一个事件的多个角色. |  | 01:landscape
+T bootstrapping |  |  | 自举 | ie | Starting from a few seed examples and iteratively discovering new patterns and relations. | 从种子例子反复发现新模式. |  | 03:methods | bootstrap; Bootstrapping
+T supervised |  |  | 有监督 | ie | Learning patterns from labelled examples. | 从标注例子学模式. | partially-supervised | 03:methods
+T partially-supervised |  |  | 部分监督 | ie | Learning from a small set of seed examples. | 从少量种子例子学. | supervised | 03:methods
+T fine-tuning |  |  | 微调 | ie | Adapting a pretrained model to a specific task with labelled data. | 针对任务调整预训练模型. |  | 03:methods
+T prompt |  |  | 提示 | ie | Instruction given to a large language model to perform a task such as extraction. | 交给大模型的指令. |  | 03:methods
+T relation extraction |  |  | 关系抽取 | ie | Finding and classifying semantic relations between entities in a text. | 找出实体之间的关系. |  | 01:apps | Relation Extraction
+T aspect-based sentiment analysis |  |  | 基于方面的情感分析 | ie | Identifying the aspects a review talks about and the sentiment towards each. | 找出评论的方面和各自的情感. |  | 01:apps | Aspektbasierte Sentimentanalyse
+T intent extraction |  |  | 意图抽取 | ie | Recognising what the user wants in a dialogue. | 理解用户的意图. | slot filling | 01:apps
+T slot filling |  |  | 槽位填充 | ie | Converting a user request into slot values a machine can query. | 把请求转成可查询的槽位. | intent extraction | 01:apps
+T multimodal |  |  | 多模态 | ie | Using text, images, audio and video together. | 同时利用多种模态. |  | 01:adv | Multimodal
+T hallucination |  |  | 幻觉 | ie | Confidently stated but fabricated output of a generative model. | 说得肯定但内容是编造的. |  | 01:adv | Halluzination
+T RAG |  |  | 检索增强生成 | ie | Retrieving relevant content from reliable sources before generating an answer. | 先检索资料再生成回答. |  | 01:adv | RAG (Retrieval-Augmented Generation)
+T gazetteer |  |  | 地名词典 | rule | List of known entities, e.g. all country or disease names. | 已知实体的列表. |  | 03:scen | Gazetteer
+T template |  |  | 模板 | ie | Predefined record format to be filled by extraction. | 要填的记录格式. |  | 03:scen | Template
+T information retrieval |  |  | 信息检索 | data | Finding the documents in a collection that satisfy an information need. | 找出满足信息需求的文档. | information extraction | 03:ir | Information Retrieval; Information Retrieval (IR)
+T ranked list |  |  | 排序列表 | data | Result of a search, ordered by relevance. | 按相关程度排好的结果. |  | 03:ir
+T topics |  |  | 主题 | data | Set of information needs in an IR test collection. | 测试集里的信息需求. | relevance judgments | 03:ir
+T relevance judgments |  |  | 相关性判断 | data | For each information need, the set of relevant documents. | 每个需求对应的相关文档. | topics | 03:ir
+T pooling |  |  | 汇集 | data | Judging only the union of the top results of several systems. | 只判断几个系统前几名的并集. |  | 03:ir
+T Open IE |  |  | 开放信息抽取 | data | Extracting arbitrary (subject, relation, object) triples without predefined templates. | 不预先定义模板. |  | 03:ie
+T question answering |  |  | 问答 | data | Answering natural-language questions, seen as just-in-time information extraction. | 即时的信息抽取. |  | 03:qa | Question Answering (QA)
+T factoid question |  |  | 事实型 | data | Question whose answer is a short fact such as a person, time or place. | 答案是一个短事实. |  | 03:qa | Factoid
+T corpus |  |  | 语料库 | data | Collection of language samples produced in natural contexts without experimental intervention. | 自然产生的语言样本的集合. |  | 03:sources | Korpus
+T genre |  |  | 体裁 | data | Text type such as blog, forum or news. | 文本类型. |  | 03:sources | Genre
+T web spam |  |  | 网页垃圾 | data | Pages artificially created to manipulate search rankings. | 为操纵排名制造的网页. |  | 03:clean | Web spam
+T boilerplate removal |  |  | 去除样板文字 | data | Removing navigation, headers, link lists, disclaimers and ads from web pages. | 去掉导航、页眉、广告. |  | 03:clean | Boilerplate removal
+T watermarking |  |  | 水印 | data | Embedding detectable statistical marks in generated text. | 在生成文本里嵌入可检测的标记. |  | 03:clean | Watermarking
+T near-duplicate |  |  | 近似重复 | data | Documents with essentially the same content but different layout. | 内容相同、排版不同. |  | 03:dup | Near-duplicate
+T shingling |  |  | 瓦片算法 | data | Representing a document by its sequences of k consecutive words for duplicate detection. | 用 k 个连续词的序列表示文档. | super-shingle | 03:dup | Shingling
+T super-shingle |  |  | 超级瓦片 | data | Shingle over shingles, used to decide which documents to compare. | 在瓦片上再做一次瓦片. | shingling | 03:dup
+T Jaccard similarity |  |  | Jaccard 相似度 | data | Size of the intersection divided by the size of the union of two sets. | 交集除以并集. |  | 03:dup | Jaccard
+T confusion set |  |  | 混淆集 | data | Set of words that are frequently confused with each other. | 常被混淆的一组词. |  | 03:text | Confusion set
+T language identification |  |  | 语言识别 | data | Determining which language a text is written in. | 判断文本的语言. |  | 03:lang | LID
+T code page |  |  | 代码页 | data | Mapping table for one script; 0–127 as in ASCII, 128–255 differ. | 每种文字一张映射表. |  | 03:lang | Code page
+T UTF-8 |  |  | UTF-8 | data | Variable-length encoding of Unicode code points in 1 to 4 bytes. | 每个字符 1 到 4 个字节. |  | 03:lang
+T exact match |  |  | 精确匹配 | eval | Share of entities extracted with exactly the right string. | 字符串完全一致. | partial match | 04:met | Exact Match
+T partial match |  |  | 部分匹配 | eval | Scoring by token overlap with the gold entity. | 按词元重叠计分. | exact match | 04:met | Partial Match
+T precision |  |  | 精确率 | eval | Share of retrieved items that are relevant. | 检索到的里有多少相关. | recall | 04:met | Precision
+T recall |  |  | 召回率 | eval | Share of relevant items that are retrieved. | 相关的里有多少被检索到. | precision | 04:met | Recall
+T true positive |  |  | 真阳性 | eval | Actually positive and predicted positive. | 实际为正, 预测为正. | false positive | 04:met | TP
+T false positive |  |  | 假阳性 | eval | Actually negative but predicted positive (type I error). | 实际为负却预测为正. | false negative | 04:met | FP
+T false negative |  |  | 假阴性 | eval | Actually positive but predicted negative (type II error). | 实际为正却预测为负. | false positive | 04:met | FN
+T accuracy |  |  | 准确率 | eval | (TP + TN) divided by the number of all documents. | 所有判断里对的比例. | precision | 04:met | Accuracy
+T F1-score |  |  | F1 值 | eval | Harmonic mean of precision and recall. | 精确率和召回率的调和平均. |  | 04:met | F1
+T F-beta |  |  | F-beta 值 | eval | Weighted harmonic mean in which β states how much more important recall is than precision. | β 调节召回率的权重. |  | 04:met
+T top-k precision |  |  | Top-k 精确率 | eval | Share of relevant documents among the first k results. | 前 k 个里有多少相关. | top-k recall | 04:rank
+T top-k recall |  |  | Top-k 召回率 | eval | Share of all relevant documents found among the first k results. | 相关的里有多少在前 k 个. | top-k precision | 04:rank
+T MRR |  |  | 平均倒数排名 | eval | Mean of the reciprocal rank of the first relevant result over all queries. | 第一个相关结果名次倒数的平均. |  | 04:rank | Mean Reciprocal Rank
+T sensitivity |  |  | 灵敏度 | eval | Another name for recall, used in medicine. | 就是召回率. | specificity | 04:more | Sensitivity
+T specificity |  |  | 特异度 | eval | TN / (TN + FP): share of irrelevant documents correctly not returned. | 正确排除不相关的比例. | sensitivity | 04:more | Specificity
+T false discovery rate |  |  | 错误发现率 | eval | FP / (TP + FP), equal to 1 − precision. | 判为正的里错的比例. | precision | 04:more | FDR
+T ROC curve |  |  | ROC 曲线 | eval | Curve of true positive rate against false positive rate over all thresholds. | 真阳性率对假阳性率. |  | 04:more | ROC
+T AUC |  |  | AUC | eval | Area under the ROC curve. | ROC 曲线下的面积. |  | 04:more
+T cosine similarity |  |  | 余弦相似度 | eval | How well the directions of two vectors agree. | 两个向量方向有多一致. |  | 04:more
+T gold standard |  |  | 金标准 | eval | Manually annotated reference data. | 人工标注的参考数据. |  | 04:learn | gold label
+T silver label |  |  | 银标签 | eval | Automatically produced, less reliable label. | 自动产生、不太可靠的标签. | gold standard | 06:eval
+T named entity |  |  | 命名实体 | rule | Real-world object such as a person, organisation, location or date. | 现实世界的对象. |  | 04:rule
+T rule-based NER |  |  | 基于规则的 NER | rule | Recognising named entities with hand-written or learned rules. | 用规则识别命名实体. |  | 04:rule | Rule-Based NER
+T token features |  |  | 词元特征 | rule | Properties of a token used in rules: string, orthography, POS, gazetteer membership. | 规则可用的词元性质. |  | 04:types | Token Features
+T overfitting |  |  | 过拟合 | rule | Learning too much from one example, so that rules do not transfer. | 从一个例子记住太多. | overgeneralization | 04:learn | Overfitting; Überanpassung
+T overgeneralization |  |  | 过度泛化 | rule | A rule that is too general and matches many wrong cases. | 规则太宽. | overfitting | 04:learn | Overgeneralization
+T covering algorithm |  |  | 覆盖算法 | rule | Removing examples already covered by a new rule before learning the next one. | 去掉已被覆盖的例子. |  | 04:bu | Covering Algorithm
+T human-in-the-loop |  |  | 人在回路中 | rule | The user interacts with the system to modify rules or add examples. | 人和系统交互修改规则. |  | 04:td | Human-in-the-loop
+T sliding window |  |  | 滑动窗口 | ml | Classifying every window of the text as entity or not. | 逐个窗口判断是不是实体. |  | 06:window
+T feature |  |  | 特征 | ml | Property of a window or token used for classification. | 分类用的性质. | feature vector | 06:window | Merkmal
+T feature vector |  |  | 特征向量 | ml | Vector of the feature values of an example. | 一个例子的特征值组成的向量. | feature | 06:window | Merkmalsvektor
+T feature engineering |  |  | 特征工程 | ml | Manually designing features for a learning method. | 人工设计特征. |  | 01:part1 | Feature Engineering
+T decision tree |  |  | 决策树 | ml | Tree whose inner nodes test attributes and whose leaves are class labels. | 节点判断属性, 叶子是类别. |  | 06:dt | Entscheidungsbaum
+T contingency table |  |  | 列联表 | ml | Counts for each combination of feature value and class. | 特征和类别组合的计数. |  | 06:asm | Kontingenztafel
+T entropy |  |  | 熵 | ml | Measure of the disorder of a set of examples. | 一组例子的无序度. | information gain | 06:asm | Entropie
+T information gain |  |  | 信息增益 | ml | Reduction in entropy after knowing the value of an attribute. | 知道属性后熵降低了多少. | entropy | 06:asm | Informationsgewinn
+T Gini index |  |  | Gini 指数 | ml | Impurity measure used to choose splits. | 选分裂用的不纯度. | entropy | 06:asm | Gini-Index Gini
+T pruning |  |  | 剪枝 | ml | Removing splits from a fully grown tree to avoid overfitting. | 删掉分裂避免过拟合. |  | 06:mpg
+
+SKIP 研讨课的阅读任务, 不是知识点 | Last words
+SKIP 回顾, 归入 语言识别与字符编码 | rec
+SKIP 例子, 归入 信息抽取 | Information Extraction (another example); Information extraction · Search Problems in old times
+SKIP 例子, 归入 剪枝 | A small dataset: Miles Per Gallon
+SKIP 总览和小结, 内容在各节 | Commonly used metrics; Interim Discussion
+SKIP 例子, 归入 自底向上构造规则 | Example (Boundary Detection)
+DROP 抓取误差或例子, 不是术语 | N; Awarded; AI; HTML; OCR; JSON; P = 1; NER; Splog; mashup; Knowledge Discovery; unigram; bigram; data mining; List; Definition; topics; Tokenization & Normalization; Entity Recognition
+DROP 并入其他术语 | Gazetteer; Information Extraction (IE); Information Retrieval (IR); NER (Named Entity Recognition); RAG (Retrieval-Augmented Generation); Bootstrapping; Overfitting; Überanpassung; gold label; Merkmal; Merkmalsvektor; Entscheidungsbaum; Kontingenztafel; Entropie; Informationsgewinn; Gini-Index Gini
+ZH 描述性名称 | 信息抽取概览; 规则方法的优缺点; 词的向量表示
+DE 描述性名称 (课件把这几种表示列在一页上, 没有总标题) | Word representations
+ZH 描述性子标题, 不是术语 | 从具体规则出发; 类型错误; 规则方法的优点; 规则方法的局限; 鸢尾花例子
+Q bootstrapping | bootstrap rules/patterns from “seed” examples | Slide 29–30
+Q partially-supervised | Partially-supervised: bootstrap rules/patterns from “seed” examples; Iteratively discover new patterns and relations | Slide 29–30
+Q gazetteer | Gazetteers (the list of some set of entities such as cities, organisations, days of the week) | Slide 52
+Q relevance judgments | Sets of documents that satisfy the information needs (relevance judgments) | PDF S. 15
+Q sensitivity | True Positive Rate: the fraction of relevant documents we correctly retrieve (Recall, Sensitivity) | Slide 37
+Q covering algorithm | Apply the rule to the all instances, and remove the ones that returns a successful coverage (Covering Algorithm) | Slide 63
+Q human-in-the-loop | Then, the user interacts with the system to modify or tune the rules or to provide more labeled examples (Human-in-the-loop). | Slide 81
+Q gold standard | The key resource required is a gold standard annotated corpus | Slide 58
+NOQ supervised; relation extraction; multimodal; topics; pooling; factoid question; super-shingle; language identification; partial match; MRR; AUC; contingency table
+M unstructured | iedef
+M structured | iedef
+M entity | iedef
+M relation | iedef
+M event | iedef
+M supervised | methods
+M partially-supervised | methods
+M fine-tuning | methods
+M prompt | methods
+M aspect-based sentiment analysis | apps
+M intent extraction | apps
+M slot filling | apps
+M multimodal | advanced
+M ranked list | irie
+M topics | irie
+M relevance judgments | irie
+M genre | sources
+M exact match | match
+M partial match | match
+M accuracy | acc
+M named entity | netypes
+M sliding window | window
