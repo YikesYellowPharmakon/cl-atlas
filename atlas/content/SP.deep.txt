@@ -1,0 +1,342 @@
+# SP 深层内容. 依据 SP 01–06 笔记. 外文按课件写英语.
+# D 概念 | 英语定义   X 概念 | 讲解   S 父概念 | 子 id | 中文 | 外文 | 一句话
+
+D python | Python is an interpreted, dynamically typed language in which whitespace (indentation) marks code blocks.
+X python | 解释型: 解释器一边读一边执行, 写完立刻能跑, 代价是速度一般慢一些; Java、C++ 是编译型. 动态类型: 不用写 int x, 看赋的值就知道类型, x = 5 之后可以 x = "hi", 用 type(x) 查看. 空白有意义: Java/C 用花括号, 缩进只为好看; Python 缩进错了程序结构就变了, 甚至报 IndentationError. 1990 年代由 Guido van Rossum 开发, 是 AI、数据科学和 NLP 的主流语言.
+S python | interp | 解释型语言 |  | 一边读一边执行.
+S python | dyn | 动态类型 | Dynamically typed | 类型在运行时确定.
+S python | indent | 空白有意义 |  | 缩进表示代码块.
+
+D repl | The REPL (Read-Eval-Print-Loop) reads a line of input, evaluates it, prints the result and waits for the next input.
+X repl | 在终端输入 python (macOS 上常是 python3) 进入, 提示符是 >>>, quit() 退出. 只输入一个表达式回车, REPL 会自动显示它的值, 写在 .py 文件里则必须 print. REPL 显示字符串值带引号, print 不带. 变量是存储单元, 有数据类型、变量名、变量值三个要素; = 是赋值, 判断相等用 ==.
+S repl | var | 变量 | Variables | 名字 = 值.
+
+D types | Python's built-in data types include numbers, strings, lists, dictionaries, tuples, files, sets, booleans and None; functions, modules and classes are program unit types.
+X types | 数值运算: / 是浮点除法 (1/4 = 0.25, 4/2 = 2.0), // 是整数除法 (7//2 = 3), ** 是乘方; 比较运算的结果是 True 或 False. 函数、模块、类在 Python 里也是对象, 用来组织代码而不是存数据.
+S types | num | 数值类型 | Number data types | int 和 float.
+
+D str | Strings are immutable sequences of single characters.
+X str | 序列: 可以按下标取, 负下标从末尾数; 切片 s[start:end] 含起点不含终点, 长度正好是 end − start, 越界的下标报 IndexError, 切片越界不报错; s[::-1] 反转字符串. 不可变: s[0] = 'T' 报 TypeError, 只能造新串. 四种写法: 双引号、单引号、三引号 (跨多行, 也用于 docstring)、r 前缀的原始字符串. 常用方法: join (分隔符在前)、find (找不到返回 −1)、replace、split (不给参数时按空白切, 是最简单的分词)、upper、lower. 原字符串都不变, 返回的是新字符串.
+S str | strops | 字符串操作 | String operations | 下标、切片、join、split、find、replace.
+S str | rawstr | 原始字符串 | raw string | 反斜杠不转义.
+
+D enc | Unicode assigns a unique code point to each character; encodings such as UTF-8 and UTF-16 turn code points into bytes.
+X enc | 计算机只能存字节, 所以要分两步: 字符 → 编号 (Unicode, 码位), 编号 → 字节 (UTF-8、UTF-16). ord("A") 是 65, chr(65) 是 'A'; 大写和小写是不同字符, 相差 32; 0–127 就是 ASCII. UTF-8 每个字符 1 到 4 个字节, 英文文本里绝大多数字符只占 1 字节, 所以通常比 UTF-16 省空间. 'Bäume' 有 5 个字符, encode 后是 6 个字节, 因为 ä 占两个字节 (\xc3\xa4). 解码用 b"…".decode("utf-8"). open() 不写 encoding 时默认编码取决于系统区域设置, 应该始终写 encoding='utf-8'.
+S enc | unicode | Unicode | Unicode | 给每个字符一个码位.
+S enc | utf8 | UTF-8 | UTF-8 | 每个字符 1 到 4 个字节.
+S enc | encdec | 编码与解码 |  | encode 变字节, decode 变回字符串.
+
+D list | Lists are ordered, mutable sequences that can hold arbitrary objects and have no fixed size.
+X list | 和字符串一样支持 len、下标、切片、+ 和 *, 因为都是序列; + 和 * 返回新列表. append、pop (按位置, 返回被删的项)、insert、remove (按值, 不存在报 ValueError)、reverse、sort 都是就地修改, 返回 None: l = l.sort() 会让 l 变成 None, 想保留原列表用 sorted(l). 列表里可以再放列表表示矩阵, M[1][2] 先取第二行再取第三个元素.
+S list | listops | 列表操作 | List operations | 就地修改的方法返回 None.
+S list | nested | 嵌套列表 | Nested lists | 先选行再选列.
+
+D dict | Dictionaries are mutable mappings from unique, immutable keys to values, with approximately constant-time access.
+X dict | 字典不按位置取值, d[0] 是「键为 0 的值」. 键必须唯一 (再赋值是覆盖) 且不可变 (查找靠键的哈希值, 键一变就找不回来), 所以列表不能做键. 对不存在的键, 写 d['num'] = 1 是新建, 读 d['num'] 或 d['num'] += 1 报 KeyError. get 返回 None 或默认值; update 合并; pop 删除并返回值; del 只删不返回. 构造方式: dict(name='Bob')、dict([(k, v)])、dict(zip(keys, values)). 'age' in d 只查键; for k, v in d.items() 遍历. NLP 里最典型的用法是词频统计.
+S dict | keyerr | KeyError |  | 读不存在的键.
+S dict | dictops | 字典操作 | Dictionary operations | get、update、pop、del、items.
+
+D tuple | Tuples are immutable lists written with parentheses.
+X tuple | 支持下标、切片、+、len 等所有不修改内容的序列操作, 没有 append、pop、sort; t[0] = 9 报 TypeError. 用来表示固定的一组数据, 如坐标、字典的 (键, 值) 对. 陷阱题: t + (5, 6) 只是生成并显示了一个新元组, 没有赋值回 t, 所以 len(t) 不变.
+
+D set | Sets are mutable, unordered collections of unique, immutable elements.
+X set | 自动去重, 不能用下标; x in S 约为常数时间, 比在列表里找快得多. set('spaam') 把字符串拆成字符, 得到 4 个元素. {} 是空字典, 空集合要写 set(). 交集 intersection、并集 union、差集 difference (有方向) 都返回新集合. NLP 里 set(text.split()) 一步得到词汇表, len 就是 type 数.
+S set | setops | 集合运算 |  | 交集、并集、差集.
+
+D mutimm | Numbers, strings and tuples are immutable; lists, dictionaries, sets and objects of user-defined classes are mutable.
+X mutimm | 不可变对象建好后内容不能改, 「修改」其实是造了一个新对象; 可变对象可以就地修改 (append、d[k] = v、add). 只有不可变对象能做字典的键和集合的元素. 这张表考试常考, 第 3 讲还会从引用的角度再讲一次.
+
+D flow | if/elif/else chooses a branch, while repeats while a condition is true, and for iterates over the elements of any iterable.
+X flow | if 条件后要冒号, 下一行缩进; elif 从上到下检查, 执行第一个为真的分支. while True 是无限循环, Ctrl-C 中断, 实际用 break 跳出. 在条件位置空字符串、空列表为假 (truthiness), 所以 while x 意思是「只要 x 不空」. Python 的 for 直接遍历元素, 能遍历字符串、列表、字典 (逐个键)、文件 (逐行); range(a, b) 从 a 到 b 之前.
+S flow | ifs | if 语句 | if-statements | 冒号加缩进, elif 多路选择.
+S flow | whiles | while 循环 | While loops | 条件为真就重复.
+S flow | fors | for 循环 | For loops | 逐个取出可迭代对象的元素.
+
+D file | open(filename, mode) returns a file object; with ensures that the file is closed when the block ends.
+X file | 'r' 读 (默认), 'w' 写 (文件已存在会先被清空), 'a' 在末尾追加. read() 一次读完成一个字符串, 逐行读就 for line in f. write 不会自动换行, 要自己加 '\n'. 不写 encoding 时默认编码看系统, 所以要写 encoding='utf-8'.
+
+D func | A function packages a group of statements under a name so that it can be run several times in a program.
+X func | 好处: 最大化复用、最小化冗余; 把大任务分解成小函数; 支持递归. def 名字(参数): 后面缩进函数体. 没有 return 的函数返回 None. return 把结果交回给调用者, print 只是显示在屏幕上: b = g(3) 屏幕显示 6, b 却是 None.
+S func | defn | 定义函数 | Defining functions | def、参数、return.
+S func | retprint | return 与 print |  | 交回结果还是只显示.
+
+D funcobj | In Python functions are ordinary objects: they can be assigned to variables, stored in containers and passed as arguments.
+X funcobj | f = mul 让 f 指向函数 mul, 不带括号; f(3, 5) 才是调用. do(8, 4, add) 把函数当参数传进去, 这叫高阶函数, 例如 sorted(words, key=len). 函数可以存成字典的值, d['multipliziere'](3, 14) 先取出函数再调用, 这种「名字 → 函数」的字典可以代替一长串 if/elif.
+
+D mod | A module packages code and data for reuse; each module has its own namespace, and roughly every .py file is a module.
+X mod | 模块里定义的名字叫这个模块的属性, 用 math.pi 访问; 模块 a 和 b 里都可以有叫 count 的函数. 程序是一张由 import 连起来的模块网络, 只有一个入口文件. import collections 要带前缀, from collections import defaultdict 直接用名字, import numpy as np 起别名. if __name__ == "__main__": 下面的代码只在直接运行时执行. 虚拟环境: python3 -m venv env 创建, source env/bin/activate 激活, pip install nltk 装包, deactivate 退出; $ 是终端命令, >>> 是 Python 代码.
+S mod | venv | 虚拟环境 | virtual environment | 每个项目一套自己的包.
+S mod | main | __name__ == "__main__" |  | 只在直接运行时执行.
+
+D unittest0 | Unit tests automatically check whether the smallest units of a program, usually functions, produce the expected output.
+X unittest0 | 四个好处: 抓住容易自动发现的错误; 明确规格 (测试本身就是功能说明); 改代码更安心; 防止回归 (重构后确认原有功能没坏). Python 自带两个测试框架, 不用 pip 安装: 简单的 doctest 和功能更强的 unittest.
+
+D doctest | The doctest module searches docstrings for text that looks like interactive REPL sessions, runs it and compares the result with the expected output.
+X doctest | >>> 后要有一个空格, 期望输出紧接在下一行, 比较是按文本逐字进行的, 期望写 4.0 实际是 4 也算失败. 测试就是文档, 示例还保证是对的. 运行: python3 -m doctest -v example_module.py, -v 打印每条测试的过程, 不加时全部通过就什么都不输出; 1 items had no tests 只是信息, 不是错误.
+S doctest | run | 运行测试 | Running the tests | python3 -m doctest -v.
+
+D tdd | In test-driven development the tests are written first; the function body starts as pass, and the features are implemented until the failing tests pass.
+X tdd | 好处: 事先明确输入和输出; 逼你考虑边界情况 (空字符串、空集合、float('inf')、0、负数), 例如求平均词长的函数输入空文本会除以 0; 通过的测试比例就是进度. 函数体只有 pass 时 square(2) 返回 None, doctest 报告 Got nothing.
+
+D unittest | The unittest module, similar to Java's JUnit, puts tests in a separate test module: a class inheriting from unittest.TestCase with methods whose names start with test.
+X unittest | 只有以 test 开头的方法才会被自动识别为测试. 要用继承来的 self.assertEqual 等断言方法, 不用内置的 assert, 因为前者失败时报告清楚、能被统计. 常用断言: assertEqual、assertTrue (看 bool(x))、assertIs、assertIsNone、assertIn、assertIsInstance. == 比较值, is 比较是不是同一个对象, 判断 None 惯用 x is None. 运行: python3 -m unittest -v test_square.py. 一个测试方法里第一条断言失败后, 后面的不再执行; 测试的单位是方法, 不是断言.
+S unittest | asserts | 断言方法 | Different types of asserts | assertEqual、assertTrue、assertIs、assertIn.
+S unittest | isvseq | == 与 is |  | 比较值, 还是比较是不是同一个对象.
+
+D setup | setUp is executed before each test method to create shared preconditions; tearDown is executed after each test method for clean-up.
+X setup | 执行顺序对每个测试方法重复一遍: setUp → testXxx → tearDown. 例子把三个 (输入, 期望输出) 元组存在 self.inputs_outputs 上, 测试方法用 for i, o in … 逐对检查, 测试数据和测试逻辑分开, 加新数据只改 setUp. tearDown 用得较少, 用来关闭连接、删除临时文件.
+
+D vc | Version control manages changes to files over time; Git is a distributed version control system in which every copy carries the full history.
+X vc | 版本控制记录历史、可以撤销和重做、支持并行开发, 不只用于代码. Git 由 Linus Torvalds 在 2005 年为 Linux 内核开发. 分布式: 没有网络、没有中央服务器也能查历史、提交、建分支; 集中式的 SVN 历史只在服务器上. 分支只是一个指针, 建分支几乎不花时间. Git 是装在你电脑上的程序, GitLab、GitHub 是托管仓库副本的网站.
+S vc | distrib | 分布式 |  | 每份副本都有完整历史.
+
+D snapshot | Git stores snapshots: each commit records what all files of the project look like at that moment; unchanged files are stored as links to the previous version.
+X snapshot | 回到某个版本时, Git 把那张快照整个还原出来, 不是一步步倒推改动. 大部分操作只用本地文件. 每个提交有一个 40 位的 SHA-1 哈希值, 由内容算出, 平时写前 7 位就够. Git 基本只添加数据, 一旦提交几乎不会丢; 还没提交的改动才是真正可能丢的.
+S snapshot | hash | 哈希值 |  | 40 位 SHA-1, 由内容算出.
+
+D areas | Each file is untracked, unmodified, modified or staged; the states correspond to the working directory, the staging area (index) and the .git directory.
+X areas | 工作区是你编辑的文件夹, 暂存区是下一次提交的打包台, .git 目录是存着完整历史的本地仓库, 删掉它这个文件夹就不再是 Git 仓库. 日常三步: 改 → add → commit; 反方向的 checkout 从历史里取出某个版本放回工作区. 暂存区的用处: 只挑一部分改动提交, 一次提交只做一件事. 第一次用先 git config --global 设名字和邮箱; 得到仓库只有 git init 和 git clone 两种方式.
+S areas | wd | 工作区 | Working directory | 你编辑的文件夹.
+S areas | stage | 暂存区 | Staging area | 下一次提交的内容.
+S areas | gitdir | .git 目录 |  | 本地仓库, 存着完整历史.
+S areas | init | 配置与建立仓库 | Initial configuration | git config、git init、git clone.
+
+D commit | git status shows the state of each file, git add puts changes into the staging area, and git commit stores the staged snapshot permanently in the history.
+X commit | git status 是最常用的命令, 看不懂下一步时先跑一次. git add 一个命令两种用途: 新文件开始被跟踪, 改过的文件进入暂存. add 的是文件此刻的样子, add 之后又改了要再 add 一次. commit -m 后写清楚改了什么. git rm 删文件并暂存删除, git rm --cached 只取消跟踪, git mv 改名.
+S commit | status | git status |  | 每个文件处在哪种状态.
+S commit | add | git add |  | 放进暂存区.
+S commit | rmmv | git rm 与 git mv |  | 删除和移动文件.
+
+D log | git log shows the commit history with hash, author, date and message, newest first.
+X log | 历史长时进入分页, 按 q 退出. 常用选项: -p 显示改了哪些行; -2 只看最近两个; --stat 每个提交改了哪些文件; --oneline --graph --all 一行一个提交并画出分支线, 学分支时最推荐; --author、--since 按作者和时间筛选.
+
+D branch | A branch is a movable pointer to a commit; HEAD points to the branch you are currently on.
+X branch | 每个提交指向它的上一个提交. 在某分支上提交时指针前移到新提交, HEAD 跟着走. git branch testing 只建不切, git checkout testing 切换, git checkout -b testing 一次完成. 合并要先切到接收改动的分支, 再 git merge testing; 方向搞反是最常见的错误. 结果有两种: 快进 (fast-forward), 直接把指针往前挪; 两边都有新提交时, 做三方合并, 生成一个合并提交. Git 默认分支叫 master, GitLab、GitHub 上新建仓库默认叫 main.
+S branch | head | HEAD | HEAD | 指向当前分支.
+S branch | merge | 合并 | merge | 把别的分支并进当前分支.
+S branch | ff | 快进 | fast-forward | 直接把指针往前挪.
+
+D undo | git revert adds a new commit that undoes an earlier one; git reset moves the branch pointer back as if the commit had never happened.
+X undo | 漏了文件: add 后 git commit --amend. 把文件从暂存区拿回来: git restore --staged. 丢掉对文件的修改: git restore, 没提交过的改动找不回来. revert 历史只增不减, push 之后要撤销用它; reset 改写历史, 只用于还没 push 的提交. master~1 是往前数一个提交. reset 三种模式只差在被撤掉的改动放到哪: --soft 留在暂存区, --mixed (默认) 退回工作区, --hard 彻底丢掉, 最危险.
+S undo | rev | revert | revert | 新加一个抵消的提交.
+S undo | res | reset | reset | 把分支指针往回挪.
+S undo | modes | --soft、--mixed、--hard |  | 被撤掉的改动放到哪.
+
+D remote | A remote is a short name for the address of a copy of the repository on a server; git clone adds a remote called origin automatically.
+X remote | LMU 信息学院有自己的 GitLab. 连接有 https (用户名加密码或令牌) 和 ssh (一对密钥) 两种. ssh-keygen -t ed25519 生成密钥, 把 .pub 公钥交给 GitLab, 不带 .pub 的私钥绝不外传. git remote add 名字 地址、git remote rm、git remote -v. 每个远程列两行, fetch 和 push 各一行.
+S remote | ssh | ssh 密钥 | ssh keys | 公钥交给 GitLab, 私钥留在电脑上.
+S remote | clonec | 克隆 | Cloning | 连同历史复制一个仓库.
+S remote | origin | origin |  | clone 时自动添加的 remote.
+
+D sync | git fetch downloads new commits and updates the remote branch, git pull fetches and merges into the current branch, and git push uploads your new commits.
+X sync | clone 之后 master 是你自己的本地分支, origin/master 是远程分支, 记录上次联系时服务器上的 master 在哪; 它不会自动更新, 要 fetch. 比较 master 和 origin/master 就知道哪些是只在本地的工作. fetch 不动你的文件, pull 相当于 fetch + merge, push 改的是服务器.
+S sync | rbranch | 远程分支 | Remote Branches | origin/master.
+S sync | fetchc | fetch | fetch | 下载, 不动本地文件.
+S sync | pullc | pull | pull | fetch 加 merge.
+S sync | pushc | push | push | 上传新提交.
+
+D conflict | A merge conflict arises when both sides changed the same line; Git stops and lets you decide which version to keep.
+X conflict | 改的是不同行时 Git 会自动合好. 经过: push 被拒 (服务器上有你没有的提交) → pull 时合并报 CONFLICT → 打开文件, <<<<<<< HEAD 到 ======= 是你的版本, ======= 到 >>>>>>> 是拉下来的版本 → 改成最终内容并删掉三行标记 → git add、git commit、git push. 忘了删标记就提交, Python 文件会报 SyntaxError. 小组循环: pull → 改 → commit → pull → push, 开工前和 push 前都先 pull.
+S conflict | marker | 冲突标记 |  | <<<<<<< ======= >>>>>>>.
+S conflict | teamflow | 远程工作流程 | Typical workflow with a remote | pull → 改 → commit → pull → push.
+
+D mut | A mutable object can still be changed after creation; an immutable object never changes, and an apparent change creates a new object.
+X mut | 关键是分清变量和对象: 变量只是名字 (标签), 指向内存里的对象. x = 'b' 没有改动字符串 'a', 而是让 x 改指向新对象. 本讲最重要的思维模型: 列表里存的不是值本身, 而是一排引用. append 在原列表对象末尾加位置, x 还指向同一个对象. x[2] = 'e' 改的是列表那个位置的指向, 字符串 'c' 一点没变. 多维列表也是同一张图: 外层位置里存着指向内层列表的引用.
+S mut | refs | 列表里存的是引用 |  | 改的是指向, 不是元素本身.
+S mut | multidim | 多维列表 | Multidimensional lists | 外层存着指向内层列表的引用.
+
+D slicing | List indices start at 0, negative indices count from the end, and slicing myList[start:end] returns a new list from start up to end (exclusive).
+X slicing | myList[-2] 是倒数第二个. [2:3] 得到只有一个元素的列表 ['c'], 不是字符串 'c'. 省略 start 从头开始, 省略 end 到末尾, [:] 得到整个列表的拷贝. 切片总是返回新的列表对象, 改它不影响原列表, 但它是浅拷贝.
+
+D duck | Duck typing: Python does not care what type an object has, only whether it supports the operations you need.
+X duck | 「走起来像鸭子、叫起来像鸭子, 那它就是鸭子」. 字符串和列表都是序列, 都支持下标和切片, 用法一样: "quacking duck"[9:] 是 duck. 区别在可变性: myString[0] = "T" 报 TypeError, 只能拼一个新的再让变量指过去.
+
+D shared | A shared reference means that several names refer to the same object; assignment does not copy.
+X shared | 变量不是饭盒, 更像人名. kathy = katherine 只是给同一个列表再起一个名字, 通过 kathy 修改, katherine 也「跟着变」, kathy is katherine 是 True. 第 4 讲的聚合也会用到同一回事: 几个对象共享同一个被引用的对象.
+
+D shallow | A shallow copy such as y = x[:] creates a new outer list that still holds the same references as the original.
+X shallow | z = x 是别名, z is x 为 True; y = x[:] 是新列表, y is x 为 False, 但 y == x 为 True. 元素是不可变的字符串时没问题; 元素是列表时, a = [[1, 2], 3]、b = a[:] 后 b[0].append(99) 会让 a 也变, 因为内层只有一个. 连内层一起复制用 copy.deepcopy (练习课讲).
+S shallow | deep | 深拷贝 |  | copy.deepcopy 连内层一起复制.
+
+D comp | A list comprehension [expression for variable in sequence if condition] creates a new list from an existing one.
+X comp | 等价于先建空列表, 再在 for 循环里按条件 append, 写法更短, 通常也更快. 字典也能这样写: {k: v * 2 for k, v in prices.items() if v > 3}.
+
+D scope | A variable is only available inside the region where it is created; Python looks up a name in the local, then enclosing, then global scope.
+X scope | 局部作用域: 函数里创建的变量函数结束就消失, 外面用会报 NameError. 外围作用域: 内层函数能读外层函数的变量, 反过来不行. 全局作用域: 程序主体里创建的变量任何地方都能读. 三层像套盒, 从里往外找到第一个就停. 函数里写 x = 200 会新建一个局部 x, 遮住全局的 x; 写了 global x 才改的是全局变量.
+S scope | local | 局部作用域 | Local scope | 函数里创建, 函数外看不到.
+S scope | enclosing | 外围作用域 | Enclosing scope | 内层函数能读外层的变量.
+S scope | glob | 全局作用域 | Global scope | 任何地方都能读.
+S scope | globkw | global 关键字 | Global keyword | 在函数里改全局变量.
+
+D proc | In imperative (procedural) programming a program is a sequence of commands organised by functions and procedures, and its state changes over time.
+X proc | 命令式: 「先做这个, 再做那个」, 来自拉丁语 imperare. 控制结构决定步骤顺序, 数据结构决定数据组织. 优点是一步一步执行, 容易读懂和跟踪; 缺点是项目一大代码容易乱. 对比面向对象: 过程式按函数划分, 没有访问修饰符, 不支持多态和继承; 面向对象按对象划分, 数据和操作放在一起. 小任务 (如预处理脚本) 用过程式反而更合适.
+
+D oopc | Object-oriented programming represents data and the methods that operate on it as objects, in order to write reusable rather than repetitive code.
+X oopc | 房子、汽车、时钟都是对象. 对象有属性, 所有属性的当前取值合起来是它的状态; 有的属性会变 (颜色、速度), 有的几乎不变 (轮胎数). 可以给对象发消息让它做事, 在程序里就是调用方法; 方法可以带参数、有返回值, 有的要先检查再改 (加速不超过最高速度).
+S oopc | state | 状态与行为 |  | 属性的取值, 和能对它做什么.
+
+D class | A class is a construction plan that defines the attributes and methods of its objects; an instance is a concrete object built from it.
+X class | 同一张汽车图纸造出的车结构一样, 具体属性不同. 类规定属性 (实例变量) 和方法, 每个对象给属性填上具体的值, 这组值就是它的状态. 像调用函数一样调用类 Account() 就造出一个实例. 一切皆对象: str、int 也是类, "hello" 是 str 的实例; 列表、字典的操作背后都是方法, 内置类也能被继承.
+S class | inst | 实例 | instance | 按类造出的具体对象.
+S class | attr | 属性 | attribute | 描述对象的状态.
+S class | allobj | 一切皆对象 | Everything in Python is an object | 内置类型也是类.
+
+D init | The constructor __init__ is called automatically when an object is created and assigns initial values to its attributes.
+X init | Python 的属性不是在类里声明的, 而是在第一次赋值时才出现在对象上; 从没给 self.balance 赋过值就会报 AttributeError. 构造方法可以有参数: Account(1, "Anne") 里的 1 和 "Anne" 依次传给 num 和 person, self 由 Python 自动传; 不传参数报 TypeError. self.num 是对象的属性, 方法结束后还在; 只写 num 是局部变量.
+S init | attrexist | 属性必须先存在 | Attributes must exist | 没赋过值就报 AttributeError.
+
+D self | self is the first parameter of an instance method and refers to the object on which the method is called.
+X self | annesAcc = Account(1, "Anne") 分三步: 造一个空对象, 调用构造方法让 self 指向它, 把造好的对象赋给变量. 方法的代码只在类里写一份, self 告诉方法这次操作的是哪个对象. self 不是关键字, 只是约定俗成的名字. 类名首字母大写 (CamelCase), 用点号读写属性、调用方法.
+
+D method | Methods are functions that belong to a class; instance methods read or modify the attributes of a particular object.
+X method | annesAcc.deposit(500) 等于 Account.deposit(annesAcc, 500). 对象里只存自己的属性值, 方法只在类里存一份, 所有对象共用. 调用时 Python 先在对象自己身上找, 找不到再去类里找, 有了继承还会去父类里找. 在需求描述里, 名词通常是属性, 动词通常是方法.
+
+D encap | Data encapsulation means that the attributes of an object are hidden from the outside and changed only by the class's own methods.
+X encap | 设计类时问三个问题: 用什么描述状态 (属性)? 创建时已经知道什么 (构造方法的参数)? 要做哪些改变状态的操作 (方法)? 所有修改都经过方法, 方法里可以检查, 保证状态合法: withdraw 先检查余额, 余额就不会变负. 需要从外部修改的属性写 setter (set_属性名), 在里面验证新值, 不合法就 raise TypeError 或 ValueError. Python 没有真正的私有变量, 约定下划线开头的名字是私有的.
+S encap | setterm | setter 方法 | Setter Methods | 验证后再修改属性.
+S encap | priv | 下划线约定 |  | _name 当作私有.
+
+D magic | Special (magic) methods have double underscores before and after their name and are called automatically by Python in specific situations.
+X magic | print(obj) 或 str(obj) 会调用 __str__, 没有时退而使用 __repr__; 交互模式里直接输入对象名用 __repr__. 不定义的话打印出来只是 <__main__.Account object at 0x…>. __init__ 也是特殊方法. myDict["k"] = v 背后是 myDict.__setitem__("k", v), 所以 TalkingDict 继承 dict 并重写 __setitem__ 就能在每次赋值时打印一句, 但调用父类原版方法那一行不能省.
+S magic | strrepr | __str__ 与 __repr__ | String Representation of an Object | 决定对象怎样显示.
+
+D uml | A UML class diagram is a box with three compartments: class name, attributes and methods; relations between classes have their own notation.
+X uml | 属性可以写可见性 (+ 公开, - 私有)、名字和类型, 如 id: int; 方法栏不写继承来的方法, 可以写返回值类型. 继承画空心三角箭头, 从子类指向父类; 聚合画空心菱形, 组合画实心菱形, 菱形在整体那一端; 连线上的数字是多重性. UML 是标准化的图示语言, 不依赖具体编程语言, 适合写代码前设计结构.
+S uml | umlinh | UML 中的继承 | Inheritance in UML | 空心三角, 从子类指向父类.
+S uml | umlhier | 类层次 | Class Hierarchy | 公共方法写在父类里只写一次.
+
+D inherit | Inheritance expresses an is-a relation: a child (derived) class is a special version of its parent (base, super) class and inherits its attributes and methods.
+X inherit | 写法 class Child(Parent):. 判断能不能用继承就问「子类是不是一种父类」: 储蓄账户是一种账户, 发动机不是一种汽车. Lion 自己什么都没写, make_sound 用父类 Animal 的; Duck 定义同名方法覆盖父类. 银行例子: 父类 Account 放所有账户共有的功能, SavingsAccount 加利率和结息, CreditAccount 加信用额度并重写 withdraw. 存 200 后结息得 206.99999999999997, 是浮点数的舍入误差. based on、derived from、extends 说的是同一件事.
+S inherit | isa | is-a 关系 |  | 子类是一种父类.
+S inherit | child | 子类 | Child Classes | 只写新增的部分.
+S inherit | superc | 超类 | super class | 被继承的类.
+
+D classvar | A static variable (class variable) belongs to the class itself and is shared by all instances; it is assigned inside the class but outside all methods.
+X classvar | 利率对所有储蓄账户都一样, 正适合做类变量 interest_rate = 0.035. 类内部用类名访问 (SavingsAccount.interest_rate), 一眼看出是类变量. 通过实例读时 Python 先找实例属性, 再去类里找. 通过实例赋值 (a.interest_rate = 0.05) 不会改类变量, 而是给 a 新建一个同名的实例变量. 实例变量写在方法里, 每个对象一份; 类变量写在方法外, 所有对象共用一份.
+S classvar | static | 静态变量 | static variable | 类变量的另一个名字.
+
+D override | A child class overrides a parent method by defining a method with the same name; with polymorphism the result of a call depends on the object's position in the class hierarchy.
+X override | 对 CreditAccount 对象调用 withdraw 用的是子类自己的版本; deposit 子类没写, 用 Account 的. Python 沿类层次从下往上找, 用第一个找到的方法. 多态的好处: 调用方不必关心具体是哪种账户, 一个列表里混着各种账户, 统一写 acc.withdraw(100), 每个账户按自己的规则取款. 例: 额度 500, 存 200, 取 400 后余额 -200, 再取 400 只能取 300.
+S override | ow | 重写方法 | Overwriting Methods | 子类定义同名方法.
+S override | poly | 多态 | Polymorphism | 结果取决于对象的类.
+
+D redund | Redundancy means that the same data is stored in several places or the same code is written several times.
+X redund | 数据冗余可能导致不一致, 代码冗余难以维护: CreditAccount 的构造方法把 Account 里的三行赋值又写了一遍, Account 以后加一个属性就得在每个子类里都加. 解决办法: 在子类方法里先调用父类的同名方法, Account.__init__(self, num, person), 再补上自己的部分; 通过类调用方法时 Python 不会自动填 self, 要手动传.
+S redund | callsuper | 调用父类方法 | Minimizing Redundancies | Account.__init__(self, …).
+
+D multi | Multiple inheritance means that a class inherits from several classes at once, written class C(A, B).
+X multi | Java 一个类只能有一个父类, Python 允许多个. 这门课不讲, 建议最多只用一个父类: 多个父类里有同名方法时用哪个的规则比较复杂, 容易出错.
+
+D compo | Composition and aggregation are has-a relations: an attribute of an object holds another object.
+X compo | 继承是 is-a (储蓄账户是一种账户), 这里是 has-a (汽车有轮胎). 聚合 (aggregation): 拥有或访问另一个类的独立对象, 单向; 系撤销了学生还在; UML 空心菱形. 组合 (composition): 更强的聚合, 部分不能脱离整体存在, 容器销毁了内容也没了; UML 实心菱形. 判断只问一个问题: 整体没了, 部分还能单独存在吗? 代码上: 组合是容器自己创建部分 (Account 的构造方法里新建 Person, 两个账户里就是两个互不相干的 Anne); 聚合是接收外面已有的对象 (传进同一个 anne, 两个账户共享她, 过生日时都看到 86 岁).
+S compo | comp | 组合 | Composition | 容器自己创建部分.
+S compo | aggr | 聚合 | Aggregation | 接收外面已有的对象.
+S compo | attrobj | 属性也可以是对象 | Other classes as attributes | Car 的 engine 是 Engine 对象.
+
+D regdef | A regular expression (regex) is a text pattern in a special syntax used to match strings and extract subpatterns.
+X regdef | 由三种东西组成: 要找的普通字符、运算符 (特殊符号) 和保留符号 (如「任意数字」「行首」). 在计算语言学里用得很广, 早年用于各种文本处理, 现在仍用于分词之类的任务. 惯例写成 /hello/ 是 Perl 的写法, Python 里模式就是一个普通字符串, 如 re.search('hello', text).
+
+D reglang | A regular expression defines a formal language: the set of all strings it allows, possibly including the empty string ε.
+X reglang | (a|b)c* 是 a 或 b 开头、后面跟任意个 c, 等价于 [ab]c*. a*b* 是任意个 a 后接任意个 b, 包括空串, 但不包括 ba. 优先级: | 最弱, 所以 a|bc* 是 a|(bc*), 匹配不了 ac. 和 FS、SNS 里的正则文法是同一个形式语言概念.
+
+D regsyn | Regex syntax comprises character sets, the wildcard dot, quantifiers, alternation, anchors, character classes and groups.
+X regsyn | H[ae]llo 用方括号字符集; [^ab5] 开头的 ^ 表示取反. . 匹配任意一个字符, \. 只匹配句点. 量词只作用于紧挨在前面的一项: * 零次或多次, + 一次或多次, ? 零次或一次, {n,m} n 到 m 次; 重复 ab 整体要写 (ab)*. ^ 和 $ 是锚点, 只匹配位置. 字符类: \w 字母数字下划线, \d 数字, \s 空白, \b 单词边界; 大写是取反. 圆括号组成捕获组. * 是贪婪的: <.*> 在 <img/> <a> 里会吃掉整段, 要用 <.*?> 或 <[^>]*>.
+S regsyn | charset | 字符集 |  | 方括号里任选一个字符.
+S regsyn | quant | 量词 | quantifier | 作用于紧挨在前面的一项.
+S regsyn | anch | 锚点 | anchor | 只匹配位置.
+S regsyn | grp | 捕获组 | Capture groups | 圆括号, 可以单独取出.
+S regsyn | greedy | 贪婪 |  | 尽量多吃字符.
+
+D remod | Python's re module provides re.match (only at the beginning), re.search (first match anywhere) and re.findall (list of all matching strings).
+X remod | match 和 search 找到时返回 match object, 找不到返回 None, 可以直接放进 if. match object 的 group() 取匹配到的文本, start()/end() 取位置, span() 一次给出两者, 和切片一样左闭右开. re.compile 把模式编译成正则对象, 在循环里反复用时先编译一次更高效. r'\w+ly\b' 找出以 -ly 结尾的词, \b 保证 flyer 不会被截出 fly.
+S remod | mo | match object | match object | 记录匹配内容和位置.
+S remod | comp2 | re.compile |  | 反复用的模式先编译.
+
+D raw | Both regular expressions and Python strings treat the backslash as special; a raw string prefixed with r passes backslashes unchanged to the regex engine.
+X raw | 普通字符串里 '\n' 先被 Python 变成换行符, 正则引擎看不到反斜杠, 要写 '\\n'. 经典例子: "\b" 在普通字符串里是退格符, 模式变成「退格符 + a」, 什么都匹配不到, 而且不报错, 最难查; r"\b" 才是单词边界. 所以正则一律写成 r'...'.
+
+D nltk | NLTK (Natural Language Toolkit) is a Python library for retrieving, analysing, annotating, classifying and generating text.
+X nltk | 由宾夕法尼亚大学的 Steven Bird 和 Edward Loper 开发, 2001 年首次发布. 本课主要用 nltk.corpus 读语料、nltk.tokenize 分词、nltk.probability 里的频率分布, 对应 NLTK 书第 1、2 章. 装好包之后语料和模型要另外下载: nltk.download() 打开图形化下载器, 或 nltk.download('gutenberg') 下载单个资源.
+
+D doc | A document is often the basic unit of an NLP system; a corpus is a collection of language data, usually consisting of documents and built for a specific purpose.
+X doc | 一篇新闻、一篇维基百科文章、一条评论或推文都可以是文档. 语料库的数据要最能代表任务, 例如词义消歧、情感分析、文本分类. 文档可以存成原始字符串、分词后的字符串列表或各词出现的次数, 后两种都要先决定什么算一个词.
+S doc | corpusd | 语料库 | corpus | 为某个目标收集的语言数据.
+
+D tok | Tokenization splits raw text into basic units (words, phrases, symbols), called tokens; it is the first step of almost every NLP task.
+X tok | 按空格切 (str.split) 标点粘在词上; 按 \W+ 切缩写 Dr.、U.S. 被拆坏; 按空格或撇号切缩写保住了句号又粘回来, 每种简单规则都顾此失彼. 难点: 撇号既表示所有格又表示缩写 (aren’t 怎么切), 连字符 (ex-wife), 词内空格 (New York). nltk.word_tokenize 知道常见缩写, 句末句号和所有格 's 单独切出; wordpunct_tokenize 遇到标点就切; WhitespaceTokenizer 按任意空白; SpaceTokenizer 只按空格字符.
+S tok | simple | 用字符串方法和正则分词 |  | 每种简单规则都顾此失彼.
+S tok | nltktok | NLTK 的分词器 | NLTK Tokenization | word_tokenize 知道常见缩写.
+
+D toktype | Tokens are all occurrences of words in a text (N in total); types are the distinct words, which form the vocabulary V.
+X toktype | the cat saw the dog 有 5 个 token、4 个 type. 词频按 token 数. 怎样预处理和分词会直接改变这些数字, 例如 This 和 this 算不算同一个词. 基础文本统计: len(text1) 是 token 数, len(set(text1)) 是 type 数, 《白鲸》约 26 万 token、1.9 万 type; 标点也算 token, 逗号是最多的.
+S toktype | stats | 基础文本统计 | Basic Text Statistics | len(text) 和 len(set(text)).
+
+D count | A document can be represented as a dictionary mapping each word to its number of occurrences.
+X count | 四种写法: 普通字典, 在里面就加 1, 不在就设为 1; defaultdict(int), 访问不存在的键时自动用 0, 但只是读一下 w2c["barbara"] 也会把它写进字典, 只想查询用 get 或 in; Counter, 一行数完, 有 most_common(n), 读不存在的键返回 0 但不加进去; NLTK 的 nltk.Text 加 nltk.FreqDist.
+S count | ddict | defaultdict |  | 读一下就会加键.
+S count | counter | Counter |  | 专门用来计数的字典子类.
+
+D corpread | When nltk.corpus is imported, NLTK creates a corpus reader object for every corpus; readers offer raw, words and sents and, for categorized corpora, categories.
+X corpread | 语料的四种组织方式: isolated (古登堡计划的书)、categorized (Brown 按体裁)、overlapping (路透社新闻可属于几个主题)、temporal (历届总统就职演说). 读取器是懒加载的, 用到时才读文件. raw / words / sents 分别取原始字符串、词列表、句子列表, 带 fileids= 或 categories= 只取指定部分. Brown 是第一个百万词级的英语电子语料, 按体裁分成 15 类, 适合研究体裁之间的系统差异, 这叫文体学 (stylistics).
+S corpread | struct | 语料的四种结构 |  | isolated、categorized、overlapping、temporal.
+S corpread | brown | Brown 语料 |  | 按体裁分类的百万词语料.
+S corpread | styl | 文体学 | stylistics | 研究体裁之间的系统差异.
+
+D konk | A concordance (keyword in context) lists every occurrence of a word in a text together with its left and right context, with the keyword aligned in the middle.
+X konk | 《白鲸》里 monstrous 出现 11 次, 从索引里能读出 the ___ pictures、a ___ size 这样的上下文. 自然的问题是还有哪些词也出现在同样的空位里, 这就是 similar.
+
+D distsim | text.similar finds words that occur in the same contexts as a given word, based on the distributional hypothesis that words in similar contexts tend to have similar meanings.
+X distsim | 同一个词在两部书里结果差别很大: 《白鲸》里 monstrous 的邻居是 true、contemptible 等形容词; 奥斯汀笔下是 very、so、exceedingly 这类程度副词, monstrous 在那里相当于「极其」. common_contexts 列出几个词共有的上下文, 下划线代表这个词的位置.
+
+D disp | A lexical dispersion plot shows the positions at which words occur in a text, with one vertical line per occurrence.
+X disp | 横轴是从开头数的第几个 token. 能看出一个词是贯穿全书还是集中在某几章. 画图需要 matplotlib.
+
+D ttr | The type-token ratio (TTR), the number of types divided by the number of tokens, measures lexical diversity.
+X ttr | 《创世记》44764 个 token、2789 个 type, TTR 约 0.062, 平均每个词用了 16 次. 《白鲸》7.4%, 《理智与情感》4.8%. TTR 受文本长度影响: 文本越长常用词重复越多, TTR 越低, 所以只有长度相近的文本才能比较. 取值最大是 1, 下限趋近 0. lexical_diversity 不是 NLTK 自带的, 要按 NLTK 书自己定义.
+
+D lexres | A lexicon or lexical resource is a collection of words or phrases with associated information such as definitions or sentiment polarity.
+X lexres | 词汇资源通常从文本派生, 借助文本建立和扩充. 最简单的三种: 排好序的词表、频率分布、条件频率分布. 停用词表、人名表、CMU 发音词典也是词汇资源.
+
+D freqd | A frequency distribution records how often each type occurs; NLTK's FreqDist is a subclass of Counter.
+X freqd | FreqDist(text1) 和 text1.vocab() 内容相同, 像字典一样查: whale 在《白鲸》里出现 906 次. 频率分布随文本和文本的类别变化. 只出现一次的词叫 hapax (hapax legomenon), 《白鲸》里有 9002 个, 几乎占全部 type 的一半. fdist1.plot(50) 的曲线开头急剧下降, 后面又平又长: 少数几个词占了大量出现次数, 这是齐普夫定律.
+S freqd | hapax | 只出现一次的词 | hapax | hapax legomenon.
+S freqd | zipf | 齐普夫定律 |  | 少数词占了大量出现次数.
+
+D cfd | A conditional frequency distribution is a collection of frequency distributions, one for each condition; it is built from (condition, event) pairs.
+X cfd | 频率分布数的是一个个事件 (词); 条件频率分布要把每个事件和条件配成一对. 用双层列表推导式为 news 和 romance 里的每个词生成 (体裁, 词) 对, 交给 ConditionalFreqDist. cfd["romance"] 本身是一个 FreqDist, cfd["romance"]["could"] 是 193. 条件也可以是语言 (udhr 语料, 事件是词长) 或年份 (就职演说语料, fileid[:4]).
+
+D annot | Annotated corpora carry linguistic annotation such as POS tags, named entities, syntactic structure or semantic roles.
+X annot | CoNLL 格式 (OntoNotes 风格) 每个词一行, 每层标注一列: POS、句法括号、谓词论元、命名实体、共指链编号, 一个句子同时带了词法、句法、语义、语篇四层标注. NLTK 自带 Brown、CESS 树库、CMU 发音词典、CoNLL 2000 组块数据等, 下载时写语料的 id. 知识库也是一种标注资源, 把文本里的实体归到类别下.
+
+D stop | A word list is a special lexical resource consisting of a list of words; stopwords are very frequent words with little lexical meaning.
+X stop | NLTK 带了停用词、人名、Swadesh 核心词表、英语单词表. 英语停用词表 179 个, 包括代词、疑问词、be 的各种形式和 you're 之类的缩写; 德语停用词有冠词、代词、介词、连词和助动词形式. 人名表 (男名、女名) 能为照应消解和机器翻译提供性别线索, 但 Adrian 两张表里都有, 只是概率性的. w in female_names 在列表里顺序查找, 先转成 set 快得多.
+S stop | stopw | 停用词 | stopword | 高频、几乎没有词汇意义.
+S stop | names | 人名表 |  | 性别是照应消解的线索.
+
+D pipe | In an NLP pipeline such as Stanford CoreNLP, annotators run one after another on a shared annotation object, each reading earlier results and adding its own.
+X pipe | CoreNLP 的顺序: tokenize → ssplit → pos → lemma → ner → parse → dcoref. 顺序有依赖: 词形还原和句法分析都要先有词性. 第二张图把流水线分成预处理 (分句、分词、规范化) 和处理 (词性标注之后的句法分析、特征标注、语义分析、语篇分析) 两大块; 本讲讲预处理, 词性标注是下一讲.
+
+D prep | Preprocessing comprises sentence segmentation, tokenization and normalization (lowercasing, stopword removal, stemming, lemmatization).
+X prep | 一个句子逐步经过: 按空格分词 → 去标点 → 小写 → 词干提取 (cars → car, different → differ) → 词形还原 (are → be) → 去停用词. NLTK 默认的 WordNet 词形还原器不会把 are 还原成 be. 分句用 PunktSentenceTokenizer, 它是从数据中学出来的模型, 记住了缩写、搭配和常在句首的词, 所以 Mr. 后面的句点不是句子边界; 平时用 nltk.sent_tokenize. LineTokenizer 按行切.
+S prep | sentseg | 分句 | Satzsegmentierung | Punkt 模型.
+
+D norm | Stemming and lemmatization both reduce inflected (sometimes derived) forms to a base form; lemmatization yields the dictionary form, stemming cuts off affixes.
+X norm | ich laufe 的词元是 laufen, 词干是 lauf, 不一定是一个词. 词形还原判断表面不同的词有同一个词根: am、are、is 的词元都是 be. 最精细的是完整的形态分析: 形态学研究词怎样由语素构成, 语素分词干和词缀. 词干提取是简化的形态分析, 主要砍掉词尾; 最常用的 Porter 算法是一系列级联的改写规则, 结果像 this → thi、was → wa.
+S norm | stem | 词干提取 | stemming | 砍掉词缀.
+S norm | lemma | 词形还原 | lemmatization | 给出词典里的词元.
+S norm | porter | Porter 算法 | Porter stemmer | 级联的改写规则.
+S norm | morphem | 语素 | morpheme | 词干和词缀.
+
+D morphlang | How much lemmatization and stemming help depends on the morphology of the language.
+X morphlang | 1000 个平行句子里每个词元平均对应的词形: 泰语 1.00、汉语 1.01 (没有用语素表示的屈折变化), 芬兰语 1.53、土耳其语 1.65 (大量屈折词尾和格). 屈折越多, 同一个词元分散成越多 type, TTR 越高. 芬兰语名词有 15 个格, 土耳其语是黏着语, 一个词可以对应一整句英语, 不做形态切分几乎没法统计.
+
+D kolloc | A collocation is a sequence of words that occur together unusually often and cannot easily be replaced by synonyms.
+X kolloc | red wine 是搭配, the wine 不是; 换成近义词 maroon wine 就很别扭. 索引是针对一个给定的词、列出它每一次出现的查看工具; 搭配是从整个文本统计出来、比偶然更常一起出现的词组, 是分析结果. 只按频率排最前面是 of the、in the; text.collocation_list() 先过滤停用词, 再用互信息之类的统计量衡量.
+
+D ngram | A bigram is a pair of adjacent words, a trigram three adjacent words, in general an n-gram.
+X ngram | n 个词的文本有 n − 1 个二元组、n − 2 个三元组. nltk.bigrams 和 trigrams 返回生成器, 要用 list() 才能看到内容, 而且只能用一次. 「搭配就是频繁的二元组」是简化的说法.
+S ngram | big | 二元组 | bigram | 相邻两个词.
+S ngram | ng | n 元组 | n-gram | 相邻 n 个词.
+
+D gen | Random text can be generated with a conditional frequency distribution over bigrams: the previous word is the condition and the following word the event.
+X gen | cfd["living"] 是 living 后面跟过的词的分布, max() 是 creature. 从 living 出发每次打印当前词, 再换成最常跟在后面的词, 很快陷入 the → land → of → the 的循环, 因为每一步都确定地取最大值, 而且只看前一个词. 改进: 按频率随机抽下一个词, 用更长的上下文 (三元组、n 元组), 这正是语言模型的基本思想.

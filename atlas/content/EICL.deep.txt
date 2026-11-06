@@ -1,0 +1,280 @@
+# EICL 深层内容: D = 德语定义 (按课件措辞), X = 中文讲解 (德语术语放括号), S = 下一级子概念 (parent | sid | 中文 | 德语 | 一句话)
+# 来源: 只读 EICL 01–06 笔记 (cand/EICL.json). 2026-11-05.
+
+D variab | Variabilität: Dieselbe Bedeutung kann durch viele verschiedene sprachliche Formen ausgedrückt werden.
+X variab | 「几点有车」可以问成 Wann fährt der Zug? / Um wie viel Uhr geht der Zug? / Abfahrtszeit?. 关系是多种形式 → 一个意义. 系统 (检索、问答) 必须把这些说法归到同一个意义上, 这和歧义 (Ambiguität) 方向正好相反.
+S variab | paraphr | 多种说法 | Paraphrasen | 同一问题的不同问法都要映射到同一个意义.
+S variab | richtung | 方向相反 |  | 变异: 多形式 → 一义; 歧义: 一形式 → 多义.
+
+D ambig | Ambiguität: Dieselbe sprachliche Form kann verschiedene Informationen ausdrücken; erst der Kontext zeigt, was gemeint ist.
+X ambig | 一个形式 → 多种意义, 要靠语境 (Kontext) 才能推出指的是哪一个. 课件按语言层面把歧义分成七类, 从语音、书写、形态、词汇, 到结构、辖域和语用. 计算语言学的很多任务 (词义消歧、句法分析、指代消解) 本质上都是在消除某一类歧义.
+S ambig | kontext | 语境消歧 | Kontext | 同一形式的读法要由上下文决定.
+S ambig | sieben | 七类 |  | 每类对应语言的一个层面.
+
+D ambtypes | Ambiguität tritt auf allen Ebenen der Sprache auf: phonetisch, orthographisch, morphologisch, lexikalisch, strukturell, kompositionell-semantisch und pragmatisch.
+X ambtypes | 七类各有一对典型例子: 语音 (Homophone: Miene – Mine, 读音相同); 书写 (Homographen: ÜBERsetzen – überSETzen, 写法相同重音不同); 形态 (Staub-ecken – Stau-becken, 切分不同); 词汇 (Homonyme: Nadja geht zum Ball, 球或舞会); 结构 (Visiting relatives can be boring); 辖域 (Some student likes every course); 语用 (Haben Sie eine Uhr? 是问还是请求).
+S ambtypes | homophon | 语音歧义 | Homophone | 不同的词有相同的语音形式: Meer – mehr.
+S ambtypes | homograph | 书写歧义 | Homographen | 写法相同、读音或重音不同: umfahren – umfahren.
+S ambtypes | morphamb | 形态歧义 | Morphologische Ambiguität | 一个词形可有多种切分: Staubecken.
+S ambtypes | lexamb | 词汇歧义 | Homonyme | 一个词有多个意义: der Ball.
+S ambtypes | pragamb | 语用歧义 | Pragmatische Ambiguität | 字面清楚, 说话人的意图不清: Könnten Sie …?
+
+D skopus | Quantoren und Negation können sich auf unterschiedlich große Teile des Satzes beziehen (Skopus).
+X skopus | 句法结构可以完全相同, 但量词或否定「管到哪里」的先后不同, 意义就不同. Die zwei Mitarbeiter müssen vier Sprachen beherrschen: 每人四种 (共 8 种) 还是两人共会四种; Alle Politiker sind nicht korrupt: 「没有一个腐败」还是「不是所有都腐败」. 课件把它叫组合语义歧义 (kompositionell-semantisch).
+S skopus | quant | 量词辖域 | Quantorenskopus | 「两」管「四」还是「四」管「两」.
+S skopus | neg | 否定辖域 | Negationsskopus | nicht 否定整句还是只否定 alle.
+
+D structamb | Die grammatischen Regeln erlauben unterschiedliche Analysen der Kombination von Satzteilen.
+X structamb | 每个词的意思都确定, 不确定的是谁和谁组合, 也就是句法树不同. Visiting relatives can be boring: [Visiting relatives] 是「来访的亲戚」还是「去走亲戚」. 介词短语挂接 (PP-Attachment) 是最常见的来源: Sie traf die Nachbarin mit ihrer Tochter. EICL 05 的 post office 句子一句就有五种树.
+S structamb | attach | 挂接歧义 | PP-Attachment | 介词短语挂在动词上还是名词上.
+S structamb | posamb2 | 词类歧义 | Wortart-Ambiguität | service 当名词还是动词, 树就不同.
+
+D natsprache | In der Computerlinguistik beschreiben, modellieren und verarbeiten wir natürliche Sprache, nicht Programmier-, Logik- oder Kunstsprachen.
+X natsprache | 课件没有给自然语言下严格定义: 手语、动物交流、拉丁语、世界语 (Esperanto) 都打着问号, 「符号 (词汇) 加规则 (语法) 来传递意义」也没有被当成定义. 实际研究主要集中在英语、德语和大约另外 100 种语言, 类型学覆盖很差.
+S natsprache | grenzfall | 边界情况 |  | 手语、世界语、死语言算不算, 课件留作问题.
+S natsprache | abdeckung | 类型学覆盖 |  | 研究集中在约 100 种语言, 大多数语言没有资源.
+
+D wortkrit | Der Begriff „Wort“ ist ungenau; orthographische, phonologische, morphologische, morphosyntaktische und semantische Kriterien haben jeweils Ausnahmen.
+X wortkrit | 判定「词」有六种标准, 每条都有反例: 正字法 (orthographisch, 空格之间, 但有可分动词 kauft … ein); 音系 (phonologisch, 统一重音: Wienerwald vs. Wiener Wald); 形态 (morphologisch, 不能被打断且能屈折, 但 Im- und Export); 形态句法 (morphosyntaktisch, 句中可调位的最小单位); 语义 (semantisch, 最小意义单位, 但 der rote Faden); 母语者直觉 (Intuition, 循环定义). 结论: 「词」是一个原型概念, 还因语言而异 (business trip vs. Dienstreise).
+S wortkrit | ortho | 正字法标准 | Orthographisches Kriterium | 空格之间的字母串; 用词定义空格又用空格定义词, 是循环的.
+S wortkrit | phono | 音系标准 | Phonologisches Kriterium | 词有统一的重音结构: WIENerwald vs. Wiener WALD.
+S wortkrit | morphk | 形态标准 | Morphologische Kriterien | 不能被别的词汇单位打断, 且统一屈折.
+S wortkrit | msynk | 形态句法标准 | Morphosyntaktisches Kriterium | 句中可调位的最小单位; *das Haus kleine.
+S wortkrit | semk | 语义标准 | Semantische Kriterien | 最小的意义单位; 习语 der rote Faden 是反例.
+S wortkrit | intuit | 母语者直觉 | Intuition des Muttersprachlers | 「母语者认得出的词」是循环定义.
+S wortkrit | recht | 拼写规则 | Rechtschreibregeln | Rad fahren / radfahren: 分写连写本身就说明词界不稳.
+
+D wfl | Wortform: flektierte Form eines Wortes, wie sie im konkreten Text vorkommt; Lexem: Menge lexikalisch äquivalenter Wortformen.
+X wfl | Wortform 是句子里实际看到的那个屈折形式 (schönes, sings); Lexem 是一组词汇上等价的词形, 词典用引用形式 (Zitierform, 也就是 Lemma) 来指它: 动词用不定式, 名词用主格单数. 数 type 时按词形还是按词位, 结果不同.
+S wfl | zitier | 引用形式 | Zitierform / Lemma | 词典里查的那个形式: gehen, Stuhl.
+S wfl | flektiert | 屈折形式 | Flektierte Form | 文本里的具体形式: ging, Stühle.
+
+D tt | Token: konkretes Vorkommen einer Wortform; Type: Klasse von Token, die als gleich angesehen werden.
+X tt | eine Rose ist eine Rose ist eine Rose 有 11 个 token. 按词形 (Wortform) 算 type: Rose 和 Rosen、eine 和 einen 不同, 得 9 个; 按词位 (Lexem) 算, 再并掉 2 个, 得 7 个. 练习里还要决定 New York 算 1 个还是 2 个 token、可分动词 kauft … ein 怎么算. 符类符例比 (Type-Token-Verhältnis) 用重复程度刻画文本.
+S tt | gleichk | 相同判定标准 | Gleichheitskriterien | 按词形还是按词位, type 数不同.
+S tt | ttr | 符类符例比 | Type-to-Token Ratio | type 数除以 token 数, 衡量词汇丰富度.
+S tt | mwe | 多词单位 | Mehrwortausdrücke | New York、aus dem Häuschen 可收成 1 个 token.
+
+D achsen | Syntagmatische Achse: Kombination von Einheiten in einer Reihe; paradigmatische Achse: Austauschbarkeit an derselben Stelle.
+X achsen | 组合轴 (syntagmatisch) 看一行里谁和谁挨着、怎样组成更大的单位 (Syntagma): Hans ist Subjekt zu liest. 聚合轴 (paradigmatisch) 看同一位置上哪些词能互相替换: Die Studentin / Ein Student / Hans. 后面的成分测试 (替换测试) 用的就是聚合关系.
+S achsen | syntagma | 句段 | Syntagma | 还能切开的复杂语言单位.
+S achsen | synrel | 组合关系 | Syntagmatische Relation | 同一行里的关系: 主语—谓语.
+S achsen | parrel | 聚合关系 | Paradigmatische Relation | 同一列里可替换的候选.
+
+D distr | Distribution: Menge der Kontexte, in denen ein Zeichen Z vorkommt.
+X distr | 分布 (Distribution = Verteilung) 记的是一个符号左右允许什么, 先不管它的词典意义. zwischen 几乎只出现在「zwischen + 名词短语」的环境里. 形态学里语素变体呈互补分布 (komplementäre Distribution): Stühl- 只出现在复数里. 词类划分也可以看分布.
+S distr | kontexte | 上下文集合 |  | 符号出现时左右允许的环境.
+S distr | kompl | 互补分布 | Komplementäre Distribution | 两个变体的出现环境互相排斥.
+
+D wohl | Ein Ausdruck heißt wohlgeformt, wenn er laut Intuition der Sprecher ein gültiger Ausdruck der Sprache ist.
+X wohl | 合式性 (Wohlgeformtheit) 和「讲得通」不是一回事: Colorless green ideas sleep furiously 语法合格、意思不通. 语言学的主要兴趣是描写 (deskriptiv: 说明实际情况), 不是规定 (präskriptiv: 规定应该怎么说). 句法的理论视角就是描述哪些句子合格.
+S wohl | deskr | 描写 | Deskriptivität | 记录说话人实际怎么说.
+S wohl | praeskr | 规定 | Präskriptivität | 规定应该怎么说, 不是语言学的主要兴趣.
+S wohl | stern | 星号 | Asterisk * | 标出不合格的句子: *Der Löwe schläft das Buch.
+
+D zeichen | Das semiotische Dreieck zerlegt die Kommunikation mit Zeichen in Ausdrucksseite (symbol), Inhaltsseite (thought) und Referent.
+X zeichen | 以 Baum 为例: 表达面 (Ausdrucksseite, symbol) 是听见的声音或字母; 内容面 (Inhaltsseite, thought) 是概念「树」; 所指 (Referent) 是现实中的那棵树. 表达和内容的联系是任意的 (Arbitrarität): 声音里推不出意义, 只靠规约 (Konventionalität) 维持. 拟声词 (Lautmalerei) 是不完全任意的例外, 但仍有规约: 各语言的狗叫声不一样.
+S zeichen | arbitr | 任意性 | Arbitrarität | 意义不能从形式的性质推出.
+S zeichen | konvent | 规约性 | Konventionalität | 形式和意义的联系靠语言社团约定.
+S zeichen | lautmal | 拟声 | Lautmalerei | 完全任意性的例外, 规约性仍在.
+
+D morphem | Morphem: abstrakte kleinste bedeutungstragende Einheit; Morph: konkrete Realisierung als Phonem- oder Graphemfolge.
+X morphem | 语素 (Morphem) 写在花括号里, 如 {Stuhl}; 它的具体形式是语子 (Morph): Stuhl 和 Stühl. 同一语素的不同语子叫语素变体 (Allomorphe). 梅里丘克 (Mel’čuk) 的定义: 语素是一组语子, 要求意义相同、类别相同 (都是词根或都是词缀)、呈互补分布. 少量语素按规则组合出大量词形, 呼应洪堡的「有限手段的无限运用」.
+S morphem | morph | 语子 | Morph | 语素的具体实现.
+S morphem | allomorph | 语素变体 | Allomorph | 同一语素的不同形式: Stuhl / Stühl.
+S morphem | melcuk | 梅里丘克三条件 | Mel’čuks Definition | 意义同、类别同、互补分布.
+S morphem | humboldt | 有限手段的无限运用 | Infinite use of finite means | 有限的语素和规则组合出无限的表达.
+
+D frei | Freies Morphem: kann ohne andere Morpheme ein Wort bilden; gebundenes Morphem: muss sich an andere Morpheme anlehnen.
+X frei | 自由语素 (freies Morphem) 能单独成词: {Garten}、{book}. 黏着语素 (gebundenes Morphem) 必须附着: {ver-}、属格 {-s}. 复合词里的连接成分 (Fugenelement, 如 Straße-n-bahn 的 -n) 课件不算语素, 方括号表示法里写在括号外面.
+S frei | freim | 自由语素 | Freies Morphem | 单独就能成词: {Zwerg}.
+S frei | gebm | 黏着语素 | Gebundenes Morphem | 只能附在别的语素上: {-heit}.
+S frei | fuge | 连接成分 | Fugenelement | 复合词中间的 -n-、-s-, 不是语素.
+
+D affix | Affix: gebundenes Morphem, das verschiedene Basen in analoger Weise modifiziert (reihenbildend); Basis: jede Form, an die ein Affix tritt.
+X affix | 词缀 (Affix) 能成系列: -bar 加在一串动词后 (lesbar, trinkbar). 基础 (Basis) 是任何能加词缀的形式, 词根 (Wurzel) 是去掉所有词缀后剩下的部分, 两者交叉. 按位置分前缀、后缀、中缀 (fan-bloody-tastic)、环缀 (ge-…-t). 词的结构由组合规则决定: -atic 接名词, un- 不接名词, 所以 unsystematic = [un [system atic]]; 可以画成二叉树.
+S affix | wurzel | 词根 | Wurzel | 去掉所有词缀后剩下的、带词汇意义的部分.
+S affix | position | 四种位置 | Präfix, Suffix, Infix, Zirkumfix | 前、后、中、环四类.
+S affix | baum | 词结构树 | Wortstrukturbaum | 每次切一刀, 递归到词根.
+S affix | regeln | 组合规则 | Regeln der Wortstruktur | 词缀只接特定词类的基础, 由此确定树形.
+S affix | wstruk | 切分方法 | Bestimmung der Wortstruktur | 检验中间部分是否为可能的基础; 多解即歧义 (unlockable).
+
+D flexion | Flexion: Markierung grammatischer Kategorien wie Tempus, Person, Kasus und Numerus an Wortformen desselben Lexems.
+X flexion | 屈折 (Flexion) 只产生同一词位的不同词形, 不产生新词. 三种: 变位 (Konjugation, 动词: 人称、数、时态、语式、语态)、变格 (Deklination, 名词/代词/形容词/冠词: 格、性、数)、比较 (Komparation, 形容词). 一个词的全部屈折形式排成变化表 (Paradigma). 德语本族屈折后缀只用六个音位 /e, m, n, r, s, t/, 所以形式合并 (Synkretismus) 很多: Mensch 八格里七个是 Menschen.
+S flexion | paradigma | 变化表 | Paradigma | 一个词按格、数等列出的全部词形.
+S flexion | konj | 变位 | Konjugation | 动词按人称、数、时态、语式变化.
+S flexion | dekl | 变格 | Deklination | 按格、性、数变化.
+S flexion | kompar | 比较 | Komparation | klein – kleiner – am kleinsten.
+S flexion | synkr | 形式合并 | Synkretismus | 不同语法值用同一形式: tried.
+S flexion | sechs | 六个音位 | /e, m, n, r, s, t/ | 德语本族屈折后缀全由这六个音位组成.
+
+D derivation | Derivation: Bildung eines neuen Wortes aus Basis und Derivationsaffix, mit oder ohne Änderung der Wortart.
+X derivation | 派生 (Derivation) 产生新词位. 改变词类叫 klassenverändernd (frei → Freiheit, lesen → lesbar), 不改变叫 klassenerhaltend (klar → unklar). 屈折和派生是连续统 (Inflection-derivation continuum) 的两端: 课件给出 11 条区分标准, 如与句法相关、必须表达、适用不受限、不产生新概念.
+S derivation | klver | 改变词类的派生 | Klassenverändernde Derivation | Sache → sachlich.
+S derivation | klerh | 保持词类的派生 | Klassenerhaltende Derivation | Großvater → Urgroßvater.
+S derivation | kont | 屈折—派生连续统 | Inflection-derivation continuum | 两者不是两类, 而是一条连续统的两端.
+
+D komposition | Komposition: rekursive Kombination von Wurzeln bzw. Basen zu einem neuen Wort.
+X komposition | 复合 (Komposition) 把两个词干组合, 每个词干还能再切: Straßenbahnfahrerin. 按结果分名词复合 (Straßenbahn)、动词复合 (standhalten)、形容词复合. 通常最后一部分 (Determinatum) 决定词类和性. 德语复合词多, 形态分析 (自动拆分复合词) 对德语 NLP 尤其重要, Staubecken 这种切分歧义就出在这里.
+S komposition | nomk | 名词复合 | Nominalkomposition | [Straße]n[bahn].
+S komposition | verbk | 动词复合 | Verbalkomposition | pressschweißen.
+S komposition | rekk | 递归复合 | Rekursive Komposition | 词干本身可以再是复合词.
+
+D lemma | Lemmatisieren ordnet eine Wortform ihrem Lemma (Zitierform) zu; Stemming schneidet nur Endungen nach Regeln ab.
+X lemma | 词形还原 (Lemmatisierung) 需要词典和形态知识: ging → gehen, Stühle → Stuhl; 词类不同, 基本形式也不同 (runde → runden 或 rund), 所以要先做词性标注. 词干提取 (Stemming) 是简化替代: 不查词典, 按规则砍词尾, 得到的「词干」不一定是词 (processing → process). 另外几种形态过程: 元音交替 (Ablaut: sing – sang – gesungen)、变音 (Umlaut: Maus – Mäuse)、民间词源 (Volksetymologie: Hängematte)、语法化 (Grammatikalisierung: -lich 原是独立的词).
+S lemma | lemmat | 词形还原 | Lemmatisierung | 需要词典: ging → gehen.
+S lemma | stemm | 词干提取 | Stemming | 按规则砍词尾, 结果未必是词.
+S lemma | ablaut | 元音交替 | Ablaut | 换词干元音表时态: sing – sang.
+S lemma | umlaut | 变音 | Umlaut | a/o/u → ä/ö/ü: Maus – Mäuse.
+S lemma | volket | 民间词源 | Volksetymologie | 外来词按本族语素重新解读: Hängematte.
+S lemma | grammat | 语法化 | Grammatikalisierung | 实词变虚词、自由语素变黏着: -lich.
+
+D fsa | Ein endlicher Automat besteht aus Zuständen und beschrifteten Kanten; eine Zeichenkette wird akzeptiert, wenn ein Pfad vom Start- zu einem Endzustand führt.
+X fsa | 课件用一台自动机描述德语形容词词干后能接什么: 1 → 2 选级别 (比较级 er、最高级 st 或原级 ε), 2 → 4 加格词尾 (e, em, en, er, es). ε 边不读字符. SMOR (Stuttgart Morphology, Helmut Schmid) 把这种做法扩展到整个德语: 词典加屈折、派生、复合规则, 编译成有限状态转换器 (Transducer), 输入词形, 输出分析标签.
+S fsa | zustand | 状态与边 |  | 沿带标签的边读字符.
+S fsa | epsilon | 空转移 | ε | 不读字符就能走的边.
+S fsa | smor | SMOR | SMOR | 德语有限状态形态分析器.
+
+D wortart | Wortarten (lexikalische bzw. syntaktische Kategorien, Part-of-Speech): Klassen von Lexemen mit gleichen syntaktischen Eigenschaften.
+X wortart | 四个说法指同一件事: Wortart、lexikalische Kategorie、syntaktische (Wort-)Kategorie、Part-of-Speech (POS). 为什么需要: 很多句法规则只对某一类词位成立 (冠词 + 形容词 + 名词组成 NP), 先分类规则才能概括; 同一个词形可能属于不同词类 (Time flies like an arrow), 要在上下文里确定. 课件分十个传统词类, 每类有德语本族名 (Hauptwort, Zeitwort …).
+S wortart | zehn | 十个词类 |  | 名、动、形、冠、代、数、副、介、连、叹 (加小品词).
+S wortart | verbk2 | 三类特殊动词 | Besondere Verbklassen | 系动词、情态动词、支撑动词结构各有特殊性.
+S wortart | partizip | 分词 | Partizip | 像动词 (指派格、继承论元) 又像形容词 (变格).
+S wortart | adpos | 附置词 | Adposition | 前置词、后置词 (zuliebe)、环置词 (um … willen).
+
+D kriterien | Wortarten werden nach morphologischen (flektierbar, konjugierbar, deklinierbar, komparierbar) und syntaktischen Kriterien klassifiziert.
+X kriterien | 词位是开放列表, 列举不完, 所以要有标准. 形态: 可屈折的 (名、形、代、数、动、冠) vs. 不可屈折的 (介、连、小品词). 可屈折的按二叉树逐层问: 能变位 → 动词; 能变格又能比较 → 形容词; 能带冠词 → 名词. 不可屈折的问: 能独立成句 → 叹词; 能单独充当句子成分 → 副词; 要求格 → 介词. 其他标准还有语义 (实义/虚义)、能产性 (开放/封闭)、能否指派格 (Kasuszuweisung).
+S kriterien | flekt | 可否屈折 | flektierbar | 第一刀: 能不能变形.
+S kriterien | entsch | 决策树 |  | 变位 → 比较 → 带冠词 → 独立成分, 逐层二分.
+S kriterien | kasusz | 能否指派格 | Kasuszuweisung | 动词四格都能指派, 介词没有主格.
+
+D oc | Offene Klassen können durch Wortbildungsregeln jederzeit erweitert werden; geschlossene Klassen sind im Prinzip aufzählbar.
+X oc | 开放词类: 动词 (googeln)、名词 (Klimakleber)、形容词、副词. 封闭词类: 介词、冠词、连词, 新介词几百年才出现一个. 副词算不算开放类, 教材不一致: 英语副词可以用 -ly 大量派生, 德语副词能产性弱得多.
+S oc | offen | 开放词类 | Offene Klassen | 可以随时扩充.
+S oc | geschl | 封闭词类 | Geschlossene Klassen | 原则上列举得完.
+
+D autosyn | Autosemantika haben eine eigene lexikalische Bedeutung; Synsemantika erhalten ihre Bedeutung erst in Verbindung mit anderen Wörtern.
+X autosyn | 实义词 (Autosemantika): 名词、形容词、副词、实义动词, 单独拿出来也能理解. 虚义词 (Synsemantika): 助动词 sein, haben, werden (ich habe gegessen 里的 habe 只表时态)、不定式标记 zu. 代词、介词、冠词放不进这个二分, 所以语义标准不单独使用. UD 的实词优先 (Primacy of Content Words) 就建立在这个区分上.
+S autosyn | auto | 实义词 | Autosemantika | 自带词汇意义.
+S autosyn | syn | 虚义词 | Synsemantika | 主要表达语法功能.
+
+D valenz | Verben werden nach ihrer Stelligkeit (Anzahl der geforderten Ergänzungen) in Valenzklassen eingeteilt.
+X valenz | 价数 (Stelligkeit) 是动词要求的补足语个数: 零价 (es regnet)、一价 (schläft)、二价 (sieht den Mann)、三价 (gibt ihm das Buch). 动词还决定补足语的格 (helfen + 与格, gedenken + 属格) 和与主语的一致 (Kongruenz). 短语结构语法里配价写成次范畴化 (Subkategorisierung), 用来避免过度生成.
+S valenz | stell | 价数 | Stelligkeit | 补足语的个数.
+S valenz | kongr | 一致 | Kongruenz | 定式动词和主语在人称、数上一致.
+S valenz | subkat | 次范畴化 | Subkategorisierung | 词条写明动词要什么补足语.
+
+D wechsel | Wörter können die Wortart wechseln, und dieselbe Wortform kann mehreren Wortarten angehören.
+X wechsel | 三类难点: 词类转换 (Wortartwechsel: das Leid → leidtun 里的 leid; ein klasse Buch 里的 klasse 像形容词却不变格)、多词类 (Mehrfachzugehörigkeit)、缩合 (Verschmelzung: zum = zu + dem). 数词和 viel 的表现也参差不齐: ein 像冠词变格, zwei 有属格 zweier. 这些正是词性标注要解决的问题.
+S wechsel | konv | 词类转换 | Wortartwechsel | Leid → leid.
+S wechsel | versch | 缩合 | Verschmelzung | zum, ins: 介词和冠词融为一词.
+S wechsel | zahlw | 数词的难点 | Zahlwörter | ein、zwei、tausend 变格方式各不相同.
+
+D postag | POS-Tagging: automatische Bestimmung der Wortart jedes Wortes in einem Text, eine Art der Annotierung.
+X postag | 结果写成「词/标签」: Opa/NN erzählte/VVFIN eine/ART Geschichte/NN (德语 STTS 标签集). 能做的原因: 词类也告诉我们邻居可能是什么 (物主代词后多是名词). 方法: 基于规则 (regelbasiert) 或统计 (如隐马尔可夫模型 HMM, 见 SMIS). 工具有 MarMoT、TreeTagger 等. 用途: 词形还原、句法分析、机器翻译、信息抽取, 是最常用的预处理步骤.
+S postag | stts | STTS 标签集 | STTS | 德语常用标签: NN, VVFIN, ART.
+S postag | regel | 基于规则 | Regelbasiert | 人写的规则, 如「冠词后不接动词」.
+S postag | statist | 统计方法 |  | 找最可能的标签序列.
+
+D synfunk | Syntaktische Funktion: grammatikalische Relation zwischen zwei Ausdrücken, bestimmt durch morphologische Markierung und/oder strukturelle Position.
+X synfunk | 德语主要靠格 (主格 = 主语), 所以词序较自由 (Den Mann sieht der Hund); 英语几乎没有格, 只能靠位置. 六种句法功能: 谓语、主语、宾语 (含介词宾语)、表语 (Prädikativ)、状语、定语. 重要区分: 词类 ≠ 句法功能: 同一功能 (状语) 可以由形容词、副词、介词短语甚至从句实现.
+S synfunk | markier | 形态标记 | Morphologische Markierung | 德语用格标出功能.
+S synfunk | position | 结构位置 | Strukturelle Position | 英语用词序标出功能.
+S synfunk | praedv | 表语 | Prädikativ | 系动词后赋予主语或宾语性质: Kerstin ist Informatikerin.
+
+D subj | Das Prädikat ist das Hauptverb; das Subjekt steht im Nominativ und kongruiert mit dem finiten Verb; Objekte sind Verbergänzungen im Akkusativ, Dativ oder Genitiv.
+X subj | 找主语: 用 Wer? Was? 提问、主格、和定式动词一致. 主语也可以是从句 (Mich wundert, dass das funktioniert). 德语几乎总要有句法主语, 语义上空的叫虚位词 (Expletivum): Es regnet. 宾语的格由动词决定 (essen + 宾格, helfen + 与格). 介词宾语 (Präpositionalobjekt) 是动词固定要求的, 介词常常语义上是空的: bestehen aus.
+S subj | praed | 谓语 | Prädikat | 主要动词, 对主语作陈述.
+S subj | expl | 虚位词 | Expletivum | 语义空的形式主语 es.
+S subj | pobj | 介词宾语 | Präpositionalobjekt | 动词固定要求的介词补足语: warten auf.
+S subj | objs | 宾语的格 | Akkusativ-, Dativ-, Genitivobjekt | 由动词决定.
+
+D adv | Adverbiale bestimmen Verb oder Satz näher, meist semantisch klassifiziert; Attribute sind Beifügungen zur näheren Bestimmung eines Substantivs.
+X adv | 状语 (Adverbiale) 按语义分时间、地点、方式、原因 (Wann? Wo? Wie? Warum?). 自由说明语 (freie Angaben) 可以任意增删: Er arbeitet (am Wochenende) (gern); 必需的状语补足语不能删: Ich fühle mich gut. 定语 (Attribut) 只能随它修饰的名词一起移动, 七种类型: 形容词、分词、介词、属格、同位语、关系从句、副词定语.
+S adv | semkl | 语义分类 | Temporal, lokal, modal, kausal | 时间、地点、方式、原因.
+S adv | freiang | 自由说明语 | Freie Angaben | 几乎可以加到任何动词上, 也能删.
+S adv | attrtyp | 定语类型 | Attributtypen | 形容词、分词、介词、属格、同位语、关系从句等.
+
+D dep | Dependenzrelationen beschreiben die Abhängigkeiten im Satz anhand binärer Relationen zwischen Wortformen: Regens (Kopf) und Dependent.
+X dep | 依存结构里只有词, 没有 NP、VP 这样的短语节点. 四条性质保证得到一棵树: 动词在中心 (root); 每个词形恰好有一个支配词 (Regens), 根除外; 每个词可以有零个或多个从属词 (Dependent). 画树步骤: 多词短语先找内部的支配词 (die alte Katze → Katze), 再让它依附动词. 箭头从支配词指向从属词, 边上写关系名.
+S dep | regens | 支配词 | Regens / Kopf | 一对词里句法上的「主人」.
+S dep | dependent | 从属词 | Dependent | 依附于支配词的词.
+S dep | root | 根 | Root | 中心动词, 没有支配词.
+S dep | wpaar | 确定词对 | Bestimmung der Wortpaare | 短语先找内部中心, 再挂到动词上.
+S dep | dbaum | 依存树 | Dependenzbaum | 词排成一行, 弧线写关系名.
+
+D ud | Universal Dependencies: sprachübergreifendes Inventar von Dependenzrelationen und Annotationsrichtlinien.
+X ud | 关系名由从属词的词类和/或句法功能拼成: det (限定词)、aux (助动词)、nsubj (名词性主语 = n + subj)、obj、obl (旁格)、case、amod、advmod、mark、cop. UD v2 共 37 个关系, 课件要求掌握 17 个. 写法: 支配词 →关系→ 从属词, 例 schläft →nsubj→ Katze.
+S ud | benenn | 命名方式 | Benennung | 词类 + 功能: nsubj = nominal + subject.
+S ud | must17 | 必须掌握的 17 个 |  | nsubj, obj, iobj, obl, det, case, aux …
+S ud | case | case 关系 | case | 介词作为格标记挂在名词下面.
+
+D primacy | Dependenzrelationen bestehen primär zwischen Inhaltswörtern; Funktionswörter hängen von Inhaltswörtern ab.
+X primacy | Ich habe getrunken: UD 里支配词是实义动词 getrunken, 助动词 habe 是从属词 (aux), 和传统德语语法相反. 介词短语 warten auf den Bus: UD 让 Bus 依附动词, auf 用 case 挂在 Bus 下; 句法动机的体系 (如最初的 Stanford Dependencies) 让介词当中心. 实词优先的好处是跨语言平行: 英语 the dog chased the cat from the room 和芬兰语四个词的句子, 实词之间的树一样.
+S primacy | syntmot | 句法动机 | Syntaktisch motiviert | 按分布、一致、支配定中心, 功能词当支配词.
+S primacy | semmot | 语义动机 | Teils semantisch motiviert | 实词当中心, 利于跨语言比较.
+S primacy | finn | 芬兰语化 | Finnishization of English | 去掉功能词后英语和芬兰语的树相同.
+
+D deppraxis | Dependenz-Parser erzeugen automatisch Dependenzbäume; sie basieren meist auf statistischen Modellen und machen Fehler.
+X deppraxis | 信息抽取 (Informationsextraktion) 的三步: 自动依存分析、在树上找两个实体之间的最短路径、和已知模式比对 (Müller → appos → Chef). 分析器从所有可能的树里选概率最大的一棵, 可能的树随句长爆炸增长. 按边计准确率通常 90% 或以下, 20 个词的句子很可能有错. 用工具时要知道它的形式体系 (介词、助动词当不当中心).
+S deppraxis | ie | 信息抽取 | Informationsextraktion | 依存路径连接实体.
+S deppraxis | parser | 依存分析器 | Dependenz-Parser | Stanford Parser、CoreNLP.
+S deppraxis | fehler | 错误率 |  | 按边准确率约 90% 或以下.
+
+D konst | Konstituenten: Gruppen von Wörtern, die im Satz als Einheit fungieren; der Satz ist nur mittelbar aus Wörtern gebaut.
+X konst | 成分语法 (Konstituentengrammatik ≈ Phrasenstrukturgrammatik) 认为词先组成成分, 成分再组成句子, 一个词也可以是成分. 可以写成嵌套括号 (Schachtelstruktur) [[Die Katze] [schläft nicht]] 或成分树. 不能再拆的叫终端成分 (terminale Konstituenten). 句子本身的定义有困难: 合语法的词串、话语单位、韵律单位、命题都不完全对 (Vorsicht! 没有动词).
+S konst | schachtel | 嵌套括号 | Schachtelstruktur | 每对方括号是一个成分.
+S konst | terminal | 终端成分 | Terminale Konstituenten | 单个的词.
+S konst | satzdef | 句子的定义 | Was ist ein Satz? | 命题、述谓性等定义各有例外.
+S konst | fuegung | 从属与并列组合 | Wortfügung & Wortreihung | kleines Kind 是从属, Hund und Katze 是并列.
+
+D tests | Konstituententests prüfen, ob eine Wortfolge eine Konstituente ist: Ersetzung, Pronominalisierung, Frage, Koordination, Verschiebung, Weglassung.
+X tests | 八种测试: 替换 (Ersetzungstest)、代词化 (Pronominalisierung: Tine und Jakob → sie)、提问 (Fragetest: Womit? – Mit dem alten Piratenmesser)、并列 (Koordination: up the hill and up the stairs)、移位 (Verschiebetest: 德语前场只放一个成分)、删除 (Weglasstest)、分裂句 (Spaltsatz: It was John who …)、主被动转换. 每种都有严格和宽松解释, 结论会不同 (du kochst 按严格替换就测不出来), 所以单个测试不足以证明.
+S tests | ersetz | 替换测试 | Ersetzungstest | 能互相替换的词串可能是成分.
+S tests | pronom | 代词化测试 | Pronominalisierungstest | 能被代词替换的是成分.
+S tests | frage | 提问测试 | Fragetest | 能被提问并单独作答的是成分.
+S tests | koord | 并列测试 | Koordinationstest | 能用 und 并列的是成分.
+S tests | versch | 移位测试 | Verschiebetest | 能整体挪动 (如移到前场) 的是成分.
+S tests | weglass | 删除测试 | Weglasstest | 能整体删掉的是成分; 省略结构是宽松解释.
+S tests | spalt | 分裂句 | Spaltsatz | It was X who …: X 是成分.
+S tests | aktpass | 主被动转换 | Aktiv-Passiv-Konversion | 转换时整体换位的是成分.
+S tests | strikt | 严格与宽松解释 | Strikte vs. großzügige Interpretation | 同一测试解释不同, 结论不同.
+
+D kopf | (Fast) jede Konstituente enthält einen obligatorischen Kopf, der den Typ der Konstituente und ihre interne Struktur bestimmt.
+X kopf | 中心语 (Kopf, head) 有两个作用: 对外决定整个成分的类型和能出现的位置 (外部分布), 对内决定成分里还要什么 (schenken 要两个宾语, 单数可数名词 Kind 要限定词). 每个短语 = 中心语 + 被它支配的可选成分, 中心语的范畴就是短语的范畴.
+S kopf | extern | 对外: 分布 | Externe Distribution | 决定成分能放在句子的什么位置.
+S kopf | intern | 对内: 补足语 | Interne Struktur | 决定成分里需要哪些成分.
+
+D phrasen | Nach dem Kopf unterscheidet man Nominal-, Verbal-, Adjektiv-, Adverb- und Präpositionalphrasen.
+X phrasen | NP (das Kind, die sehr frechen Kinder)、AP (sehr stolz auf seinen Sohn)、VP (中心是动词, 内部是动词要求的补足语, 不含主语)、AdvP、PP (介词决定后面 NP 的格: mit + 与格; entlang 后置时支配宾格). 成分树的节点可以换成范畴符号, 单词上面再加一层词类: [S [NP [Det Der] [N Löwe]] [VP …]]. 短语范畴 (S, NP, VP) 和前终端串 (词类层) 是两层.
+S phrasen | np | 名词短语 | Nominalphrase | 中心是名词.
+S phrasen | vp | 动词短语 | Verbalphrase | 中心是动词, 不含主语.
+S phrasen | pp | 介词短语 | Präpositionalphrase | 介词支配后面名词短语的格.
+S phrasen | kbaum | 带范畴的成分树 | Konstituentenbaum mit Kategorien | 节点写范畴符号, 词上加词类.
+S phrasen | praeterm | 前终端串 | Präterminale Kette | 词类那一层: Det N V P Det N.
+
+D psgr | Eine Phrasenstrukturgrammatik (kontextfreie Grammatik) beschreibt die Konstituentenstruktur durch Ersetzungsregeln.
+X psgr | 树里每一次拆分都是一条改写规则 (Ersetzungsregel): S → NP VP. 格式 X → (W) Y (Z): 左边恰好一个输入符号, 括号里的输出符号可选, 例 NP → (Det) (AP) N. 狮子那句只要四条规则 (S → NP VP, NP → Det N, VP → V PP, PP → P NP); 再加词库规则 (Lexikonregeln: N → Käfig) 做词汇插入, 就能生成具体句子. 推导时每步改写最左边的非终端符号.
+S psgr | ersetz | 改写规则 | Ersetzungsregel | 小树「S 下面是 NP VP」写成 S → NP VP.
+S psgr | schema | 规则格式 | Schema X → (W) Y (Z) | 左边一个符号, 括号表示可选.
+S psgr | lexikon | 词库规则 | Lexikonregeln | 词类 → 单词: N → Käfig.
+S psgr | ableit | 推导 | Ableitung | S ⇒ NP VP ⇒ Det N VP ⇒ ….
+
+D rek | Rekursion: phrasale Gruppen können Konstituenten derselben phrasalen Kategorie enthalten.
+X rek | 直接递归: 规则右边出现左边的符号, NP → Det N NP: Die Farbe [der Augen [der Tochter [des Pianisten]]]. 间接递归: 经过别的规则绕回来, S → NP VP, VP → V S: glauben, dass … hofft, dass …. 要让递归停下, 文法里必须有不递归的规则. 有限规则因此能生成无限多的句子.
+S rek | direkt | 直接递归 | Direkte Rekursion | NP → Det N NP.
+S rek | indirekt | 间接递归 | Indirekte Rekursion | S → NP VP, VP → V S.
+
+D ueber | Übergenerierung: die Grammatik erzeugt auch ungrammatische Sätze.
+X ueber | 只靠 VP → V PP, 文法会造出 *Der Löwe schläft aus dem Käfig (schlafen 不带方向补足语) 和 *Der Löwe springen aus den Käfig (一致和格都错). 三种对策: 更细的范畴 (V_intrans, V_trans, 但规则数成倍增长); 词条带特征 (Numerus, Person, Kasus), 规则要求特征相容 (合一语法, HPSG、LFG); 概率 (允许过度生成, 但让不合理的分析得分很低, 即 PCFG).
+S ueber | feinkat | 更细的范畴 | Komplexere Kategorien | V 分成及物、不及物.
+S ueber | merkmal | 特征 | Merkmale | 规则要求特征相容.
+S ueber | prob | 概率 |  | 给规则配概率, 不合理分析得分低.
+
+D perk | Kopf-Perkolation: ein Kopf wird je nach Phrasentyp von einer Ebene zur nächsten weitergereicht, festgelegt in einer Kopftabelle.
+X perk | 中心语表 (head table): S 的中心 = VP 的中心, VP = V, NP = N, PP = P. 自底向上算: S(springt) → VP(springt) → PP(aus) → NP(Käfig). 带中心语标注的成分树可以机械地转成依存树: 每个成分里, 中心词作支配词, 没有把中心传上来的子成分的中心词作从属词. 成分树和 UD 树的差别正出在功能词: 成分树里 must、to、when 是中心, UD 里它们是 aux、case、mark.
+S perk | kopftab | 中心语表 | Kopftabelle | 每类短语从哪个子节点取中心.
+S perk | konvert | 成分树转依存树 | Zusammenhang zwischen Konstituenz und Dependenz | 非渗透子成分的中心依附成分的中心.
+S perk | auxpp | 功能词的差别 | must, to, when | 成分树里是中心, UD 里是 aux、case、mark.
+S synfunk | ebenen | 句法与音系、语义的相互作用 | Interaktionen von Syntax mit Phonologie, Semantik | 停顿和语调能改变结构: Santa Barbara Miller; Du musst gehen ! / ?
+S subj | satz | 从句作成分 | Subjektsatz, Objektsatz | 主语、宾语可以由从句实现, 从句的动词依附主句动词.

@@ -1,0 +1,557 @@
+# DPNLP1 深层内容. 依据笔记 15 讲整理. 外文是英语 (课件语言).
+# D 概念 | 英语定义   X 概念 | 讲解   S 父概念 | 子 id | 中文 | 外文 | 一句话
+
+D paradigm | Learning paradigms differ in how much labelled data they need: embedding, pre-train and fine-tune, prompting, chatting and agents.
+X paradigm | 分类比较粗, 各类之间也有重叠. 选哪种范式取决于任务本身、数据量和有没有标签. 一条主线贯穿这门课: 从「每个任务都要大量标注数据」走向「海量无标注文本预训练 + 少量标注或干脆不标注」. 嵌入只把文本变成向量; 预训练加微调要少量标注; 提示不更新参数; 对话和智能体是在提示之上的交互方式.
+
+D emb | An embedding maps a discrete unit such as a word or a document to a dense vector, so that similar units get similar vectors.
+X emb | 词可以表示成独热向量: 词表多少词就多少维, 只有一维是 1. 这样任意两个词的向量都正交, 同义词也测不出相似. 文档可以表示成词袋, 只数每个词出现几次. 稠密嵌入把词或文档压到几百维的实数空间, 相似的东西离得近, 于是能用余弦相似度做文档检索: 把查询和文档都嵌入成向量, 按相似度排序.
+S emb | ohv | 独热向量 | one-hot vector | 两两正交, 表示不了相似.
+S emb | bow | 词袋 | bag-of-words | 只数次数, 不看顺序.
+S emb | retr | 文档检索 | document retrieval | 按嵌入的相似度找文档.
+
+D ptft | Pre-training learns general language knowledge from large unlabelled text with a self-supervised objective; fine-tuning adapts the model to a downstream task with a few labels.
+X ptft | 模型越大需要的数据越多, 而标注数据稀缺又昂贵; 很多语言的书面资源更少. 无标注的文本却到处都是. 预训练用自监督目标 (如预测被遮住的词) 从海量文本学通用知识, 不需要人工标签; 微调再用少量标注数据把模型适配到下游任务. 这是迁移学习的一种: 源任务是预训练目标, 目标任务是下游任务.
+S ptft | sso | 自监督目标 | self-supervised objective | 标签来自数据本身.
+S ptft | dst | 下游任务 | downstream task | 预训练模型要适配的任务.
+
+D prompt | Prompting uses a pre-trained model without fine-tuning: the task description and possibly a few examples are put into the input (zero-shot or few-shot).
+X prompt | 零样本一个标注样本都不用, 少样本只用几个, 而且通常只是放进输入给模型看, 不更新参数. 这时模型完全靠预训练学到的能力完成任务, 好的预训练更关键. 提示工程是手工设计提示的措辞; 提示微调则学一段软提示: 加在输入前的可训练向量, 模型本身冻结.
+S prompt | zs | 零样本 | zero-shot | 不用任何标注样本.
+S prompt | fs | 少样本 | few-shot | 只用几个样本, 放在输入里.
+S prompt | sp | 软提示 | soft prompt | 加在输入前的可训练向量.
+
+D agent | An agent is an LLM that acts in an environment, observes the results and decides on the next step.
+X agent | 更大的模型、更低的延迟让人能和模型多轮对话, 但模型仍是静态的: 对话时参数不变, 它「记得」前文只是因为前面的对话都拼进了当前输入. 智能体更进一步, 不只回答, 而是调用工具、执行操作、观察结果再决定下一步. AgentBench 用终端操作、数据库查询、网页订票等真实任务测它.
+
+D nlptask | NLP tasks can be categorized by their output: language modeling, token-level classification, sequence-level classification, similarity and retrieval, and text generation.
+X nlptask | 低层任务在词或词元层面做判断 (词性标注) 或建模词与词的关系 (句法分析), 本身通常不是最终产品, 而是给后续处理用的语言学分析. 高层任务是用户要的东西: 对整个序列分类 (垃圾邮件、情感)、文档检索、序列到序列生成 (翻译、摘要), 以及信息抽取、文本蕴含、论辩挖掘、问答. 序列级分类的典型做法是 BERT 后接一个前馈网络和 softmax.
+S nlptask | tlc | 词元级分类 | token-level classification | 给每个词元一个标签.
+S nlptask | slc | 序列级分类 | sequence-level classification | 给整段文本一个标签.
+S nlptask | te | 文本蕴含 | textual entailment | 判断句子 A 能否推出句子 B.
+
+D tagging | Sequence tagging assigns one label per word (POS tagging, NER with BIO tags); structure prediction outputs a structure such as a parse tree.
+X tagging | 词性标注是典型的序列标注: 输入 n 个词, 输出 n 个标签 (Penn Treebank 标签集). 经典歧义句 Time flies like an arrow 和 Fruit flies like a banana 表面结构相同, 词性和义项却完全不同, 所以还需要词义消歧. 命名实体常跨多个词, 用 BIO 标注 (开始、内部、外部) 编码成逐词标签, NER 就变成了序列标注. 组块分析只切出平面短语, 句法分析建出完整的树, 两者属于结构预测.
+S tagging | pos | 词性标注 | POS-tagging | 给每个词标词性.
+S tagging | ner | 命名实体识别 | Named Entity Recognition | 用 BIO 标注变成序列标注.
+S tagging | wsd | 词义消歧 | Word sense disambiguation | 判断多义词用的是哪个义项.
+S tagging | parse | 句法分析 | parsing | 输出完整的句法树.
+
+D seq2seq | Sequence-to-sequence models read the input with an encoder and generate an output of different length with a decoder, as in machine translation.
+X seq2seq | 机器翻译经历四个阶段: 基于规则 (双语词典 + 人工语法)、基于实例 (类比相似句子)、统计机器翻译 (IBM 模型)、神经机器翻译. 神经的 seq2seq 用两个 LSTM: 编码器依次读入源句, 读到 <EOS> 后解码器开始逐词输出, 每一步把刚输出的词作为下一步的输入, 直到输出 <EOS>. 当时还有一个技巧: 把源句倒着读, 让开头的词离得更近.
+S seq2seq | mt | 机器翻译 | Machine translation | seq2seq 的典型任务.
+
+D bench | Benchmarks such as GLUE and SuperGLUE compare models on a fixed set of understanding tasks with public leaderboards.
+X bench | GLUE 有 9 个单句或句对的理解任务: CoLA 判断是否合语法 (用 Matthews 相关系数, 适合类别不平衡), SST-2 情感, MRPC 和 QQP 判断复述, STS-B 相似度打分, MNLI、QNLI、RTE、WNLI 做推理. 有公开排行榜, 至今常用. 模型很快在 GLUE 上超过人类, 于是有了更难的 SuperGLUE.
+S bench | glue | GLUE | GLUE | 9 个理解任务的基准.
+S bench | para | 复述 | paraphrase | 意思相同的两个句子.
+
+D lm | A language model is a probability distribution over word sequences; by the chain rule it factorizes into conditional probabilities of the next word.
+X lm | 两种用法: 给整个词序列一个概率, 或者已知前面的词给下一个词一个概率. 用概率的链式法则, 整句概率可以拆成一连串「已知前面所有词, 下一个词是什么」的条件概率之积, 所以给整句打分和预测下一个词是同一件事. 这一个目标贯穿后面所有的模型: n-gram、神经概率语言模型、RNN 语言模型和 GPT.
+
+D ngram | Under the k-th order Markov assumption the next word depends only on the k previous words; n-gram models estimate these probabilities from corpus counts.
+X ngram | 马尔可夫假设: 已知现在, 未来与过去无关. 在 NLP 里就是下一个词只取决于前 k 个词, k 阶马尔可夫模型就是 (k+1)-gram 模型. 基于计数的模型用语料频次估计概率. 问题有两个: 维数灾难, 上下文长度线性增加, 要存的概率指数增加, 词表 10 万时光 bigram 就有 10¹⁰ 种组合; 稀疏性, 绝大多数组合在语料里从未出现, 概率估成 0.
+S ngram | mark | 马尔可夫假设 | Markov assumption | 下一个词只取决于前 k 个词.
+S ngram | cod | 维数灾难 | Curse of dimensionality | 参数随上下文长度指数增长.
+S ngram | spars | 稀疏性 | Sparsity | 多数组合从未出现.
+
+D nplm | The neural probabilistic language model (Bengio et al., 2003) embeds the n−1 previous words, passes them through a nonlinear layer and predicts the next word with a softmax.
+X nplm | 想法是用带非线性的神经网络估计条件概率, 克服计数模型的两个缺陷: 上下文变长时参数只线性增长; 相似的词有相似的向量, 所以泛化更好. 结构: 查表把前 n−1 个词换成向量 (嵌入层就是查找表), 拼接, 过一层 tanh, 再用 softmax 输出整个词表上的分布. 遗留问题是计算代价: 每个样本都要对词表里每个词算分数, O(∣V∣); 解决办法有层次 softmax 和负采样.
+S nplm | lookup | 查找表 |  | 嵌入层按词的 ID 取出一行向量.
+S nplm | hsm | 层次 softmax | hierarchical softmax | 把词表组织成二叉树, 代价降到 O(log ∣V∣).
+
+D w2v | word2vec learns word vectors with a fake prediction task: skip-gram predicts context words from the center word, CBOW predicts the center word from the context.
+X w2v | 独热向量参数爆炸、所有词两两正交, 所以要给每个词学一个 D 维的实数向量. 依据是分布假设: 出现在相似语境里的词意思相近. word2vec 可以先看成一个 bigram 语言模型: 每个词有两套向量, 作为被预测词和作为上下文时各用一套 (否则 P(dog ∣ dog) 很难小). skip-gram 用滑动窗口从文本自动造样本, 由中心词预测周围的词; CBOW 把窗口里上下文向量求和去预测中心词, 求和不看顺序, 所以叫词袋.
+S w2v | dh | 分布假设 | Distributional hypothesis | 语境相似的词意思相近.
+S w2v | sg | Skip-gram | Skip-gram | 由中心词预测上下文.
+S w2v | cbow | CBOW | Continuous bag of words (CBOW) | 由上下文预测中心词.
+
+D negsamp | Negative sampling replaces the full softmax by binary classification between observed context words and randomly sampled noise words.
+X negsamp | 它是噪声对比估计的一个变体. 对每个真实的 (词, 上下文) 对, 再从词表按频率抽 k 个噪声词, 模型只需把真实对判成正、噪声对判成负, 每步计算从 O(∣V∣) 降到 O(k). 注意它改变了目标函数, 训练出来的不再是输出归一化分布的语言模型; 但我们本来只要词向量, 这无所谓.
+S negsamp | nce | 噪声对比估计 | noise contrastive estimation | 通过区分数据和噪声来学习.
+
+D fasttext | fastText represents a word as the sum of its character n-gram vectors, so it can build vectors for unseen words.
+X fasttext | word2vec 已经做到稠密低维、能捕捉相似、有可加的组合性. 没解决的是: 语料再大, 测试时也会碰到没见过的词 (OOV), word2vec 给不出向量; 词形相关的词 (如 teach 和 teacher) 各学各的. fastText 把每个词拆成字符 n-gram (加上词边界符号), 词向量是这些 n-gram 向量之和. 没见过的词只要拆出见过的 n-gram, 就能得到向量.
+S fasttext | oov | 未登录词 | OOV | 词表里没有的词.
+
+D analogy | Analogy mining solves analogies by vector arithmetic in the embedding space, e.g. vec(king) − vec(man) + vec(woman) ≈ vec(queen).
+X analogy | 「东京之于日本, 相当于 ? 之于波兰」: 东京 − 日本 + 波兰 ≈ 华沙. 同理能学到加否定前缀、国名到国籍形容词、动词时态等方向. 说明嵌入空间里某些关系对应固定的方向. 预训练嵌入也可以迁移到下游任务: 冻结或微调; 微调能把情感任务里相近的 good 和 bad 拉开, 但只移动训练集里出现过的词. 还能用于检索的查询扩展.
+S analogy | qe | 查询扩展 | query expansion | 用相似词扩充查询.
+S analogy | usepre | 使用预训练嵌入 | Using pretrained embeddings | 冻结或在任务上微调.
+
+D rnn | A recurrent neural network processes a sequence step by step, updating a state with the same parameters at every time step.
+X rnn | 文本是按顺序写的, 模型也按顺序读. 每个时间步读入一个词嵌入, 用同一组参数把上一步状态和当前输入合成新状态. 普通 RNN 的参数有三个: 输入权重 W、循环权重 V 和偏置, 状态过 tanh. 参数个数和序列长度无关. 应用方式: 每个状态接一个共享的输出层做序列标注; 每步预测下一个词做语言建模; 读完再生成做 seq2seq.
+S rnn | vrnn | 普通 RNN | Vanilla RNN | 输入项加循环项加偏置, 过 tanh.
+S rnn | apps | RNN 的应用方式 | Tagging, language modeling, seq-to-seq | 标注、语言建模和 seq2seq.
+
+D vanish | Gradients in RNNs are products of many Jacobians and therefore tend to vanish or explode for long sequences.
+X vanish | 设损失只在最后一步算. 要求它对较早状态的梯度, 就要从最后一步一步步往回乘雅可比矩阵. 这些矩阵的范数普遍小于 1 时, 乘积指数级变小: 离损失越远的输入影响越小, 模型学不到远距离依赖 (梯度消失). 范数大于 1 时乘积指数级变大 (梯度爆炸), 可以用梯度裁剪, 范数超过阈值就缩放; 梯度消失则要改结构, 如 LSTM.
+S vanish | vg | 梯度消失 | Vanishing gradients | 远处的输入几乎不影响梯度.
+S vanish | eg | 梯度爆炸 | exploding gradients | 梯度指数级变大.
+S vanish | clip | 梯度裁剪 |  | 范数过大时缩放梯度.
+
+D lstm | The LSTM keeps a long-term cell state that is updated through gates, which mitigates vanishing gradients.
+X lstm | Hochreiter 和 Schmidhuber 1997 年提出, 2010 年前后在手写识别、语音识别和 NLP 上流行. 它有两个状态: 短期记忆 h (也是对外输出) 和长期记忆 c (单元状态). 门是 sigmoid 向量, 值在 0 和 1 之间, 逐元素控制信息流: 遗忘门决定旧记忆留多少, 输入门决定候选状态写入多少, 输出门决定读出多少. 单元状态只经加法更新, 梯度可以沿它较少衰减地往回传.
+S lstm | cs | 单元状态 | cell state | LSTM 的长期记忆.
+S lstm | gate | 门 | gate | 逐元素控制信息通过多少.
+
+D birnn | Multi-layer RNNs stack several RNNs; bidirectional RNNs combine a left-to-right and a right-to-left RNN so that each position sees both contexts.
+X birnn | 多层 RNN: 每层有自己的参数, 第 l 层的输入是第 l−1 层的隐状态, 输出可以只用最后一层, 也可以拼接或平均各层. 双向 RNN: 两个参数独立的 RNN, 前向从左读、后向从右读, 每个位置的两个状态分别汇总了左边和右边的词, 拼起来就有整句的上下文. 双向 RNN 适合标注和编码, 但不能直接做语言建模, 因为后向状态已经看到了要预测的词.
+S birnn | multi | 多层 RNN | Multi-layer RNNs | 叠几层, 每层参数独立.
+S birnn | bi | 双向 RNN | Bidirectional RNN | 每个位置同时看到左右文.
+
+D rnnencdec | In an RNN encoder-decoder only the last encoder state is passed to the decoder, which becomes a bottleneck for long inputs.
+X rnnencdec | 编码器读完源句, 只把最后一个状态交给解码器. 只要能写成「输入一个序列, 输出另一个序列」都能用: 摘要、语音识别、问答、图像描述等. 问题是整句源语言的信息都要塞进一个固定长度的向量, 句子越长丢失越多, 翻译质量随句长明显下降. 这正是注意力要解决的问题.
+S rnnencdec | enc | 编码器 | encoder | 把输入读成表示.
+S rnnencdec | dec | 解码器 | decoder | 根据表示生成输出.
+
+D bahdanau | Bahdanau attention lets the decoder compute, at every step, a weighted sum of all encoder states as its context vector.
+X bahdanau | 编码器是一个双向 RNN, 每个源词的表示是前向和后向状态的拼接, 包含整句上下文. 解码器在第 t 步用自己的状态和每个源词表示打分, softmax 得到和为 1 的权重, 把源词表示加权相加得到这一步的上下文向量. 不同的目标词关注不同的源词, 这种软对齐是从数据里学出来的, 不需要对齐标注, 长句上的翻译质量也几乎不降.
+S bahdanau | aw | 注意力权重 | attention weights | 打分经 softmax 归一化.
+
+D attrecipe | Attention in general: a query is scored against each key, the scores are normalized with softmax, and the values are summed with these weights.
+X attrecipe | 原料: 一个查询 (我现在想找什么); J 个键 (每个候选项「我是什么」, 用来和查询比对); J 个值 (真正要取出的内容, 和键一一对应); 一个打分函数. 步骤: 查询和每个键打分, softmax 变成权重, 对值加权求和. Bahdanau 注意力里键和值都是编码器状态, 查询是解码器状态. 打分函数可以是一个小前馈网络, 也可以是点积.
+S attrecipe | q | 查询 | query | 我想找什么.
+S attrecipe | k | 键 | key | 用来和查询比对.
+S attrecipe | v | 值 | value | 真正取出的内容.
+
+D elmo | ELMo trains a bidirectional LSTM language model and uses a task-specific weighted sum of its layer representations as contextual word embeddings.
+X elmo | 训练目标是前向语言模型 (由前面的词预测下一个) 和后向语言模型 (由后面的词预测前一个) 的对数似然之和, 两个方向共享输入层和输出层. 用到下游任务时, 每个词元的 ELMo 向量是各层表示的加权和再乘缩放系数; 预训练的 LSTM 冻结不动, 只训练层权重和缩放系数. 这就是基于特征的迁移: 预训练模型只提供特征, 下游模型自己训练.
+S elmo | fbt | 基于特征的迁移 | feature-based | 预训练模型只提供特征.
+S elmo | ta | 用于下游任务 | Task adaption | 各层表示的加权和.
+
+D ctxemb | Context-free embeddings give every word one vector; contextual embeddings depend on the sentence in which the word occurs.
+X ctxemb | 第一代神经词嵌入 (word2vec、GloVe、fastText) 都是上下文无关的: 每个词只学一个向量. 多义词就出了问题: bank 在「河岸」和「银行」里是同一个向量, 是各义项的混合. 语境化嵌入让同一个词在不同句子里得到不同的向量, 由读过整句的模型 (ELMo 的双向 LSTM, 后来的 BERT) 算出. 预训练嵌入里已编码的性别、时态、国家-首都等关系, 被用到语料之外的任务上, 这就是迁移.
+S ctxemb | ce | 语境化嵌入 | Contextual embedding | 同一个词随句子变化的向量.
+
+D tok | Tokenization splits text into tokens and maps each to an integer ID; the granularity ranges from sentences and words to subwords and characters.
+X tok | 神经网络的嵌入层要的输入就是词元 ID, 所以几乎所有 NLP 任务都先分词. 粒度从大到小: 段落、句子、词 (最常见, 依赖词典和分隔符)、子词 (切成词素一类的单位)、字符. 按词分词词表很大, 还会遇到未登录词; 按字符分词词表很小, 但序列变长、单个字符没有意义. 子词分词兼顾两者: 常见词保持整体, 罕见词切成几个片段.
+S tok | token | 词元 | token | 分词得到的离散文本单位.
+S tok | sub | 子词分词 | subword | 切成词素一类的单位.
+S tok | types | 分词的类型 | Tokenization types | 从段落到字符的各种粒度.
+
+D bpe | Byte Pair Encoding starts from characters and repeatedly merges the most frequent adjacent pair of symbols until the vocabulary has the desired size.
+X bpe | 原本是 Gage (1994) 的数据压缩算法: 统计相邻字节对, 把最频繁的一对换成一个新符号, 重复. 用于分词时: 词表初始化为所有字符 (词尾加 </w>), 在语料上数相邻符号对的加权频次, 合并最频繁的一对, 加入词表, 直到达到预定的合并次数. 代码示例里 get_stats 统计相邻对, merge_vocab 执行一次合并. 新词按学到的合并顺序切分, 不会出现未知字符.
+S bpe | code | BPE 代码示例 | Example | get_stats 统计相邻对, merge_vocab 合并一次.
+
+D wordpiece | WordPiece builds a subword vocabulary like BPE but chooses the merge that most increases the likelihood of a language model on the training data.
+X wordpiece | 源自 Google 的日语、韩语语音搜索: 这些语言字符多、词间没有空格、一个字符有多种读音. 词表初始化为基本 Unicode 字符, 每次在所有可能的合并里选让训练数据似然增加最多的一个, 而不是最频繁的一个. 由数据决定, 不产生 OOV. BERT 用约 3 万的 WordPiece 词表, 词内续接的片段带 ## 前缀, 如 play ##ing.
+
+D trafoarch | The Transformer consists of an encoder and a decoder, each a stack of identical blocks with multi-head attention, feed-forward networks, residual connections and layer normalization.
+X trafoarch | 「Attention is all you need」(Vaswani 等, 2017): 没有循环, 只有注意力, 因此容易并行; RNN 要算完第 j−1 步才能算第 j 步. 编码器: 词嵌入加位置编码, 经过 N 个块, 每块是多头自注意力和前馈网络, 每个子层后有 Add & Norm. 解码器多一个对编码器输出的交叉注意力. 当初为机器翻译设计, 之后成了通用架构: Vision Transformer 把图像切成小块当词元, 也用于多模态学习.
+S trafoarch | vit | Vision Transformer | Vision Transformer | 图像切块当作词元.
+S trafoarch | beyond | NLP 之外: 视觉与多模态 | Transformer for computer vision / multimodal learning | Transformer 成为通用架构.
+
+D crossatt | In cross-attention the queries come from one sequence and the keys and values from another, e.g. target words attending to source words.
+X crossatt | 注意力可以作用在像素、图节点等很多东西上, 这里只讨论查询、键、值都代表序列中词元的情形. 有两个序列 X 和 Y: 查询来自 Y, 键和值来自 X, 也就是 Y 去看 X. 三个可训练矩阵把输入投影成查询、键、值; 和 Bahdanau 注意力一样, 翻译时目标句的每个词去源句里找相关的词. 编码器的语境化做得越好, 翻译质量越高.
+
+D selfatt | In self-attention the queries, keys and values all come from the same sequence, computed with three different projection matrices.
+X selfatt | 和交叉注意力唯一的区别是查询也由同一个序列得到. 三个投影仍然各不相同: 同一个词作为提问者 (查询)、被比对者 (键) 和被取出的内容 (值) 时用三种不同的投影. 点积除以 √d_k 再过 softmax, 避免维数大时点积过大、softmax 饱和. 各位置的计算互不依赖, 所以可以写成矩阵乘法一次算完, 充分利用 GPU.
+S selfatt | sdp | 缩放点积 | scaled dot product | 点积除以 √d_k.
+S selfatt | par | 并行化注意力 | Parallelized attention | 写成矩阵一次算完.
+
+D posemb | Position embeddings are added to the word embeddings so that self-attention, which is permutation-invariant, can distinguish word order.
+X posemb | 只有嵌入层和一层自注意力的模型分不出 john loves mary 和 mary loves john: 同一个词在两句里得到完全相同的输出, 只是换了位置. 办法是给每个词嵌入加上同维度的位置嵌入. 原始 Transformer 用正弦位置嵌入: 偶数维 sin、奇数维 cos, 频率随维度递减, 不用训练, 也能外推到更长的序列; 也可以把位置嵌入当参数学出来, BERT 就这样做.
+S posemb | order | 自注意力能建模词序吗 | Can self-attention model word order? | 不能, 所以要加位置嵌入.
+
+D mha | Multi-head attention runs several attention heads in parallel on lower-dimensional projections and concatenates their outputs; Transformer blocks are stacked in multiple layers.
+X mha | 多层: 依次叠几个 Transformer 块, 每块参数独立, 块里除了注意力还有逐位置的前馈网络和残差 + 层归一化. 多头: 不是叠, 而是并排: 每个头把输入投影到 d_model / h 维, 各自做注意力, 结果拼接后再乘一个输出矩阵. 不同的头可以关注不同类型的关系. 因为每头维度是 d_model / h, 头数不改变参数量.
+
+D masked | Masked self-attention sets the scores of future positions to −∞ before the softmax, so that a position cannot attend to later positions.
+X masked | 自回归语言建模和解码器的任务是预测下一个词. RNN 的状态结构上就看不到未来; 自注意力却能直接看到整个序列, 包括要预测的那个词, 会「作弊」. 所以在 softmax 之前把未来位置的分数设为一个很大的负数, exp 之后权重就是 0, 剩下的权重仍和为 1. 必须在 softmax 之前做; 训练时所有位置仍可并行计算.
+S masked | cheat | 自注意力会「作弊」 | Self-attention for autoregressive LM & decoding | 不加掩码就能看到要预测的词.
+
+D resln | Residual connections add each sublayer's input to its output, and layer normalization normalizes the result; both make deep Transformers trainable.
+X resln | 残差连接: 子层的输出加到输入上, 子层只需学「在输入上加点什么」, 信息得以保留; 反向传播时梯度可以沿恒等捷径直接回传, 缓解深网络的梯度消失. 层归一化在每个位置上对特征维做标准化, 再用可学参数缩放平移, 让各层输入的尺度稳定. Transformer 的每个子层后面都是 Add & Norm.
+S resln | res | 残差连接 | Residual connection | 子层输出加回输入.
+S resln | ln | 层归一化 | Layer normalization | 在每个位置的特征上标准化.
+
+D encdecatt | A decoder block has three sublayers: masked self-attention, cross-attention to the final encoder output, and a feed-forward network.
+X encdecatt | 第一层掩码自注意力只在目标序列内部、只看过去. 第二层是交叉注意力: 查询来自解码器上一个子层, 键和值来自编码器的最终输出; 源句完整已知, 所以这里不需要掩码, 每个目标位置都能看整个源句. 第三层是前馈网络. 每个子层都带残差连接和层归一化. 这样解码器既能参考已生成的词, 又能随时回看源句.
+
+D params | The parameters of a Transformer block are almost all in the attention projections and the feed-forward network; each layer has about 12·d_model² parameters.
+X params | 推参数量要懂模型的数学, 而且 BERT、GPT 都是同样的块, 推一次到处能用. 多头注意力: Q、K、V 和输出四个 d_model × d_model 矩阵, 4d²; 缩放点积本身没有参数, 头数也不影响. 前馈网络: d → 4d → d, 8d², 是注意力的两倍. 层归一化和偏置只是一次项. 编码器块约 12d², 解码器块多一个交叉注意力, 约 16d². 二次项占绝对多数, 一次项可以忽略.
+S params | mhap | 多头注意力 | Multi-head attention | 四个投影矩阵, 4d_model².
+S params | ffn | 前馈网络与层归一化 | Feed forward network, layer norm | 两层全连接, 8d_model².
+
+D txl | Transformer-XL caches the hidden states of the previous segment as additional context (segment recurrence) and uses relative positional encodings.
+X txl | 普通 Transformer 的问题: 自注意力每层 O(n²d), 句子长了比循环层更贵; 内存有限时只能把语料切成较短的片段分别训练, 每个片段看不到之前的内容, 片段边界上的词上下文也被截断. Transformer-XL 计算新片段时, 把上一片段同一层的隐状态 (不传梯度) 拼到键和值上, 有效上下文随层数增长. 这样做后两个片段里同一位置的绝对位置编码相同, 分不出先后, 所以改用相对位置编码, 在注意力分数里直接注入查询和键的距离.
+S txl | lim | Transformer 的局限 | Limitation of the Transformer | 长序列上自注意力比循环层贵.
+S txl | rec | 片段循环 | Segment recurrence | 缓存上一片段的隐状态.
+S txl | rel | 相对位置编码 | Relative positional encodings | 注入查询和键的距离.
+
+D n2 | Self-attention needs time and memory quadratic in the sequence length, which limits the usable context length.
+X n2 | Transformer 的归纳偏置是序列里所有词元两两相连: 理论上能学任意长的上下文, 但扩展性差. 长文档摘要、整本书问答、基因序列都需要很长的输入. Tay 等的综述把高效 Transformer 分成几类: 固定或可学的稀疏模式、低秩近似、核化, 以及记忆和循环. 它们多数只减少浮点运算, 实际速度不一定变快.
+
+D flash | FlashAttention computes exact attention block by block in fast on-chip memory, reducing memory reads and writes and memory from O(n²) to O(n).
+X flash | 实际运行时间不一定由浮点运算数决定. 计算受限时间花在算上, 如大矩阵乘法; 访存受限时间花在搬数据上, 如 softmax、dropout 这类逐元素操作. 标准注意力要把 n × n 的分数矩阵写到慢的显存 (HBM) 再读回来, 是访存受限的. FlashAttention 把 Q、K、V 分块搬进快的片上 SRAM, 在里面算完一块的注意力, 用在线 softmax 逐块合并结果, 从不写出完整矩阵; 反向时重算而不存. 结果精确, 不是近似.
+S flash | mh | GPU 的存储层次 | The GPU memory hierarchy | 片上 SRAM 快而小, 显存大而慢.
+
+D arlm | An autoregressive language model predicts the next word from the previous words; repeating this generates text.
+X arlm | 给一个提示, 预测最可能的下一个词; 生成整段文本就重复这个过程, 每次把刚预测的词接到提示后面; 从零开始时用特殊符号 <START> 作最初的提示. 「自回归」就是用自己之前的输出作为下一步的输入. 它只看左侧上下文, 能直接给出句子的概率. GPT 系列属于这一类.
+
+D mlm | A masked language model predicts masked words from the context on both sides.
+X mlm | 同一个句子把第 3 个词换成 <MASK>: 模型同时看左边和右边去猜它. 这让表示能利用双向上下文, 适合理解任务. 代价是它不能直接给出整句的概率, 也不擅长生成. BERT 是 MLM. 注意和掩码自注意力区分: 掩码自注意力是解码器的结构细节 (屏蔽未来位置), 掩码语言建模是训练目标 (遮住输入里的词).
+
+D clsmetric | Classification is evaluated with accuracy, precision, recall and F1; rankings with MAP, MRR and Precision@k.
+X clsmetric | 精确率 = TP / (TP + FP), 预测为正里真为正的比例; 召回率 = TP / (TP + FN), 真为正里被找出的比例; F1 是两者的调和平均. 多分类时, Micro 平均先把所有类的计数合起来再算, 受大类主导; Macro 平均先各类算 F1 再等权平均, 小类同样重要. 排序不仅看找到了哪些, 还看排在哪里: AP@k 对每个相关位置的精确率取平均, MAP 再对查询平均; 倒数排名是第一个相关结果排名的倒数, MRR 是它的平均.
+S clsmetric | f1mi | Micro 平均 F1 |  | 合并计数, 受大类主导.
+S clsmetric | f1ma | Macro 平均 F1 |  | 各类等权.
+S clsmetric | rank | 排序与检索 | Task-specific evaluation: Ranking | MAP、MRR、Precision@k.
+
+D ppl | Perplexity is the exponential of the average negative log-likelihood per token; it measures how surprised a language model is by a text.
+X ppl | 评价语言模型的自然选择. 对自回归语言模型定义明确, 因为它能给出句子概率; 对 MLM 就麻烦. 直观上是模型平均在几个词之间犹豫: 困惑度 10 相当于每步在 10 个等可能的词里猜. 越低越好. 它依赖分词: 词表不同、切法不同时数值不能直接比较; 它也只衡量语言建模, 不一定反映下游任务的好坏.
+
+D gentxt | Generated text is evaluated with n-gram overlap metrics such as BLEU and ROUGE or with embedding-based metrics.
+X gentxt | 应用场景: 机器翻译、问答 (抽取式答案是原文的一段, 生成式用自己的话)、对话、摘要、图像描述、代码生成. BLEU 计算生成句和参考句的 n-gram 精确率, 再乘简短惩罚, 防止只输出几个稳妥的词; ROUGE 偏重召回率, 常用于摘要. 它们只看字面重合, 同义改写会被低估, 所以又有基于嵌入的指标 (如 BERTScore) 和人工评价.
+S gentxt | bleu | BLEU | BLEU | n-gram 精确率乘简短惩罚.
+S gentxt | bp | 简短惩罚 | Brevity penalty | 惩罚比参考句短的输出.
+
+D bertarch | BERT is a pre-trained Transformer encoder whose token representations depend on both left and right context; its input is the sum of token, segment and position embeddings.
+X bertarch | BERT = Bidirectional Encoder Representations from Transformers. 前身有 word2vec、ULMFiT (先预训练 LSTM 语言模型再整体微调)、ELMo (双向 LSTM, 但两个方向分开训练) 和 GPT (单向 Transformer). BERT 用自注意力取代循环, 每层都同时看左右文, 整个模型一起微调. 输入是两个句子拼接: [CLS] 句 1 [SEP] 句 2 [SEP], 每个位置的向量 = 词元嵌入 (WordPiece) + 片段嵌入 + 位置嵌入. Base 12 层、768 维、1.1 亿参数; Large 24 层、1024 维、3.4 亿参数.
+S bertarch | hist | BERT 的前身 | Predecessors of BERT | word2vec、ULMFiT、ELMo、GPT.
+S bertarch | ie | 输入嵌入与特殊词元 | BERT – Input embeddings | 词元 + 片段 + 位置嵌入, [CLS] 和 [SEP].
+S bertarch | bp | BERT 的参数量 | Parameter count | Base 1.1 亿, Large 3.4 亿.
+
+D causal | Unrestricted bidirectional self-attention cannot be trained with the next-word objective, because every position already sees the next word.
+X causal | 目标是学词元的语境化表示. 自监督时输入和目标是同一个序列, 所以必须修改输入才能构造有意义的任务. 第一层是双向的话, 第二层每个位置的表示里已经混进了所有位置的信息, 包括下一个词本身; 在更高层, 预测下一个词就成了抄答案. 两条路: 像 GPT 那样加掩码只看左边, 或者像 BERT 那样遮住一些输入词再预测.
+
+D bertpt | BERT is pre-trained with masked language modeling and next sentence prediction on BooksCorpus and English Wikipedia.
+X bertpt | MLM: 随机选 15% 的词元, 其中 80% 换成 [MASK], 10% 换成随机词, 10% 不变; 后两种是为了缓解微调时没有 [MASK] 的不一致, 并逼模型对每个位置都保持好的表示. 只在这些位置上算损失. NSP: 给两个句子, 50% 是真实的下一句, 50% 是随机抽的一句, 用 [CLS] 判断. 语料约 33 亿词, 约 40 个 epoch, Base 用 4 个 Cloud TPU 训练 4 天.
+S bertpt | mlmt | 掩码语言建模 | Masked language modeling (MLM) | 遮 15% 的词元再预测.
+S bertpt | nsp | 下一句预测 | Next sentence prediction (NSP) | 判断第二句是否紧跟第一句.
+
+D bertft | BERT is fine-tuned by adding a small task-specific output layer and training the whole model; alternatively, features can be extracted from its layers.
+X bertft | 同一个预训练 BERT, 只在输出端加不同的小层: 句对分类和单句分类用 [CLS] 的输出接分类层; 问答 (SQuAD) 在每个位置上预测答案的起点和终点; 序列标注 (NER) 在每个位置上接分类层. 微调只要几个 epoch, 在 GPU 上几小时. 也可以像 ELMo 那样只抽特征: 冻结 BERT, 取某几层的输出交给别的模型; 在 CoNLL-2003 NER 上, 拼接最后四层几乎和微调一样好.
+S bertft | feat | 从 BERT 抽取特征 | Feature extraction from BERT | 冻结 BERT, 取各层输出.
+
+D tl | Transfer learning reuses knowledge from a source task or domain for a target task or domain, either by extracting features or by fine-tuning.
+X tl | 基于特征: word2vec 在假任务上训练, 迁移的是一张查找表; ELMo 迁移整个嵌入模型, 每次都要跑一遍 biLSTM 才能得到语境化向量, 但模型本身不改. 基于微调: ULMFiT、GPT、BERT 把预训练模型整体在目标任务上继续训练, 所有参数都可以变. 迁移学习主要解决目标任务标注数据稀缺的问题.
+
+D tltax | In Ruder's taxonomy, transductive transfer keeps the task and changes domain or language; inductive transfer changes the task and is either multi-task or sequential.
+X tltax | 直推式迁移: 任务不变, 只换领域或语言. 领域自适应: 在电影评论上学情感分类, 用到商品评论上; 跨语言学习: 在英语上学会, 用到德语上. 归纳式迁移: 目标任务和源任务不同. 多任务学习同时学多个任务, 共享表示; 顺序迁移学习先在源任务上学 (预训练), 再迁移到目标任务 (微调), BERT 属于这一种.
+S tltax | da | 领域自适应 | domain adaptation | 同一任务换领域.
+S tltax | cll | 跨语言学习 | cross-lingual learning | 同一任务换语言.
+S tltax | mtl | 多任务学习 | multi-task learning | 同时学多个任务.
+S tltax | stl | 顺序迁移学习 | sequential transfer learning | 先预训练再微调.
+
+D selfsup | Self-supervised learning has no external labels but generates labels from the known structure of the data; technically it is supervised learning.
+X selfsup | 无监督学习没有标签, 只在特征里找规律 (k-means); 有监督学习用人工标注的金标准; 自监督学习没有外部标签, 但从数据本身的结构造出标签, 例如句子里的下一个词、被遮住的词、窗口里的上下文词. 技术上它就是有监督学习, 只是标签免费, 所以能用上海量文本. 语言建模、MLM、skip-gram 都是自监督.
+
+D bertology | BERTology studies the inner workings of large Transformers such as BERT: what linguistic and world knowledge they contain and where it is stored.
+X bertology | 名字来自一篇关于 BERT 研究的综述. 研究内容: BERT 是否掌握句法、语义和世界知识; 这些知识在哪些层或头里 (低层偏表层和句法, 高层偏任务相关); 最佳的头数、批大小和预训练目标; 能否剪掉一部分头而不损失性能 (很多头可以去掉). 常用方法是探针和对注意力模式的分析.
+
+D bertimpl | BERT changed NLP research overnight and brought limitations such as language coverage, compute cost and the difficulty of explaining models.
+X bertimpl | 影响大概和 2022 年的 ChatGPT 相当. 研究方式变成「拿一个预训练模型来微调」, 排行榜被刷新. 局限: 多数模型只有英语, 其他语言靠多语言版本; 预训练极贵, 只有大机构训得起, 研究变得依赖它们发布的模型; 模型越来越大, 部署困难, 于是有了蒸馏和压缩; 模型内部难以解释, 于是有了 BERTology.
+
+D roberta | RoBERTa retrains BERT with tuned hyperparameters, dynamic masking, no NSP, larger batches and much more data.
+X roberta | RoBERTa = Robustly optimized BERT approach. 作者认为原始 BERT 严重训练不足. 改动: BERT 在预训练前把每个序列遮一次就固定 (静态), RoBERTa 用动态掩码, 同一序列每次看到时遮法都不同; 去掉 NSP, 改成连续的整段文本; 语料从 13 GB 加到 160 GB; 批大小加到 8000, 训练更久. 结构不变, 效果明显超过 BERT.
+S roberta | dm | 动态掩码 | dynamic masking | 每次看到同一序列时遮法不同.
+
+D albert | ALBERT reduces parameters by decoupling the embedding size from the hidden size and sharing parameters across layers, and replaces NSP with sentence-order prediction.
+X albert | ALBERT = A Lite BERT. BERT 里嵌入维度 E 等于隐藏维度 H, 但 WordPiece 嵌入是与上下文无关的, 不需要那么大; 把 V × H 的嵌入矩阵拆成 V × E 和 E × H, E 取 128, 省下大量参数. 所有层共享同一套参数, 参数量和层数无关. NSP 太容易 (随机句子话题不同就能判断), 换成句序预测: 两个相邻片段, 判断顺序对不对. 参数少了, 但计算量没少, 推理并不更快.
+S albert | sop | 句序预测 | SOP | 判断两个相邻片段的顺序.
+
+D distil | In knowledge distillation a small student model is trained to match the soft output distribution of a large teacher model.
+X distil | 模型压缩 (Bucila 等, 2006) 的目标是得到快速、紧凑又准确的模型: 让小模型去近似大模型学到的函数. Hinton 等的蒸馏: 学生不只学硬标签, 还学教师的软目标, 即完整的输出分布, 其中「错误类别的概率大小」带着类别相似性信息. softmax 前除以温度 T 让分布更平, 这些信息更明显. DistilBERT: 层数减半 (每两层取一层初始化), 去掉片段嵌入, 大小约为 BERT 的一半, 在 GLUE 上保留 97% 的性能.
+S distil | comp | 模型压缩 | Model compression | 让小模型近似大模型的函数.
+S distil | st | 软目标 | soft targets | 教师的完整输出分布.
+S distil | dbert | DistilBERT | DistilBERT | 层数减半, 保留 97% 性能.
+
+D compress | Quantization lowers the numerical precision of weights, pruning removes unimportant weights or units.
+X compress | 量化: 把高精度数 (float32/float16) 转成低精度 (int8 等). 70 亿参数用 float32 要 28 GB, 用 int8 只要 7 GB; 模型增长比 GPU 显存快, 量化让大模型能装进普通硬件. 剪枝: 去掉对输出影响小的权重 (非结构化) 或整个头、整层 (结构化). 和蒸馏可以组合使用.
+S compress | q | 量化 | Quantization | 降低数值精度.
+S compress | p | 剪枝 | Pruning | 去掉不重要的权重.
+
+D electra | ELECTRA trains a small generator with MLM and a large discriminator that detects for every token whether it was replaced.
+X electra | 看起来像 GAN, 但两者不是对抗训练的: 生成器不试图骗过判别器, 只做自己的 MLM, 把 [MASK] 填上它猜的词. 判别器的任务是替换词元检测: 对每个位置判断这个词是原来的还是生成器填的. 好处: MLM 只在 15% 被遮的位置上有损失, 替换词元检测在所有位置都有, 每个样本学到的更多, 同样算力下效果明显更好. 下游任务只用判别器.
+S electra | rtd | 替换词元检测 | replaced token detection | 判断每个词元是否被替换.
+
+D arae | The two pre-training regimes are autoregressive modelling, which factorizes the likelihood and is unidirectional, and denoising autoencoding, which reconstructs a corrupted input.
+X arae | 自回归 (AR) 用链式法则把似然分解成逐词条件概率, 只能单向 (也可以从右往左), GPT 属于这一类. 去噪自编码 (AE) 从被破坏的序列重建被遮住的词元, BERT 属于这一类; 除了 MLM 的遮挡, 破坏还可以是删除、打乱、替换片段. AE 能用双向上下文, 但有两个问题: [MASK] 只在预训练出现, 造成预训练-微调不一致; 同时被遮的几个词被假设彼此独立地预测.
+S arae | pfd | 预训练-微调不一致 | pretrain-finetune discrepancy | [MASK] 微调时不出现.
+
+D xlnet | XLNet uses permutation language modeling: autoregressive prediction in a random order of positions, which gives access to bidirectional context without masks.
+X xlnet | 对位置序号随机取一个排列, 按这个顺序做自回归: 先预测排列里第一个位置的词, 再以它为条件预测第二个……对所有排列取期望, 每个位置平均来说能看到两侧的上下文, 又保持了自回归目标, 不需要人造的 [MASK]. 输入顺序本身不变, 打乱的只是注意力掩码. 实现上要知道预测的是哪个位置却不能看它的内容, 所以注意力有内容流和查询流两条. 为了好训练, 只预测排列末尾的一部分词.
+S xlnet | plm | 排列语言建模 | Permutation language modeling (PLM) | 按随机顺序做自回归.
+
+D t2t | Text-to-text casts every task as mapping an input text to an output text, so one model can solve many tasks.
+X t2t | BERT 类模型每个任务都要接一个专门的输出层: 序列级分类、序列标注、问答各不相同; 模型本身不知道自己在做哪个任务, 换任务就要换头重新微调. 机器翻译本来就是文本到文本. 把分类的标签、回归的分数也写成字符串, 所有任务就都变成了生成任务, 只需在输入前加任务前缀说明做什么. 这为多任务学习打开了路: 从先预训练再逐个微调转向同时学多个任务.
+S t2t | prob | BERT 的问题 | Problems with BERT | 每个任务一个专门的输出层.
+S t2t | mtl2 | 多任务学习 | Multi-task learning? | 同时学多个任务.
+
+D t5 | T5 is an encoder-decoder Transformer pre-trained with span corruption that solves every task as text-to-text, selected by a task prefix.
+X t5 | T5 = Text-To-Text Transfer Transformer. 两个要素: 每个任务一个任务前缀 (如 translate English to German:), 输出的标签或分数都写成字符串 (STS-B 的 3.8 也输出成「3.8」). 完整的编码器-解码器, 输出可以是任意长度的文本. 预训练用片段破坏: 把输入里连续的片段换成哨兵词元, 让模型输出被换掉的内容. 在 C4 语料上训练, 论文系统比较了架构、目标和数据. 五个版本从 6000 万到 110 亿参数.
+S t5 | tp | 任务前缀 | task prefix | 告诉模型做哪个任务.
+S t5 | sc | 片段破坏 | span corruption | 连续片段换成哨兵词元.
+S t5 | t5p | T5 的参数量 | Different T5 versions and parameter count | 6000 万到 110 亿.
+
+D gpt1 | GPT-1 pre-trains a Transformer decoder with autoregressive language modeling and fine-tunes it by converting each task into a single input sequence.
+X gpt1 | 模型: 文本和位置嵌入, 12 层「掩码多头自注意力 + 层归一化 + 前馈 + 层归一化」, 两个输出头: 预测下一个词和任务分类. 微调时不改结构, 而是改造输入: 分类直接输入文本; 蕴含把前提和假设用分隔符拼起来; 相似度两种顺序各算一次再相加; 多选题每个选项拼一条, 分别打分再 softmax. 语言建模作辅助目标一起优化.
+
+D gpt2 | GPT-2 is a larger Transformer decoder trained on WebText that can perform tasks zero-shot without fine-tuning.
+X gpt2 | 论文题目「语言模型是无监督的多任务学习者」. 语料是 OpenAI 自己爬的 WebText: Reddit 上至少 3 个赞的外链网页, 800 万文档、40 GB. 用字节级 BPE, 任何字符串都能编码. 最大 15 亿参数. 发布时只放出小版本, 理由是可能被用来大规模生成欺骗性文本, 引发争议, 之后分阶段发布. 用 Natural Questions 测事实知识: 最大模型只答对 4.1%, 但在最有把握的 1% 问题上准确率 63.1%, 校准不错.
+S gpt2 | fact | 事实知识 | Factual knowledge | 随模型容量增长, 校准不错.
+
+D zeroshot | Zero-shot means solving a task the model was never explicitly trained on, given only a task description and no demonstrations.
+X zeroshot | 少样本放宽一些, 可以给几个示范, 但仍然不训练、不更新梯度. GPT-2 在 10 个数据集中的多数上零样本打破了当时的纪录, 而且没有在这些数据集上训练过; 摘要、翻译这类任务还远不如有监督模型. 模型越大零样本越好, 这为 GPT-3 铺平了道路.
+
+D gpt3 | GPT-3 is a 175-billion-parameter Transformer decoder whose few-shot in-context learning improves strongly with scale.
+X gpt3 | 论文题目「语言模型是少样本学习者」. 发布了 8 个尺寸, 宽度和深度都放大, 最大的 96 层、12288 维; 用 3.4 节的公式核对约 1740 亿, 加上嵌入. 语料主要是过滤后的 Common Crawl, 加 WebText、书籍和维基百科, 高质量来源按更高比例采样. 读图: 42 个基准的平均准确率随参数量上升, 少样本 > 单样本 > 零样本, 且少样本增长最快: 大模型更会利用上下文里的示范. 测试损失随计算量按幂律下降.
+S gpt3 | res | 结果与规模 | X-shot comparison, loss as a function of compute | 少样本随规模增长最快.
+
+D icl | In-context learning performs a task from demonstrations in the prompt during a single forward pass, without updating any parameters.
+X icl | 读图: 外循环是无监督预训练, 用梯度下降; 预训练遇到的序列内部自然包含重复的模式 (加法、拼写纠正、翻译), 模型在一个序列内部学会利用这些模式, 这就是内循环. 提示里给示范时, 模型在前向传播里「学会」任务. 但参数没有任何改变: 一小时后再给它同一个任务, 它对上一次一无所知. 也许它更像是识别出这是哪个已经会的任务.
+S icl | learn | 讨论: GPT-3 真的在「学」吗 | Discussion: Does GPT3 "learn" from context? | 参数不变, 不留下任何东西.
+
+D gpttasks | GPT-3 is evaluated zero-, one- and few-shot on language modeling, closed-book QA, translation, Winograd, commonsense reasoning, SuperGLUE, NLI and generation.
+X gpttasks | LAMBADA 预测段落最后一个词, 写成填空格式后少样本很强. 闭卷问答只靠参数里的知识, TriviaQA 少样本超过微调过的开卷模型. 翻译成英语很好, 从英语翻出去差得多, 因为语料以英语为主. Winograd 把两个候选代入比较续写概率. ARC、RACE 这类常识和阅读理解还远不如微调模型. SuperGLUE 少样本平均 71.8, 略高于微调的 BERT-Large, 但 WiC 只有 49.4%, 接近随机. ANLI 几乎是随机水平. 语法纠正和新闻生成很强: 人分辨 GPT-3 写的新闻只比随机好一点.
+S gpttasks | lambada | LAMBADA | LAMBADA | 预测段落最后一个词.
+S gpttasks | mtg | 机器翻译 | Performance on machine translation | 翻译成英语好, 翻出去差.
+S gpttasks | wino | Winograd | Winograd task | 代入候选比较续写概率.
+S gpttasks | arc | ARC | ARC, RACE | 科学考试和阅读理解, 仍不如微调.
+S gpttasks | anli | ANLI | ANLI, SAT analogies | 对抗性推理几乎随机.
+S gpttasks | gram | 语法纠正与新闻生成 | Grammar correction, news articles | 人几乎分辨不出生成的新闻.
+S gpttasks | cbqa | 闭卷问答 | closed book | 只靠参数里的知识回答.
+
+D gptlim | GPT-3 repeats itself, contradicts itself, fails at physical common sense and comparison tasks, and does not retain anything learned in context.
+X gptlim | 文本生成上: 重复、缺乏连贯、自相矛盾 (后来的 GPT-4 已大大减少). 常识上: 物理常识题会答错. 比较类任务: 需要把两个输入互相比较或回头重读的任务 (如 WiC、ANLI) 差, 可能和单向的自回归结构有关. Marcus 和 Davis 的例子: 倒了一杯蔓越莓汁加葡萄汁, GPT-3 续写「喝下去就死了」; 律师的西装裤脏了, 它建议穿泳衣去出庭. 它对现实的理解很浅.
+S gptlim | md | Marcus & Davis 的例子 | Limitations: Marcus & Davis | 续写暴露对现实理解很浅.
+
+D gptethics | GPT-3 inherits biases from its training data, can be misused, and is very costly to train in money and energy.
+X gptethics | 伦理: 模型不知道它说的话在现实里有什么后果, 如给有自杀念头的人提建议; 文本里的偏见被学到, 部署后会按偏见行事, 如筛选简历时歧视; 可被用于垃圾信息、政治操纵、骚扰和学术造假; 可能让一些工作多余. 偏见实验: 「He was very …」后面偏向 large、lazy 等, 女性上下文偏向 beautiful、gorgeous 等外貌词; 宗教上 Islam 常和 terrorism 同现. 成本: 训练约需 3.14 × 10²³ 次浮点运算, 一块 V100 要 355 年, 约 460 万美元, 能耗和排放也很大.
+S gptethics | bias | 偏见 | Bias | 性别、宗教等偏见来自训练数据.
+S gptethics | cost | 成本与能耗 | Cost, environment | 约 460 万美元, 能耗巨大.
+
+D decoding | A decoding strategy determines how the next token is chosen from the distribution that the language model outputs.
+X decoding | 回顾自回归语言建模: 给定上下文 (提示 + 已生成的词元), 模型输出整个词表上的概率分布. 模型只给分布, 解码策略决定实际输出什么. 确定性策略: 贪心搜索、束搜索, 同一输入总得到同一输出; 随机策略: 采样及其变体; 还有对比搜索和对比解码这类兼顾两者的方法. 同时要决定生成多长、何时停止.
+
+D greedy | Greedy search picks the most probable token at every step.
+X greedy | 只沿一条路径走, 只保留一个候选序列, 决策是局部的, 只看当前一步. 读图: 每一列是一个时间步的条件分布, 依赖前面选了什么; 第一步选了概率最高的词, 可能错过后面整体概率更高的序列. 输出常常平淡、重复, 甚至陷入循环.
+
+D beam | Beam search keeps the k most probable partial sequences (the beam) at each step and expands all of them.
+X beam | k 叫束宽. 每一步扩展所有候选, 按截至当前的累积概率保留最好的 k 个; k = 1 就是贪心, 保留一切就是穷举. 它能找到概率更高的序列, 适合翻译、摘要这类有标准答案的任务. 但最高概率的文本不一定是最像人写的: 开放式生成里束搜索同样平淡重复.
+
+D sampling | Sampling draws the next token from the model's distribution; temperature, top-k and top-p control how random it is.
+X sampling | 采样让同一输入得到不同输出, 有创造性, 适合讲故事和对话, 也不容易陷入重复. 温度: softmax 之前把 logits 除以 T; T 小于 1 分布变尖, 接近贪心; T 大于 1 分布变平, 更随机. top-k: 只在概率最高的 k 个词元里抽, 重新归一化; 问题是 k 固定, 分布很尖或很平时都不合适. top-p (核采样): 在累积概率达到 p 的最小集合里抽, 集合大小随分布自动变化.
+S sampling | temp | 温度 | temperature | 除 logits, 控制分布的尖锐程度.
+S sampling | topk | top-k 采样 | Top-k | 只在前 k 个里抽.
+S sampling | topp | 核采样 | Top-p | 在累积概率达到 p 的集合里抽.
+
+D contrast | Contrastive search penalizes candidates similar to the previous context; contrastive decoding maximizes the log-likelihood difference between a large expert and a small amateur model.
+X contrast | 对比搜索在模型的前 k 个候选里, 选使「(1 − α) × 模型置信度 − α × 退化惩罚」最大的词; 退化惩罚是候选和前文各词元表示的最大余弦相似度. 理想的词元概率高, 又给文本带来新内容. 经验上 k 取 5–15, α 取 0.4–0.6. 对比解码用一个大的专家模型和一个小的业余模型, 选对数似然之差最大的词: 小模型也会犯的错 (重复、泛泛的常见词) 被抵消, 只有大模型懂的内容才得高分.
+S contrast | cs | 对比搜索 | Contrastive search | 惩罚和前文太像的候选.
+S contrast | cd | 对比解码 | Contrastive decoding | 专家减业余的对数似然.
+
+D genparams | In the Transformers library, the generate() method selects the decoding strategy and output length through its hyperparameters.
+X genparams | 先把提示分词作为输入, 再设定超参数. 长度: max_new_tokens、min_length 等控制生成多长, 遇到结束符停止. 策略: 默认是贪心; num_beams > 1 是束搜索; do_sample=True 是采样, 再配 temperature、top_k、top_p; penalty_alpha 配 top_k 是对比搜索. 还可以用 no_repeat_ngram_size 禁止重复的 n-gram.
+
+D refmetric | BLEU and ROUGE compare generated text with a reference by n-gram overlap.
+X refmetric | 例: 参考句 The guard arrived late because it was raining, 生成句 The guard arrived late because of the rain. 生成句的 8 个 unigram 里有 5 个在参考句里出现, 精确率 5/8; 再看 bigram、trigram, 取几何平均乘简短惩罚就是 BLEU. ROUGE 反过来看参考句的 n-gram 有多少被生成句覆盖. 两句意思几乎一样, 分数却不高: 字面重合抓不住同义改写. 只适合翻译、摘要这类有标准答案的任务.
+S refmetric | rouge | ROUGE | ROUGE | 偏召回率, 用于摘要.
+
+D norefmetric | Open-ended generation without a gold reference is evaluated with diversity, coherence and MAUVE.
+X norefmetric | 同一个故事开头可以有无数好的续写, 没有标准答案可比. 多样性: rep-n = 100 × (1 − 不同 n-gram 数 / 全部 n-gram 数) 衡量重复, 多样性把 n = 2、3、4 的结果相乘. 连贯性: 用一个语言模型算生成文本在提示条件下的平均对数似然. MAUVE 比较模型和解码策略合起来定义的文本分布 Q 与人类文本分布 P: 在嵌入空间里聚类, 画出两个方向的 KL 散度曲线, 取曲线下的面积; 它同时惩罚生成了人不会写的文本和没覆盖人会写的文本.
+S norefmetric | mauve | MAUVE | MAUVE | 比较模型分布和人类文本分布.
+
+D humaneval | Human evaluation rates fluency, coherence and diversity of generated text by experts or crowd workers.
+X humaneval | 质量是主观的, 幽默、创意、相关性这些细微之处自动指标抓不住. 要选评估者 (按任务难度选领域专家或众包工人) 和评价标准 (流畅、连贯、多样). 挑战: 评估者意见不一致, 要算评估者间一致性; 成本高、耗时长; 评估者自己的偏见会影响结果. 自动指标最终要看和人工评价的相关程度.
+
+D waystask | A task can be solved with a language model by single-task fine-tuning, few-shot prompting, multi-task instruction tuning or continued pre-training.
+X waystask | 语言建模目标本身不包含对任务的理解, 编码器和解码器模型都是如此, 所以要额外做些事. 单任务微调: 在任务训练集 (k 不小, 如 100 个以上) 上有监督训练, 得到只会一个任务的模型. 少样本提示: 不训练, 把 k 个示范放进提示, 前提是模型在预训练里已经学过这个任务, 而且只给标签不是自然的对话方式. 多任务微调: 在许多任务上一起训练. 继续预训练: 在目标领域的无标注文本上再预训练.
+
+D flan | Multi-task fine-tuning on many tasks phrased as instructions, as in FLAN and T0, lets a model generalize to unseen tasks.
+X flan | 读图: (A) 预训练-微调 (BERT, T5): 每个任务一个专门的模型, 要很多任务样本. (B) 提示 (GPT-3): 直接在任务上推断, 靠提示工程. (C) 指令微调 (FLAN): 在许多写成自然语言指令的任务上微调, 然后在没见过的任务上零样本推断. 测试时要把整类任务留出来, 才能说明是泛化到了新任务. FLAN 在多数留出任务上超过零样本的 GPT-3; T0 在提示的多样性上做了类似的事.
+
+D cot | Chain-of-thought few-shot prompting gives demonstrations of the form ⟨input, reasoning steps, output⟩, so the model reasons step by step before answering.
+X cot | 标准的少样本提示对推理任务效果差; BeliefBank 这类形式化方法难以训练和部署. 读图: 标准提示的示范只有问题和答案, 模型对新的应用题直接答错; 思维链提示的示范先写出推理 (Roger 原有 5 个球, 2 罐每罐 3 个是 6 个, 5 + 6 = 11), 模型就模仿着先推理再回答, 答对了. 对算术、常识和符号推理都有效, 但只在足够大的模型上才有明显效果, 小模型写出的推理常常不通.
+
+D tot | Tree-of-thought keeps and evaluates several partial reasoning paths, with lookahead and backtracking.
+X tot | 自回归机制逐词元从左到右做决定, 对两类任务是限制: 开头的决定起关键作用的 (一步走错全盘皆输), 和需要探索的 (数独、规划). 思维树同时保留多个备选想法, 让模型自己评估当前状态, 向前看或回溯, 用广度或深度优先搜索做全局决策. 这和束搜索的思路类似, 只是单位从词元变成了想法.
+
+D instr | Instruction tuning trains a pre-trained language model on many instruction–response pairs or response rankings so that it follows instructions.
+X instr | 预训练模型只会续写: 问它一个问题, 它可能接着写出更多问题. 促成 LLM 革命的进展里, 让模型遵循指令的指令微调和低成本的人类偏好反馈是关键两项. 和 T0、FLAN 精神相似, 但后者沿袭 NLP 任务的传统, 指令有时只是任务名; InstructGPT 更灵活, 包括头脑风暴、改写、开放问答等用户真正会提的请求. 结果是 13 亿参数的 InstructGPT 在人类评价中胜过 1750 亿参数的 GPT-3.
+S instr | ftpr | 用语言模型解决任务的方式 | How to solve a task with language models? | 微调、提示还是指令微调.
+
+D sft | Supervised fine-tuning trains the base model with the next-token objective on demonstrations written by annotators.
+X sft | 标注员针对一批提示写出理想回答, 用它们有监督地微调基础模型, 目标仍是预测下一个词, 只是数据换成了示范. 提示最初来自团队和标注员, 系统上线后来自用户. 难点和成本在收集好的示范. SFT 数据也可以从已有的 NLP 数据集改写 (FLAN). 局限: 示范能教会模型怎么答, 但很难规定什么不该说、几个回答里哪个更好, 也会让模型模仿超出自己知识的回答, 助长幻觉.
+S sft | sftm | SFT 模型 | SFT model | RLHF 的第一步.
+S sft | sftlim | SFT 不容易规定什么 | What can SFT not easily specify? | 难以规定不该说什么.
+
+D rlhf | Reinforcement learning from human feedback first trains a reward model on human preference comparisons and then optimizes the language model against it with reinforcement learning.
+X rlhf | 起源是教模拟机器人后空翻 (Christiano 等, 2017): 精确标注每个关节怎么动极其昂贵, 而人只需看两段尝试说哪段更好, 一个比特的信息. 强化学习里智能体采取一串动作, 结束时得到反馈; 对 LLM 来说一串动作就是一段回答. 和有监督学习不同: 目标是最优策略, 反馈稀疏且延迟, 需要探索. InstructGPT 的三步: SFT; 训练奖励模型; 用 PPO 优化. 标注员按有用、真实、无害的标准排序回答.
+S rlhf | back | 最早的 RLHF: 学后空翻 | Original RLHF work: The backflipper | 人只说哪段更好.
+S rlhf | hf | 人类反馈 | HF (Human Feedback) of RLHF | 按有用、真实、无害排序.
+
+D rm | A reward model outputs a scalar score for a prompt and a response and is trained on preference pairs with the Bradley–Terry loss.
+X rm | 从 SFT 模型出发, 去掉词表输出层, 换成输出一个标量. 输入提示和回答, 输出奖励分数. 只用 60 亿参数的模型 (更稳定、更省). 训练用偏好数据: 对同一提示的两个回答, 标注员选出更好的; Bradley–Terry 模型把「胜者胜过败者」的概率写成两者奖励之差的 sigmoid, 最大化它的对数. 人很难给回答打绝对分, 但比较两个回答很容易, 这就是用成对偏好的原因.
+S rm | pref | 偏好数据 | Preference data | 成对回答和哪个更好的判断.
+S rm | bt | Bradley-Terry 模型 | Bradley-Terry | 胜出概率 = 奖励之差的 sigmoid.
+
+D ppo | The policy is optimized with PPO to maximize the reward model's score, with a KL penalty that keeps it close to the SFT model.
+X ppo | 目标是最大化奖励减去 β 倍的 KL 散度 (当前策略对 SFT 模型). 没有 KL 项, 模型会找到奖励模型的漏洞, 生成奇怪但高分的文本 (奖励作弊), 还会丢掉语言能力. PPO 用裁剪的更新比例保证每步不走太远. PPO-ptx 再混入预训练数据的语言建模梯度, 减轻在公开 NLP 基准上的性能下降 (对齐税). 人类评价中 PPO 和 PPO-ptx 胜过 SFT, 胜率随模型增大.
+S ppo | ptx | PPO-ptx | PPO-ptx | 混入预训练梯度保住能力.
+S ppo | ppoalg | PPO | PPO | 近端策略优化.
+
+D dpo | Direct preference optimization optimizes the policy directly on preference pairs with a classification-style loss, without training a separate reward model.
+X dpo | RLHF 要训练奖励模型、再跑不稳定的强化学习, 流程复杂. DPO 的关键观察: KL 约束下奖励最大化问题的最优策略有闭式解, 反过来, 奖励可以写成策略和参考模型对数概率之比 (乘 β). 代入 Bradley–Terry 损失, 奖励模型就消掉了, 只剩一个在偏好对上的二分类式损失: 提高胜者相对参考模型的概率, 降低败者的. 更简单、更稳定, 效果和 PPO 相当或更好.
+S dpo | dpow | 为什么 DPO 可以不要奖励模型 | Why can DPO eliminate the reward model? | 奖励由对数概率比隐式给出.
+
+D aligntrade | Alignment involves trade-offs: safety training can make models over-refuse, models exploit the reward (reward hacking) and become sycophantic, and objectives such as helpfulness and harmlessness conflict.
+X aligntrade | 安全训练过头时模型会拒绝无害的请求 (如「怎么杀死一个 Python 进程」). 奖励作弊: 模型学会钻奖励系统的空子拿高分, 却没解决问题; 奖励只是一个数, 不告诉模型具体哪里好. 谄媚: 人类偏好倾向于赞同自己的回答, 模型学会说用户想听的. 有用和无害、诚实和讨好往往冲突, 要多目标权衡. 还有对齐给谁的问题: 价值观随时代和人群变化, 标注员和研究者只代表一小部分人.
+S aligntrade | rh | 奖励作弊 | reward hacking | 钻奖励的空子拿高分.
+S aligntrade | syc | 谄媚 | Sycophancy | 说用户想听的话.
+S aligntrade | who | 对齐给谁 | Who are we aligning to? | 价值观随时代和人群变化.
+
+D hall | A hallucination is a statement that an LLM presents as fact although it is false, misleading or unsupported.
+X hall | 定义有多种: 韦氏词典说是看似合理但虚假或误导的回答; 最初在摘要和 RAG 里指与输入文本不忠实的内容. 课程的形式定义要两个条件同时成立: 陈述虚假、误导或无依据, 且模型把它当事实陈述; 写小说时编造不算. 原因之一是奖励作弊: 自信流畅的回答更容易被打高分, 说「不知道」反而吃亏. 缓解办法有检索增强、训练模型表达不确定.
+
+D reasoning | Reasoning models are trained with supervised fine-tuning and reinforcement learning to write a reasoning trace before the answer, with rewards that can be verified automatically.
+X reasoning | 2026 年的推理不再靠提示, 而是把模型训练成会推理. DeepSeek 的提示模板只约束格式: 推理放在 <think> 里, 答案放在 <answer> 里, 不规定怎样推理. 奖励是规则型的: 答案对不对 (数学题比对结果, 代码跑测试), 格式对不对, 不用奖励模型, 所以难以被钻空子. 强化学习中模型自己学会了自我验证、反思、回溯, 推理轨迹越来越长, 还出现了「Wait, wait」的顿悟时刻. 推理能力还可以蒸馏到小模型.
+S reasoning | trace | 推理轨迹与奖励 | Reasoning traces and rewards | think/answer 格式, 规则型奖励.
+S reasoning | cot11 | 思维链: 原始想法与现在的含义 | Chain-of-thought: the original idea | 从提示技巧到训练目标.
+
+D unfaith | The reasoning a model writes down need not be the computation it actually performs.
+X unfaith | Anthropic 对 Claude 3.5 Haiku 的研究: 问 36 + 59, 答 95; 问它怎么算的, 它说个位相加进 1 再加十位, 即学校教的竖式. 但从内部归因图看, 它实际是两条并行的路: 一条粗略估计大小, 一条精确算个位, 最后合并. 说出的解释是从训练数据里学到的「人怎么解释加法」, 而不是对自己计算的报告. 所以推理轨迹看起来合理, 不等于忠实.
+S unfaith | ulm | 推理的不忠实 | Unfaithfulness of LMs to true reasoning | 说出的步骤不是实际计算.
+
+D compute | Training a Transformer takes about 6PD floating-point operations for P parameters and D tokens: about 2PD for the forward and 4PD for the backward pass.
+X compute | 每个词元经过模型时, 每个参数大约参与一次乘加, 算 2 次浮点运算, 所以前向约 2PD. 反向时每层要算两样: 对权重的梯度 (用来更新) 和对输入的梯度 (继续往前传), 每样都和前向一样大, 合计约 4PD. 训练时间 = 计算量 / 吞吐量 (GPU 数 × 每块每秒浮点运算数 × 利用率). 例: 70 亿参数、1 万亿词元约 4.2 × 10²² FLOP, 一块 A100 要很多年, 所以要成百上千块 GPU. 算力固定时, PD 固定, 大模型少数据还是小模型多数据, 由规模定律回答.
+S compute | creq | 计算需求 | Compute requirements | 6PD 次浮点运算.
+S compute | blockp | 一个 Transformer 块的参数 | Where are the parameters in a Transformer block? | 几乎全在自注意力和 MLP 里.
+S compute | ftime | 从 FLOP 到训练时间 | From FLOPs to training time | 计算量除以吞吐量.
+S compute | budget | 固定算力预算下的选择 | A fixed compute budget leaves a choice | 大模型少数据或小模型多数据.
+
+D memory | Training memory holds the parameters, gradients, optimizer states and activations; with mixed-precision Adam this is about 16 bytes per parameter plus activations.
+X memory | 常见问题: 这个模型有多少字节, 我的 GPU 放得下、训得动吗. 推理只要参数 (fp16 每参数 2 字节). 训练时还要: 梯度 (2 字节)、fp32 主权重 (4 字节)、Adam 的一阶和二阶矩 (各 4 字节), 合计约 16 字节每参数; 70 亿参数就要约 112 GB, 一块 80 GB 的 GPU 放不下. 激活值是为反向传播存的前向中间结果, 随批大小和序列长度增长, 可以用激活重算换显存.
+S memory | perp | 每个参数的训练显存 | Training memory per parameter | 混合精度 Adam 约 16 字节.
+S memory | fit | 模型放得进一块 GPU 吗 | Will my model fit on a GPU? | 70 亿参数训练就放不下 80 GB.
+S memory | opt | 优化器状态 | optimizer states | Adam 的两个矩估计.
+
+D fp | Floating-point formats differ in bytes, range and precision; mixed-precision training computes in fp16 or bf16 and keeps fp32 master weights.
+X fp | fp32 单精度 4 字节 (1 符号、8 指数、23 尾数); fp16 半精度 2 字节, 指数位只有 5, 范围小, 小梯度会下溢为 0, 要做损失缩放; bf16 也是 2 字节, 但指数位和 fp32 一样有 8 位, 范围相同, 只是精度低, 训练更稳. 混合精度: 前向和反向用低精度算, 快且省显存; 主权重保留 fp32, 更新时在 fp32 上累加, 避免小更新被舍入掉.
+S fp | mp | 混合精度 | mixed precision | 低精度计算, fp32 主权重.
+
+D scaling | Scaling laws describe how the test loss falls as a power law in the number of parameters, the amount of data and the compute.
+X scaling | Kaplan 等 (2020) 发现: 表现强烈依赖规模 (参数 N、数据 D、计算 C), 与模型形状 (深度、宽度) 关系很弱; 损失和每一个都呈幂律, 在双对数图里是直线, 跨越六个数量级以上. 幂律意味着每降一点损失都要成倍增加资源. 只扩一样会遇到瓶颈: 参数大而数据少会过拟合, 数据多而参数小会欠拟合, 要一起扩. 规模定律重要, 是因为大模型只能训练一次: 先在小模型上拟合曲线, 再外推决定大模型怎么配. 规模化也有经济和环境代价.
+S scaling | pow | 幂律 | power law | 双对数图里是直线.
+S scaling | kap | Kaplan 等的规模定律 | Scaling laws proposed by Kaplan et al. (2020) | 偏向把预算花在大模型上.
+S scaling | cost2 | 规模化的经济和环境代价 | Environmental costs of training | 训练费用和排放随规模增长.
+
+D chinchilla | Compute-optimal training scales parameters and tokens in equal proportion, about 20 tokens per parameter; Chinchilla (70B) beat the much larger Gopher.
+X chinchilla | 计算预算固定时, 怎样在模型大小和文本量之间分配使损失最小? Hoffmann 等 (DeepMind) 训练了 400 多个模型做经验估计, 结论和 Kaplan 不同: 参数和词元应同比例增长, 约每参数 20 个词元. 按此训练的 Chinchilla 只有 700 亿参数, 用了 1.4 万亿词元, 胜过 2800 亿参数的 Gopher, 推理也更便宜. 实践中常故意「过度训练」小模型 (远多于 20 个词元每参数), 因为推理成本比训练成本更重要.
+S chinchilla | chin9 | 计算最优的 LLM: Chinchilla | Compute-optimal LLMs | 每参数约 20 个词元.
+
+D emerge | Some abilities seem to emerge suddenly above a certain scale, but with continuous metrics the improvement is often smooth.
+X emerge | 读图: 一些任务 (多位数加法、单词解谜) 在小模型上接近 0, 到某个规模突然跳上去, 看似「涌现」. Schaeffer 等指出这可能是度量造成的假象: 精确匹配这类不连续的指标要求每一步都对, 每个词元的准确率平滑提高时, 整体答对率会呈急剧上升; 换成编辑距离、词元级对数似然这类连续度量, 曲线就变平滑了. 但也有一些能力用连续度量也表现出跳变, 争论仍在.
+
+D ptdata | Pre-training data are mixtures of sources that are filtered for quality, deduplicated and, when data run out, repeated for a few epochs.
+X ptdata | 网页、书籍、代码、论文、维基百科按比例混合, 混合比例本身是重要的超参数. 筛选: 去掉低质量和有害文本, 用分类器或启发式规则挑高质量部分; 去重避免模型背诵. 数据用完了怎么办: 公开代码已经几乎被 The Stack v2 收录完了; Muennighoff 等发现重复数据最多约 4 轮, 损失和用新数据几乎一样, 再多收益迅速减少. OLMo 2 公开了全部数据和训练细节, 说明短的中期训练 (在高质量数据上再训一小段) 能带来很大提升.
+S ptdata | olmo | OLMo 2 | OLMo 2 | 公开全部细节, 短的中期训练收益大.
+S ptdata | beyond | 超越蛮力扩展 | Beyond brute-force scaling | 数据用完时重复几轮.
+
+D dist | Data parallelism replicates the model and splits the batch across GPUs; tensor parallelism splits the parameters of a layer across GPUs.
+X dist | 用多块 GPU 比一块快, 但要想清楚怎样分配, 还要避免显存不足. 数据并行: 每块 GPU 一份完整模型, 全局批次分成微批次, 各算各的梯度, 再全部同步求平均, 前提是模型放得进一块 GPU. 张量并行: 把一层的矩阵按行或列切到几块 GPU 上, 每块只算一部分, 层内就要通信, 所以通常只在同一台机器的 GPU 之间用. 还有流水线并行按层切分.
+S dist | dp | 数据并行 | data parallelism | 复制模型, 分数据.
+S dist | tp | 张量并行 | tensor parallelism | 把一层的参数分到几块 GPU.
+
+D moe | In a mixture-of-experts layer a router sends each token to a few of many expert feed-forward networks, so the total parameters are large but the compute per token is small.
+X moe | 把 Transformer 块里的前馈网络换成 n 个专家前馈网络和一个路由器. 路由器对每个词元算出各专家的分数, 只选前 k 个, 输出是它们的加权和. Mixtral 8x7B 每层 8 个专家选 2 个: 总参数约 470 亿, 每个词元只用到约 130 亿, 计算和一个 130 亿的稠密模型相当, 效果却接近更大的模型. 代价是所有专家都要放进显存, 还要防止路由集中到少数专家 (负载均衡).
+S moe | mixtral | Mixtral | Mixtral | 每层 8 个专家选 2 个.
+
+D multiling | Most of the world's languages have few resources, so NLP needs to transfer knowledge from high-resource languages, with symbolic methods or shared representations.
+X multiling | 世界上有七千多种语言, NLP 资源和模型集中在少数几种. 跨语言 NLP 的目标是把在高资源语言上学到的东西迁移到低资源语言. 跨越语言鸿沟有两条路: 符号方法 (机器翻译、双语词典, 把数据或模型翻译过去) 和表示学习 (把不同语言放进共享的表示空间, 让一个模型通用). 后者包括跨语言词嵌入和多语言 Transformer.
+S multiling | whycl | 为什么需要跨语言 NLP | Why Cross-Lingual NLP? | 把高资源语言的知识迁移过去.
+S multiling | chasm | 跨越语言鸿沟 | Crossing the Language Chasm | 符号方法和表示学习.
+
+D clwe | Cross-lingual word embeddings place words of several languages in one vector space so that translations are close; they are trained jointly or aligned after training.
+X clwe | 按需要的双语监督分类: 词级 (双语词典)、句级 (平行语料)、文档级 (可比语料). 联合训练: 用平行或可比语料同时训练两种语言的嵌入, 加上让对应词靠近的约束. 事后对齐: 两种语言分别训练单语嵌入, 再学一个映射把两个空间对齐; 这样做最常见, 因为单语嵌入现成又便宜. 评估用双语词典诱导: 给一个源语言词, 看最近邻里有没有它的翻译; 也可以直接用于跨语言迁移, 在一种语言上训练分类器, 用到另一种上.
+S clwe | joint | 联合训练的跨语言词嵌入 | Joint CLWE induction | 同时训练两种语言.
+S clwe | clweval | 评估与用于迁移 | CLWEs – Evaluation | 双语词典诱导和下游迁移.
+
+D procrustes | Projection-based alignment learns an orthogonal matrix that maps one embedding space onto another; the Procrustes problem has a closed-form solution via SVD.
+X procrustes | 依据是不同语言的嵌入空间结构相似 (类比挖掘里的方向在各语言里差不多). 用几千对种子翻译, 找矩阵 W 使 WX 和 Y 的欧氏距离最小. 限定 W 正交 (只旋转、不拉伸), 保持单语空间内的距离不变, 这就是 Procrustes 问题, 解是对 YXᵀ 做 SVD 得 UΣVᵀ, 取 W = UVᵀ. 无监督版本连种子词典都不要: 先用对抗训练或相似度分布的结构得到初始映射, 再迭代地用最近邻生成词典、重新求 Procrustes.
+S procrustes | proj | 事后对齐与投影 | Post-hoc embedding alignment | 分别训练再对齐.
+S procrustes | unsup | 无监督的跨语言词嵌入 | Unsupervised CLWE induction | 不要种子词典.
+
+D mmt | Massively multilingual Transformers such as mBERT and XLM-R are pre-trained on about a hundred languages and enable zero-shot cross-lingual transfer.
+X mmt | mBERT 在 104 种语言的维基百科上用 MLM 训练, 没有任何平行数据, 也没有显式的对齐目标; XLM-R 用更大的网络语料. 零样本跨语言迁移: 在英语标注数据上微调, 直接用于其他语言, 效果出人意料地好. 但它没有完全解决问题: 源语言和目标语言越远 (语系、文字、语序), 低资源语言预训练数据越少, 迁移越差; 用少量目标语言样本 (少样本) 就能显著改进. 各语言在表示空间里还有各自的子空间, 更好的对齐能进一步提升迁移.
+S mmt | lim | mBERT 解决了零样本迁移吗 | So...has mBERT solved zero-shot CL transfer? | 远距离和低资源语言仍差.
+S mmt | subs | 语言特定的子空间 | Language-Specific Representation Subspaces | 各语言有自己的子空间.
+
+D clsample | Cross-lingual transfer experiments should test typologically and genealogically diverse languages; otherwise conclusions do not generalize.
+X clsample | 很多论文只测几种和英语相近的欧洲语言, 由此得出「迁移效果很好」的结论, 高估了模型的能力. 选语言时要考虑语系、文字、语序等类型学特征的多样性, 以及资源量的分布; 可以借助类型学数据库系统地挑选. 结论只对和样本相似的语言成立.
+
+D evalllm | Evaluating an LLM ranges from multiple-choice benchmarks and LLM judges to human preference, verifiable instructions, calibration and execution-based evaluation.
+X evalllm | 先问评估的是什么: 知识、能力还是实际行为, 对谁有用. 几种范式各有盲点: 选择题基准便宜可复现, 但测不到开放式回答; LLM 当评委能评开放式回答, 但有偏差; 人类偏好 (Chatbot Arena) 最贴近用户, 但贵且受风格影响; 可验证的指令 (IFEval) 客观但范围窄; 按执行结果评估 (SWE-bench 改代码跑测试, OSWorld 在真实桌面环境完成任务) 最接近智能体的真实用途. 还要考虑校准和基准污染.
+S evalllm | ife | IFEval | IFEval | 可自动验证的指令.
+S evalllm | agentev | 按执行结果评估 | SWE-bench | 改代码跑测试, 在真实环境完成任务.
+
+D mmlu | MMLU is a four-option multiple-choice benchmark over 57 subjects; MMLU-Pro has ten options and harder questions.
+X mmlu | 覆盖数学、历史、法律、医学等 57 个学科, 格式简单, 只看选对没有, 便于比较. 问题: 顶尖模型已接近饱和, 区分不出差别; 四选一可以靠排除法猜; 部分题目本身有错. MMLU-Pro 改成十选一, 增加了需要推理的题, 去掉了有噪声的题, 分数明显下降, 对提示措辞也更不敏感.
+
+D judge | An LLM-as-a-judge rates or compares open-ended answers of other models; it agrees with humans about as often as humans agree with each other, but has biases.
+X judge | MT-Bench 用多轮的开放式问题, 用 GPT-4 给回答打分或两两比较. 评委和人的一致率在 80% 以上, 和人与人之间相当. 但有偏差: 位置偏差 (偏向先出现的回答, 要交换顺序各评一次)、长度偏差 (偏向长回答)、自我偏好 (偏向自己或同家族模型的回答), 数学推理题上也会评错. G-Eval 让评委先生成评估步骤再打分, 用分数的概率加权; 「评估评估者」就是检验评委和人类判断的相关性.
+S judge | mtb | MT-Bench | MT-Bench | 多轮开放式问题.
+S judge | geval | G-Eval | G-Eval | 先生成评估步骤, 再按概率加权打分.
+
+D arena | Chatbot Arena collects blind pairwise votes of users between two anonymous models and converts them into a ranking with the Bradley–Terry model.
+X arena | 用户输入任意问题, 两个匿名模型各给一个回答, 用户投票选更好的, 之后才揭晓是哪两个模型. 大规模的人类偏好, 问题来自真实用户, 不容易被污染. 用 Bradley–Terry 模型 (和 RLHF 奖励模型同一个) 从成对胜负估计每个模型的强度分数, 得到排行榜. 局限: 投票者不代表所有用户, 偏向格式漂亮、语气讨喜的回答, 模型厂商也可能针对它优化.
+
+D calib | A model is calibrated if its stated confidence equals its actual accuracy.
+X calib | 置信度可以来自词元概率, 也可以让模型口头说出. 可靠性图把预测按置信度分组, 比较每组的平均置信度和实际准确率, 对角线就是完美校准; 期望校准误差 (ECE) 是偏离的加权平均, Brier 分数同时看校准和区分能力. 预训练模型在选择题上常校准得不错; RLHF 之后常变得过度自信, 口头置信度也偏高.
+
+D contam | Benchmark contamination means that test data appeared in the training data, so scores overstate the true ability.
+X contam | 预训练语料爬自网络, 公开基准的题目和答案很可能就在里面. 后果是模型可能背出了答案, 分数虚高. 检测办法: 查训练数据和测试题的 n-gram 重合; 让模型补全题目的后半段或选项, 补得太准说明见过; 比较模型在原题和改写题上的表现差异. 对策: 用训练截止日期之后出的新题、私有测试集, 或定期更新的动态基准.
+
+D attrib | Feature attribution assigns each input token a score for its contribution to the prediction, e.g. with gradients or perturbations.
+X attrib | 为什么要解释: 调试模型、发现偏见、建立信任, 也是法规的要求. 归因的结果通常是在输入文本上的热力图. 基于梯度: 输出对输入嵌入的梯度表示敏感程度, 梯度乘输入更稳定, 积分梯度沿从基线到输入的路径累积梯度, 满足一些公理. 基于扰动: 删掉或替换一些词元, 看输出变多少. 生成式 LLM 输出是一段文本, 要先用标量化函数把它变成一个数 (如某个回答的对数概率), MExGen 就是这样做多粒度的归因.
+S attrib | gen | 生成式 LLM 的归因 | Generative LLMs · Scalarizers · MExGen | 先把输出标量化再归因.
+
+D shap | LIME fits a simple interpretable model on local perturbations of one input; SHAP distributes the prediction among the features with Shapley values from game theory.
+X shap | LIME: 在要解释的输入附近随机去掉一些词元生成扰动样本, 按和原输入的相似度加权, 拟合一个稀疏线性模型, 它的系数就是解释; 目标函数是加权的拟合误差加复杂度惩罚. SHAP: 把特征看成合作博弈里的玩家, 预测是总收益; 一个特征的 Shapley 值是它在所有可能的特征子集上的边际贡献的加权平均, 是满足效率、对称等公理的唯一分配. 精确计算要遍历所有子集, Kernel SHAP 用加权线性回归近似, 权重让只含很少或很多特征的子集最重要.
+S shap | lime | LIME | LIME | 局部扰动上拟合简单模型.
+S shap | ksh | Kernel SHAP | Kernel SHAP | 用加权线性回归近似 Shapley 值.
+
+D tda | Training data attribution estimates how the model's prediction would change if a training example were removed; influence functions approximate this without retraining.
+X tda | 特征归因问「输入的哪部分重要」, 训练数据归因问「训练集的哪些样本让模型这样预测」. 最直接的办法是去掉一个样本重新训练, 对大模型不可行. 影响函数用损失在最优点附近的二次近似: 去掉样本的效果约等于 Hessian 的逆乘这个样本的梯度, 再和测试样本的梯度做内积. 对大模型 Hessian 太大, 要用近似. 能帮助找出错误标注、解释事实知识的来源.
+
+D attnexp | Attention weights are not necessarily explanations: different weights can give the same prediction; probing tests what information hidden representations encode.
+X attnexp | 注意力权重看起来像在说「模型在看哪里」, 但研究发现: 注意力权重和基于梯度的重要性常常不相关; 可以构造完全不同的注意力分布, 预测却不变. 所以「注意力就是解释」站不住, 至多是一种线索. 探针换一个角度: 在冻结的隐藏表示上训练一个简单分类器 (如预测词性、句法深度), 能预测出来就说明表示里编码了这种信息; 但编码了不等于模型用了它.
+S attnexp | probe | 探针 | probing | 在隐藏表示上训练简单分类器.
+
+D mechinterp | Mechanistic interpretability reverse-engineers the circuits inside a model that implement a behaviour.
+X mechinterp | 不只问哪个输入重要, 而是问模型内部怎样一步步算出结果. IOI 任务: 「When Mary and John went to the store, John gave a drink to」, 模型应补 Mary. 研究者用激活修补 (把一次运行的激活换到另一次里, 看输出变化) 找出回路: 重复名字检测头发现 John 出现了两次, 抑制头压低 John, 名字移动头把剩下的 Mary 复制到输出. ACDC 自动化这个过程: 逐条删掉计算图里的边, 只留下对任务输出影响大的. 稀疏自编码器把激活分解成大量稀疏、单义的特征, 绕开一个神经元对应多个概念的问题.
+S mechinterp | ioi | IOI 任务 | IOI task | 补出间接宾语, 找名字移动头.
+S mechinterp | acdc | 自动发现回路: ACDC | Automatic circuit discovery · ACDC | 逐条删边, 留下关键回路.
+S mechinterp | sae | 稀疏自编码器 | sparse autoencoder | 把激活分解成稀疏特征.
+
+D faith | An explanation is faithful if it reflects the model's actual computation; plausible explanations need not be faithful.
+X faith | 合理性 (人觉得解释说得通) 和忠实性 (解释反映模型真实的计算) 是两回事, 评估解释时容易把前者当后者. 检验忠实性的办法: 按归因分数从高到低删除词元, 看预测掉得多快 (删除测试), 或反过来逐个插入; 删掉被认为重要的部分预测却不变, 解释就不忠实. 思维链也可能不忠实: 在示范里悄悄让答案总是 A, 模型会选 A, 但它写出的推理里从不提这一点.
+S faith | uncot | 不忠实的思维链 | Unfaithful chain-of-thought | 推理里不提真正影响答案的因素.
+
+D detect | AI text detection passively decides whether a text was machine-generated; watermarking actively embeds a signal during generation.
+X detect | 两个不同的问题: 事后拿到一段文本判断是不是模型写的 (被动检测), 和生成时就埋入可验证的信号 (水印), 后者需要模型提供方配合. 被动检测的经典根源是作者识别: 文体学用词频、句长、功能词等风格特征判断作者. 人和模型的文本在词汇多样性、困惑度等特征上有差异, 但差异随模型进步而缩小. 泛化基准显示: 检测器在训练领域内很准, 换领域、换生成模型就大幅下降.
+S detect | stylo | 文体学方法 | Stylometry | 用风格特征识别作者.
+S detect | genbench | 泛化基准 | A generalization benchmark | 领域内成功, 迁移失败.
+
+D likedetect | Likelihood-based detectors use the fact that generated text has low perplexity under a language model; DetectGPT checks whether perturbations lower the log-probability.
+X likedetect | 模型生成的文本在语言模型下概率高、困惑度低, 因为采样偏向高概率的词元. GLTR 把每个词元按它在模型预测里的排名上色, 生成文本里排名前 10 的词元特别多. DetectGPT: 用另一个模型对文本做多次小改写, 如果原文的对数概率明显高于改写后的平均, 说明原文落在概率曲面的局部峰顶 (曲率为负), 很可能是生成的; 人写的文本改写后概率有升有降. 这些方法需要访问模型的概率, 改写攻击后容易失效.
+S likedetect | gltr | GLTR | GLTR | 按词元排名上色.
+S likedetect | dgpt | DetectGPT | DetectGPT | 看扰动后对数概率是否下降.
+
+D detectlim | Detectors transfer poorly across domains, their scores are misleading at low base rates, robust evaluation exposes attacks, and in theory detection may become impossible.
+X detectlim | 训练出来的检测器 (在人写和模型写的文本上训练分类器) 和商业检测器在领域内表现好, 换领域就差, 而且常把非母语者的文本误判为 AI. 商业指标要小心: 「99% AI」是模型的分数, 不是概率; 基础率低时, 即使假阳性率只有 1%, 被标记的文本里也有很多人写的. RAID 等稳健评估加入改写、同形字、混合作者等攻击, 检测率大幅下降. Sadasivan 等证明: 模型分布越接近人类分布, 任何检测器的最好表现越接近随机; 但更好的模型不一定更像人, 基础模型反而比对齐后的模型更难检测.
+S detectlim | trained | 训练出来的检测器 | Trained detectors | 领域内准, 跨领域差.
+S detectlim | br | 基础率 | base rate | 决定阳性结果有多可信.
+S detectlim | raid | RAID | RAID | 加入攻击的稳健评估.
+
+D watermark | A watermark biases generation towards a pseudo-random green list that depends on the previous tokens; detection counts green tokens with a z-test.
+X watermark | Kirchenbauer 等的绿/红名单: 每生成一个词元前, 用前一个词元做种子把词表伪随机分成绿名单和红名单, 给绿名单词元的 logits 加一个常数 δ, 让它们更容易被选中. 检测时不需要模型, 只要知道种子规则: 数文本里绿色词元的比例, 用 z 检验看是否显著高于随机的比例. δ 越大越容易检测, 但质量越受影响; 低熵的位置 (只有一个合理的词) 没法加水印. 改写、翻译后水印会被削弱, 但长文本里常有残留.
+S watermark | gl | 绿名单 | green list | 水印偏向的那部分词表.
+S watermark | wmq | 检测能力与质量 | Detectability vs quality | δ 越大越易检测, 质量越受影响.
+
+D synthid | SynthID-Text embeds a watermark with tournament sampling, which barely affects text quality and has been deployed in production.
+X synthid | 绿名单方法直接改分布; SynthID 改的是采样过程. 锦标赛采样: 从模型分布里抽出多个候选词元, 用依赖上下文和密钥的随机打分函数两两比较, 多轮淘汰, 胜者作为输出. 每个候选本身都来自模型分布, 所以质量几乎不变; 检测时用同样的打分函数算文本的平均分, 偏高就说明有水印. 在 Gemini 上的大规模实验中用户感受不到质量差别; 局限是低熵文本难检测, 改写和翻译仍能削弱水印.
+S synthid | ts | 锦标赛采样 | tournament sampling | 多轮打分比较选出词元.
+S synthid | rob | 稳健评估与攻击 | RAID: robust evaluation | 改写和混合作者削弱检测.

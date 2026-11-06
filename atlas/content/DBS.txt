@@ -1,0 +1,315 @@
+# DBS · 读笔记后整理的知识网和术语. 德语课件, 外文是德语. 字段说明见 SMIS.txt.
+# 依据 DBS 00–04 (2026-11-06): 数据库系统基础、关系模型、关系代数、关系演算 (04 同日补入). 后面的讲次笔记更新后按 docs/extraction-rules.md 第 14 节补.
+L DE
+H 为什么需要数据库系统, 怎样用关系模型描述数据, 再用关系代数和关系演算精确地写出查询.
+
+B grund | 数据库系统基础 | Grundlagen von Datenbanksystemen | 自己管理文件会出的问题, 数据库系统怎样用三层抽象和数据库语言解决它们.
+B relm | 关系模型 | Das Relationale Modell | 关系是笛卡尔积的子集, 用键、外键和完整性约束守住数据, 用 SQL-DDL 建表.
+B ra | 关系代数 | Relationale Algebra | 六个基本运算加上交、除、连接和聚合, 对关系封闭, 可以组合成任意查询.
+B kalk | 关系演算 | Der Relationenkalkül | 用逻辑公式描述结果元组要满足的性质: 元组演算、域演算, 以及建立在域演算上的 QBE.
+
+N warum | grund | 为什么需要数据库系统 | Warum Datenbanksysteme? | 01:warum | 自己写程序管理数据会遇到冗余、受限访问、多用户、数据丢失、完整性、安全和开发成本七类问题. | 课程示例程序当场出现了重复行、非法值、覆盖写文件 ;; 每个问题都自己解决, 等于重写一个数据库系统
+N dbs | grund | 数据库系统 | Datenbanksystem | 01:was | 数据库系统 = 数据库 (持久存储的整合数据) + 数据库管理系统 (管理它的软件). | 应用不直接碰数据文件, 所有访问都经过 DBMS ;; 数据描述现实世界的实体和联系 | DBS = DB + DBMS
+N zweck | grund | 数据库系统的功能 | Zweck eines Datenbanksystems | 01:zweck | 数据整合、高效访问、数据目录、视图、完整性约束、安全、事务、同步、恢复、即席查询. | 每项功能对应自己写程序时的一类问题 ;; 事务: 要么全部完成, 要么全部不做 ;; 列表来自 Codd 的十二条规则
+N gesch | grund | 数据管理的历史 | Geschichte des Datenmanagements | 01:gesch | 从应用自管文件、文件管理系统、层次和网状数据库, 到 1970 年代起的关系数据库. | 1970 Codd 提出关系模型 ;; System R 的查询语言 SEQUEL 后来改名 SQL ;; 今天的主流系统几乎都源自 System R 和 Ingres
+N trends | grund | 今天的发展趋势 | Entwicklungstrends | 01:trends | 新硬件带来内存数据库, 专门应用带来云数据库、数据流和大数据, 以及非关系型的 NoSQL. | NoSQL = not only SQL, 模式灵活、去掉事务等复杂功能 ;; 按数据形态和查询方式选数据库
+N ebenen | grund | 三层抽象 | Unterschiedliche Sichten auf Daten | 01:ebenen | 视图层、逻辑层、物理层: 越往上越抽象, 对用户隐藏存储细节. | 视图层: 用户和应用看到什么 ;; 逻辑层: 存了哪些数据, 结构是什么 ;; 物理层: 文件和索引怎样组织
+N schema | grund | 模式与实例 | Schemata & Instanzen | 01:schema | 模式是用某个数据模型对数据的描述, 很少变; 实例是某一时刻的实际内容, 经常变. | 像编程里的类型和值 ;; 模式也分概念、外部、物理三层
+N dunab | grund | 数据独立性 | Datenunabhängigkeit | 01:schema | 改某一层的模式, 不影响更高层. | 物理数据独立性: 加索引、换存储格式不用改逻辑模式和应用 ;; 逻辑数据独立性: 改逻辑模式不用改应用, 更难做到 ;; 方向是下层变、上层不受影响
+N modell | grund | 数据模型 | Datenmodelle | 01:modelle | 描述数据及其联系、语义和约束的一组概念. | 概念模型: ER 模型、面向对象模型 ;; 逻辑模型: 关系模型 (本课主线)、网状、层次、XML/JSON
+N ddldml | grund | 数据库语言 | Datenbanksprachen | 01:sprachen | DDL 定义模式, 结果存进数据目录; DML 查询和修改实例. | DML 分过程式 (写清楚怎样取) 和声明式 (只写要什么) ;; SQL 是声明式的 ;; SELECT 属于 DML | SELECT * FROM KUNDEN WHERE VORNAME = 'Scott'
+N arch | grund | 应用架构 | Anwendungsarchitekturen | 01:arch | 数据库应用基于客户端-服务器模型; 两层架构把应用逻辑放在客户端, 三层架构放在中间的应用服务器. | 两层: 业务逻辑分散在每台客户端 ;; 三层: 浏览器 → 后端服务 → 数据库
+
+N relmodell | relm | 关系模型 | Relationales Modell | 02:ueber | Codd 1970 年提出, 只有一种数据结构: 关系 (表), 理论基础是集合论和逻辑. | Codd 因此获 1981 年图灵奖 ;; 关系可以直接用 SQL 建, 也可以从 ER 模式推导
+N domaene | relm | 域 | Domäne | 02:domaene | 一个属性允许取的所有值组成的集合, 也就是数据类型. | 可以有限也可以无限 ;; 基数 |D| 是域的元素个数 | D = {rot, gelb, grün, blau}, |D| = 4
+N kreuz | relm | 笛卡尔积 | Kartesisches Produkt | 02:kreuz | 从 k 个集合各取一个元素按顺序排成 k 元组, 所有组合的集合. | 也叫叉积 ;; 元组有序: (1, a) 和 (a, 1) 不同 | |D₁ × … × Dₖ| = |D₁| · … · |Dₖ|
+N relation | relm | 关系 | Relation | 02:relation | 定义在域 D₁, …, Dₖ 上的关系是笛卡尔积 D₁ × … × Dₖ 的子集; 元素叫元组. | 度 (元数) = 列数, 基数 = 元组个数 ;; 数据库里的关系一定是有限的 ;; 每个域看成一列, 每个元组看成一行 | R ⊆ D₁ × … × Dₖ
+N relschema | relm | 关系模式 | Relationenschema | 02:schema | 表名加上每个属性的名字和域; 多个关系模式组成关系数据库模式. | 有序写法: 按位置找属性 ;; 无序写法: 按名字找属性, 域用 dom 给出 ;; 按位置访问会限制逻辑数据独立性 | Student(StudId: number, StudName: string, Major: string)
+N instanz | relm | 关系实例 | Relationeninstanz | 02:instanz | 模式在某一时刻的具体数据, 简称关系. | 行没有顺序 ;; 没有重复行, 因为关系是集合
+N integ | relm | 完整性约束 | Integritätsbedingungen | 02:integ | 保证数据正确、一致、有效的规则, 写在模式里, 每次修改都由 DBMS 检查. | 违反就拒绝这次操作 ;; 规则只写一次, 不靠每个应用自己检查
+N key | relm | 键 | Schlüssel | 02:schluessel | 能唯一识别元组的属性集: 满足唯一性和最小性. | 只要求唯一性的是超键 ;; 键是最小的超键 ;; 从数据能否定一个键, 不能证明一个键
+N keytypes | relm | 候选键与主键 | Kandidatenschlüssel & Primärschlüssel | 02:schluessel | 一个关系所有的键是候选键, 从中选一个作主键; 人工加的单属性主键叫代理键. | 复合键由多个属性组成 ;; 没选中的候选键可以加 UNIQUE ;; 主键加下划线
+N fremd | relm | 外键 | Fremdschlüssel | 02:fremd | 子关系里引用父关系主键的一组属性; 全部满足就保证参照完整性. | 域必须和被引用的主键一致 ;; 外键值要么是 NULL, 要么真的存在于父关系 ;; 复合主键要用复合外键引用
+N sqlddl | relm | SQL 建表 | Tabellendefinition in SQL | 02:ddl | CREATE TABLE 定义表名、列名、类型和约束, 得到模式和一个空实例. | 列名 = 属性, 类型 = 域 ;; 常用类型: INTEGER、DECIMAL(p,q)、CHAR(n)、VARCHAR(n)、DATE | CREATE TABLE T (a1 d1 c1, …)
+N constr | relm | SQL 中的约束 | Integritätsbedingungen in SQL | 02:constr | 列约束 NOT NULL、PRIMARY KEY、UNIQUE、CHECK、REFERENCES 等, 表约束可涉及多列. | 复合主键和复合外键只能写成表约束 ;; 主键隐含 NOT NULL 和唯一 ;; 省略的列取 DEFAULT, 没有就是 NULL
+N refakt | relm | 参照动作 | referenzielle Aktion | 02:constr | 父关系里被引用的行删除或修改时怎样处理: 默认拒绝, 或 CASCADE、SET NULL. | ON DELETE CASCADE: 跟着删除 ;; ON DELETE SET NULL: 外键列设为 NULL ;; 不写时被引用的行既不能删也不能改键值
+N alter | relm | 修改表定义 | Ändern von Tabellendefinitionen | 02:alter | DROP TABLE 删除整张表, ALTER TABLE 加、删、改列; 约束可以用 CONSTRAINT 起名. | DROP TABLE 连模式一起删, DELETE 只删行 ;; 新列加在最右边, 已有行取 NULL 或默认值
+
+N qlang | ra | 查询语言 | Anfragesprachen | 03:sprachen | 让用户取数据和改数据的语言; 不需要图灵完备, 有严格的形式基础, 所以可以自动优化. | 声明式: 只说要什么 ;; 过程式: 说怎样一步步得到 ;; 关系代数是过程式的, 关系演算是声明式的
+N raover | ra | 关系代数概览 | Einführung: Relationale Algebra | 03:ueber | 描述关系查询的形式语言, 运算的输入和输出都是关系 (封闭). | 六个基本运算: 选择、投影、重命名、笛卡尔积、并、差 ;; 封闭性让运算可以一层层嵌套
+N arith | ra | 算术表达式 | Arithmetische Ausdrücke | 03:arith | 常数和属性是算术表达式, 它们的和、差、积、商也是. | 能出现在投影、选择、连接、聚合和重命名里 ;; 不能出现在集合运算和笛卡尔积里 | π₂·A(r)
+N sel | ra | 选择 | Selektion | 03:selektion | σ_P(r) 挑出满足命题逻辑公式 P 的元组, 列不变. | 对应 SQL 的 WHERE ;; SQL 的 SELECT 对应的是投影 ;; 结果元组数 ≤ |r| | σ_A=B ∧ C>5(r)
+N proj | ra | 投影 | Projektion | 03:projektion | π_A₁,…,Aₖ(r) 只留下指定的列, 重复的行去掉. | 下标顺序就是结果的列顺序 ;; SQL 默认不去重, 要写 DISTINCT ;; 结果元组数 ≤ |r| | π_A,C(r)
+N setops | ra | 并与差 | Vereinigung · Differenz | 03:mengen | 并 r ∪ s 收集两边的元组, 差 r − s 留下在 r 不在 s 的元组; 前提是并相容. | 并相容: 元数相同, 对应列的域兼容 ;; 差不满足交换律 ;; 差是唯一能表达否定的基本运算 | |r − s| = |r| − |r ∩ s|
+N kreuzra | ra | 关系的笛卡尔积 | Kartesisches Produkt | 03:kreuz | r × s 把 r 的每个元组和 s 的每个元组拼成一个更长的元组. | 元数相加, 元组数相乘 ;; 拼出的是拉平的元组 ;; 是连接的基础 | |r × s| = |r| · |s|
+N rename | ra | 重命名 | Umbenennung | 03:rename | ρ 只改名字不改数据: 给结果起名, 或把同一个关系用两次时区分两份. | 自比较时必须重命名 ;; ρ_x(A₁,…,Aₖ)(E) 同时改关系名和属性名 | ρ_S1(Studierende) × ρ_S2(Studierende)
+N inter | ra | 交 | Schnittmenge | 03:zusatz | r ∩ s 是两边都有的元组, 可以用差表示. | 前提同并和差 ;; 交、除、连接都不增加表达力, 只简化写法 | r ∩ s = r − (r − s)
+N div | ra | 除法 | Division | 03:division | r ÷ s 回答含「对所有」的问题: 留下和 s 的每个元组拼起来都在 r 里的部分. | 模拟全称量词 ;; s 的属性必须是 r 的属性的一部分 ;; 是笛卡尔积的逆运算 | r ÷ s = π_A(r) − π_A((π_A(r) × s) − r)
+N natjoin | ra | 自然连接 | Natürlicher Verbund | 03:join | r ⋈ s 把同名属性取值相同的元组拼起来, 共同属性只留一份. | 没有同名属性时退化成笛卡尔积 ;; 没配上的元组会丢 ;; 碰巧同名的列也会被当成连接条件
+N theta | ra | θ 连接 | Theta-Verbund | 03:theta | r ⋈_C s = σ_C(r × s), 连接条件自己写, 可以用任何比较符. | 只用等号时叫等值连接 ;; 同名属性要先重命名 ;; 不等连接只能用它写 | r ⋈_B<D s
+N outer | ra | 外连接 | Weitere Verbund-Typen | 03:outer | 内连接丢掉没搭档的元组; 外连接把它们留下, 缺的一边填 NULL. | 左外连接保留左边, 右外连接保留右边, 全外连接两边都保留 ;; 符号多出横线的一边全部保留
+N gamma | ra | 分组与聚合 | Gruppierung und Aggregation | 03:gamma | γ 按分组属性把元组分组, 对每组算 count、avg、sum、min、max. | 对应 SQL 的 GROUP BY ;; 分组属性为空时整个关系是一组 ;; 唯一不能用六个基本运算表示的运算 | γ_MatrNr; avg(Note)(r)
+N kombi | ra | 组合运算 | Kombination von Operatoren | 03:kombi | 关系代数表达式可以像算术表达式一样嵌套; 基本表达式是数据库里的关系或常量关系. | 封闭性保证嵌套后仍是表达式 ;; 「没有」用差, 「每一门」用除, 「总共」用聚合 ;; 先选择再连接, 中间结果小得多
+N baum | ra | 运算树 | Grafische Darstellung relationaler Algebra-Ausdrücke | 03:baum | 内部节点是运算, 叶子是关系, 数据从下往上流. | SELECT … FROM … WHERE 的标准翻译: 积 → 选择 → 投影 ;; 优化器在树上调换运算, 结果不变 | π_A(σ_p(R₁ × … × Rₘ))
+
+N kalkuel | kalk | 演算 | Kalkül | 04:kalkuel | 由符号和规则组成的形式系统, 用来构造表达式、变形表达式、推出结论. | 例子是谓词演算 (一阶逻辑) ;; 组成: 变量和取值范围、谓词、量词、逻辑运算符、结果计算 | {x² ∣ x ∈ ℕ ∧ x³ > 0 ∧ x³ < 1000}
+N relkalk | kalk | 关系演算 | Relationenkalkül | 04:unterschied | 声明式查询语言: 只描述结果元组的性质, 不说怎样算出来. | 关系代数说「怎样」, 关系演算说「什么」 ;; 两种: 元组演算 (TRC) 和域演算 (DRC) ;; 是 SQL、QUEL、QBE 的理论基础
+N trc | kalk | 元组演算 | Tupelkalkül | 04:trc | 变量代表整个元组; 表达式 {t ∣ Ψ(t)} 是使公式 Ψ 为真的所有元组. | Codd 70 年代初提出 ;; t 必须是 Ψ 里唯一的自由变量 ;; 属性用 t.A 或 t[A] 取 | {s ∣ student(s) ∧ s.alter > 21}
+N freebound | kalk | 自由变量与约束变量 | Freie vs. gebundene Variablen | 04:frei | 被量词约束的变量只在公式内部有定义; 没被约束的是自由变量, 代表查询结果. | 没有自由变量的公式是封闭的, 有真值 ;; 有自由变量的公式是开放的, 真假取决于代入什么 ;; 对应 SQL: 外层表 vs. EXISTS 子查询里的表
+N atom | kalk | 原子 | Atom | 04:formeln | 公式最小的组成单位: 关系成员 R(t)、两个属性比较、属性和常量比较. | 比较符 Θ ∈ {=, <, >, ≥, ≤, ≠} ;; 原子里的变量都是自由的 ;; 属性比较对应连接条件, 常量比较对应过滤条件 | t.Gehalt > 50000
+N formel | kalk | 公式 | Formel | 04:formeln | 递归定义: 原子是公式; 公式经 ¬、∧、∨ 和量词组合后还是公式. | 逻辑运算符不改变变量的自由或约束身份 ;; 加量词是变量变成约束的唯一途径
+N quantor | kalk | 量词 | Quantor | 04:formeln | ∃t 和 ∀t 约束变量 t; ∀ 相当于对所有取值做「且」, ∃ 相当于做「或」. | ¬∀ ⇔ ∃¬, ¬∃ ⇔ ∀¬ ;; SQL 没有 ∀, 要写成 NOT EXISTS … NOT EXISTS ;; 全称查询对应关系代数的除法 | ∀s ∈ R: Ψ ≡ ∀s(R(s) ⇒ Ψ)
+N impl | kalk | 蕴含 | Implikation | 04:impl | A ⇒ B 只在 A 真、B 假时为假, 是 ¬A ∨ B 的简写. | ∀ 配 ⇒: 把要求限制在某个关系的元组上 ;; ∃ 配 ∧ ;; 前件为假时蕴含自动为真 | ∀t(t ∈ Employee ⇒ t.Gehalt > 50000)
+N semantik | kalk | 语义 | Semantik | 04:semantik | 给表达式规定含义: 变量 → 具体元组, 公式 → 真值, 表达式 → 关系. | 变量赋值 Ψ(r ∣ t): 把 t 的自由出现换成 r ;; 解释 I 按公式结构递归求真值 ;; 量词和表达式里的 r 跑遍整个值域, 不只是数据库里的元组
+N sicher | kalk | 安全表达式 | sichere Ausdrücke | 04:sicher | 结果只含数据库里的值和查询里的常量的表达式; 不安全的表达式可能得到无穷关系. | {t ∣ ¬(t ∈ Studierende)} 是无穷的 ;; 每个自由变量要被一个正的关系原子限定 ;; 安全的演算和关系代数表达力相同
+N drc | kalk | 域演算 | Domänenkalkül | 04:drc | 变量代表单个属性值; 原子 R(x₁, x₂, …) 按位置对应属性. | 常量可以直接写进原子 ;; 同一个变量出现在两个原子里就是等值连接 ;; 「只有」类查询: P(x) ∧ ¬∃y(… y ≠ …) | {x₂ ∣ ∃x₁, x₃ : student(x₁, x₂, x₃, 'Mathematik') ∧ x₃ > 21}
+N qbe | kalk | QBE | Query By Example | 04:qbe | 基于域演算的图形化查询语言: 在系统给出的表格骨架里填命令、常量、变量和条件. | 命令: P. 输出, I. 插入, D. 删除, U. 更新 ;; 变量以下划线开头, 同一变量 = 连接 ;; 条件框只有 AND 和 OR, 否定用 ¬ 行
+N qbevgl | kalk | QBE 与域演算 | Vergleich QBE – Domänenkalkül | 04:vergleich | QBE 查询可以机械地翻译成域演算: 带 P. 的列是自由变量, 其余列用 ∃ 约束. | 空列: 互不相同的 ∃ 变量 ;; 每一行变成一个关系原子, 常量和比较变成条件 ;; QBE 关系完备, 有些查询要分几步
+
+E warum > dbs | 数据库系统就是为了解决自己管理文件的那些问题.
+E dbs > zweck | 数据库系统的功能逐一对应那七类问题.
+E warum ~ zweck | 每一项功能对应自己写程序时的一类问题.
+E gesch > relmodell | 1970 年代起关系数据库成为主流.
+E gesch ~ trends | 历史一节讲到 80 年代, 趋势一节讲今天.
+E dbs > ebenen | DBMS 给用户一个抽象的数据视图.
+E ebenen > schema | 模式也分三层, 对应三层抽象.
+E schema > dunab | 数据独立性说的是改一层的模式不影响上层.
+E ebenen > dunab | 数据独立性是三层架构的直接好处.
+E modell > schema | 模式是用某个数据模型对数据的描述.
+E modell > relmodell | 关系模型是逻辑模型的一种, 也是本课主线.
+E schema > ddldml | DDL 定义模式, DML 操作实例.
+E zweck ~ ddldml | 高效访问靠数据库语言.
+E dbs > arch | 应用通过客户端-服务器结构访问数据库系统.
+E trends ~ modell | NoSQL 用的是 JSON 这类非关系模型.
+E relmodell > relation | 关系模型只有一种结构: 关系.
+E domaene > kreuz | 笛卡尔积是在域上做的.
+E kreuz > relation | 关系是笛卡尔积的子集.
+E relation > relschema | 关系模式描述关系的结构.
+E relschema > instanz | 实例是模式在某一时刻的数据.
+E schema ~ relschema | 关系模式和实例对应第 1 章的模式和实例.
+E dunab ~ relschema | 有序模式按位置访问, 会限制逻辑数据独立性.
+E instanz > key | 关系没有重复元组, 所以总能找到键.
+E integ > key | 键约束是一种完整性约束.
+E key > keytypes | 候选键是所有的键, 主键从中选出.
+E keytypes > fremd | 外键引用的是父关系的主键.
+E integ > fremd | 外键约束保证参照完整性.
+E zweck ~ integ | 完整性约束解决自己写程序时的完整性问题.
+E ddldml > sqlddl | CREATE TABLE 是 DDL.
+E relschema > sqlddl | 建表就是写出关系模式.
+E sqlddl > constr | 约束写在 CREATE TABLE 里.
+E keytypes > constr | PRIMARY KEY 和 UNIQUE 对应主键和候选键.
+E fremd > constr | REFERENCES 和 FOREIGN KEY 定义外键.
+E constr > refakt | 参照动作规定外键约束被触发时怎么处理.
+E sqlddl > alter | ALTER TABLE 修改已建好的表.
+E ddldml > qlang | DML 就是查询语言.
+E relmodell > raover | 关系代数是在关系模型里描述查询的语言.
+E qlang > raover | 关系代数是过程式的查询语言.
+E raover > sel | 选择是六个基本运算之一.
+E raover > proj | 投影是六个基本运算之一.
+E raover > setops | 并和差是基本运算.
+E raover > kreuzra | 笛卡尔积是基本运算.
+E raover > rename | 重命名是基本运算.
+E arith > proj | 投影里可以写算术表达式算出新列.
+E arith > sel | 选择条件里可以用算术表达式.
+E kreuz ~ kreuzra | 集合的笛卡尔积拼出二元组, 关系的笛卡尔积拼出拉平的元组.
+E instanz ~ proj | 关系没有重复行, 所以投影后要去重.
+E setops > inter | 交可以用差表示.
+E kreuzra > div | 除法是笛卡尔积的逆运算.
+E setops > div | 除法用差和笛卡尔积表示.
+E kreuzra > theta | θ 连接 = 先积再选择.
+E sel > theta | θ 连接用选择留下配对正确的行.
+E theta > natjoin | 自然连接是对所有同名属性的等值连接.
+E proj > natjoin | 自然连接要用投影去掉重复的共同属性.
+E natjoin > outer | 外连接保留内连接丢掉的元组.
+E rename ~ theta | 同名属性用在条件里时要先重命名.
+E raover > gamma | 分组聚合扩展了关系代数.
+E raover > kombi | 封闭性让运算可以嵌套.
+E kombi > baum | 嵌套的表达式可以画成运算树.
+E qlang ~ baum | SQL 查询在内部先翻译成运算树再优化.
+E fremd ~ natjoin | 连接常常沿着外键把两张表拼起来.
+E qlang > relkalk | 查询语言分过程式和声明式, 关系演算是声明式的一类.
+E kalkuel > relkalk | 关系演算是把谓词演算用到数据库查询上.
+E relkalk ~ raover | 同一类查询的两种写法: 演算说什么, 代数说怎样.
+E relkalk > trc | 元组演算是关系演算的一种.
+E relkalk > drc | 域演算是关系演算的另一种.
+E trc ~ drc | 区别只在变量是整个元组还是单个属性值.
+E atom > formel | 公式由原子递归构造.
+E formel > quantor | 加量词是构造公式的第三条规则.
+E quantor > freebound | 量词把自由变量变成约束变量.
+E freebound > trc | 表达式 {t ∣ Ψ(t)} 要求 t 是唯一的自由变量.
+E quantor ~ impl | ∀ 配 ⇒, ∃ 配 ∧.
+E formel > semantik | 解释按公式的语法结构递归定义.
+E semantik > sicher | 变量跑遍整个值域, 才会出现无穷的结果.
+E sicher ~ setops | 差只取 r 里的元组, 所以关系代数天生安全.
+E quantor ~ div | 「对所有」在演算里是 ∀, 在代数里是除法.
+E drc ~ theta | 域演算用同一个变量表示等值连接.
+E drc > qbe | QBE 建立在域演算上.
+E qbe > qbevgl | 翻译规则把填好的表格变成域演算表达式.
+
+T Datenbanksystem | das | Datenbanksysteme | 数据库系统 | grund | Datenbank zusammen mit dem Datenbankmanagementsystem. | 数据库加上数据库管理系统. | Datenbank | 01:was | DBS
+T Datenbank | die | Datenbanken | 数据库 | grund | Große integrierte Sammlung miteinander verknüpfter, persistent gespeicherter Daten. | 持久存储、相互关联的整合数据集合. | Datenbanksystem | 01:was | DB
+T Datenbankmanagementsystem | das | Datenbankmanagementsysteme | 数据库管理系统 | grund | Software zur Speicherung, Verwaltung und zum Zugriff auf eine Datenbank. | 存储、管理和访问数据库的软件. |  | 01:was | DBMS
+T Redundanz | die | Redundanzen | 冗余 | grund | Dieselbe Information ist mehrfach gespeichert. | 同一信息存了好几份. | Inkonsistenz | 01:warum
+T Inkonsistenz | die | Inkonsistenzen | 不一致 | grund | Mehrfach gespeicherte Daten widersprechen sich. | 多份数据互相矛盾. | Redundanz | 01:warum
+T Entität | die | Entitäten | 实体 | grund | Objekt der realen Welt, über das Daten gespeichert werden. | 数据描述的现实世界对象. | Beziehung | 01:was
+T Beziehung | die | Beziehungen | 联系 | grund | Verbindung zwischen Entitäten. | 实体之间的联系. | Entität | 01:was
+T Datenkatalog | der | Datenkataloge | 数据目录 | grund | Enthält die Metadaten über Objekte und Strukturen der Datenbank. | 存放关于数据库对象和结构的元数据. |  | 01:sprachen | Data Dictionary
+T Metadaten | die |  | 元数据 | grund | Daten über Daten. | 关于数据的数据. |  | 01:zweck
+T Transaktion | die | Transaktionen | 事务 | grund | Logische Einheit mehrerer Operationen, die ganz oder gar nicht ausgeführt wird. | 要么全部完成、要么全部不做的一组操作. |  | 01:zweck
+T Ad-hoc-Anfrage | die | Ad-hoc-Anfragen | 即席查询 | grund | Nicht vorprogrammierte Anfrage, die jederzeit gestellt werden kann. | 随时提出、没有预先编程的查询. |  | 01:zweck | Ad-hoc
+T NoSQL |  |  | NoSQL | grund | „Not only SQL“: nicht-relationale Systeme mit flexiblem Schema. | 非关系型、模式灵活的系统. |  | 01:trends
+T Sichtebene | die |  | 视图层 | grund | Beschreibt, wie Benutzer und Anwendungen die Daten sehen. | 用户和应用看到的样子. | Logische Ebene | 01:ebenen
+T Logische Ebene | die |  | 逻辑层 | grund | Beschreibt, welche Daten im DBS gespeichert werden; auch konzeptionelle Ebene. | 数据库存了哪些数据, 也叫概念层. | Physische Ebene | 01:ebenen
+T Physische Ebene | die |  | 物理层 | grund | Beschreibt, wie die Daten tatsächlich gespeichert werden. | 数据实际怎样存储. | Logische Ebene | 01:ebenen
+T Schema | das | Schemata | 模式 | grund | Beschreibung einer Sammlung von Daten mit einem gegebenen Datenmodell. | 用某个数据模型对数据的描述. | Instanz | 01:schema | Datenbankschema
+T Instanz | die | Instanzen | 实例 | grund | Tatsächlicher Inhalt der Datenbank zu einem bestimmten Zeitpunkt. | 某一时刻数据库的实际内容. | Schema | 01:schema
+T Datenunabhängigkeit | die |  | 数据独立性 | grund | Änderungen am Schema einer Ebene beeinflussen höhere Ebenen nicht. | 改一层的模式不影响上层. |  | 01:schema
+T physische Datenunabhängigkeit | die |  | 物理数据独立性 | grund | Änderungen am physischen Schema erfordern keine Änderung des logischen Schemas. | 改物理模式不用改逻辑模式和应用. | logische Datenunabhängigkeit | 01:schema
+T logische Datenunabhängigkeit | die |  | 逻辑数据独立性 | grund | Änderungen am logischen Schema erfordern keine Änderung der Anwendungen. | 改逻辑模式不用改应用. | physische Datenunabhängigkeit | 01:schema
+T Datenmodell | das | Datenmodelle | 数据模型 | grund | Sammlung von Konzepten zur Beschreibung von Daten, Beziehungen, Semantik und Constraints. | 描述数据、联系、语义和约束的一组概念. |  | 01:modelle
+T DDL |  |  | 数据定义语言 | grund | Data Definition Language: Sprache zur Definition eines Datenbankschemas. | 定义数据库模式的语言. | DML | 01:sprachen | Data Definition Language
+T DML |  |  | 数据操纵语言 | grund | Data Manipulation Language: Sprache zum Abfragen und Ändern von Instanzen. | 查询和修改实例的语言. | DDL | 01:sprachen | Data Manipulation Language
+T deklarativ |  |  | 声明式 | grund | Es wird nur angegeben, welche Daten gewünscht sind. | 只写要什么数据. | prozedural | 01:sprachen
+T prozedural |  |  | 过程式 | grund | Es wird angegeben, wie die Daten Schritt für Schritt gewonnen werden. | 写清楚怎样一步步取数据. | deklarativ | 01:sprachen
+T Anwendungslogik | die |  | 应用逻辑 | grund | Funktionalität einer Anwendung zwischen Benutzeroberfläche und Datenverwaltung. | 界面和数据管理之间的业务逻辑. |  | 01:arch | Business Logic
+T Relationales Modell | das |  | 关系模型 | relm | Datenmodell mit Relationen (Tabellen) als einziger Datenstruktur. | 以关系 (表) 为唯一数据结构的模型. |  | 02:ueber
+T Relation | die | Relationen | 关系 | relm | Teilmenge des kartesischen Produkts von Domänen. | 若干域的笛卡尔积的子集. | Relationenschema | 02:relation
+T Domäne | die | Domänen | 域 | relm | Wertebereich bzw. Typ eines Attributs. | 属性允许取的值的集合. |  | 02:domaene
+T Kardinalität | die | Kardinalitäten | 基数 | relm | Anzahl der Elemente einer Menge, bei einer Relation die Anzahl der Tupel. | 集合的元素个数, 关系里是元组个数. | Stelligkeit | 02:relation
+T kartesisches Produkt | das |  | 笛卡尔积 | relm | Menge aller Kombinationen von Elementen aus k Mengen. | 从 k 个集合各取一个元素的所有组合. |  | 02:kreuz | Kreuzprodukt
+T Tupel | das | Tupel | 元组 | relm | Element einer Relation, eine Zeile der Tabelle. | 关系的元素, 表里的一行. |  | 02:relation
+T Stelligkeit | die |  | 元数 | relm | Anzahl der Attribute einer Relation. | 关系的属性个数, 即列数. | Kardinalität | 02:relation | Grad
+T Attribut | das | Attribute | 属性 | relm | Komponente einer Relation, eine Spalte der Tabelle. | 关系的一个分量, 表里的一列. |  | 02:relation
+T Relationenschema | das | Relationenschemata | 关系模式 | relm | Name einer Relation mit ihren Attributen und Domänen. | 表名加上属性名和域. | Relationeninstanz | 02:schema
+T relationales Datenbankschema | das |  | 关系数据库模式 | relm | Sammlung von Relationenschemata. | 多个关系模式的集合. |  | 02:schema
+T Relationeninstanz | die | Relationeninstanzen | 关系实例 | relm | Konkreter Inhalt eines Relationenschemas zu einem Zeitpunkt. | 模式在某一时刻的具体数据. | Relationenschema | 02:instanz
+T Integritätsbedingung | die | Integritätsbedingungen | 完整性约束 | relm | Regel, die Korrektheit, Konsistenz und Gültigkeit der Daten sicherstellt. | 保证数据正确、一致、有效的规则. |  | 02:integ
+T Schlüssel | der | Schlüssel | 键 | relm | Minimale Attributmenge, die Tupel eindeutig identifiziert. | 能唯一识别元组的最小属性集. | Superschlüssel | 02:schluessel
+T Eindeutigkeit | die |  | 唯一性 | relm | Keine zwei Tupel stimmen in allen Attributen des Schlüssels überein. | 没有两个元组在键的所有属性上相同. | Minimalität | 02:schluessel
+T Minimalität | die |  | 最小性 | relm | Keine echte Teilmenge des Schlüssels ist eindeutig. | 键的任何真子集都不唯一. | Eindeutigkeit | 02:schluessel
+T Superschlüssel | der | Superschlüssel | 超键 | relm | Attributmenge, die nur die Eindeutigkeit erfüllt. | 只满足唯一性的属性集. | Schlüssel | 02:schluessel
+T zusammengesetzter Schlüssel | der |  | 复合键 | relm | Schlüssel aus mehreren Attributen. | 由多个属性组成的键. |  | 02:schluessel
+T Kandidatenschlüssel | der | Kandidatenschlüssel | 候选键 | relm | Jeder Schlüssel einer Relation. | 一个关系的每一个键. | Primärschlüssel | 02:schluessel
+T Primärschlüssel | der | Primärschlüssel | 主键 | relm | Aus den Kandidatenschlüsseln ausgewählter Schlüssel. | 从候选键里选出的一个. | Kandidatenschlüssel | 02:schluessel
+T Surrogatschlüssel | der | Surrogatschlüssel | 代理键 | relm | Künstlich hinzugefügter einattributiger Primärschlüssel. | 人工加的单属性主键. |  | 02:schluessel
+T Fremdschlüssel | der | Fremdschlüssel | 外键 | relm | Attributmenge, die auf den Primärschlüssel einer anderen Relation verweist. | 引用另一个关系主键的属性集. | Primärschlüssel | 02:fremd
+T referenzielle Integrität | die |  | 参照完整性 | relm | Alle Fremdschlüsselbedingungen sind erfüllt; es gibt keine defekten Referenzen. | 所有外键约束都满足, 没有悬空引用. |  | 02:fremd
+T defekte Referenz | die |  | 悬空引用 | relm | Verweis auf ein nicht existierendes Tupel. | 指向不存在的行的引用. |  | 02:fremd
+T Kind-Relation | die |  | 子关系 | relm | Relation mit dem Fremdschlüssel, die verweist. | 带外键、引用别人的关系. | Eltern-Relation | 02:fremd
+T Eltern-Relation | die |  | 父关系 | relm | Relation, auf die verwiesen wird. | 被引用的关系. | Kind-Relation | 02:fremd
+T referenzielle Aktion | die |  | 参照动作 | relm | Reaktion auf das Löschen oder Ändern eines referenzierten Tupels, z. B. CASCADE oder SET NULL. | 被引用的行删除或修改时的处理方式. |  | 02:constr
+T Anfragesprache | die | Anfragesprachen | 查询语言 | ra | Sprache, mit der Benutzer Daten abrufen und manipulieren. | 取数据和改数据的语言. |  | 03:sprachen
+T Relationale Algebra | die |  | 关系代数 | ra | Prozedurale formale Sprache für Anfragen im relationalen Modell. | 关系模型里过程式的形式查询语言. | Relationaler Kalkül | 03:sprachen
+T Relationaler Kalkül | der |  | 关系演算 | ra | Deklarative, logikbasierte Anfragesprache. | 声明式、基于逻辑的查询语言. | Relationale Algebra | 03:sprachen | Relationenkalkül
+T abgeschlossen |  |  | 封闭 | ra | Eingabe und Ausgabe jeder Operation sind Relationen. | 每个运算的输入和输出都是关系. |  | 03:ueber
+T Grundoperationen | die |  | 基本运算 | ra | Die sechs Basisoperationen Selektion, Projektion, Umbenennung, Kreuzprodukt, Vereinigung, Differenz. | 六个基本运算. |  | 03:ueber
+T Selektion | die | Selektionen | 选择 | ra | Wählt alle Tupel aus, für die eine Formel P wahr ist. | 挑出满足条件的元组. | Projektion | 03:selektion
+T Projektion | die | Projektionen | 投影 | ra | Gibt eine Relation mit nur den ausgewählten Attributen zurück. | 只留下指定的属性. | Selektion | 03:projektion
+T Vereinigung | die | Vereinigungen | 并 | ra | Tupel, die in r oder in s vorkommen. | 在 r 或 s 里的元组. | Differenz | 03:mengen
+T Differenz | die | Differenzen | 差 | ra | Tupel, die in r, aber nicht in s vorkommen. | 在 r 里、不在 s 里的元组. | Vereinigung | 03:mengen
+T Umbenennung | die | Umbenennungen | 重命名 | ra | Gibt einem Ausdruck oder seinen Attributen neue Namen. | 给表达式或属性起新名字. |  | 03:rename
+T Selbstvergleich | der |  | 自比较 | ra | Vergleich einer Relation mit sich selbst; erfordert Umbenennung. | 一个关系和自己比较, 需要重命名. |  | 03:rename
+T Schnittmenge | die | Schnittmengen | 交 | ra | Tupel, die in beiden Relationen vorkommen. | 两边都有的元组. |  | 03:zusatz | Durchschnitt
+T Division | die | Divisionen | 除法 | ra | Liefert die Tupel von r, die zu allen Tupeln von s passen. | 留下和 s 的所有元组都能配上的部分. |  | 03:division
+T natürlicher Verbund | der |  | 自然连接 | ra | Verknüpft Tupel mit gleichen Werten in gleichnamigen Attributen. | 同名属性取值相同的元组拼在一起. | Theta-Verbund | 03:join | Natural Join
+T Theta-Verbund | der |  | θ 连接 | ra | Verbund mit beliebiger Bedingung C: σ_C(r × s). | 带任意条件的连接. | natürlicher Verbund | 03:theta | bedingter Verbund
+T Equi-Verbund | der |  | 等值连接 | ra | Verbund, dessen Bedingung nur Gleichheitsvergleiche enthält. | 只用等号的连接. |  | 03:theta | Equi-Join
+T Inner Join | der | Inner Joins | 内连接 | ra | Verbund, der nur Tupel mit passendem Partner enthält. | 只保留有搭档的元组. | Outer Join | 03:outer
+T Outer Join | der | Outer Joins | 外连接 | ra | Verbund, der auch Tupel ohne Partner behält und mit NULL auffüllt. | 没搭档的元组也保留, 用 NULL 补齐. | Inner Join | 03:outer
+T Left-Outer Join | der |  | 左外连接 | ra | Behält alle Tupel der linken Relation. | 保留左边的全部元组. | Right-Outer Join | 03:outer
+T Right-Outer Join | der |  | 右外连接 | ra | Behält alle Tupel der rechten Relation. | 保留右边的全部元组. | Left-Outer Join | 03:outer
+T Full-Outer Join | der |  | 全外连接 | ra | Behält alle Tupel beider Relationen. | 两边的元组都保留. |  | 03:outer
+T Gruppierung | die | Gruppierungen | 分组 | ra | Zusammenfassen von Tupeln mit gleichen Attributwerten. | 把取值相同的元组归成一组. | Aggregation | 03:gamma
+T Aggregation | die | Aggregationen | 聚合 | ra | Anwenden einer Funktion wie count oder avg auf jede Gruppe. | 对每组算 count、avg 等. | Gruppierung | 03:gamma
+T Basisausdruck | der | Basisausdrücke | 基本表达式 | ra | Eine Relation aus der Datenbank oder eine konstante Relation. | 数据库里的关系或常量关系. |  | 03:kombi
+T Kalkül | das | Kalküle | 演算 | kalk | Formales System aus Symbolen und Regeln zum Bilden, Umformen und Ableiten von Ausdrücken. | 由符号和规则组成、用来构造和变形表达式的形式系统. |  | 04:kalkuel
+T Prädikatenkalkül | der |  | 谓词演算 | kalk | Kalkül mit Variablen, Prädikaten, Quantoren und logischen Operatoren. | 带变量、谓词、量词和逻辑运算符的演算 (一阶逻辑). |  | 04:kalkuel
+T Tupelkalkül | der |  | 元组演算 | kalk | Relationenkalkül, dessen Variablen vom Typ Tupel sind. | 变量是整个元组的关系演算. | Domänenkalkül | 04:trc | TRC
+T Domänenkalkül | der |  | 域演算 | kalk | Relationenkalkül, dessen Variablen einen einfachen Typ haben und für einzelne Attribute stehen. | 变量是单个属性值的关系演算. | Tupelkalkül | 04:drc | DRC
+T Tupelvariable | die | Tupelvariablen | 元组变量 | kalk | Variable, die für ein vollständiges Tupel mit festem Schema steht. | 代表一个完整元组的变量. | Domänenvariable | 04:trc
+T Domänenvariable | die | Domänenvariablen | 域变量 | kalk | Variable für den Wert eines einzelnen Attributs. | 代表单个属性值的变量. | Tupelvariable | 04:drc
+T freie Variable | die | freie Variablen | 自由变量 | kalk | Variable, die durch keinen Quantor gebunden ist; steht für die Tupel des Ergebnisses. | 没被量词约束、代表结果元组的变量. | gebundene Variable | 04:frei
+T gebundene Variable | die | gebundene Variablen | 约束变量 | kalk | Variable, die durch einen Quantor gebunden und nur innerhalb der Formel definiert ist. | 被量词约束、只在公式内部有定义的变量. | freie Variable | 04:frei
+T Atom | das | Atome | 原子 | kalk | Kleinste Formel: Relationszugehörigkeit oder Vergleich von Attributen bzw. Konstanten. | 最小的公式: 关系成员或比较. | Formel | 04:formeln | atomare Formel
+T Formel | die | Formeln | 公式 | kalk | Rekursiv aus Atomen, logischen Operatoren und Quantoren aufgebauter Ausdruck. | 由原子、逻辑运算符和量词递归构造的式子. | Atom | 04:formeln
+T Quantor | der | Quantoren | 量词 | kalk | Der Existenzquantor ∃ oder der Allquantor ∀; er bindet eine Variable. | 存在量词或全称量词, 约束一个变量. |  | 04:formeln
+T Allquantor | der | Allquantoren | 全称量词 | kalk | ∀: Die Formel gilt für alle Belegungen der Variable. | 对变量的所有取值都成立. | Existenzquantor | 04:formeln
+T Existenzquantor | der | Existenzquantoren | 存在量词 | kalk | ∃: Es gibt mindestens eine Belegung, für die die Formel gilt. | 至少有一个取值使公式成立. | Allquantor | 04:formeln
+T Implikation | die | Implikationen | 蕴含 | kalk | A ⇒ B ist nur falsch, wenn A wahr und B falsch ist; Kurzform für ¬A ∨ B. | 只在前件真、后件假时为假. |  | 04:impl
+T Syntax | die |  | 语法 | kalk | Regeln, wie Ausdrücke aufgebaut werden. | 表达式怎样构造. | Semantik | 04:trc
+T Semantik | die |  | 语义 | kalk | Bedeutung, die einem korrekt aufgebauten Ausdruck zugeordnet ist. | 赋给语法正确的表达式的含义. | Syntax | 04:semantik
+T Variablenzuweisung | die | Variablenzuweisungen | 变量赋值 | kalk | Ersetzt jedes freie Vorkommen von t durch ein konkretes Tupel r, notiert Ψ(r ∣ t). | 把 t 的自由出现换成具体元组 r. |  | 04:semantik
+T Interpretation | die | Interpretationen | 解释 | kalk | Ordnet einer Formel analog zum syntaktischen Aufbau den Wert true oder false zu. | 按公式结构递归求出真值. |  | 04:semantik
+T sicherer Ausdruck | der | sichere Ausdrücke | 安全表达式 | kalk | Anfrage, die ihre Ergebnisse auf Werte aus der Datenbank und der Anfrage beschränkt. | 结果只含数据库和查询里的值的表达式. |  | 04:sicher
+T Ausdrucksstärke | die |  | 表达能力 | kalk | Welche Anfragen eine Sprache formulieren kann; Kalküle und Relationenalgebra sind gleichwertig. | 一种语言能写出哪些查询. |  | 04:sicher
+T Query By Example |  |  | 按例查询 | kalk | Auf dem Domänenkalkül basierende Anfragesprache, bei der ein Tabellenskelett ausgefüllt wird. | 在表格骨架里填写的、基于域演算的查询语言. |  | 04:qbe | QBE
+T Tabellenskelett | das | Tabellenskelette | 表格骨架 | kalk | Leere Tabellenvorlage, die der Benutzer in QBE ausfüllt. | QBE 里让用户填写的空表格. |  | 04:qbe
+T Bedingungsfeld | das | Bedingungsfelder | 条件框 | kalk | Feld für zusätzliche Bedingungen in QBE (AND, OR, kein NOT). | QBE 里写额外条件的框, 没有 NOT. |  | 04:qbe
+T relational vollständig |  |  | 关系完备 | kalk | Kann jede Anfrage der Relationenalgebra ausdrücken. | 能表达关系代数的所有查询. |  | 04:vergleich
+
+# ---- 覆盖报告 ----
+SKIP 课程安排, 不是知识点 | Vorlesungen; Übungsbetrieb; Auswahl nützlicher Werkzeuge; Empfohlene Literatur
+SKIP 引入, 归入 数据库系统 | Motivation · Daten als das neue Öl des 21. Jahrhunderts
+SKIP 示例程序, 归入 为什么需要数据库系统 | Codebeispiele aus der VL: my_better_than_dbs_software.py
+SKIP 例题, 归入 SQL 建表 | Tabellendefinition in SQL · Beispiele
+SKIP 例题, 归入 组合运算 | Beispielanfragen
+DROP 例子或旁支名词 | Straw-Man; OLAP; ANSI/SPARC; ER; Constraint
+DROP 并入其他术语 | Redundanz / Inkonsistenz; Integrität; persistent; Datenkatalog / Data Dictionary; Anwendungslogik / Business Logic; Datenbankschema; Kreuzprodukt; Grad / Stelligkeit; geordnet; ungeordnet; Integritätsbedingungen; Ad-hoc; Kartesisches Produkt; unär; binär; Natürlicher Verbund; Theta-Verbund θ
+SKIP 引入, 归入 关系演算 | Erweiterungen für Datenbankanfragen
+SKIP 两个小节合成一个概念, 归入 原子 / 公式 / 量词 | Atome · Formeln
+SKIP 翻译算法, 归入 QBE 与域演算 | Realisierung einer QBE-Abfrage
+DROP 第 4 章并入其他术语 | Relationenkalkül; atomare Formel; Relationszugehörigkeit; Ausdruck; QBE
+DROP 归入 自由变量与约束变量 | geschlossen; offen
+DROP 归入 公式 | rekursiv
+DROP 并入 安全表达式 | sichere Ausdrücke
+ZH 描述性小标题, 不是术语 | ∀ 配 ⇒; 两种关系演算; 全称查询; 公式简写; 同一变量表示连接; 否定行; 和关系代数等价; 属性访问; 空列; 翻译步骤; 递归构造
+DE 课件章标题 | Der Relationenkalkül
+ZH 课件章标题的译名 | 数据库系统基础
+ZH 描述性小标题, 不是术语 | 外键可以为 NULL; 差表达否定; 无序写法; 集合论基础; 默认拒绝; 常见查询的写法
+Q Datenkatalog | Datenkatalog: Enthält alle Informationen über Objekte und Strukturen der Datenbank (Metadaten) | Folie 12
+Q Metadaten | Datenkatalog: Enthält alle Informationen über Objekte und Strukturen der Datenbank (Metadaten) | Folie 12
+Q Transaktion | Transaktionen: fassen mehrere Operationen auf Daten zu logischen Einheiten zusammen | Folie 12
+Q Logische Ebene | Logische Ebene (Logical Level) (auch konzeptionelle Ebene genannt) beschreibt, welche Daten im DBS gespeichert werden | Folie 21–22
+Q Datenunabhängigkeit | Fähigkeit, die Definition eines Schemas auf einer Ebene zu ändern, ohne dass dies Auswirkungen auf die Schemadefinitionen auf höheren Ebenen hat | Folie 24
+Q logische Datenunabhängigkeit | Logische Datenunabhängigkeit Fähigkeit, das logische Schema zu ändern, ohne Anwendungsprogramme neu schreiben zu müssen | Folie 24
+Q physische Datenunabhängigkeit | Physische Datenunabhängigkeit Fähigkeit, das physische Schema zu ändern, ohne das logische Schema oder Anwendungen anpassen zu müssen | Folie 24
+Q Datenmodell | Ein Datenmodell ist eine Sammlung von Konzepten zur Beschreibung von | Folie 25
+Q DML | Sprache zur Abfrage und Manipulation von Daten, die entsprechend einem zugrunde liegenden Datenmodell organisiert sind | Folie 27
+Q Domäne | Ist ein Wertebereich (oder Typ) Logische Menge von Werten | Folie 3
+Q Superschlüssel | Menge ist ein Superschlüssel, wenn sie lediglich die Eindeutigkeit erfüllt | Folie 15
+Q zusammengesetzter Schlüssel | Oft reicht ein einzelnes Attribut nicht aus, um ein Tupel eindeutig zu identifizieren | Folie 17
+Q Surrogatschlüssel | Es ist oft sinnvoll, einen künstlichen Primärschlüssel (ein einzelnes Attribut ⇒ Surrogatschlüssel) einzuführen | Folie 18
+Q Kandidatenschlüssel | Es ist wichtig, alle möglichen Schlüssel zu ermitteln ⇒ Menge der Kandidatenschlüssel | Folie 18
+Q Primärschlüssel | Wenn es mehr als einen Schlüssel gibt, wird einer davon (vom Designer oder der Datenbankadministrator:in) als Primärschlüssel ausgewählt | Folie 18
+Q Kind-Relation | Ein Fremdschlüssel ist eine Menge von Attributen in einer Relation (→ Kind-Relation) | Folie 20
+Q Eltern-Relation | die verwendet wird, um auf ein Tupel in einer anderen Relation zu „verweisen“ (→ Eltern-Relation) | Folie 20
+Q Outer Join | Wenn man auch Tupel ohne passenden Partner einbeziehen möchte, verwendet man Outer Joins | Folie 30
+Q Equi-Verbund | Wenn C nur Gleichheitsvergleiche enthält, spricht man auch von einem Equi-Verbund | Folie 25
+Q relationales Datenbankschema | Eine Sammlung von Relationen-Schemata = relationales Datenbankschema | Folie 7
+Q sicherer Ausdruck | Eine sichere Anfrage beschränkt ihre Ergebnisse auf Werte aus der Datenbank und der Anfrage | Folie 24
+Q Tupelvariable | Tupelvariablen besitzen ein eindeutig definiertes Schema | Folie 7
+NOQ Datenbankmanagementsystem; Redundanz; Inkonsistenz; referenzielle Integrität; Selbstvergleich
+M Metadaten | ddldml
+M Schema | schema
+M Instanz | schema
+M Anwendungslogik | arch
+M relationales Datenbankschema | relschema
+M defekte Referenz | fremd
+M Vereinigung | setops
+M Differenz | setops
+M Allquantor | quantor
+M Existenzquantor | quantor
+M Tupelvariable | trc
+M Domänenvariable | drc
+M freie Variable | freebound
+M gebundene Variable | freebound
+M Prädikatenkalkül | kalkuel
+M Syntax | trc
+M Variablenzuweisung | semantik
+M Interpretation | semantik
+M sicherer Ausdruck | sicher
+M Ausdrucksstärke | sicher
+M Query By Example | qbe
+M Tabellenskelett | qbe
+M Bedingungsfeld | qbe
+M relational vollständig | qbevgl

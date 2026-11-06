@@ -1,0 +1,400 @@
+# IDP · 读笔记后整理的知识网和术语. 英语课, 外文是英语, 没有冠词和复数. 字段说明见 SMIS.txt.
+L EN
+H 深度学习导论: 从单个神经元到 MLP、反向传播和优化, 再到 CNN、RNN、自编码器和 GAN.
+
+B mlp | 多层感知机 | Multilayer Perceptrons | 神经元层层复合, 一个隐藏层就能逼近任意连续函数.
+B train | 训练与反向传播 | Training and Backpropagation | 用梯度下降最小化经验风险, 梯度靠链式法则反向算出.
+B reg | 正则化 | Regularization | 权重衰减、提前停止、dropout 和数据增强控制过拟合.
+B opt | 优化与初始化 | Optimization Challenges, Advanced Optimization, Activations | 病态、鞍点和梯度消失, 以及动量、自适应学习率、激活和初始化的对策.
+B cnn | 卷积神经网络 | Convolutional Neural Networks | 局部连接和参数共享的滑动滤波器, 适合有空间结构的数据.
+B rnn | 循环网络与注意力 | Recurrent Neural Networks and Attention | 同一组权重逐步读入序列; 门控和注意力解决长距离依赖.
+B ae | 无监督学习与自编码器 | Unsupervised Learning and Autoencoders | 先压缩再重建输入, 学到低维表示.
+B gan | 生成对抗网络 | Generative Adversarial Networks | 生成器和判别器对抗训练, 学会采出像真数据的样本.
+
+N dlintro | mlp | 深度学习与表示学习 | Representation Learning | c1-intro | 深度学习是用神经网络作假设空间的机器学习, 网络自己从原始输入学出特征. | 仍然是 ERM, 同样要防过拟合 ;; 擅长图像、文本、语音这类非结构化数据 ;; 表格数据上不一定胜过树模型
+N neuron | mlp | 单个神经元 / 感知机 | Single Neuron / Perceptron | c1-neuron | 先做仿射变换, 再过激活函数. | 恒等激活 = 线性回归 ;; sigmoid 激活 = 逻辑回归 ;; 偏置让边界不必过原点 | f(x) = τ(wᵀx + b)
+N xor | mlp | XOR 问题 | XOR-Problem | c1-xor | 单个神经元只能画直线, 分不开 XOR; 加一层隐藏层就能分开. | XOR 含有交互项 ;; 隐藏层把数据变换到可线性分开的表示
+N shl | mlp | 单隐层神经网络 | Single Hidden Layer Neural Networks | c1-shl | 隐藏层先把输入变成新的表示, 输出层再在新表示上做简单预测. | 隐藏层必须有非线性激活 ;; 网络结构相当于先验 | f(x) = τ(W₂ᵀ σ(W₁ᵀx + b₁) + b₂)
+N mcnet | mlp | 用于多分类的单隐层网络 | Single Hidden Layer Networks for Multi-Class Classification | c1-multi | 输出层每类一个神经元, 用 softmax 变成概率, 损失是交叉熵. | 只改输出这一端 ;; 交叉熵对 softmax 输入的梯度是 π − y | softmax(z)ₖ = exp(zₖ) / Σ exp(zⱼ)
+N mlpdeep | mlp | 多层前馈神经网络 (MLP) | Multi-Layer Feedforward Neural Networks | c1-mlp | 深度网络是一串函数的复合: 每层先仿射变换, 再逐元素过激活. | 输出激活按任务选: 恒等、sigmoid 或 softmax ;; 前向传播逐层算到输出 | f = τ ∘ φ ∘ σ ∘ φ ∘ …
+N matnot | mlp | MLP 的矩阵记号 | MLP – Matrix Notation | c1-matrix | 把同一层的计算合成一次矩阵乘法, 各层权重矩阵和偏置的维度要对得上. | 一批输入一次算完 ;; 和框架代码一一对应 | z = σ(Wᵀx + b)
+N uat | mlp | 万能逼近定理 | Universal Approximation | c1-uat | 一个隐藏层、足够多神经元, 就能在紧集上一致逼近任意连续函数. | 能表示不等于能学到 ;; 需要的宽度可能指数级 ;; 深度常比宽度更省参数
+N hist | mlp | 简史 | Brief History | c1-hist | 每一代模型都解决了上一代的局限: 阈值神经元 → 感知机 → 反向传播 → 深度学习. | 单层感知机解不了 XOR, 引发 AI 寒冬 ;; 2006 年贪心逐层预训练 ;; 2012 年 AlexNet
+
+N basictrain | train | 基本训练 | Basic Training | c2-train | 用梯度下降最小化训练集上的平均损失; 目标非凸, 只能从起点一步步走. | 随机梯度下降每步只用一个小批量 ;; 一轮 = 看完一遍训练集 ;; 学习率决定步长 | θ ← θ − α ∇R_emp(θ)
+N cgraph | train | 链式法则与计算图 | Chain Rule and Computational Graphs | c2-graph | 损失对权重的导数沿复合关系一层层乘回去; 计算图把复合关系画出来. | 多条路径的影响要相加 ;; 反向模式自动微分在图上反向走一遍 | ∂L/∂x = Σᵢ ∂L/∂yᵢ · ∂yᵢ/∂x
+N bp | train | 反向传播 | Backpropagation | c2-bp1 | 前向传播算预测和损失, 反向传播用链式法则算出每个参数的偏导. | 考试常考小网络上的手算 ;; 复用中间结果, 很高效
+N bprec | train | 误差信号的递推 | Basic Backpropagation 2 | c2-bp2 | 把公共部分起名叫误差信号, 后一层的误差信号决定前一层的. | 有了误差信号, 每个权重的梯度只要一次乘法 ;; 可写成整层的向量形式 | δ⁽ˡ⁾ = (W⁽ˡ⁺¹⁾ δ⁽ˡ⁺¹⁾) ⊙ σ′(z⁽ˡ⁾)
+N hw | train | 硬件与软件 | Hardware and Software | c2-hw | 训练几乎全是大规模矩阵运算, GPU、TPU 把它并行化, 框架包好了求导. | GPU 有成千上万个简单核心 ;; TPU 用脉动阵列 ;; PyTorch、TensorFlow 自动微分
+
+N regbasic | reg | 基本正则化 | Basic Regularization | c3-basic | 在经验风险后加参数范数的惩罚, L2 惩罚在梯度下降中就是权重衰减. | 加惩罚等价于带约束的优化 ;; 广义的正则化还包括提前停止、dropout | R_reg = R_emp + λ/2 ‖θ‖²
+N ridge | reg | 岭回归 | Ridge Regression | c3-ridge | 线性回归加 L2 惩罚, 有闭式解, 系数被收缩向原点. | 特征多或高度相关时仍稳定 ;; 等价于在 L2 球内求最优 | θ̂ = (XᵀX + λI)⁻¹ Xᵀy
+N srm | reg | 非线性模型与结构风险最小化 | Non-Linear Models and Structural Risk Minimization | c3-nonlin | 惩罚同样用于神经网络; 结构风险最小化在一串越来越复杂的模型里挑一个. | 假设空间、损失、惩罚三个旋钮 ;; λ 连续变化也是 SRM 的特例 ;; 奥卡姆剃刀
+N geol2 | reg | L2 正则化的几何分析 | Geometry of L2 Regularization | c3-geol2 | 在最优点附近二次近似, L2 沿 Hessian 特征方向按比例收缩. | 曲率大的方向几乎不动 ;; 曲率小的方向被压向 0
+N es | reg | 提前停止 | Early Stopping | c3-es | 不改目标函数, 只在验证误差最低时停止迭代. | 对线性模型近似等价于 L2 ;; 迭代步数扮演 λ 的角色 ;; 用 patience 防止过早停
+N dropout | reg | Dropout 与数据增强 | Dropout and Augmentation | c3-dropout | dropout 训练时随机关掉神经元, 近似为共享权重的子网络集成; 数据增强人工扩充训练集. | 平均降低方差 ;; 防止神经元共适应 ;; 测试时用全网络并按保留概率缩放
+
+N optchal | opt | 优化中的难点 | Challenges in Optimization | c4-chal | 梯度下降只看一阶信息, 会被病态、局部极小、鞍点和悬崖困住. | 病态: 各方向曲率差太多 ;; 高维里鞍点比局部极小多得多 ;; 悬崖用梯度裁剪
+N advopt | opt | 进阶优化 | Advanced Optimization | c4-adv | 动量累积旧速度, Adagrad、RMSprop、Adam 按分量调学习率, 批归一化稳定各层输入. | 动量抑制峡谷里的振荡 ;; Adam = 动量 + RMSProp + 偏差修正 ;; 学习率可以按计划衰减 | v ← φv − α∇R, θ ← θ + v
+N act | opt | 现代激活函数 | Modern Activation Functions | c4-act | sigmoid 类函数两端饱和导致梯度消失, ReLU 及其变体缓解了这个问题. | ReLU 会出现神经元死亡 ;; Leaky ReLU、ELU、SELU 改负半轴 ;; 输出激活和损失配套
+N init | opt | 网络初始化 | Network Initializations | c4-init | 权重的初始尺度决定信号逐层变大还是变小; Glorot 和 He 按层宽定方差. | 全部初始化为同一个值无法打破对称 ;; Glorot 配 tanh, He 配 ReLU ;; 偏置通常初始化为 0 | Var(w) = 2 / n_in
+
+N cnnintro | cnn | CNN 导论 | CNN: Introduction | c5-intro | 卷积、池化再接全连接层, 擅长图像这类有空间结构的数据. | 全连接层参数太多, 也不利用邻近关系 ;; 端到端学习特征
+N conv | cnn | 卷积运算 | Convolutional Operation | c5-conv | 小滤波器在图上滑动, 逐元素相乘再求和, 得到特征图. | Sobel 滤波器提取边缘 ;; CNN 的滤波器是学出来的 | (I ∗ K)(i, j) = Σₘ Σₙ I(i + m, j + n) K(m, n)
+N convprop | cnn | 卷积的性质 | Properties of Convolution | c5-prop | 稀疏交互和参数共享大大减少参数, 卷积对平移等变. | 每个输出只看一小块输入 ;; 同一滤波器扫过所有位置 ;; 池化带来近似的平移不变
+N cnncomp | cnn | CNN 的组件 | CNN Components | c5-comp | 通道、填充、步幅和池化决定特征图的大小. | 同尺寸填充让输出不缩小 ;; 步幅大于 1 是下采样 ;; 全局平均池化代替全连接层 | o = ⌊(i − k + 2p) / s⌋ + 1
+N cnnapp | cnn | CNN 的应用 | CNN Applications | c5-app | 分类、着色、定位、语义分割和图像描述, 各自设计不同的输出和损失. | 输出粒度从整张图到每个像素 ;; 定位要同时输出类别和边界框
+N convtypes | cnn | 一维、二维、三维卷积 | 1D / 2D / 3D Convolutions | c5-types | 卷积的维数指卷积核能沿几个方向滑动, 和通道数无关. | 一维用于文本和传感器序列 ;; 三维用于视频和 MRI ;; 卷积核总是覆盖全部通道
+N dilconv | cnn | 空洞卷积与转置卷积 | Important Types of Convolutions | c5-dil | 空洞卷积不加参数就扩大感受野, 转置卷积把特征图放大. | 空洞卷积会有网格效应 ;; 转置卷积会有棋盘格伪影 ;; 因果卷积只看过去
+N sepconv | cnn | 可分离卷积与展平 | Separable Convolutions and Flattening | c5-sep | 把一个卷积拆成两步来省计算, 展平把特征图变成向量交给全连接层. | 秩 1 的核可拆成行和列两步 ;; 深度可分离 = 逐通道卷积 + 逐点卷积
+N modcnn1 | cnn | 现代结构 (一) | Modern Architectures - I | c5-mod1 | LeNet、AlexNet、VGG、NiN: 每种结构比前一种多一个关键改进. | AlexNet 用 ReLU、dropout 和 GPU ;; VGG 只用 3×3 小卷积块 ;; NiN 引入 1×1 卷积和全局平均池化
+N modcnn2 | cnn | 现代结构 (二) | Modern Architectures - II | c5-mod2 | GoogLeNet、ResNet、DenseNet、U-Net, 其中 ResNet 的残差连接让很深的网络也能训练. | 残差连接解决退化问题 ;; DenseNet 把相加换成拼接 ;; U-Net 用跳跃连接保留空间细节 | y = F(x) + x
+
+N rnnintro | rnn | RNN 导论 | Recurrent Neural Networks - Introduction | c6-intro | 同一组权重逐步读入序列, 隐藏状态带着之前的信息. | 普通网络的权重个数和输入长度绑定 ;; 按输入输出分 one-to-one 到 seq-to-seq | h⁽ᵗ⁾ = σ(Wh⁽ᵗ⁻¹⁾ + Ux⁽ᵗ⁾ + b)
+N bptt | rnn | RNN 的反向传播 | Recurrent Neural Networks - Backpropagation | c6-bptt | 沿时间展开后反向传播; 梯度反复乘同一个矩阵, 容易爆炸或消失. | 谱半径大于 1 爆炸, 小于 1 消失 ;; 爆炸用梯度裁剪
+N lstm | rnn | 现代 RNN: LSTM、GRU、双向 RNN | Modern Recurrent Neural Networks | c6-lstm | 门控机制控制信息的保留和遗忘, 缓解梯度消失; 双向 RNN 同时看前后文. | LSTM 有细胞状态和三个门 ;; GRU 只有更新门和重置门
+N rnnapp | rnn | RNN 的应用 | Applications of RNNs | c6-app | 语言建模每步预测下一个词, 编码器–解码器先读完输入再生成不同长度的输出. | 机器翻译用 seq-to-seq ;; 训练时用教师强制 ;; 解码时用集束搜索
+N attn | rnn | 注意力与 Transformer | Attention and Transformers | c6-att | 解码器每一步按相关程度加权回看编码器的全部状态; Transformer 只用注意力. | 解决上下文向量的瓶颈 ;; 自注意力让序列内部互相看 ;; 位置编码补上顺序信息
+
+N unsup | ae | 无监督学习 | Unsupervised Learning | c7-unsup | 没有标签, 只找数据自身的结构: 聚类、降维、密度估计、生成. | 深度学习里常用自编码器和生成模型 ;; PCA 是经典的降维方法
+N ae | ae | 自编码器的基本原理 | Autoencoders - Basic Principle | c7-ae | 编码器压缩、解码器还原, 训练目标是重建误差, 真正要的是中间的隐变量. | 不需要标签 ;; 线性欠完备自编码器 + L2 学到 PCA 子空间 | L(x, g(f(x)))
+N regae | ae | 正则化自编码器 | Regularized Autoencoders | c7-reg | 编码不窄时在损失里加正则项, 防止只学会复制: 稀疏、去噪、收缩. | 过完备时网络能原样复制 ;; 去噪自编码器从加噪输入重建原输入 ;; 收缩自编码器惩罚编码的导数
+N aeapp | ae | 特定的自编码器及其应用 | Specific Autoencoders and Applications | c7-spec | 卷积自编码器保留空间结构, 用于去噪、图像压缩和降维. | 编码器用卷积和池化, 解码器用上采样或转置卷积
+N mani | ae | 流形学习 | Manifold Learning | c7-mani | 高维数据挤在低维弯曲曲面附近, 自编码器学的是这个曲面上的坐标. | 流形上每点有切平面 ;; 去噪自编码器把点拉回流形
+
+N ganintro | gan | GAN 导论 | Introduction to Generative Adversarial Networks | c8-intro | 生成器把噪声变成假样本, 判别器区分真假, 两者做极小极大博弈. | 不写出概率密度 ;; 最优判别器下等价于最小化 JS 散度 ;; 均衡是纳什均衡 | min_G max_D V(D, G)
+N ganvar | gan | GAN 的变体 | GAN Variants | c8-var | 非饱和损失让训练初期也有梯度, 条件 GAN 让我们控制生成什么. | 生成器改为最大化 log D(G(z)) ;; 条件 GAN 给两个网络加上标签
+N ganchal | gan | GAN 优化的难点 | Challenges for GAN Optimization | c8-chal | 两个玩家同时做梯度下降并不保证收敛, 可能绕圈或发散, 还会出现模式坍塌. | 不动点不一定被梯度下降找到 ;; 模式坍塌: 只生成少数几种样本
+
+E dlintro > neuron | 深度网络从单个神经元搭起.
+E neuron > xor | 单个神经元分不开 XOR.
+E xor > shl | 加一层隐藏层就能分开.
+E shl > mcnet | 输出层换成 g 个神经元.
+E shl > mlpdeep | 叠很多层.
+E mlpdeep > matnot | 每层写成矩阵乘法.
+E shl > uat | 一个隐藏层已经是万能逼近器.
+E hist > xor | 单层感知机解不了 XOR, 引发 AI 寒冬.
+E hist > bp | 反向传播让多层网络可训练.
+E dlintro ~ hist | 深度学习的由来.
+
+E mlpdeep > basictrain | 网络的权重靠梯度下降定下来.
+E mlpdeep > cgraph | 网络是函数的复合, 求导要用链式法则.
+E cgraph > bp | 反向传播就是在计算图上反向用链式法则.
+E basictrain > bp | 梯度下降需要的梯度由反向传播算出.
+E bp > bprec | 把手算过程抽象成递推.
+E matnot > bprec | 递推写成整层的向量形式.
+E matnot > hw | GPU 靠批量矩阵乘法提速.
+E bp > hw | 框架自动做反向传播.
+
+E basictrain > regbasic | 在经验风险上加惩罚.
+E regbasic > ridge | 线性模型上的 L2 惩罚.
+E ridge > geol2 | 一般模型上的 L2 效果.
+E regbasic > srm | 推广到非线性模型.
+E es ~ regbasic | 提前停止近似等价于 L2.
+E geol2 ~ es | 两者都先保留曲率大的方向.
+E regbasic > dropout | 神经网络特有的正则化.
+
+E basictrain > optchal | 梯度下降会遇到哪些困难.
+E optchal > advopt | 动量和自适应学习率针对病态和鞍点.
+E bp > act | 反向传播里激活的导数逐层相乘.
+E act > init | 激活选好后, 权重尺度仍决定梯度大小.
+E optchal > init | 初值不当会让非凸优化失败.
+E neuron > act | 激活函数是神经元的非线性部分.
+
+E mlpdeep > cnnintro | 全连接网络处理图像参数太多.
+E cnnintro > conv | CNN 的核心运算.
+E conv > convprop | 卷积为什么省参数.
+E conv > cnncomp | 填充、步幅、池化改变输出大小.
+E cnncomp > cnnapp | 零件拼成各种视觉任务.
+E conv > convtypes | 按数据维度区分卷积.
+E conv > dilconv | 两种特殊的卷积.
+E conv > sepconv | 把卷积拆成两步.
+E cnncomp > modcnn1 | 早期结构就是这些组件的组合.
+E modcnn1 > modcnn2 | 结构一代代改进.
+E optchal > modcnn2 | 残差连接缓解深网络的优化困难.
+E act > modcnn1 | AlexNet 用 ReLU.
+E dropout > modcnn1 | AlexNet 用 dropout.
+E advopt > modcnn2 | 批归一化让深网络更好训练.
+
+E mlpdeep > rnnintro | 普通网络处理不了变长序列.
+E rnnintro > bptt | 沿时间展开再反向传播.
+E bp > bptt | 同样是链式法则, 只是沿时间.
+E bptt > lstm | 门控缓解梯度消失.
+E act ~ bptt | 饱和激活的导数加剧梯度消失.
+E lstm > rnnapp | 语言建模和机器翻译.
+E rnnapp > attn | 注意力解决编码器–解码器的瓶颈.
+E convtypes ~ rnnintro | 一维卷积也能处理序列.
+
+E unsup > ae | 深度学习里的无监督模型.
+E ae > regae | 编码不窄时要正则化.
+E ae > aeapp | 换成卷积结构.
+E conv > aeapp | 卷积自编码器.
+E dilconv > aeapp | 解码器用转置卷积上采样.
+E ae > mani | 自编码器学的是流形上的坐标.
+E regae > mani | 去噪自编码器把点拉回流形.
+E regbasic > regae | 在损失里加正则项.
+
+E unsup > ganintro | 生成模型的另一类.
+E ganintro > ganvar | 改损失或加条件.
+E ganintro > ganchal | 对抗目标难以优化.
+E ae ~ ganintro | 都是生成模型, 训练方式不同.
+E basictrain > ganchal | 两个玩家的梯度下降不保证收敛.
+
+T representation learning |  |  | 表示学习 | mlp | The network learns useful features from raw input by itself. | 网络自己从原始输入学出有用的特征. |  | c1-intro
+T hypothesis space |  |  | 假设空间 | mlp | The set of functions a learner can choose from; in deep learning, the neural networks. | 学习器可选的函数集合, 深度学习里是神经网络. |  | c1-intro
+T embedding |  |  | 嵌入 | mlp | A learned dense vector representation, e.g. for a high-cardinality categorical feature. | 学出的稠密向量表示, 如用于高基数类别特征. |  | c1-intro
+T high-cardinality categorical feature |  |  | 高基数类别特征 | mlp | A categorical feature with very many levels. | 取值种类非常多的类别特征. |  | c1-intro
+T object detection |  |  | 目标检测 | cnn | Finds the objects in an image and gives each a box and a class. | 找出图中物体, 给每个一个框和类别. | semantic segmentation | c7-unsup
+T semantic segmentation |  |  | 语义分割 | cnn | Assigns a class to every pixel. | 给每个像素一个类别. | instance segmentation | c5-app
+T instance segmentation |  |  | 实例分割 | cnn | Assigns every pixel to a class and to a single object instance. | 把每个像素分到类别和具体的物体实例. | semantic segmentation | c1-intro
+T perceptron |  |  | 感知机 | mlp | A single neuron with a step activation, outputting 0 or 1. | 用阶跃激活、输出 0 或 1 的单个神经元. |  | c1-neuron
+T pre-activation |  |  | 预激活值 | mlp | The result of the affine transformation before the activation is applied. | 激活之前仿射变换的结果. |  | c1-neuron
+T affine function |  |  | 仿射函数 | mlp | A linear function plus a constant, wᵀx + b. | 线性函数加常数 wᵀx + b. |  | c1-neuron
+T interaction |  |  | 交互项 | mlp | A product of features, such as x₁x₂ in the XOR problem. | 特征的乘积, 如 XOR 里的 x₁x₂. |  | c1-xor
+T hidden layer |  |  | 隐藏层 | mlp | A layer between input and output that learns a new representation. | 输入和输出之间、学出新表示的层. |  | c1-shl
+T derived features |  |  | 派生特征 | mlp | The outputs of hidden units, used as new features by the next layer. | 隐藏单元的输出, 作为下一层的新特征. |  | c1-shl
+T element-wise |  |  | 逐元素 | mlp | The activation is applied separately to each component. | 激活分别作用在每个分量上. |  | c1-shl
+T piecewise linear |  |  | 分段线性 | mlp | A ReLU network computes a function made of linear pieces. | ReLU 网络算出的函数由线性片段拼成. |  | c1-shl
+T softmax |  |  | softmax 函数 | mlp | Turns g scores into g probabilities that sum to one. | 把 g 个分数变成和为 1 的概率. |  | c1-multi
+T cross-entropy |  |  | 交叉熵 | mlp | The loss for probabilistic multiclass outputs. | 多分类概率输出的损失. |  | c1-multi
+T one-hot |  |  | 独热 | mlp | A vector with a single 1 at the position of the class. | 只在类别位置为 1 的向量. |  | c6-app | one-hot encoding
+T forward pass |  |  | 前向传播 | train | Computes the output layer by layer from the input. | 从输入逐层算到输出. | backward pass | c2-bp1
+T broadcasting |  |  | 广播 | mlp | Adds a bias vector to every row of a batch automatically. | 自动把偏置向量加到一批的每一行. |  | c1-matrix
+T batch |  |  | 批 | mlp | A set of inputs processed together as one matrix. | 一起作为矩阵处理的一组输入. |  | c1-matrix
+T universal approximation theorem |  |  | 万能逼近定理 | mlp | A single hidden layer network can approximate any continuous function on a compact set arbitrarily well. | 单隐藏层网络能在紧集上任意好地逼近任意连续函数. |  | c1-uat | universal approximation
+T compact |  |  | 紧 | mlp | In ℝᵖ, bounded and closed. | 在 ℝᵖ 里就是有界闭集. |  | c1-uat
+T AI winter |  |  | AI 寒冬 | mlp | A period of reduced interest and funding in AI research. | AI 研究兴趣和经费骤减的时期. |  | c1-hist
+T greedy layer-wise pretraining |  |  | 贪心逐层预训练 | mlp | Trains a deep network one layer at a time before fine-tuning. | 先逐层训练深网络, 再整体微调. |  | c1-hist
+T kernel machines |  |  | 核方法 | mlp | Methods such as SVMs that dominated before the deep learning era. | 深度学习之前占主导的 SVM 等方法. |  | c1-hist
+
+T gradient descent |  |  | 梯度下降 | train | Moves the parameters a step against the gradient of the risk. | 沿风险梯度的反方向移动参数. |  | c2-train
+T stochastic gradient descent |  |  | 随机梯度下降 | train | Gradient descent with gradients estimated on a minibatch. | 用小批量估计梯度的梯度下降. | gradient descent | c2-train | SGD
+T minibatch |  |  | 小批量 | train | A small random subset of the training data used for one update. | 一次更新用的一小部分随机训练数据. |  | c2-train
+T epoch |  |  | 轮 | train | One pass through the whole training set. | 把整个训练集看一遍. |  | c2-train
+T learning rate |  |  | 学习率 | train | The step size of gradient descent. | 梯度下降的步长. |  | c2-train
+T stationary point |  |  | 驻点 | train | A point where the gradient is zero. | 梯度为 0 的点. |  | c2-train
+T chain rule |  |  | 链式法则 | train | The derivative of a composition is the product of the derivatives. | 复合函数的导数是各层导数的乘积. |  | c2-graph
+T multivariate chain rule |  |  | 多元链式法则 | train | Sums the contributions of all paths from a variable to the output. | 把变量到输出的所有路径贡献相加. |  | c2-graph
+T computational graph |  |  | 计算图 | train | A graph whose nodes are operations and whose edges carry intermediate results. | 节点是运算、边传中间结果的图. |  | c2-graph
+T Jacobian |  |  | 雅可比矩阵 | train | The matrix of partial derivatives of a vector-valued function. | 向量值函数的偏导数矩阵. |  | c2-graph
+T backpropagation |  |  | 反向传播 | train | Computes all gradients by applying the chain rule from the output back to the input. | 从输出往输入用链式法则算出所有梯度. | forward pass | c2-bp1 | backward pass
+T automatic differentiation |  |  | 自动微分 | train | Computes exact derivatives of a program mechanically. | 机械地算出程序的精确导数. |  | c2-hw
+T reverse-mode automatic differentiation |  |  | 反向模式自动微分 | train | Automatic differentiation from output to input; backpropagation is a special case. | 从输出往输入的自动微分, 反向传播是它的特例. |  | c2-graph
+T TPU |  |  | 张量处理器 | train | A chip designed by Google for matrix operations in neural networks. | 谷歌为神经网络矩阵运算设计的芯片. |  | c2-hw | tensor processing unit
+T systolic array |  |  | 脉动阵列 | train | A grid of units through which data flows rhythmically for matrix multiplication. | 数据有节奏地流过、做矩阵乘法的单元网格. |  | c2-hw
+T inference |  |  | 推理 | train | Using a trained network to make predictions. | 用训练好的网络做预测. |  | c2-hw
+T edge computing |  |  | 边缘计算 | train | Running models on devices close to the data instead of in the cloud. | 在靠近数据的设备上而不是云端运行模型. |  | c2-hw
+T federated learning |  |  | 联邦学习 | train | Trains a model across devices without collecting their data centrally. | 不集中收集数据, 在多台设备上训练模型. |  | c2-hw
+
+T regularization |  |  | 正则化 | reg | Any modification of learning that is intended to reduce the generalization error. | 为降低泛化误差而对学习做的任何修改. |  | c3-basic
+T weight decay |  |  | 权重衰减 | reg | L2 regularization in gradient descent, which shrinks the weights in every step. | 梯度下降里的 L2 正则化, 每步把权重缩小. |  | c3-basic
+T overfitting |  |  | 过拟合 | reg | The model fits noise in the training data and generalizes worse. | 模型学到训练噪声, 泛化变差. |  | c3-basic
+T capacity |  |  | 容量 | reg | How complex the functions a model can represent are. | 模型能表示的函数有多复杂. |  | c3-basic
+T ridge regression |  |  | 岭回归 | reg | Linear regression with an L2 penalty. | 带 L2 惩罚的线性回归. |  | c3-ridge
+T shrinkage |  |  | 收缩 | reg | Pulling the parameters towards zero. | 把参数往 0 拉. |  | c3-ridge
+T structural risk minimization |  |  | 结构风险最小化 | reg | Chooses a model from a nested sequence of increasingly complex hypothesis spaces. | 在一串越来越复杂的嵌套假设空间里选模型. |  | c3-nonlin | SRM
+T inductive bias |  |  | 归纳偏置 | reg | Preferences built into a learner that the data alone do not determine. | 数据本身决定不了、预先放进学习器的偏好. |  | c3-nonlin
+T Occam's razor |  |  | 奥卡姆剃刀 | reg | Prefer the simplest model that explains the data. | 优先选能解释数据的最简单模型. |  | c3-nonlin
+T Hessian |  |  | 海森矩阵 | reg | The matrix of second partial derivatives. | 二阶偏导数组成的矩阵. |  | c3-geol2 | Hessian matrix
+T positive semidefinite |  |  | 半正定 | reg | A matrix A with vᵀAv ≥ 0 for every vector v. | 对任意向量 v 都有 vᵀAv ≥ 0 的矩阵. |  | c3-geol2
+T early stopping |  |  | 提前停止 | reg | Stops training when the validation error stops decreasing. | 验证误差不再下降时停止训练. |  | c3-es
+T patience |  |  | 耐心 | reg | How many steps without improvement are allowed before stopping. | 停止前允许连续多少步没有改善. |  | c3-es
+T ensemble |  |  | 集成 | reg | Combines several models to reduce the variance of the prediction. | 组合多个模型来降低预测的方差. |  | c3-dropout
+T dropout |  |  | dropout | reg | Randomly removes units during training. | 训练时随机去掉一些单元. |  | c3-dropout
+T co-adaptation |  |  | 共适应 | reg | Units rely on specific other units instead of learning useful features on their own. | 单元依赖特定的其他单元, 而不是自己学有用的特征. |  | c3-dropout
+T dataset augmentation |  |  | 数据增强 | reg | Enlarges the training set with transformed copies of the data. | 用变换后的数据副本扩充训练集. |  | c3-dropout | data augmentation
+
+T ill-conditioning |  |  | 病态 | opt | The curvature differs strongly between directions, so one step size cannot suit all. | 各方向曲率差得太多, 一个步长照顾不了所有方向. |  | c4-chal
+T condition number |  |  | 条件数 | opt | The ratio of the largest to the smallest eigenvalue of the Hessian. | Hessian 最大与最小特征值之比. |  | c4-chal
+T local minima |  |  | 局部极小 | opt | Points lower than their neighbourhood but not the global minimum. | 比邻域都低但不是全局最小的点. | saddle point | c4-chal | local minimum
+T saddle point |  |  | 鞍点 | opt | A stationary point that is a minimum in some directions and a maximum in others. | 某些方向是极小、另一些方向是极大的驻点. | local minima | c4-chal | saddle points
+T cliffs |  |  | 悬崖 | opt | Regions where the gradient becomes extremely large. | 梯度变得极大的区域. |  | c4-chal
+T gradient clipping |  |  | 梯度裁剪 | opt | Rescales the gradient when its norm exceeds a threshold. | 梯度范数超过阈值时把它缩小. |  | c4-chal
+T Rayleigh quotient |  |  | 瑞利商 | opt | Gives the curvature of the loss in a given direction. | 给出损失在某个方向上的曲率. |  | c4-chal
+T momentum |  |  | 动量 | opt | Adds a decayed sum of past gradients to the update. | 在更新里加上过去梯度的衰减和. |  | c4-adv
+T Adagrad |  |  | Adagrad | opt | Scales each parameter's learning rate by the accumulated squared gradients. | 按累积的梯度平方逐个缩放学习率. | RMSprop | c4-adv
+T RMSprop |  |  | RMSprop | opt | Like Adagrad, but with an exponentially decaying average of squared gradients. | 像 AdaGrad, 但用梯度平方的指数衰减平均. | AdaGrad | c4-adv
+T Adam |  |  | Adam | opt | Combines momentum and RMSProp with bias correction. | 动量 + RMSProp + 偏差修正. |  | c4-adv
+T bias correction |  |  | 偏差修正 | opt | Corrects the moment estimates of Adam, which start at zero. | 修正 Adam 从 0 开始的矩估计. |  | c4-adv
+T effective learning rate |  |  | 有效学习率 | opt | The learning rate after the adaptive rescaling for each parameter. | 每个参数经自适应缩放后的实际学习率. |  | c4-adv
+T learning rate range test |  |  | 学习率范围测试 | opt | Increases the learning rate during a short run to find a good range. | 短时间训练中逐渐增大学习率, 找合适的范围. |  | c4-adv
+T batch normalization |  |  | 批归一化 | opt | Normalizes the inputs of a layer over the minibatch, then rescales them with learned parameters. | 在小批量上标准化层的输入, 再用学到的参数缩放. |  | c4-adv | batch norm
+T internal covariate shift |  |  | 内部协变量偏移 | opt | The distribution of a layer's inputs changes as earlier layers are trained. | 前面的层训练时, 这一层输入的分布跟着变. |  | c4-adv
+T saturate |  |  | 饱和 | opt | The activation becomes flat for large inputs, so its derivative is almost zero. | 输入很大时激活变平, 导数几乎为 0. |  | c4-act | saturation
+T vanishing gradient |  |  | 梯度消失 | opt | Gradients become tiny as they are multiplied back through many layers. | 梯度经过多层连乘后变得极小. |  | c4-act | vanishing gradients
+T ReLU |  |  | ReLU | opt | An activation that outputs max(0, x). | 输出 max(0, x) 的激活. |  | c4-act | rectified linear unit
+T dying ReLU |  |  | 神经元死亡 | opt | A ReLU unit whose input is always negative stops learning. | 输入总为负的 ReLU 单元不再学习. |  | c4-act
+T break symmetry |  |  | 打破对称 | opt | Units must start with different weights, otherwise they all learn the same. | 单元的初始权重必须不同, 否则学到的都一样. |  | c4-init
+T Glorot initialization |  |  | Glorot 初始化 | opt | Sets the weight variance from the fan-in and fan-out of a layer. | 按层的输入和输出宽度设定权重方差. | He initialization | c4-init | Xavier initialization
+T He initialization |  |  | He 初始化 | opt | Sets the weight variance to 2 / fan-in, suited to ReLU. | 把权重方差设为 2 / 输入宽度, 适合 ReLU. | Glorot initialization | c4-init
+
+T convolution |  |  | 卷积 | cnn | Slides a filter over the input and sums the element-wise products. | 滤波器在输入上滑动, 逐元素相乘再求和. |  | c5-intro
+T max pooling |  |  | 最大池化 | cnn | Keeps the maximum of each small window. | 每个小窗口取最大值. |  | c5-intro
+T fully connected |  |  | 全连接 | cnn | Every unit is connected to every unit of the previous layer. | 每个单元连到上一层的所有单元. |  | c5-intro
+T end-to-end learning |  |  | 端到端学习 | cnn | Learns the whole mapping from raw input to output in one model. | 一个模型直接学从原始输入到输出的整个映射. |  | c5-intro
+T Sobel filter |  |  | Sobel 滤波器 | cnn | A hand-designed filter that detects edges. | 手工设计的边缘检测滤波器. |  | c5-conv
+T feature map |  |  | 特征图 | cnn | The output of a convolution with one filter. | 一个滤波器卷积后的输出. |  | c5-conv
+T kernel |  |  | 卷积核 | cnn | The small matrix of weights that slides over the input. | 在输入上滑动的小权重矩阵. |  | c5-types | filter
+T sparse interactions |  |  | 稀疏交互 | cnn | Each output depends only on a small region of the input. | 每个输出只依赖输入的一小块. |  | c5-prop
+T parameter sharing |  |  | 参数共享 | cnn | The same filter weights are used at every position. | 同一组滤波器权重用在所有位置. |  | c5-prop | weight sharing
+T receptive field |  |  | 感受野 | cnn | The region of the input that influences one unit. | 影响一个单元的输入区域. |  | c5-prop
+T equivariant |  |  | 等变 | cnn | Shifting the input shifts the output in the same way. | 输入平移, 输出同样平移. | invariant | c5-prop | translation equivariance
+T invariant |  |  | 不变 | cnn | The output does not change when the input is shifted. | 输入平移时输出不变. | equivariant | c5-comp
+T channel |  |  | 通道 | cnn | One layer of the input, such as one colour of an RGB image. | 输入的一层, 如 RGB 图像的一个颜色. |  | c5-comp
+T padding |  |  | 填充 | cnn | Adds values around the border so that the output does not shrink. | 在边缘外补值, 使输出不缩小. |  | c5-comp | same padding
+T stride |  |  | 步幅 | cnn | How many positions the filter moves at each step. | 滤波器每步移动几格. |  | c5-comp
+T downsampling |  |  | 下采样 | cnn | Reduces the spatial size of a feature map. | 缩小特征图的空间尺寸. | up-sampling | c5-comp
+T global average pooling |  |  | 全局平均池化 | cnn | Averages each feature map into a single number. | 把每张特征图平均成一个数. |  | c5-comp
+T bounding box |  |  | 边界框 | cnn | The rectangle that localizes an object. | 定位物体的矩形框. |  | c5-app
+T voxel |  |  | 体素 | cnn | A volume element, the 3D analogue of a pixel. | 体积元素, 像素的三维对应. |  | c5-types
+T dilated convolution |  |  | 空洞卷积 | cnn | A convolution whose kernel skips input positions, enlarging the receptive field. | 核跳过部分输入位置、扩大感受野的卷积. |  | c5-dil | atrous convolution
+T dilation factor |  |  | 空洞率 | cnn | The spacing between the kernel elements of a dilated convolution. | 空洞卷积核元素之间的间隔. |  | c5-dil | dilation
+T gridding effect |  |  | 网格效应 | cnn | Stacked dilated convolutions miss some input positions. | 叠加的空洞卷积漏掉一部分输入位置. |  | c5-dil
+T causal convolution |  |  | 因果卷积 | cnn | A convolution whose output depends only on past inputs. | 输出只依赖过去输入的卷积. |  | c5-dil
+T temporal convolutional network |  |  | 时间卷积网络 | cnn | A sequence model built from causal and dilated convolutions. | 由因果卷积和空洞卷积组成的序列模型. |  | c5-dil | TCN
+T transposed convolution |  |  | 转置卷积 | cnn | Up-samples a feature map; corresponds to multiplying with the transposed convolution matrix. | 放大特征图, 对应乘以卷积矩阵的转置. |  | c5-dil | deconvolution
+T up-sampling |  |  | 上采样 | cnn | Increases the spatial size of a feature map. | 增大特征图的空间尺寸. | downsampling | c5-dil
+T Toeplitz matrix |  |  | 托普利茨矩阵 | cnn | A matrix with constant diagonals; a convolution can be written as one. | 每条对角线为常数的矩阵, 卷积可以写成它. |  | c5-dil
+T checkerboard artifacts |  |  | 棋盘格伪影 | cnn | Uneven overlaps in transposed convolutions produce a grid pattern. | 转置卷积的重叠不均匀产生的格子图案. |  | c5-dil
+T rank-1 matrix |  |  | 秩 1 矩阵 | cnn | A matrix that can be written as a column vector times a row vector. | 能写成列向量乘行向量的矩阵. |  | c5-sep
+T depthwise convolution |  |  | 逐通道卷积 | cnn | Convolves each channel separately with its own filter. | 每个通道用自己的滤波器单独卷积. | pointwise convolution | c5-sep
+T pointwise convolution |  |  | 逐点卷积 | cnn | A 1×1 convolution that mixes the channels. | 混合各通道的 1×1 卷积. | depthwise convolution | c5-sep
+T flattening |  |  | 展平 | cnn | Turns a feature map into a vector for a fully connected layer. | 把特征图变成向量交给全连接层. |  | c5-sep
+T bottleneck |  |  | 瓶颈层 | cnn | A 1×1 convolution that reduces the number of channels before an expensive layer. | 在昂贵的层前减少通道数的 1×1 卷积. |  | c5-mod2
+T skip connection |  |  | 跳跃连接 | cnn | Passes the input of a block directly to its output. | 把块的输入直接送到输出. |  | c5-mod2 | residual connection
+T degradation problem |  |  | 退化问题 | cnn | Deeper plain networks reach a higher training error than shallower ones. | 更深的普通网络训练误差反而更高. |  | c5-mod2
+T concatenation |  |  | 拼接 | cnn | DenseNet joins feature maps along the channel axis instead of adding them. | DenseNet 沿通道把特征图接起来, 而不是相加. |  | c5-mod2
+T growth rate |  |  | 增长率 | cnn | The number of channels each DenseNet layer adds. | DenseNet 每层增加的通道数. |  | c5-mod2
+T transition layer |  |  | 过渡层 | cnn | Reduces channels and spatial size between DenseNet blocks. | 在 DenseNet 块之间减少通道和尺寸. |  | c5-mod2
+
+T recurrent neural network |  |  | 循环神经网络 | rnn | Processes a sequence step by step with the same weights and a hidden state. | 用同一组权重和隐藏状态逐步处理序列. |  | c6-intro | RNN
+T hidden state |  |  | 隐藏状态 | rnn | The vector that carries information from earlier time steps. | 带着之前时间步信息的向量. |  | c6-intro
+T word embedding |  |  | 词嵌入 | rnn | A dense vector representation of a word. | 一个词的稠密向量表示. |  | c6-app
+T spectral radius |  |  | 谱半径 | rnn | The largest absolute eigenvalue of a matrix; decides whether gradients explode or vanish. | 矩阵特征值绝对值的最大值, 决定梯度爆炸还是消失. |  | c6-bptt
+T exploding gradient |  |  | 梯度爆炸 | rnn | Gradients become huge as they are multiplied back through many steps. | 梯度经过多步连乘后变得极大. | vanishing gradient | c6-bptt | exploding gradients
+T LSTM |  |  | 长短期记忆 | rnn | A recurrent unit with a cell state and input, forget and output gates. | 有细胞状态和输入门、遗忘门、输出门的循环单元. | GRU | c6-lstm | long short-term memory
+T GRU |  |  | 门控循环单元 | rnn | A simpler gated unit with an update gate and a reset gate. | 只有更新门和重置门的简化门控单元. | LSTM | c6-lstm | gated recurrent unit
+T cell state |  |  | 细胞状态 | rnn | The internal memory of an LSTM, changed only by gated additions. | LSTM 的内部记忆, 只经门控的加法改变. |  | c6-lstm
+T gate |  |  | 门 | rnn | A sigmoid layer whose output between 0 and 1 controls how much information passes. | 输出在 0 到 1 之间、控制信息通过多少的 sigmoid 层. |  | c6-lstm
+T update gate |  |  | 更新门 | rnn | Decides how much of the old hidden state the GRU keeps. | 决定 GRU 保留多少旧的隐藏状态. | reset gate | c6-lstm
+T reset gate |  |  | 重置门 | rnn | Decides how much of the old hidden state enters the candidate. | 决定旧隐藏状态有多少进入候选状态. | update gate | c6-lstm
+T bidirectional RNN |  |  | 双向 RNN | rnn | Combines one RNN reading forwards and one reading backwards. | 结合正向读和反向读的两个 RNN. |  | c6-lstm
+T language modelling |  |  | 语言建模 | rnn | Predicts the next token from the previous ones. | 根据前面的词元预测下一个. |  | c6-app
+T character-level language model |  |  | 字符级语言模型 | rnn | A language model that predicts the next character. | 预测下一个字符的语言模型. |  | c6-bptt
+T encoder-decoder |  |  | 编码器-解码器 | rnn | One network reads the input into a representation, another generates the output from it. | 一个网络把输入读成表示, 另一个据此生成输出. |  | c6-app | seq2seq
+T teacher forcing |  |  | 教师强制 | rnn | Feeds the true previous output into the decoder during training. | 训练时把真实的上一步输出喂给解码器. |  | c6-att
+T beam search |  |  | 集束搜索 | rnn | Keeps the k best partial sequences at each decoding step. | 解码时每步保留 k 个最好的部分序列. |  | c6-app
+T transfer learning |  |  | 迁移学习 | rnn | Reuses a model trained on one task for another. | 把在一个任务上训练的模型用到另一个任务. |  | c6-app
+T context vector |  |  | 上下文向量 | rnn | The fixed-length summary of the input passed to the decoder. | 交给解码器的固定长度输入摘要. |  | c6-att
+T attention |  |  | 注意力 | rnn | Weights all encoder states by their relevance at each decoding step. | 解码每一步按相关程度给编码器各状态加权. |  | c6-att | additive attention
+T alignment |  |  | 对齐 | rnn | The attention weights between output and input positions. | 输出位置和输入位置之间的注意力权重. |  | c6-att
+T self-attention |  |  | 自注意力 | rnn | Attention of a sequence to itself. | 序列对自身的注意力. |  | c6-att
+T positional encoding |  |  | 位置编码 | rnn | Adds information about the position of each token, since attention ignores order. | 补上每个词元的位置信息, 因为注意力不看顺序. |  | c6-att
+T pre-training |  |  | 预训练 | rnn | Training on a large general dataset before the actual task. | 在实际任务之前先在大规模通用数据上训练. | fine-tuning | c6-att
+T fine-tuning |  |  | 微调 | rnn | Continues training a pre-trained model on the target task. | 在目标任务上继续训练预训练模型. | pre-training | c6-att
+
+T unsupervised learning |  |  | 无监督学习 | ae | Learning from data without labels. | 从没有标签的数据中学习. | semi-supervised learning | c7-unsup
+T semi-supervised learning |  |  | 半监督学习 | ae | Learning from a few labelled and many unlabelled data. | 用少量有标签和大量无标签数据学习. | unsupervised learning | c7-unsup
+T principal component analysis |  |  | 主成分分析 | ae | Projects the data onto the directions of largest variance. | 把数据投影到方差最大的方向. |  | c7-unsup | PCA
+T autoencoder |  |  | 自编码器 | ae | A network trained to reconstruct its input through a code. | 经过编码来重建输入的网络. |  | c7-ae
+T latent variable |  |  | 隐变量 | ae | The code in the middle of an autoencoder. | 自编码器中间的编码. |  | c7-ae
+T self-supervised |  |  | 自监督 | ae | The training signal comes from the input itself. | 训练信号来自输入本身. |  | c7-ae
+T undercomplete autoencoder |  |  | 欠完备自编码器 | ae | The code has fewer dimensions than the input. | 编码维数小于输入维数. | overcomplete autoencoder | c7-reg
+T overcomplete autoencoder |  |  | 过完备自编码器 | ae | The code has at least as many dimensions as the input. | 编码维数不小于输入维数. | undercomplete autoencoder | c7-reg | overcomplete
+T sparse autoencoder |  |  | 稀疏自编码器 | ae | Penalizes the code so that only a few units are active. | 惩罚编码, 让只有少数单元激活. |  | c7-reg
+T denoising autoencoder |  |  | 去噪自编码器 | ae | Reconstructs the clean input from a corrupted version. | 从加噪的输入重建干净的输入. |  | c7-reg
+T contractive autoencoder |  |  | 收缩自编码器 | ae | Penalizes the derivatives of the code with respect to the input. | 惩罚编码对输入的导数. |  | c7-reg
+T compressive autoencoder |  |  | 压缩自编码器 | ae | An autoencoder used for lossy image compression. | 用于有损图像压缩的自编码器. |  | c7-spec
+T median filter |  |  | 中值滤波 | ae | A classical denoising filter that takes the median of a window. | 取窗口中位数的经典去噪滤波. |  | c7-spec
+T manifold |  |  | 流形 | ae | A low-dimensional curved surface in a high-dimensional space. | 高维空间里的低维弯曲曲面. |  | c7-mani
+T manifold learning |  |  | 流形学习 | ae | Learning the low-dimensional surface on which the data lie. | 学习数据所在的低维曲面. |  | c7-mani
+T tangent plane |  |  | 切平面 | ae | The local linear approximation of a manifold at a point. | 流形在一点处的局部线性近似. |  | c7-mani
+T distributed representation |  |  | 分布式表示 | ae | Each concept is represented by many units and each unit takes part in many concepts. | 每个概念由多个单元表示, 每个单元参与多个概念. |  | c7-mani
+
+T generative adversarial network |  |  | 生成对抗网络 | gan | A generator and a discriminator trained against each other. | 相互对抗训练的生成器和判别器. |  | c8-intro | GAN
+T generator |  |  | 生成器 | gan | Maps random noise to fake samples. | 把随机噪声映射成假样本. | discriminator | c8-intro
+T discriminator |  |  | 判别器 | gan | Classifies samples as real or fake. | 把样本分成真或假. | generator | c8-intro
+T Jensen-Shannon divergence |  |  | JS 散度 | gan | A symmetric divergence that the GAN objective minimizes for the optimal discriminator. | 最优判别器下 GAN 目标所最小化的对称散度. | KL divergence | c8-intro
+T KL divergence |  |  | KL 散度 | gan | An asymmetric measure of the difference between two distributions. | 衡量两个分布差异的不对称量. | Jensen-Shannon divergence | c8-intro
+T mode collapse |  |  | 模式坍塌 | gan | The generator produces only a few kinds of samples. | 生成器只产生少数几种样本. |  | c8-chal
+T non-saturating loss |  |  | 非饱和损失 | gan | The generator maximizes log D(G(z)), which gives gradients early in training. | 生成器最大化 log D(G(z)), 训练初期也有梯度. |  | c8-var
+T conditional GAN |  |  | 条件 GAN | gan | Both networks receive extra information such as a class label. | 两个网络都额外接收类别标签等信息. |  | c8-var
+T autoregressive model |  |  | 自回归模型 | gan | A generative model that produces one element at a time conditioned on the previous ones. | 按前面的元素逐个生成的生成模型. |  | c8-intro
+T restricted Boltzmann machine |  |  | 受限玻尔兹曼机 | gan | An early energy-based generative model. | 早期基于能量的生成模型. |  | c8-intro | RBM
+T Nash equilibrium |  |  | 纳什均衡 | gan | No player can improve by changing only its own strategy. | 任何玩家单独改变策略都得不到更好结果. |  | c8-chal
+T zero-sum game |  |  | 零和博弈 | gan | One player's gain is the other player's loss. | 一方所得就是另一方所失. |  | c8-chal
+T fixed point |  |  | 不动点 | gan | A point where the iteration stops, i.e. both gradients are zero. | 迭代停住不动、两个梯度同时为 0 的点. |  | c8-chal
+T simultaneous gradient descent |  |  | 同时梯度下降 | gan | Both players update their parameters at the same time with their own gradients. | 两个玩家同时用各自的梯度更新参数. |  | c8-chal
+
+ZH 笔记加粗词写作 gridding effect 网格效应 | 网格效应
+
+T candidate hidden state |  |  | 候选隐藏状态 | rnn | The proposed new hidden state of a GRU before the update gate mixes it with the old one. | GRU 里由更新门和旧状态混合之前的新状态候选. |  | c6-lstm
+T residual |  |  | 残差 | train | The difference between prediction and target; the negative derivative of the L2 loss. | 预测和目标之差, 是 L2 损失导数的相反数. |  | c2-bp1
+T pyramid pooling |  |  | 金字塔池化 | cnn | Pools a feature map at several grid sizes so that inputs of any size give a fixed-length vector. | 按几种网格尺寸池化, 任意大小的输入都得到定长向量. |  | c5-comp
+T SELU |  |  | SELU | opt | A scaled ELU whose two constants are chosen so that activations normalize themselves. | 按比例缩放的 ELU, 两个常数选得让激活自动标准化. |  | c4-act
+
+DROP 抓取格式残缺 (英文和中文混在一起), 对应术语已收录 | AI winter AI; GRU (gated recurrent unit); Jensen-Shannon divergence JS; KL divergence KL; LSTM (long short-term memory); Sobel filter Sobel; TCN (temporal convolutional network); generative adversarial network (GAN); restricted Boltzmann machine (RBM); RMS (root mean square)
+DROP 抓取误差, 不是术语 | S. 14; VGG19; GloVe
+DROP 太笼统的普通词 | CNN; classification; detection; divergence; score; multimodal; unimodal; sparse data; jointly trained
+DROP 例子或旁支 | Iverson bracket; LAB color space LAB; annealed mean; REP-CV; mmce (mean misclassification error); cross-validation; graphical models; Region-based; Single-shot; false negative; false positive; sentiment classification; spectrogram; speech emotion recognition; non-parametric; DenseNet; backtracking line search
+DROP 并入其他术语 | bias-variance trade-off; systematic under-fitting; function class; diminished gradient; spatial invariance
+DE 笔记加粗词 (在讲解框里) | gridding effect
+
+# 读过后判定不适合当例句的课件原句 (说的是别的意思, 如 batch 指批归一化、bottleneck 指存储瓶颈)
+NOQ object detection; batch; compact; residual; Jacobian; inductive bias; bottleneck; interaction
+
+# 术语 → 概念
+M hypothesis space | dlintro
+M high-cardinality categorical feature | dlintro
+M instance segmentation | unsup
+M affine function | neuron
+M one-hot | rnnapp
+M minibatch | basictrain
+M learning rate | basictrain
+M stationary point | basictrain
+M computational graph | cgraph
+M reverse-mode automatic differentiation | cgraph
+M systolic array | hw
+M inference | hw
+M edge computing | hw
+M federated learning | hw
+M regularization | regbasic
+M capacity | regbasic
+M condition number | optchal
+M local minima | optchal
+M cliffs | optchal
+M Rayleigh quotient | optchal
+M Adagrad | advopt
+M RMSprop | advopt
+M bias correction | advopt
+M effective learning rate | advopt
+M learning rate range test | advopt
+M fully connected | cnnintro
+M invariant | cnncomp
+M downsampling | cnncomp
+M pyramid pooling | cnncomp
+M dilation factor | dilconv
+M causal convolution | dilconv
+M temporal convolutional network | dilconv
+M up-sampling | dilconv
+M Toeplitz matrix | dilconv
+M growth rate | modcnn2
+M transition layer | modcnn2
+M recurrent neural network | rnnintro
+M LSTM | lstm
+M update gate | lstm
+M reset gate | lstm
+M candidate hidden state | lstm
+M transfer learning | rnnapp
+M pre-training | attn
+M fine-tuning | attn
+M autoencoder | ae
+M distributed representation | mani
+M generative adversarial network | ganintro
+M KL divergence | ganintro
+M autoregressive model | ganintro
+M restricted Boltzmann machine | ganintro
+M zero-sum game | ganintro
+M simultaneous gradient descent | ganchal
+M SELU | act
+NOQ element-wise; instance segmentation; generative adversarial network
