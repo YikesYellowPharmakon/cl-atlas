@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process'; import fs from 'node:fs';
 import { fileURLToPath } from 'node:url'; import * as P_ from 'node:path';
-const URLB = 'file://' + P_.resolve(P_.dirname(fileURLToPath(import.meta.url)), '../../笔记总目录.html').split('/').map(encodeURI).join('/');  // 正式主页
+const URLB = process.env.RV_URL || 'file://' + P_.resolve(P_.dirname(fileURLToPath(import.meta.url)), '../../笔记总目录.html').split('/').map(encodeURI).join('/');  // 正式主页
 const LOCAL_ = (() => { try { return JSON.parse(fs.readFileSync(P_.resolve(P_.dirname(fileURLToPath(import.meta.url)), '../.local.json'), 'utf8')); } catch { return {}; } })();
 const OUT = P_.join((LOCAL_.evidence || '').replace(/^~/, process.env.HOME) || (await import('node:os')).tmpdir(), '复习层-测试截图') + '/'; fs.mkdirSync(OUT, { recursive: true }); /* 截图位置在 复习层/.local.json 里配置 (不进仓库) */ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 /* 2026-11-06 安全保护: 两次在锁屏解锁时整机卡死复位, 当时都有无头 Chrome 在跑 (还有没退出的残留实例).
