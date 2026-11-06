@@ -52,7 +52,7 @@
   function page(p) { if (p === R.p) return; morph(); OPEN = {}; clearQ(); trans(function () { R.p = p; R.node = ''; scrollTo(0, 0); return render(false); }); }
   /* 跨栏目跳到某门课的某个位置: 术语 → 图谱概念, 图谱概念 → 术语 */
   function jump(p, f, node) { morph(); OPEN = {}; clearQ(); trans(function () { R.p = p; R.f = f; R.node = node || ''; scrollTo(0, 0); return render(false); }); }
-  function setF(v, node) { var inPlace = R.p === 'notes' ? NOTESF : R.p === 'terms' && !(BY[v] && BY[v].has) ? TERMS.f : null; if (inPlace) { R.f = v; R.node = node || ''; OPEN = {}; if (scrollY) scrollTo(0, 0); syncTop(); if (window.__bgRepal) window.__bgRepal(); inPlace(true); return; } morph(); if (R.p === 'graph' && GRAPH.go) { R.f = v; R.node = node || ''; GRAPH.go(v, node); syncTop(); if (window.__bgRepal) window.__bgRepal(); return; } trans(function () { R.f = v; R.node = node || ''; OPEN = {}; scrollTo(0, 0); return render(false); }); }
+  function setF(v, node) { var inPlace = R.p === 'notes' ? NOTESF : R.p === 'terms' && !(BY[v] && BY[v].has) ? TERMS.f : null; if (inPlace) { R.f = v; R.node = node || ''; OPEN = {}; if (scrollY) scrollTo(0, 0); syncTop(); clearTimeout(setF.bg); if (window.__bgRepal) setF.bg = setTimeout(window.__bgRepal, CALM ? 0 : 340); /* 背景配色等收放动画结束再算, 不和动画第一帧抢时间 */ inPlace(true); return; } morph(); if (R.p === 'graph' && GRAPH.go) { R.f = v; R.node = node || ''; GRAPH.go(v, node); syncTop(); if (window.__bgRepal) window.__bgRepal(); return; } trans(function () { R.f = v; R.node = node || ''; OPEN = {}; scrollTo(0, 0); return render(false); }); }
   function clearQ() { var q = $('#q'); if (!q) return; q.value = ''; q.blur(); $('#res').innerHTML = ''; $('.slq').classList.remove('has'); }
 
   /* ---------- 外壳 ---------- */
@@ -94,6 +94,10 @@ __TOUCH__
   function paintRail(dir) { var box = $('#rail .sci'), h = railHTML(RAILG); clearTimeout(RAILT);
     $$('.rlv.outl, .rlv.outr', box).forEach(function (x) { x.remove(); }); var lv = $('.rlv', box);
     if (lv && lv.innerHTML === h) { lv.classList.remove('inr', 'inl'); return; }
+    /* 2026-11-06: 只是选中项变了 (同一层): 不重建按钮, 只切换 .on, 下划线和文字颜色的过渡才走得起来 */
+    var noOn = function (t) { return t.replace(/ on"/g, '"'); };
+    if (lv && !dir && noOn(lv.innerHTML) === noOn(h)) { lv.classList.remove('inr', 'inl'); $$('.rk', lv).forEach(function (b) { var v = b.dataset.f, g2 = b.dataset.g; b.classList.toggle('on', v != null ? R.f === v : g2 != null && b.classList.contains('rgh') && R.f === 'g:' + g2); });
+      var sc0 = lv.querySelector('.rls'), on0 = sc0 && sc0.querySelector('.on'); if (on0 && sc0.scrollWidth > sc0.clientWidth) sc0.scrollTo({ left: Math.max(0, on0.offsetLeft - sc0.offsetLeft - sc0.clientWidth / 2), behavior: CALM ? 'auto' : 'smooth' }); return; }
     var nv = D.createElement('div'); nv.className = 'rlv'; nv.innerHTML = h;
     /* 旧的一层立即换掉, 只让新的一层轻轻滑入: 任何时刻只有一层, 不会叠字 */
     if (lv) lv.replaceWith(nv); else box.appendChild(nv); if (lv && dir && !CALM) { nv.classList.add(dir > 0 ? 'inr' : 'inl'); RAILT = setTimeout(function () { nv.classList.remove('inr', 'inl'); }, 220); }
@@ -124,7 +128,7 @@ __TOUCH__
   /* 课程列表的收放 (笔记首页、术语首页共用). 只动真正变化的元素. 没变化的行和组一个属性都不碰, 版面其他地方不会跟着抖 */
     function fold(e, show, anim) { var runs = e.getAnimations ? e.getAnimations().filter(function (a) { return a.id === 'fold'; }) : [], wasOff = e.classList.contains('k5off'); if (!runs.length && wasOff === !show) return; var h0 = runs.length ? e.getBoundingClientRect().height : null, op0 = runs.length ? +getComputedStyle(e).opacity : null; runs.forEach(function (a) { a.onfinish = null; a.cancel(); }); clearTimeout(e._ft); e.style.overflow = '';
     if (!anim || CALM) { e.classList.toggle('k5off', !show); return; } e.classList.remove('k5off'); var cs = getComputedStyle(e), hn = e.offsetHeight, K = ['marginTop', 'marginBottom', 'paddingTop', 'paddingBottom'], full = { height: hn + 'px', opacity: 1 }, zero = { height: '0px', opacity: 0 }; K.forEach(function (x) { full[x] = cs[x]; zero[x] = '0px'; });
-    var from = {}, to = show ? full : zero; for (var x in full) from[x] = wasOff && !runs.length ? zero[x] : full[x]; if (h0 != null) { from.height = h0 + 'px'; from.opacity = op0; } e.style.overflow = 'clip'; var a = e.animate([from, to], { duration: 300, easing: 'cubic-bezier(.22,.8,.24,1)' }); a.id = 'fold'; function done() { e.style.overflow = ''; if (!show) e.classList.add('k5off'); } a.onfinish = done; if (!show) e._ft = setTimeout(function () { if (e.getAnimations().every(function (q) { return q.id !== 'fold' || q.playState === 'finished'; })) done(); }, 340); }
+    var from = {}, to = show ? full : zero; for (var x in full) from[x] = wasOff && !runs.length ? zero[x] : full[x]; if (h0 != null) { from.height = h0 + 'px'; from.opacity = op0; } e.style.overflow = 'clip'; var a = e.animate([from, to], { duration: 320, easing: 'cubic-bezier(.22,.8,.24,1)' }); a.id = 'fold'; function done() { e.style.overflow = ''; if (!show) e.classList.add('k5off'); } a.onfinish = done; if (!show) e._ft = setTimeout(function () { if (e.getAnimations().every(function (q) { return q.id !== 'fold' || q.playState === 'finished'; })) done(); }, 360); }
   function foldList(el, code, anim) { var first = true; $$('.grp', el).forEach(function (g) { var rows = $$('.cr', g), vis = rows.map(function (r) { return inF(BY[code(r)]); }), any = vis.some(Boolean), was = !g.classList.contains('k5off'); g.classList.toggle('k5first', any && first); if (any) first = false;
       /* 组要收起: 里面的行先不动, 跟着组一起收; 组要重新出现: 行先到位, 再展开组; 组留着: 行各自收起或展开 */
       if (any) rows.forEach(function (r, i) { fold(r, vis[i], anim && was); }); fold(g, any, anim); }); }
@@ -145,8 +149,12 @@ __TOUCH__
       return true; }
     function applyF(anim) { clearTimeout(openT); spDrop(); var from = prevF; prevF = R.f;
       if (anim && !CALM && BY[from] && BY[R.f] && from !== R.f && swapCourse(from, R.f)) return;
+      /* 2026-11-06: 进入课程不再分两段 (先收起其他行, 0.3 秒后才展开笔记列表): 其他行收起和列表展开同一帧开始, 时长、缓动相同, 一次到位.
+         目标行本来隐藏时, 先无动画展开, 这样组 / 行的展开高度已经包含列表, 结束时不会跳一下 */
+      var tgt = anim && BY[R.f] ? el.querySelector('[data-nopen="' + R.f + '"]') : null;
+      if (tgt && !tgt.classList.contains('open') && (tgt.classList.contains('k5off') || tgt.closest('.grp').classList.contains('k5off'))) { var cb0 = $('.cb', tgt); cb0.style.transition = 'none'; show(tgt, true); void cb0.offsetHeight; cb0.style.transition = ''; }
       foldList(el, function (r) { return r.dataset.nopen; }, anim);
-      if (anim) { $$('.cr.open', el).forEach(function (cr) { if (cr.dataset.nopen !== R.f) cr.classList.remove('open'); }); if (BY[R.f]) openT = setTimeout(function () { var cr = el.querySelector('[data-nopen="' + R.f + '"]'); if (cr && cr.isConnected && !cr.classList.contains('open')) cr.querySelector('.ch').click(); }, CALM ? 0 : 200); } }
+      if (anim) { $$('.cr.open', el).forEach(function (cr) { if (cr.dataset.nopen !== R.f) cr.classList.remove('open'); }); if (tgt) { if (!tgt.classList.contains('open')) show(tgt, true); OPEN[R.f] = 1; } } }
     NOTESF = applyF; CLEAN.push(function () { NOTESF = null; clearTimeout(openT); }); applyF(false);
     function show(cr, on) { cr.classList.toggle('open', on); if (on) fill($('.nbox', cr), cr.dataset.nopen); }
     /* 页面最底部收起课程时, 页面会变短, 浏览器把滚动位置往回收, 整页往下滑一截.
