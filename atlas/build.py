@@ -70,7 +70,7 @@ for ln in open(HERE + '/content/_bridges.txt', encoding='utf-8'):
     BR.append({'a': [a, an, lab[(a, an)]], 'b': [b, bn, lab[(b, bn)]], 'why': why.strip()})
 js = open(SRC + 'core.js', encoding='utf-8').read().replace('/*__MOD__*/', ''.join(open(SRC + x, encoding='utf-8').read() for x in ('graph.js', 'terms.js'))).replace('__RING__', open(SRC + 'ring.js', encoding='utf-8').read()).replace('__TOUCH__', open(SRC + 'touch.js', encoding='utf-8').read())
 page = open(SRC + 'shell.html', encoding='utf-8').read()
-for a, b in (('/*__PAL__*/', '\n'.join(css) + '\n' + raster_css()), ('/*__PILL__*/', pill_css()), ('/*__CSS__*/', ''.join(open(p, encoding='utf-8').read() + '\n' for p in (SRC + 'app.css', SRC + 'keys.css', SRC + 'main.css'))), ('/*__IDX__*/', 'window.IDX=' + json.dumps({'courses': CS, 'groups': G, 'hubs': hubs, 'bridges': BR}, ensure_ascii=False).replace('</', '<\\/') + ';'), ('/*__BG__*/', bg_runtime()), ('/*__JS__*/', js)):
+for a, b in (('/*__PAL__*/', '\n'.join(css) + '\n' + raster_css()), ('/*__PILL__*/', pill_css()), ('/*__CSS__*/', ''.join(open(p, encoding='utf-8').read() + '\n' for p in (SRC + 'app.css', SRC + 'keys.css', SRC + 'main.css'))), ('/*__IDX__*/', 'window.IDX=' + json.dumps({'courses': CS, 'groups': G, 'hubs': hubs, 'bridges': BR}, ensure_ascii=False).replace('</', '<\\/') + ';'), ('/*__BG__*/', bg_runtime()), ('/*__JS__*/', js), ('/*__INTRO__*/', open(SRC + 'intro.js', encoding='utf-8').read())):
     page = page.replace(a, b)
 # 质量闸门: 每门有内容的课都要通过 cover.py (考点、覆盖、非知识排除). 不通过就不发布 (必须在写页面之前)
 if '--nogate' not in sys.argv:
