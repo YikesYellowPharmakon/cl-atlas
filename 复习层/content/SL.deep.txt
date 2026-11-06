@@ -1,0 +1,358 @@
+# SL 深层内容. 依据笔记 9 章 79 个小节整理. 外文是英语 (课件语言).
+# D 概念 | 英语定义   X 概念 | 讲解   S 父概念 | 子 id | 中文 | 外文 | 一句话
+
+D rmin | Empirical risk minimization replaces the unknown theoretical risk by the average loss on the training data; the gap to the Bayes optimal model splits into estimation and approximation error.
+X rmin | 真正关心的是理论风险: 模型在新数据上的期望损失. 它要对未知的联合分布积分, 算不出来, 所以 ERM 用 n 个训练样本上的平均损失代替. 整章围绕这个「代替」展开: 学到的模型和贝叶斯最优模型差多少 (贝叶斯遗憾), 这个差距能拆成估计误差 (样本有限) 和近似误差 (假设空间太小); 数据无限时, 一致收敛保证经验风险的最小点也趋于理论风险的最小点.
+S rmin | brisk | Bayes 风险 | Bayes risk | 给定损失下任何模型都达不到更低的风险.
+S rmin | regret | 贝叶斯遗憾 | Bayes regret | 学到的模型的风险减去 Bayes 风险.
+S rmin | unif | 一致收敛 | uniform convergence | 经验风险在整个假设空间上同时逼近理论风险.
+
+D lossprop | Loss functions are chosen by their statistical properties, their robustness against outliers and their optimization properties such as convexity and differentiability.
+X lossprop | 选损失时看三件事. 统计: 最小化 L2 等价于高斯噪声下的最大似然, 选了 L2 就默认噪声对称、尾部轻. 稳健: L2 把大残差平方放大, 一个离群点就能把拟合拉偏, L1 和 Huber 受影响小得多. 优化: 凸的损失局部最优就是全局最优, 光滑可导的损失能直接用梯度方法. 基本术语是对称 (只依赖残差或间隔) 和凸.
+S lossprop | robust | 稳健性 | robustness | 个别离群点对拟合影响小.
+S lossprop | convex | 凸性 | convexity | 局部最小就是全局最小, 便于优化.
+
+D pr | The pseudo-residual is the negative gradient of the loss with respect to the current prediction; for the L2 loss it is proportional to the ordinary residual.
+X pr | 伪残差把回归里「残差」的想法推广到任意可导损失: 它告诉我们每个点的预测该往哪个方向改、改多少. 对 0.5 倍的 L2 损失, 负梯度正好是 y − f, 就是普通残差; 对 L1 损失是残差的符号, 只说方向不说大小. 这一节是为第 8 章准备的: 梯度提升每一轮都用一个基学习器去拟合当前的伪残差.
+
+D l2l1 | The risk minimizer of the L2 loss is the conditional expectation of y given x, that of the L1 loss is the conditional median.
+X l2l1 | L2 损失按残差的二次增长, 一个残差为 3 的点贡献 9, 抵得上 9 个残差为 1 的点, 所以拟合会被少数远离的点拉过去; 它的风险最小化器是条件期望, 最优常数是均值. L1 按绝对值增长, 更稳健, 最小化器是条件中位数, 最优常数是中位数, 但在 0 处不可导. 深入一节补了 L1 的两种证明: 总体版本用 Leibniz 积分法则求导, 经验版本用首尾配对, 都落到中位数「左右各一半」的定义上.
+S l2l1 | condexp | 条件期望 | conditional expectation | L2 损失的风险最小化器.
+S l2l1 | condmed | 条件中位数 | conditional median | L1 损失的风险最小化器.
+S l2l1 | l1dd | L1 风险最小化器 (深入) | L1 Risk Minimizer (Deep-Dive) | 用 Leibniz 法则或首尾配对证明中位数最优.
+
+D advreg | Huber, log-cosh, Cauchy, ε-insensitive and quantile loss each trade off properties of the L2 and L1 loss.
+X advreg | 这五种损失都是在 L2 和 L1 之间做取舍或改造. Huber 和 log-cosh 想同时要 L2 的光滑和 L1 的稳健: 小残差像平方, 大残差像绝对值. Cauchy 比 L1 更稳健, 大残差的损失只按对数增长, 代价是不凸. ε-不敏感损失让 ε 以内的误差完全不计, 是支持向量回归的损失. 分位数损失让高估和低估代价不对称, 风险最小化器是条件分位数, 用来预测区间而不是中心.
+S advreg | huber | Huber 损失 | Huber loss | 小残差用平方, 大残差用绝对值.
+S advreg | cauchy | Cauchy 损失 | Cauchy loss | 对离群点极不敏感, 但不凸.
+S advreg | quant | 分位数损失 | quantile loss | 风险最小化器是条件分位数.
+
+D zo | The 0-1 loss counts misclassifications; its risk minimizer is the Bayes optimal classifier, which predicts the class with the highest posterior probability.
+X zo | 0-1 损失的风险就是误分类率. 把它逐点最小化, 最优决策是取后验概率最大的类, 这就是 Bayes 最优分类器, 它的错误率 (Bayes 错误率) 是任何分类器的下限. 它需要真实后验, 实际中只能估计. 在间隔写法里, y·f > 0 表示分对. 0-1 损失对参数是分段常数, 梯度几乎处处为 0, 直接最小化是组合优化问题, 所以实践中换成凸的替代损失.
+S zo | bayescls | Bayes 最优分类器 | Bayes optimal classifier | 预测后验概率最大的类.
+S zo | berr | Bayes 错误率 | Bayes error rate | 最优分类器也避免不了的错误率.
+S zo | margin | 间隔 | margin | 标签和分数的乘积, 正值表示分对.
+
+D bern | The Bernoulli loss is the negative log-likelihood of a Bernoulli model; it can be written on probabilities, scores or margins.
+X bern | 二分类最常用的损失, 名字多是因为从不同角度都能推出来: Bernoulli 似然 (统计)、逻辑回归 (模型)、交叉熵 (信息论). 写在概率 π 上是 −y log π − (1−y) log(1−π), 写在分数上是 log(1 + exp(−y f)). 它的风险最小化器是真实后验概率. 数据完全可分时, 把系数放大总能让损失再降一点, 参数会发散, 需要正则化.
+S bern | logloss | 对数损失 | log loss | Bernoulli 损失写在概率上的名字.
+S bern | sep | 完全可分 | complete separation | 两类可完全分开时逻辑回归系数发散.
+
+D logreg | Logistic regression combines a linear score, the logistic function and the Bernoulli loss; its Hessian is positive semi-definite, so the empirical risk is convex.
+X logreg | 深入一节推导的三步是一条线: 梯度给出梯度下降要用的方向, 形式是 (π − y) x 的和, 和线性回归的梯度一样, 只是预测值换成了概率; Hessian 给出 Newton-Raphson 要用的曲率, 形式是 XᵀWX, W 的对角元 π(1−π) > 0; Hessian 处处半正定说明经验风险是凸的, 局部最优就是全局最优. 令梯度为 0 解不出闭式解, 所以要迭代, Newton 法写开来就是 IRLS.
+S logreg | grad | 梯度 | gradient | 和线性回归形式相同, 预测换成概率.
+S logreg | hess | Hessian | Hessian | 半正定, 所以问题是凸的.
+S logreg | irls | 迭代加权最小二乘 | IRLS | 逻辑回归的 Newton 法.
+
+D psr | A scoring rule is proper if the expected loss is minimized by predicting the true probability, and strictly proper if this minimizer is unique.
+X psr | 这一节回答: 什么样的概率损失会在训练时把预测推向真实概率? 期望损失在真实概率处取最小就叫适当 (proper), 最小点唯一就叫严格适当. 对数损失和 Brier 分数是严格适当的; 概率上的 L1 损失不是, 它会把预测推到 0 或 1. 判断方法是一阶条件: 期望损失对预测概率求导, 在真实概率处为 0. 适当评分规则可以用凸函数的 Bregman 散度构造, 连续目标上对应的是 CRPS.
+S psr | strict | 严格适当 | strictly proper | 真实概率是期望损失唯一的最小点.
+S psr | bregman | Bregman 散度 | Bregman divergence | 由凸函数构造适当评分规则.
+S psr | crps | 连续排序概率评分 | CRPS | 连续目标的适当评分规则.
+
+D brier | The Brier score is the L2 loss on predicted probabilities; its risk minimizer is the posterior probability, so its predictions are calibrated.
+X brier | 直接在概率上算平方损失就是 Brier 分数. 它和 log 损失都在 0.5 处给 0.25, 但最大值只有 1, 而 log 损失趋于无穷, 所以对置信错误的惩罚轻得多. 写在概率上是凸的; 写在分数上 (过一次 sigmoid) 曲线是 S 形, 有拐点, 不凸. 概率上的 L1 损失不适当, 最优解被推到 0 或 1.
+S brier | calib | 校准 | calibrated | 预测概率为 p 的样本里真正为正的比例也是 p.
+S brier | l1prob | 概率上的 L1 损失 | L1 loss on probabilities | 不适当, 最优解被推到 0 或 1.
+
+D advcls | Surrogate losses such as hinge, squared hinge and exponential loss are convex, continuous upper bounds of the 0-1 loss defined on the margin.
+X advcls | 0-1 损失是阶跃函数, 梯度方法得不到方向, 所以要找替代损失: 凸、连续, 并压在 0-1 损失之上. 读图时横轴是间隔: hinge 在间隔 ≥ 1 时为 0, 之后线性增长, 是 SVM 的损失; squared hinge 是它的平方, 处处可导; 指数损失随间隔指数下降, 对分错的点惩罚极重, 是 AdaBoost 背后的损失. 它们都不给出概率.
+S advcls | hinge | hinge 损失 | hinge loss | SVM 的损失, 间隔大于 1 时为 0.
+S advcls | exploss | 指数损失 | exponential loss | AdaBoost 最小化的损失.
+S advcls | surr | 替代损失 | surrogate loss | 代替 0-1 损失的凸上界.
+
+D constm | The optimal constant model ignores the features; under the empirical log loss it predicts the class frequencies of the training data.
+X constm | 最优常数模型对所有观测都给同一个预测. 对概率型损失, 这个「预测」是一个概率 (二分类) 或一个概率向量 (多分类). 对数损失下, 用拉格朗日乘子在概率和为 1 的约束下求最小, 结果正好是训练集里的类别比例. 它有两个用处: 一是最朴素的基线, 用到特征的模型都应该比它好; 二是决策树的叶节点本身就是常数模型, 下一节靠它把树的分裂和损失函数连起来.
+
+D losstree | Splitting a tree node by minimizing the summed loss of optimal constant models is equivalent to impurity-based splitting: Bernoulli loss gives entropy, Brier score gives the Gini index.
+X losstree | CART 选分裂用不纯度 (熵或 Gini 指数), 看起来是一套和风险最小化无关的规则. 这一节说明两者是同一件事: 在每个子节点里用某个损失拟合最优常数, 把损失加起来, 选总损失最小的分裂, 结果和用对应的不纯度一样. Bernoulli 损失下, 子节点的最小损失正是熵乘以样本数; Brier 分数下正是 Gini 指数; 回归时 L2 损失对应方差.
+S losstree | imp | 不纯度 | impurity | 节点里类别混合的程度.
+S losstree | gini | Gini 指数 | Gini index | Brier 分数下的不纯度.
+
+D mle | Taking the negative log-likelihood as loss turns maximum likelihood into empirical risk minimization; Gaussian noise gives the L2 loss, Laplace noise the L1 loss.
+X mle | 到目前为止损失函数被当作人为选择的东西, 这一节从统计学给它一个来源: 先假设 y 给定 x 的条件分布, 再用最大似然估计参数; 把负对数似然当损失, 最大似然就成了 ERM. 由此每个常见损失都对应一个噪声分布: 高斯 → L2, 拉普拉斯 → L1, Bernoulli → 对数损失. 反过来不一定成立: 不是每个损失都对应一个似然. 用 Q-Q 图可以检查残差是否符合假设的分布.
+S mle | nll | 负对数似然 | negative log-likelihood | 把最大似然变成风险最小化的损失.
+S mle | lap | 拉普拉斯分布 | Laplace distribution | 负对数似然是 L1 损失的噪声分布.
+
+D bvd | Under L2 loss, the expected generalization error of a learner decomposes into irreducible noise, squared bias and variance.
+X bvd | 主角是学习器 (算法), 不是某个训练好的模型. 训练集是随机抽的, 换一份训练集就学出另一个模型, 所以期望对训练集和测试点两种随机性同时取. 偏差是「平均学出来的模型离真实函数多远」, 方差是「换训练集时学出来的模型散得多开」, 噪声是数据本身的不可约误差. 模型容量增加, 偏差下降、方差上升. 深入一节在 L2 下逐步展开平方, 说明哪几项交叉项为零, 要会自己推一遍.
+S bvd | bias | 偏差 | bias | 平均预测离真实函数多远.
+S bvd | var | 方差 | variance | 换训练集时预测的波动.
+S bvd | noise | 噪声 | noise | 不可约误差, 任何模型都去不掉.
+S bvd | bvdd | 偏差–方差分解 (深入) | Bias-Variance Decomposition (Deep-Dive) | L2 下的完整推导, 交叉项为零.
+
+D aee | The excess risk of the ERM model splits into estimation error and approximation error; in practice an optimization error is added.
+X aee | 这是另一种拆法: 在学到的模型和 Bayes 最优模型之间插入「假设空间里最好的模型」, 加减一项即得, 对任何损失都成立. 估计误差来自样本有限, 学到的模型不是假设空间里最好的; 近似误差来自假设空间太小, 里面最好的模型也不是 Bayes 最优. 扩大假设空间, 近似误差下降、估计误差上升. 如果优化没找到真正的经验风险最小点, 还要再加优化误差.
+S aee | esterr | 估计误差 | estimation error | 来自样本有限.
+S aee | approxerr | 近似误差 | approximation error | 来自假设空间太小.
+S aee | opterr | 优化误差 |  | 来自没找到真正的最小点.
+
+D mcloss | In multiclass classification the label takes one of g unordered classes; with one-hot encoding, 0-1 loss, Brier score and log loss generalize directly.
+X mcloss | 和二分类的唯一区别是标签取值多于两个. 类别编号只是名字, 没有大小顺序, 不能当数值做回归, 所以先做 one-hot 编码. 模型输出 g 个分数或 g 个概率; 0-1 损失看最大分数的类对不对, Brier 分数是概率向量和 one-hot 向量的平方距离, 对数损失只看真实类的概率, 就是交叉熵. 最优常数模型同样是各类比例.
+S mcloss | onehot | one-hot 编码 | one-hot encoding | 把类别写成只有一位为 1 的向量.
+S mcloss | mcbrier | 多分类 Brier 分数 | multiclass Brier score | 概率向量和 one-hot 向量的平方距离.
+
+D softmax | Softmax regression uses g linear scores, the softmax transformation and the multiclass log loss; for two classes it reduces to logistic regression.
+X softmax | 同一套配方换两个零件: 逻辑回归 = 线性分数 + sigmoid + Bernoulli 损失; softmax 回归 = g 个线性分数 + softmax + 多分类对数损失. softmax 对每个分数取指数再归一化, 保持分数的大小顺序. 所有分数同时加一个常数, 概率不变, 所以参数不可识别; 把某一类的参数固定为 0 (参照类) 就解决了, 两类时剩下的就是逻辑回归.
+S softmax | smfun | softmax 函数 | softmax | 把 g 个分数变成和为 1 的概率.
+S softmax | refc | 参照类 | reference class | 参数固定为 0 的类, 让参数可识别.
+
+D ovr | Reductions solve a multiclass problem with binary classifiers: one-vs-rest trains one classifier per class, one-vs-one one per pair of classes.
+X ovr | 前一节改造模型本身, 这一节模型不动, 只改数据和组合方式, 用一组二分类器拼出多分类器; 这对只会做二分类的方法 (原始 SVM) 是标准办法. 一对其余训练 g 个分类器, 每个把一类当正类、其余当负类, 预测取分数最高的; 各分类器分数要可比, 数据也会不平衡. 一对一训练 g(g−1)/2 个分类器, 每个只用两类的数据, 单个更快, 预测时多数投票.
+S ovr | ovrs | 一对其余 | one-vs-rest | 每个类对其余所有类.
+S ovr | ovos | 一对一 | one-vs-one | 每一对类各训练一个分类器.
+S ovr | vote | 多数投票 | majority voting | 一对一时按赢的次数决定类别.
+
+D ecoc | A codebook assigns each class a codeword of binary labels; error-correcting output codes choose codewords far apart so that single classifier errors can be corrected.
+X ecoc | 编码本把「怎么拆」写成一张表: 每行是一个类的码字, 每列是一个二分类问题. 一对其余和一对一都是它的特例. 预测时把各分类器的输出拼成一串, 和每行比汉明距离, 取最近的类. 借用通信里的纠错码: 行与行相距越远, 能纠正的分类器错误越多 (行分离); 列与列也要彼此不同, 否则分类器犯同样的错 (列分离). 好的编码本可以用随机爬山搜索.
+S ecoc | cb | 编码本 | codebook | 每个类一行码字, 每列一个二分类问题.
+S ecoc | ham | 汉明距离 | Hamming distance | 两个码字不同的位置数.
+S ecoc | rowsep | 行分离 | row separation | 码字相距远才能纠错.
+
+D entropy | Entropy is the expected surprisal of a discrete random variable, H(X) = −Σ p(x) log p(x).
+X entropy | 单个结果的惊奇度是 −log p(x): 越不可能的事发生, 带来的信息越多. 熵是它的期望, 衡量分布的平均意外程度. 基本性质: 非负; 确定时为 0; 均匀分布时最大 (log g); 两个独立变量的联合熵是各自之和. 以 2 为底单位是比特. 这一章为后面打基础: 对数损失就是交叉熵, 决策树的信息增益就是互信息.
+S entropy | surp | 惊奇度 | surprisal | 单个结果的信息量 −log p(x).
+S entropy | binent | 二元熵函数 | binary entropy function | Bernoulli 变量的熵, p = 0.5 时最大.
+
+D maxent | The maximum entropy principle chooses, among all distributions satisfying given constraints, the one with the largest entropy.
+X maxent | 上一节的性质 (连续、均匀时最大、独立时可加) 反过来问: 满足这些性质的度量是不是只有熵一种? 唯一性定理回答是, 所以熵的公式不是随手选的. 最大熵原理把熵用作建模工具: 已知条件下选最不确定的分布, 不额外假设任何东西. 没有约束时得到均匀分布 (不充分理由原则); 约束期望值时, 拉格朗日乘子法推出指数族的形式.
+S maxent | uniq | 唯一性定理 | uniqueness theorem | 满足几条基本性质的度量只有熵.
+S maxent | expfam | 指数族 | exponential family | 最大熵原理推出的分布形式.
+
+D diffent | Differential entropy extends entropy to continuous random variables by integrating over the density; it can be negative and changes under rescaling.
+X diffent | 连续变量没有「取某个值的概率」, 只有密度, 所以把求和换成积分、概率换成密度, 用小写 h 和离散熵区分. 它和离散熵有三点不同: 可以为负 (密度可以大于 1); 随变量缩放而改变, 把 X 乘 a 熵就加 log∣a∣; 也不是离散熵在格子变细时的极限, 两者差一个发散的项. 所以它只能比较「同一单位下哪个分布更分散」. 方差固定时, 正态分布的微分熵最大.
+
+D kl | The Kullback-Leibler divergence D_KL(p ∥ q) is the expected log ratio of p and q under p; it is non-negative and zero only if the distributions are equal.
+X kl | KL 散度从三个角度看: 两条对数密度之差在 p 下的平均; 拟合时要最小化的损失; 对数似然比的期望. 它非负, 证明用 Jensen 不等式 (即 Gibbs 不等式), 只在两个分布相同时为 0. 「距离」要打引号: KL 不对称, 也不满足三角不等式. 方向有讲究: D_KL(p ∥ q) 在 p 大而 q 小的地方惩罚重, 所以用它拟合 q 时 q 会尽量盖住 p 的全部支撑.
+S kl | gibbs | Gibbs 不等式 | Gibbs inequality | KL 散度非负.
+
+D ce | Cross-entropy H(p, q) is the expected surprisal under q of data drawn from p; it equals the entropy of p plus the KL divergence.
+X ce | 本节的核心只有一个恒等式: 交叉熵 = 熵 + KL. 熵是 p 本身的不确定性, 与 q 无关; KL 是用 q 代替 p 付出的额外代价. 由于 KL 非负, 交叉熵永远不小于熵, 只在 q = p 时相等 (这也是适当评分规则的另一种证明). 离散和连续情形写法相同, 用正态和 Laplace 的例子可以把三者画在一张图上.
+
+D infoml | Minimizing the KL divergence to the data distribution, minimizing cross-entropy, maximizing likelihood and minimizing log loss are equivalent.
+X infoml | 这一节把信息论的量和前面的训练准则对上号. 用模型 q_θ 逼近数据分布 p: 最小化 KL 与最大似然等价; 交叉熵 = 熵 + KL, 熵不依赖参数, 所以也等价于最小化交叉熵. 分类问题里把标签看成 one-hot 分布 (硬标签), 交叉熵就成了对数损失; 换成软标签也能直接用. 所以训练分类器时最小化的交叉熵损失, 本质上就是在做最大似然.
+S infoml | celoss | 交叉熵损失 | cross-entropy loss | 分类里把标签当 one-hot 分布时的对数损失.
+
+D mi | Conditional entropy is the remaining uncertainty about X once Y is known; mutual information I(X; Y) = H(X) − H(X ∣ Y) is the reduction in uncertainty.
+X mi | 联合熵把数对当成一个随机变量, 再套单变量熵的定义. 条件熵是知道 Y 后关于 X 还剩多少不确定性, 链式法则 H(X, Y) = H(X) + H(Y ∣ X). 互信息是熵的减少量, 也等于联合分布和边缘乘积之间的 KL. 由 KL 非负得: 互信息非负, 独立时为 0; 条件熵不超过原熵, 但这只在平均意义上成立, 观察到某个具体值可能让不确定性变大. 互信息能捕捉非线性依赖, 相关系数只看线性; 决策树的信息增益就是互信息. 深入一节证明它在对每个变量分别做可逆变换时不变.
+S mi | jent | 联合熵 | joint entropy | 把数对当成一个随机变量的熵.
+S mi | cent | 条件熵 | conditional entropy | 知道另一个变量后剩下的不确定性.
+S mi | ig | 信息增益 | information gain | 分裂带来的熵减少, 就是互信息.
+S mi | midd | 重参数化下的互信息 (深入) | Mutual Information under Reparametrization (Deep-Dive) | 各变量分别可逆变换时互信息不变.
+
+D code | The entropy with base 2 is the minimal average number of bits per symbol; Huffman coding builds an optimal instantaneous code.
+X code | 这一节给熵一个最具体的含义: 编码一个符号平均至少要多少个 0/1. 关键词是平均: 常见的消息值得用短码字. 定长码不利用频率; 即时码 (前缀码) 里没有码字是另一个码字的前缀, 能边收边解. 即时码的码长必须满足 Kraft 不等式, 由此可证平均码长不小于熵. Huffman 编码反复合并两个最少见的符号, 得到最优即时码. log 损失也可以读成「用模型的概率编码数据要多少比特」.
+S code | fixlen | 定长码 | fixed-length code | 所有码字一样长.
+S code | inst | 即时码 | instantaneous code | 没有码字是别的码字的前缀.
+S code | kraft | Kraft 不等式 | Kraft inequality | 即时码码长必须满足的条件.
+S code | huff | Huffman 编码 | Huffman coding | 构造最优即时码的算法.
+
+D srccode | If data from p are coded with the optimal code for q, the average code length is the cross-entropy H(p, q).
+X srccode | 读图: 上排是两个分布 p 和 q, 下排分别是用 p 自己的最优码和用 q 的最优码 (码长 log(1/q)) 编码 p 的数据. 用错的分布设计编码, 平均码长就是交叉熵 H(p, q); 多出来的部分正好是 KL 散度. 所以 KL 可以读成「用错误模型付出的额外比特数」, 最小化交叉熵就是找最省比特的编码.
+
+D curse | The curse of dimensionality is a group of phenomena by which data become sparse, neighbourhoods become large and volume concentrates at the boundary as the dimension grows.
+X curse | 维度诅咒不是一个定理, 而是一组现象. 依次看到四种: 格子数随维度指数增长, 数据变稀疏; 要装下 10% 的数据, 「局部」立方体的边长要接近整个范围; 单位球的体积相对外接立方体趋于 0, 体积集中在角上; 高维高斯样本集中在一层薄壳上, 几乎没有点在中心附近. 背后是同一件事: 体积随维度按幂次增长. 距离平方是很多独立项之和, 相对波动缩小, 所有点看起来一样远.
+S curse | sparse | 数据变稀疏 |  | 格子数指数增长, 每格几乎没有数据.
+S curse | shell | 薄壳现象 | thin shell | 高维正态样本集中在一层壳上.
+S curse | relcon | 相对对比度 | relative contrast | 最远和最近距离的相对差趋于 0.
+
+D codex | In high dimensions, k-NN neighbours are no longer close and linear models suffer from high variance when the number of features grows.
+X codex | k-NN 的预测依赖「最近邻离得近, 所以标签相似」. 维度高了, 最近和最远距离之比趋于 1, 「最近」只由噪声决定; 加入无关特征, 距离被它们淹没, 误差明显变大. 线性模型不靠距离, 受影响的方式不同: 特征数接近样本数时系数的方差急剧变大, 特征数超过样本数时最小二乘没有唯一解. 这正是下一章正则化要解决的问题.
+
+D rrm | Regularized empirical risk minimization adds a complexity penalty J(θ), weighted by λ, to the empirical risk.
+X rrm | 数据有限时, 很多模型都能把训练集拟合得一样好, 归纳偏置决定在它们之间选哪个. 正则化选的偏好是「简单」: 系数小 (收缩) 或很多系数为 0 (稀疏). 这会多引入一点偏差, 换来方差的大幅下降. λ 控制权衡: λ = 0 回到 ERM, λ → ∞ 系数全被压到 0. λ 本身是超参数, 要用重采样调.
+S rrm | ib | 归纳偏置 | inductive bias | 数据给不出、预先放进模型的偏好.
+S rrm | shrink | 收缩 | shrinkage | 把系数往 0 拉.
+S rrm | lam | 正则化强度 | regularization strength | λ 控制拟合和简单之间的权衡.
+
+D ridge | Ridge regression is linear regression with an L2 penalty; it shrinks the coefficients towards zero and has the closed form (XᵀX + λI)⁻¹Xᵀy.
+X ridge | OLS 的方差是 σ²(XᵀX)⁻¹. 特征数大于样本数时 XᵀX 不可逆; 特征高度相关时它有接近 0 的特征值, 求逆后方差极大. 岭回归在对角线上加 λ, 矩阵总可逆, 系数被收缩, 方差下降. 惩罚形式等价于带约束的问题: 在 ‖θ‖² ≤ t 的圆盘里找最小残差. 深入一节给出两个新视角: 等价于在数据里加 p 行伪观测, 也等价于特征带噪声时最小化风险.
+S ridge | constr | 约束形式 | constrained form | 在 L2 球内最小化经验风险.
+S ridge | ridgedd | 岭回归的几种视角 (深入) | Perspectives on Ridge Regression (Deep-Dive) | 加伪观测, 或特征带噪声时的风险.
+
+D lasso | The lasso is linear regression with an L1 penalty; it sets some coefficients exactly to zero and thus selects features.
+X lasso | L1 惩罚在 0 处有折角, 不能简单地令梯度为 0, 所以没有闭式解. 用次梯度写最优性条件: 系数非零时梯度和 λ·sign 平衡; 系数为 0 时只要求梯度的绝对值不超过 λ. 这个「区间」条件让很多系数恰好为 0, lasso 因此自带特征选择. λ 从大到小变化时, 系数一个接一个进入模型.
+S lasso | subg | 次梯度 | subgradient | 有折角的凸函数的梯度推广.
+S lasso | fsel | 特征选择 | feature selection | 被压成 0 的特征退出模型.
+
+D lvr | Geometrically, the L1 constraint region is a diamond with corners on the axes, so the lasso solution is often sparse, while the L2 disc only shrinks.
+X lvr | 约束形式下, 残差平方和的等高线是椭圆, 从无约束最优点向外扩, 第一次碰到约束区域的点就是解. L2 是圆盘, 碰到的通常不在坐标轴上, 所以只收缩; L1 是菱形, 角在坐标轴上, 椭圆常先碰到角, 对应系数为 0. 系数路径图显示同样的差别. 两种惩罚都依赖特征的尺度, 失去缩放等变性, 所以要先标准化. 特征高度相关时, lasso 倾向于随机留一个, ridge 把系数平均分开.
+S lvr | path | 系数路径 | coefficient path | 系数随 λ 变化的曲线.
+S lvr | scale | 缩放等变性 | rescaling equivariance | 加惩罚后不再成立, 要先标准化.
+
+D enet | The elastic net combines L1 and L2 penalties; regularization extends to GLMs such as logistic regression.
+X enet | 弹性网把「罚多少」和「怎么罚」分到两个超参数上: 总强度 λ 和混合比例 α, α = 1 是 lasso, α = 0 是 ridge. L2 部分让目标严格凸, 所以解唯一; 高度相关的特征会被一起选进或一起去掉 (分组效应); 特征数大于样本数时 lasso 最多选 n 个, 弹性网没有这个限制. 正则化同样可以加在逻辑回归等 GLM 的负对数似然上, 并解决完全可分时系数发散的问题.
+S enet | reglog | 正则化逻辑回归 | regularized logistic regression | 负对数似然加惩罚.
+
+D othreg | Penalties beyond L1 and L2, such as L0, SCAD and MCP, reduce the bias that L1 and L2 introduce for large coefficients.
+X othreg | 由软阈值可以算出: 系数很小时 lasso 把它清零, 系数大时向 0 平移 λ, 所以无论信号多强, lasso 总少估一个 λ, 这就是收缩偏差. L0 惩罚直接数非零系数, 对应最优子集选择 (硬阈值), 没有偏差但组合爆炸、不连续. SCAD 和 MCP 在小系数处像 L1, 大系数处惩罚变平, 不再收缩, 具有神谕性质, 代价是非凸.
+S othreg | l0 | L0 正则化 | L0 regularization | 数非零系数的个数, 对应最优子集选择.
+S othreg | scad | SCAD | SCAD | 大系数不再收缩的非凸惩罚.
+S othreg | oracle | 神谕性质 | oracle property | 像已知真特征一样估计.
+
+D srm | Structural risk minimization chooses a model from a nested sequence of increasingly complex hypothesis spaces; regularization is its continuous version.
+X srm | 第 5 章前面的内容收成一句话: 几乎所有监督学习方法都可以看成在三个旋钮上各选一档: 假设空间、损失、惩罚. 例如线性模型 + 平方损失 + L2 = 岭回归, 线性模型 + hinge + L2 = SVM. 结构风险最小化把假设空间排成一串嵌套的、越来越复杂的集合, 在泛化误差最小处选; 读图时训练误差单调下降, 泛化误差先降后升. 正则化让这个选择变得连续. 背后的原则是奥卡姆剃刀. 非线性模型 (如神经网络) 同样直接加 L2 惩罚.
+S srm | occam | 奥卡姆剃刀 | Occam's razor | 能解释数据的最简单模型优先.
+
+D bayesprior | Regularized risk minimization corresponds to maximum a posteriori estimation: a Gaussian prior gives the L2 penalty, a Laplace prior gives the L1 penalty.
+X bayesprior | ERM 与最大似然对应; 再往前一步, 给参数本身加一个先验分布, 表示看数据之前的信念. 后验正比于似然乘先验, 取负对数后就是「损失 + 惩罚」, 所以最大后验 (MAP) 估计就是正则化风险最小化. 高斯先验给 L2, 拉普拉斯先验给 L1, 均匀先验什么也不加, 回到最大似然. 一维例子里 λ = 噪声方差 / 先验方差: 数据越吵越要靠先验收缩, 先验越窄越坚信系数接近 0.
+S bayesprior | map | 最大后验估计 | MAP | 后验的众数, 等于正则化风险的最小点.
+S bayesprior | gprior | 高斯先验 | Gaussian prior | 对应 L2 惩罚.
+S bayesprior | lprior | 拉普拉斯先验 | Laplace prior | 对应 L1 惩罚.
+
+D wd | With gradient descent, adding an L2 penalty is equivalent to weight decay: before each step the parameters are multiplied by (1 − αλ).
+X wd | L2 惩罚项 (λ/2)Σθⱼ² 对 θⱼ 求导得 λθⱼ, 代入梯度下降更新式, 合并含 θ 的两项, 就成了「先乘 1 − αλ, 再走经验风险梯度」. 只有 αλ < 1 时乘子才在 0 和 1 之间, 是真正的衰减. 对普通梯度下降两种说法完全等价; 用 Adam 等自适应优化器时梯度被逐分量缩放, 两者不再等价, 所以有了把衰减单独做的 AdamW.
+S wd | adaptive | 自适应优化器 | adaptive optimizer | 逐分量缩放梯度, 让 L2 和权重衰减不再等价.
+
+D geol2 | Approximating the risk quadratically around the unregularized minimum shows that L2 shrinks the solution along each eigenvector of the Hessian by the factor dⱼ / (dⱼ + λ).
+X geol2 | 一般的非线性模型没有闭式的正则化解, 所以在未正则化最小点附近把经验风险换成二次函数: 一阶项为 0 (最小点梯度为 0), Hessian 半正定. 这样问题就和线性回归一样可解. 结论: 沿 Hessian 第 j 个特征方向, 解被乘以 dⱼ / (dⱼ + λ). 曲率大 (dⱼ ≫ λ) 的方向几乎不动, 那里数据信息充足; 曲率小的方向被强烈收缩, 那里移动参数几乎不改变风险.
+
+D geol1 | The same quadratic approximation with an L1 penalty yields soft-thresholding of each coordinate, which explains why the lasso produces exact zeros.
+X geol1 | 和 L2 走同一条路, 区别全在惩罚的梯度上. L2 的梯度和参数成正比, 参数越接近 0 往回拉的力越小, 永远拉不到恰好 0. L1 的梯度是常数大小, 参数再小也被同样大的力推向 0, 所以能推到恰好 0. 在 Hessian 为对角阵的简化下, 每个坐标分开求解, 结果就是软阈值: 绝对值小于 λ/dⱼ 的被清零, 其余向 0 平移. 深入一节分情况讨论最小点落在哪里.
+S geol1 | soft | 软阈值 | soft-thresholding | 小于阈值置 0, 其余向 0 平移.
+S geol1 | softdd | 软阈值与 L1 正则化 (深入) | Soft-thresholding and L1 regularization (Deep-Dive) | 按最小点的位置分情况推导.
+
+D es | Early stopping halts training when the validation error starts to increase; for gradient descent it approximately corresponds to L2 regularization.
+X es | 读图: 横轴是迭代次数而不是模型复杂度, 但形状和 SRM 那张图一样: 训练误差单调下降, 验证误差先降后升. 迭代越多, 参数离初始值走得越远, 能拟合的细节越多. 优化早期主要拟合强而稳定的规律, 后期才去拟合噪声, 所以在后期停下就截掉了拟合噪声那一段. 在二次近似下, 迭代次数 T 和学习率 α 的作用约等于 1/(Tα) 大小的 L2 惩罚. patience 规定连续多少轮没改善才停.
+S es | pat | 耐心 | patience | 连续多少轮没有改善才停.
+
+D hardsvm | The hard-margin SVM chooses, among all hyperplanes that separate linearly separable data, the one with maximum margin; this is a convex quadratic program.
+X hardsvm | 前面的线性分类器先选损失再最小化风险; SVM 先从几何上问「什么样的分离线最好」: 离两类最近点都最远的那条, 这样对新数据的扰动最有余量 (安全间隔). 把超平面缩放到最近点满足 y f(x) = 1 (规范超平面), 间隔就是 1/‖θ‖, 最大化间隔等价于最小化 ½‖θ‖², 约束是所有点都在间隔外. 这是凸二次规划, 解唯一. 只有落在间隔边界上的点决定解, 叫支持向量.
+S hardsvm | ls | 线性可分 | linearly separable | 存在超平面无误分开两类.
+S hardsvm | canon | 规范超平面 | canonical hyperplane | 缩放到最近点满足 y f(x) = 1.
+S hardsvm | sv | 支持向量 | support vector | 落在间隔上、决定解的点.
+
+D dual | The Lagrange dual of the hard-margin SVM is a quadratic program in the multipliers α in which the data only appear through inner products.
+X dual | 拉格朗日函数把约束用乘子 αᵢ ≥ 0 加进目标. 先对 α 求最大: 若某约束被违反, 把对应 α 调到无穷大; 若都满足, α 取 0 最好, 于是「先 max 再 min」正好等于原问题. 对偶就是交换顺序成「先 min 再 max」, 弱对偶保证它不超过原问题; SVM 满足强对偶, 两者相等. 对 θ 求导得 θ = Σ αᵢ yᵢ xᵢ, 代回后数据只以内积 xᵢᵀxⱼ 出现 (Gram 矩阵). KKT 的互补松弛条件说明只有支持向量的 α 非零.
+S dual | lagr | 拉格朗日函数 | Lagrange function | 用乘子把约束加进目标.
+S dual | wdual | 弱对偶 | weak duality | 对偶最优值不超过原始最优值.
+S dual | kkt | KKT 条件 | KKT conditions | 互补松弛: 非支持向量的乘子为 0.
+
+D softsvm | The soft-margin SVM introduces slack variables ζ that allow margin violations, penalized with weight C; its dual adds the box constraint 0 ≤ α ≤ C.
+X softsvm | 现实里标签噪声、类别重叠很常见, 只要一个点混进对方区域, 硬间隔的约束就无法同时成立, 问题没有可行解. 软间隔给每个点一个松弛变量 ζ ≥ 0, 允许它越过间隔甚至被分错, 在目标里加 C Σ ζ 作为代价. C 大时几乎不容忍违规, 接近硬间隔, 间隔窄; C 小时间隔宽, 违规多. 对偶问题几乎不变, 只是乘子多了上界 C. 支持向量现在包括间隔上、间隔内和被分错的点.
+S softsvm | slack | 松弛变量 | slack variable | 一个点越过间隔多远.
+S softsvm | box | 盒约束 | box constraint | 对偶里的 0 ≤ α ≤ C.
+S softsvm | cpar | 超参数 C | cost parameter C | 违规的代价, 越大越接近硬间隔.
+
+D svmerm | The soft-margin SVM is equivalent to regularized empirical risk minimization with the hinge loss and an L2 penalty.
+X svmerm | 在最优解处, 松弛变量取能满足约束的最小值, 即 ζ = max(0, 1 − y f(x)), 这正是 hinge 损失. 代回目标, 软间隔 SVM 就成了「hinge 损失之和 + L2 惩罚」, λ 相当于 1/(2C). ζ 是以间隔宽度为单位的相对量, 「最大化间隔同时最小化违反距离」的几何故事说不圆了, 换成「损失 + 正则项」的视角就清楚. 好处是可以换成别的损失: 平方 hinge、Huber 化 hinge, 或回归用的 ε-不敏感损失.
+S svmerm | hingel | hinge 损失 | hinge loss | 松弛变量的最优值.
+
+D svmtrain | The primal SVM objective is not differentiable and is solved by subgradient descent; the dual is usually solved by pairwise coordinate ascent (SMO).
+X svmtrain | 原问题 hinge 损失在间隔 = 1 处不可导, 用次梯度下降, 变量是 p 个系数, 每步代价随 n 线性增长, 适合样本很多、特征不太多的线性 SVM. 对偶问题变量是 n 个乘子, 需要 n × n 的核矩阵, 适合中小样本、要用核的情形. 对偶有等式约束 Σ αᵢ yᵢ = 0, 单独改一个乘子会破坏它, 所以 SMO 每次成对更新两个, 子问题有闭式解.
+S svmtrain | sgd | 次梯度下降 | subgradient descent | 解原问题.
+S svmtrain | smo | 序列最小优化 | SMO | 每次更新两个乘子来解对偶.
+
+D featmap | Nonlinear separation can be obtained by mapping inputs with a feature map φ into a higher-dimensional feature space and separating linearly there.
+X featmap | 思路是不改分类器, 改数据的表示. SVM 只会画超平面, 但「超平面」是相对坐标而言的: 给每个点加上原特征的非线性函数作新坐标, 在新空间画平面, 投回原空间就是曲面. 这和线性回归加多项式项是同一个想法. 读图: 二维里两类缠在一起, 加一个坐标后在高度上拉开, 一张平面就能分开. 问题在计算: 二次映射的维数是 p² 量级, 高次多项式的单项式个数爆炸.
+S featmap | fspace | 特征空间 | feature space | 映射后的高维空间.
+S featmap | mono | 单项式 | monomial | 特征幂次的乘积, 是多项式映射的坐标.
+
+D ktrick | The kernel trick replaces inner products ⟨φ(x), φ(x̃)⟩ in the dual problem and in prediction by a kernel function k(x, x̃) that is computed directly.
+X ktrick | 对偶问题的输入只是 n² 个两两内积, 和特征空间维数无关; 预测也只要 Σ αᵢ yᵢ ⟨φ(xᵢ), φ(x)⟩. 只要能直接算出特征空间里的内积, 就不必显式构造 φ. 核函数就是这样一个函数. 例子: 齐次二次映射的内积正好是 (xᵀx̃)², 计算只要 p 次乘法. 对偶的推导一步都不用改, 核 SVM 只是把内积换成核.
+S ktrick | kfun | 核函数 | kernel function | 直接算特征空间内积的函数.
+S ktrick | kmat | 核矩阵 | kernel matrix | 训练点两两核值组成的矩阵.
+
+D polyk | The polynomial kernel (xᵀx̃ + b)ᵈ corresponds to a feature space of all monomials up to degree d; with b = 0 it is homogeneous.
+X polyk | 齐次多项式核 (xᵀx̃)ᵈ 对应所有恰好 d 次的单项式; 加常数 b 后的非齐次核包含所有不超过 d 次的项, b 控制低次项的权重. 推导: 把内积当作 p 项之和代入多项式定理, 系数开平方一半分给 x 一半分给 x̃, 就成了两个特征向量的内积, 所以特征里带着系数的平方根. d 越大, 决策边界越弯, 也越容易过拟合.
+S polyk | homo | 齐次多项式核 | homogeneous polynomial kernel | 只含恰好 d 次的项.
+
+D rkhs | Every positive definite kernel corresponds to a feature space (an RKHS); the representer theorem states that the regularized solution is a combination of kernels at the training points.
+X rkhs | 前几节是「先有映射, 再把内积换成核」; Mercer 定理走反方向: 只要有一个对称正定函数, 就保证存在某个特征空间让它当内积用. 所以设计新核时只需验证正定性 (任意点集的核矩阵都半正定), 不必写出 φ; 高斯核的特征空间无穷维, 也写不出来. 希尔伯特空间可以理解成可以无穷维的欧氏空间. 表示定理说明: 在 RKHS 里做「损失 + 范数惩罚」的最小化, 解一定是训练点上核函数的线性组合, 这就把无穷维问题变成了 n 维.
+S rkhs | mercer | Mercer 定理 |  | 正定核一定对应某个特征空间.
+S rkhs | hilb | 希尔伯特空间 | Hilbert space | 带内积的完备空间, 可以无穷维.
+S rkhs | rep | 表示定理 | representer theorem | 解是训练点上核函数的组合.
+
+D rbf | The Gaussian RBF kernel exp(−‖x − x̃‖² / 2σ²) decays with distance and corresponds to an infinite-dimensional feature space.
+X rbf | σ 是长度单位, 表示核在多远距离上衰减; 软件里常用 γ = 1/(2σ²). 例子: σ = 1 时距离 1、2、3 的核值约 0.61、0.14、0.011, 距离超过 3σ 基本就看不见了. 决策函数是以支持向量为中心的钟形之和, 所以能包住任意形状的区域, 任何数据都能分开. σ 小时每个钟形很窄, 边界紧贴训练点, 容易过拟合; σ 大时接近线性.
+
+D svmsel | The cost parameter C and the kernel parameters must be tuned in an outer loop; choosing the kernel means choosing the inductive bias.
+X svmsel | 同一个 SVM 优化程序, 换一个核就是换一个假设空间, 学出来的模型可以完全不同, 所以核化的 SVM 是一族算法. 选核本质上是在选归纳偏置, 也是融入先验知识的入口: 字符串用字符串核, 图像用平移不变的核. 训练目标只在给定核和 C 的前提下优化, 训练误差随核变复杂而单调下降, 所以不能用它来选核, 只能靠外层的重采样. C 和 σ 相互影响, 要在对数网格上一起调.
+
+D svmdet | Kernel SVMs are non-parametric; with a universal kernel such as the Gaussian kernel they are universally consistent.
+X svmdet | 非参数不是没有参数, 而是参数个数随数据量增长 (每个训练点一个 α); 线性模型不论多少数据都只有 p 个系数. 这里说了两个层次的性质: 逼近能力, 普适核能把任何连续函数逼近得任意好; 一致性, 数据量增长且 C 合适地变化时, 风险收敛到 Bayes 风险. 核也不限于数值向量: 谱核计数两个字符串的公共子串, 让 SVM 能直接处理文本和序列.
+S svmdet | nonpar | 非参数 | non-parametric | 参数个数随数据量增长.
+S svmdet | univ | 普适一致性 | universal consistency | 对任何分布都收敛到 Bayes 风险.
+S svmdet | spec | 谱核 | spectrum kernel | 计数公共子串的字符串核.
+
+D ada | AdaBoost trains weak learners sequentially, increasing the weights of misclassified observations, and combines them by weighted majority vote.
+X ada | bagging 和 boosting 都是同质集成, 区别在成员之间的关系: bagging 的成员彼此独立, 各自在自助样本上学同一个问题, 主要降方差; boosting 是接力, 第 m 个成员专门修正前面的错误, 主要降偏差. AdaBoost 每轮训练一个弱学习器 (常用树桩), 按加权误差算出它的投票权重, 再把被分错的点的权重调大, 下一轮就更关注它们. 后来发现它等价于用指数损失做前向分步加性建模, 由此引出梯度提升.
+S ada | hom | 同质集成 | homogeneous ensemble | 成员都是同一种学习器.
+S ada | weak | 弱学习器 | weak learner | 只比随机猜好一点的学习器.
+
+D gb | Gradient boosting fits an additive model of base learners in a forward stagewise manner; each new learner is fitted to the pseudo-residuals of the current model.
+X gb | 换一个更一般的视角: 不从改样本权重出发, 直接把 boosting 看成拟合一个加性模型, 即 M 个基学习器的加权和. 前向分步: 每轮只加一个新成员, 前面的不再改. 新成员要让风险下降最多, 一般无法直接求, 于是在函数空间里做梯度下降: 在每个训练点上算伪残差 (负梯度), 用基学习器拟合它, 再用线搜索定步长. 只要写下经验风险, 损失就可任选, 回归和分类用同一套框架.
+S gb | fsam | 前向分步加性建模 | forward stagewise additive modeling | 每轮加一个成员, 不改前面的.
+S gb | ls | 线搜索 | line search | 定每一步的步长.
+
+D gbillu | The illustration fits the same data with different losses to show how the pseudo-residuals determine what each boosting step adds.
+X gbillu | 这一节是梯度提升算法的动画版: 同一份数据、同一种基学习器, 只换损失. 损失只出现在两处: 初始化的最优常数, 和每轮的伪残差; 基学习器永远用 L2 去拟合伪残差, 和外层用什么损失无关. L2 的初值是均值, 伪残差就是残差; L1 的初值是中位数, 伪残差只剩符号, 每个点被同样大的力推动, 所以对离群点不敏感; Huber 介于两者之间.
+
+D gbreg | Gradient boosting is regularized by the number of iterations, the depth of the base learners and the learning rate; subsampling adds stochastic gradient boosting.
+X gbreg | 梯度提升特别容易过拟合: 每轮都在拟合还没拟合好的部分, 训练损失几乎可以无限降, 最后剩下的残差是噪声也会被拟合进去. 随机森林多加树只让平均更稳, boosting 多加树是在加容量. 三个旋钮: 迭代次数 M 限制走多远, 用提前停止选; 树深限制每个成员的复杂度; 学习率 ν 让每一步只走一小段, ν 越小需要越多轮, 但通常泛化更好. 每轮只用随机子样本拟合, 就是随机梯度提升.
+S gbreg | lr | 学习率 | learning rate | 每个新成员乘的缩小系数.
+S gbreg | sgb | 随机梯度提升 | stochastic gradient boosting | 每轮在随机子样本上拟合.
+
+D gbcls | For binary classification gradient boosting uses the Bernoulli or exponential loss on a real-valued score; for g classes it fits g discriminant functions in parallel.
+X gbcls | 框架对损失通用, 只要损失对 f 可导就能算伪残差. 分类时 f 是一个实数分数 (对数几率), 不是概率; 概率要过一次 logistic 函数. 这和逻辑回归完全对应, 只是 f 不再是线性函数, 而是许多树的和. Bernoulli 损失的伪残差是 y − π, 「标签减概率」. 换成指数损失就回到 AdaBoost. 多分类时每轮为每个类各拟合一棵树, 用 softmax 合起来, 伪残差是 one-hot 标签减各类概率.
+S gbcls | logodds | 对数几率 | log-odds | 模型输出的实数分数.
+
+D gbtree | With trees as base learners, the depth controls the order of interactions, and the leaf values are re-optimized for the actual loss.
+X gbtree | 树的优点都来自一个性质: 只关心特征值的顺序和切分点. 所以对单调变换不敏感、对离群特征值稳健, 能处理缺失值和类别特征, 没被选作切分的特征对预测没有作用 (内置变量选择). 深度为 d 的树最多表达 d 阶交互, 树桩模型就是加性模型. 第二部分把树写成区域指示函数的加权和: 区域定下来后, 每个叶子的值可以按真实损失单独优化, 因为伪残差的平均只对 L2 是最优步长; 一般用一步 Newton 近似. 多分类时每类一棵树.
+S gbtree | stump | 树桩 | tree stump | 只切一次, 模型是加性的.
+S gbtree | inter | 交互作用 | interaction | 树深决定能表达几阶交互.
+S gbtree | trees2 | 基于树的梯度提升 (二) | Gradient Boosting with Trees 2 | 叶子系数的重新优化和多分类.
+
+D xgb | XGBoost is gradient tree boosting with a second-order approximation of the loss, an explicit penalty on the number and size of leaves, and many engineering optimizations.
+X xgb | XGBoost 没有新的提升框架, 贡献分两类. 统计上: 叶子值和切分增益都用损失的二阶 (Newton) 近似, 再加显式正则项, 惩罚叶子数 γ 和叶子值的平方 λ; 切分增益小于 γ 就不切, 起剪枝作用. 工程上: 用分位点近似找切点, 行和列子采样, 并行, 稀疏数据和缺失值的默认方向. 「if properly tuned」不是客套: 超参数很多, 不调效果可能平平.
+S xgb | approx | 近似切分 | approximate split finding | 只在分位点上找切点.
+
+D cwb | Componentwise boosting (CWB) selects in each iteration only the best-fitting base learner, each belonging to one feature, and updates it; this yields built-in feature selection.
+X cwb | 树 boosting 的最终模型是成百上千棵树的和, 没法说清某个特征单独起了什么作用. CWB 让每个基学习器就是一个熟悉的统计模型分量 (一条直线、一条样条), 每轮对所有候选拟合伪残差, 只把拟合最好的那个加进模型. 同一个基学习器被多次选中时参数可以直接相加, 所以最终每个特征只剩一个分量, 模型自动是 GLM 或 GAM, 可以按特征拆开来读. 没被选中的特征不进模型. 类别特征可以整体独热编码作一个基学习器, 或每个类别拆成一个.
+S cwb | sel | 内置变量选择 | built-in feature selection | 从没被选中的特征不进模型.
+S cwb | cat | 类别特征 | categorical features | 整体作一个基学习器, 或逐类拆开.
+S cwb | cwb2 | 分量式提升基础 (二) | CWB Basics 2 | 类别特征和截距的处理.
+
+D cwbglm | With linear base learners, componentwise boosting converges to the maximum likelihood solution of the corresponding GLM.
+X cwbglm | 每个候选都是「某个特征乘一个系数」, 被选中的同一特征可以合并参数, 所以无论跑多少轮, 模型始终是 β₀ + Σ βⱼxⱼ 的形状, 只是每轮只动一个 βⱼ. 这就是逐坐标的梯度下降 (坐标下降); 设计矩阵满秩时损失是凸的, 一直跑下去收敛到最小二乘解, 也就是高斯假设下的最大似然解; 换成 Bernoulli 损失就收敛到逻辑回归. 截距由初始的最优常数提供. 提前停止时很多系数还是 0, 效果类似 lasso.
+S cwbglm | cd | 坐标下降 | coordinate descent | 每次只更新一个坐标.
+
+D cwbadv | Advanced CWB uses P-spline base learners to fit GAMs and sets penalties so that base learners of different complexity compete fairly.
+X cwbadv | B 样条把 x 的范围用节点切成几段, 每个基函数是只在几段上非零的小鼓包, 样条是它们的加权和. 因为对参数线性, 两次选中同一个样条可以直接相加, 最终每个特征一条曲线, 模型是 GAM. P 样条在 B 样条上对相邻系数之差加惩罚, 鼓包可以给很多, 平滑程度由惩罚决定. 灵活的基学习器拟合伪残差总是更好, 会被偏爱; 所以要按自由度统一设定惩罚, 让选择公平. 张量积样条表示两个特征的交互. 选择后再对系数做推断要谨慎.
+S cwbadv | pspl | P 样条 | P-spline | 对相邻系数之差加惩罚的 B 样条.
+S cwbadv | df | 自由度 | degrees of freedom | 按它设惩罚, 让不同基学习器公平竞争.
+S cwbadv | tps | 张量积样条 | tensor product spline | 表示两个特征的交互.
+
+D blm | The Bayesian linear model puts a prior on the coefficients and obtains a posterior distribution instead of a point estimate; with Gaussian prior and noise the posterior is Gaussian.
+X blm | 这是 GP 之前的热身. 和频率派线性回归的区别只在一句话: 那里 θ 是一个未知但固定的数, 要它的估计; 这里 θ 是随机变量, 不确定性用分布描述. 模型本身 (线性 + 高斯噪声) 不变. 高斯先验是共轭先验, 后验仍是高斯, 可以用配方直接写出; 数据越多后验越窄. 预测分布同时包含参数的不确定性 (认知不确定性, 数据多了会变小) 和噪声 (偶然不确定性, 不会变小). 后验众数就是岭回归的解.
+S blm | conj | 共轭先验 | conjugate prior | 后验和先验同一形式.
+S blm | epi | 认知不确定性 | epistemic uncertainty | 来自数据有限, 会随数据变小.
+S blm | alea | 偶然不确定性 | aleatoric uncertainty | 来自噪声, 不会随数据变小.
+
+D gpbasic | A Gaussian process is a distribution over functions such that the function values at any finite set of inputs are multivariate normal; it is fully specified by a mean and a covariance function.
+X gpbasic | 权重空间视角是上一节的做法: 对函数的一切不确定性都先翻译成对 θ 的不确定性, 函数族被参数化方式锁死, 线性模型的先验抽出来的都是直线. 函数空间视角直接对函数放分布: 把每个输入处的函数值看成一个随机变量, 要求任意有限个函数值的联合分布是多元正态. 这样的随机过程就是 GP, 由均值函数 m(x) 和协方差函数 k(x, x̃) 完全决定. 计算时只会用到有限个点, 边缘化性质保证只看这些点就够.
+S gpbasic | wsv | 权重空间视角 | weight-space view | 分布放在参数上.
+S gpbasic | fsv | 函数空间视角 | function-space view | 分布直接放在函数上.
+S gpbasic | marg | 边缘化性质 | marginalization property | 任意有限个函数值都是多元正态.
+
+D gpcov | The covariance function of a GP encodes assumptions about the shape of the functions, such as smoothness and length scale; it must be positive semi-definite.
+X gpcov | 协方差函数在每对输入上给出函数值的协方差, 填出来就是协方差矩阵; 方差不能为负, 所以它必须半正定. 它编码了对函数的假设: 平稳核只依赖两点之差, 各向同性核只依赖距离. 平方指数核给出无穷次可导、非常平滑的函数; Matérn 核用参数 ν 控制可导次数, 更接近真实数据. 长度尺度 ℓ 控制函数多快变化: 小则抖动、大则平缓. 每个特征一个长度尺度就是 ARD, 长度尺度很大的特征几乎无关.
+S gpcov | se | 平方指数核 | squared exponential kernel | 函数无穷次可导, 非常平滑.
+S gpcov | matern | Matérn 核 | Matérn kernel | 用 ν 控制光滑程度.
+S gpcov | lscale | 长度尺度 | length scale | 函数多快变化.
+S gpcov | ard | 自动相关性判定 | ARD | 每个特征一个长度尺度.
+
+D gppred | Conditioning the joint multivariate normal of training and test function values on the observations gives the GP posterior, with closed-form predictive mean and variance.
+X gppred | 这是从「GP 作为先验」到「GP 作为预测模型」的关键一步. 先验抽出的曲线和数据无关, 只展示核决定了什么形状; 要做回归就像贝叶斯线性模型那样: 先验 × 似然 → 后验. 训练点和测试点的函数值合在一起仍是多元正态, 更新就是多元正态的条件化, 有闭式解 (用舒尔补). 无噪声时后验均值穿过观测点, 方差在观测点为 0, 是插值器; 加上 nugget (噪声项) 后不再严格插值. 后验均值和核岭回归的预测相同; 地统计学里这叫 Kriging.
+S gppred | nug | 块金效应 | nugget | 对角线上的噪声项, 不再插值.
+S gppred | krr | 核岭回归 | kernel ridge regression | 预测和 GP 后验均值相同.
+
+D gptrain | Training a GP means estimating the kernel hyperparameters by maximizing the marginal likelihood; the cost is dominated by inverting the n × n covariance matrix.
+X gptrain | 预测公式里的矩阵由核算出, 核自带超参数: 长度尺度、信号方差、nugget、Matérn 的 ν 等. 同样的数据, 长度尺度取 0.2 和 2 给出完全不同的预测曲线, 所以训练 GP 实际上就是定这些超参数. 把函数积分掉得到边际似然, 它自带数据拟合项和复杂度惩罚项, 最大化它 (第二类最大似然、经验贝叶斯) 不容易过拟合. 每次求值都要对 n × n 矩阵做 Cholesky 分解, 代价 O(n³), 大数据要用近似方法.
+S gptrain | ml | 边际似然 | marginal likelihood | 把函数积分掉后数据的似然.
+S gptrain | t2 | 第二类最大似然 | type-II maximum likelihood | 最大化边际似然选超参数.
+S gptrain | chol | 楚列斯基分解 | Cholesky decomposition | 稳定地求解协方差矩阵方程.
+
+D gpmean | The mean function of a GP expresses a trend in the data; far from the data the posterior mean returns to it.
+X gpmean | 零均值不是硬限制: 后验均值是以训练点为中心的核函数的加权和, 数据足够时能拟合各种形状. 问题在远离数据的地方: 那里核值趋于 0, 后验均值退回先验均值. 如果数据有明显的线性上升趋势, 零均值 GP 外推时会掉回 0, 而带趋势的 GP 会沿趋势延伸. 推导: 减去均值函数得到零均值 GP, 套用原来的公式, 再把均值加回去. 趋势的系数也要估计时, 叫泛克里金.
+S gpmean | uk | 泛克里金 | universal Kriging | 带参数化趋势的 GP 回归.

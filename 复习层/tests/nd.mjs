@@ -1,0 +1,21 @@
+// 笔记首页综合诊断: 每步之后报告 容器 min-height 残留 / 页面底部空白 / scrollY 变化 / 被点行位移
+export default async ({ go, vp, ev, sleep, send }) => { await vp(1440, 900);
+  const S = `(()=>{const sc=document.querySelector('[data-nopen]')&&document.querySelector('[data-nopen]').closest('.grp').parentElement;const rows=[...document.querySelectorAll('[data-nopen]')].filter(r=>r.offsetHeight);const last=rows.at(-1);const lb=last?last.getBoundingClientRect().bottom+scrollY:0;return JSON.stringify({mh:(sc?sc.style.minHeight:'?')+'|sp='+(document.querySelector('.nsp9')?document.querySelector('.nsp9').style.height:'-'),blank:Math.round(document.documentElement.scrollHeight-lb),sy:Math.round(scrollY),open:[...document.querySelectorAll('.cr.open')].map(x=>x.dataset.nopen).join(','),vis:rows.length})})()`;
+  const rep = async (lab) => console.log(lab.padEnd(26), await ev(S));
+  const clickRow = async (code) => { const p = JSON.parse(await ev(`(()=>{const r=document.querySelector('[data-nopen="${code}"] .ch');r.scrollIntoView({block:'center'});const b=r.getBoundingClientRect();return JSON.stringify([b.x+50,b.y+b.height/2])})()`)); await sleep(200); for (const t of ['mouseMoved', 'mousePressed', 'mouseReleased']) await send('Input.dispatchMouseEvent', { type: t, x: p[0], y: p[1], button: 'left', clickCount: 1 }); await sleep(900); };
+  await go('notes/ALL', 1500); await rep('load ALL');
+  await clickRow('SMIS'); await rep('open SMIS (mid)');
+  await clickRow('SMIS'); await rep('close SMIS');
+  await clickRow('EIP'); await rep('open EIP (top)');
+  await clickRow('IE'); await rep('switch to IE');
+  await ev(`document.querySelector('.rgk[data-g=HP]').click()`); await sleep(900); await rep('filter HP');
+  await clickRow('FS'); await rep('HP: open FS');
+  await ev(`document.querySelector('.rbk').click()`); await sleep(900); await rep('back ALL');
+  await ev('scrollTo(0,1e6)'); await sleep(400); await rep('scroll bottom');
+  const rows = JSON.parse(await ev(`JSON.stringify([...document.querySelectorAll('[data-nopen]')].map(x=>x.dataset.nopen))`));
+  await clickRow(rows.at(-1)); await rep('open last'); await clickRow(rows.at(-1)); await rep('close last');
+  await ev(`document.querySelector('.rgk[data-g=P]').click()`); await sleep(900); await rep('filter P after bottom');
+  await ev(`document.querySelector('.rbk').click()`); await sleep(900); await rep('back ALL 2');
+  await go('notes/SMIS', 2000); await rep('route notes/SMIS');
+  await go('notes/ALL', 1500); await rep('route notes/ALL');
+};

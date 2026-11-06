@@ -1,0 +1,357 @@
+# EIP 深层内容. 依据 EIP 两份合集. 外文按笔记原文 (讲义和 Python 课件德语, 书英语).
+# D 概念 | 定义   X 概念 | 讲解   S 父概念 | 子 id | 中文 | 外文 | 一句话
+
+D linux | Linux ist ein Mehrbenutzer- und Multitasking-System mit Timesharing; es ist in Kernel, Systemdienste, Dienstprogramme und Benutzerschnittstelle geschichtet.
+X linux | 多用户 (Multi-User-Betrieb, 靠用户名区分)、多任务 (Multi-Tasking, 很多程序同时运行)、分时 (Timesharing, 按优先级轮流分到 CPU) 说的是同一件事的不同侧面: 你 ssh 登录 CIP 时正和几十个同学共用一台机器. 四层同心圆: 最里面的内核 (Kernel) 直接管硬件、内存、CPU 和设备; 系统服务以 C 程序的形式提供 (系统调用和 C 标准库); 实用程序就是 ls、cp 这些命令; 最外层是用户界面, 即 shell 或图形界面.
+S linux | multi | 多用户与多任务 | Multi-User-Betrieb & Multi-Tasking | 很多人、很多程序同时用一台机器.
+S linux | kernel | 内核 | Kernel | 直接管硬件的最里层.
+S linux | schichten | 四层结构 |  | 内核、系统服务、实用程序、用户界面.
+
+D shell | The shell is a program that takes keyboard commands and passes them to the operating system to carry out; almost all Linux distributions supply bash.
+X shell | bash 是 bourne-again shell 的缩写, 增强并取代了 Steve Bourne 的原始 sh. 图形界面下要通过终端模拟器这个窗口程序和 shell 打交道: 终端只负责显示和按键, 解释命令的是 shell. 提示符是 用户名@主机名 当前目录, 末尾 $ 是普通用户, # 是 root. 输入乱码时 bash 回答 command not found, 读懂报错是第一个要养成的习惯. ↑ ↓ 翻命令历史. 在终端里 Ctrl-C 不是复制, 而是中断程序.
+S shell | termemu | 终端模拟器 | Terminal Emulators | 显示文字、接收按键的窗口.
+S shell | prompt | 提示符 | Making Your First Keystrokes | $ 是普通用户, # 是 root.
+S shell | hist | 命令历史与光标移动 | Command History · Cursor Movement | ↑ 调出上一条命令.
+
+D login | Mit der CIP-Kennung meldet man sich per ssh am Linux-Server remote.cip.ifi.lmu.de an.
+X login | 你有两个账号: 校园账号只用来在 CipConf 上申请 CIP 账号; 之后开启远程登录、ssh、在机房登录都用 CIP 账号. 步骤: 申请账号 → 用 CIP 账号登录 CipConf 开启 remote connections → 打开终端 → ssh 用户名@remote.cip.ifi.lmu.de, 第一次输入 yes 确认指纹, 输密码时屏幕不显示 → uname -s 打印 Linux 就说明命令在服务器上执行. Permission denied 时按顺序查用户名、远程登录设置、密码和生效时间. 入口服务器只适合短命令, 每周重启一次.
+S login | twoacc | 两个账号 |  | 校园账号只用来申请 CIP 账号.
+
+D editor | Unter Linux gibt es Editoren für das Textterminal (vi, emacs, nano) und für die grafische Oberfläche (kate); sed ist ein nicht-interaktiver Stream-Editor.
+X editor | 通过 ssh 登录时没有图形界面, kate 打不开, 用 nano 最省事或学 vi. kate 按扩展名决定模式, .py 有语法高亮; 会话 (Sitzung) 存着打开了哪些文件和窗口怎么摆; 写程序时打开行号 (F11), 另存为时选 UTF-8. 文件第一行的 shebang (#!/usr/bin/env python3) 告诉系统用哪个解释器, 再加执行权限就能写 ./datei.py. sed 逐行读输入、依次执行命令, 把结果打印出来, 原文件不变: s/abc/def/g 把每一处都换掉, 不加 g 只换每行第一处.
+S editor | kate | kate 的几种模式 | Verschiedene Modi von kate | 按扩展名决定模式.
+S editor | sitz | 会话 | Sitzungen | 打开的文件和窗口布局.
+S editor | shebang | shebang 行 | Shebang | 指定解释器的第一行.
+S editor | sedopt | sed 和 emacs | Andere Editoren | 流编辑器和可扩展的全屏编辑器.
+
+D tree | Alle Dateien sind streng hierarchisch in einem Baum organisiert, ausgehend vom Stammverzeichnis /; jeder Benutzer befindet sich jederzeit in einem Arbeitsverzeichnis.
+X tree | 没有盘符: 不同的硬盘和分区挂到树的任意位置, 树的样子不变. Windows 每个盘一棵树, Linux 永远只有一棵树. 登录后你站在自己的家目录, 它是普通用户唯一可以随意写文件的地方. 讲义的案例里三个学生的家目录在 /mounts/users/student/ 下, 这是 CIS 机房的实际布局.
+S tree | root | 根目录 | Stammverzeichnis | 树的顶端 /.
+S tree | cwd | 当前工作目录 | The Current Working Directory | pwd 告诉你站在哪.
+S tree | fstree | 文件系统树 | Understanding the File System Tree | 只有一棵树.
+
+D fhs | Der Filesystem Hierarchy Standard (FHS) legt fest, welche Standardverzeichnisse wofür verwendet werden.
+X fhs | /etc 放全系统的配置, 全是可读的文本; /home 普通用户的家目录; /root 是 root 的家; /tmp 临时文件; /var 会变的数据, 日志在 /var/log; 程序在各种 bin 里, 只给管理员用的在 sbin, 库在 lib; /usr/local 是管理员自己装的软件. /proc 不是真的文件, 是内核把运行状态装成文件给你读. 讲义表里有几处是旧系统的样子, 例如服务脚本 /etc/init.d 已被 systemd 取代.
+S fhs | etc | /etc |  | 全系统的配置.
+S fhs | proc | /proc 与 /dev |  | 内核提供的窗口.
+S fhs | tour | 系统导览: 重要目录 | Taking a Guided Tour | 抓住几条规律, 不用死记.
+
+D ftypes | Linux kennt drei Arten von Dateien: gewöhnliche Dateien, Verzeichnisse und spezielle Dateien, vor allem Gerätedateien.
+X ftypes | 设备文件 (Gerätedatei): 读写它就是和硬件做输入输出, 这就是「Linux 里一切皆文件」. /dev/sda 是第一块盘, /dev/sda1 是它的第一个分区. /dev/null 吞掉写进去的一切, /dev/zero 读出无穷的零字节. 长格式里设备文件的类型字母是 b (块设备) 或 c (字符设备). Linux 不靠扩展名判断内容, 用 file 看内容本身; 纯文本可以用 less 一屏一屏地看, 空格翻页、/ 搜索、q 退出.
+S ftypes | geraet | 设备文件 | Gerätedatei | 和硬件做输入输出.
+S ftypes | filecmd | 用 file 判断文件类型 | Determining a File’s Type with file | 不靠扩展名, 看内容.
+S ftypes | lessv | 用 less 查看文本 | Viewing File Contents with less | 分页器, q 退出.
+
+D path | Ein absoluter Pfad beginnt beim Wurzelverzeichnis /, ein relativer Pfad beim aktuellen Arbeitsverzeichnis.
+X path | 区分只看第一个字符: 以 / 开头就是绝对路径. . 是当前目录, .. 是上一级; ./ 一般可以省略, 但运行当前目录里的程序必须写 ./脚本名. 开头的 / 表示根目录, 中间的 / 只是分隔符. cd 不带参数回家目录, cd - 在两个目录之间来回切换, cd ~bob 进入 bob 的家目录.
+S path | abs | 绝对路径 | Absolute Pathnames | 从根目录出发.
+S path | rel | 相对路径 | Relative Pathnames | 从当前目录出发.
+S path | cdshort | cd 的快捷方式 | Some Helpful Shortcuts | cd、cd -、cd ~.
+
+D fname | Dateinamen unterscheiden Groß- und Kleinschreibung; ihre Länge wird in Bytes gemessen, und das einzige verbotene Zeichen ist der Schrägstrich /.
+X fname | 文件名用 UTF-8 编码, ä 占 2 字节, 汉字占 3 字节, 所以 254 字节不等于 254 个字符. 以点开头的是隐藏文件, ls -a 才显示; 以 - 开头会被命令当成选项, 删除时写 rm -- -foo 或 rm ./-foo. 不要带空格, 否则 shell 把一个名字拆成两个参数. 没有扩展名的概念, .txt 只是名字的一部分. macOS 默认不区分大小写, CIP 上区分.
+S fname | hidden | 隐藏文件 | versteckte Datei | 名字以点开头.
+S fname | facts | 文件名的重要事实 | Important Facts About Filenames | 区分大小写, 不要空格.
+
+D fileops | Dateien und Verzeichnisse werden mit mkdir, cp, mv, rm und ln angelegt, kopiert, verschoben, gelöscht und verlinkt.
+X fileops | 建文件: cat > 文件 把键盘输入写进去 (Ctrl-D 结束), touch 建空文件或更新时间戳. 查看: cat 一口气倒出, more 和 less 分页. 目录: mkdir 建, rmdir 只删空目录, 非空用 rm -r. 复制: cp 目标已存在就直接覆盖, 复制多个文件时最后一个参数必须是目录; cp -r dir1 dir2 在 dir2 已存在时得到 dir2/dir1. mv 移动, 也用来改名. 没有旧版本和回收站, cat > 已有文件 会先清空. 实用技巧: -i 动手前先问, -r 连子目录一起处理, -f 不问; 讲义建议把 rm、cp、mv 设成带 -i 的别名.
+S fileops | anlegen | 建文件 | Das Anlegen von Dateien | cat > 文件 或 touch.
+S fileops | loeschen | 删除文件 | Das Löschen von Dateien | rm, rm -r 连目录一起删.
+S fileops | anzeigen | 查看文件 | Das Anzeigen von Dateien | cat、more、less.
+S fileops | verz | 管理目录 | Das Verwalten von Verzeichnissen | mkdir、rmdir、cd.
+S fileops | kopieren | 复制与改名 | Das Kopieren und Umbenennen von Dateien | cp 和 mv.
+S fileops | tipps | 实用技巧 | Tipps für die Praxis | -i、-r、-f.
+S fileops | aliasrm | 用 alias 防止误删和覆盖 | Verhindern des automatischen Löschens | 设成带 -i 的别名.
+
+D wild | Wildcards bezeichnen mit einem Muster mehrere Dateinamen: * steht für beliebig viele Zeichen, ? für genau ein Zeichen, [abc] für ein Zeichen aus der Menge.
+X wild | 展开是 shell 做的, ls、cp 收到的已经是展开后的文件名, 所以任何命令里都能用, cd semin* 也行; 但有两个以上匹配时 cd 报 too many arguments, 没有匹配时模式原样传下去. * 不匹配以点开头的名字, 隐藏文件要显式写 .*; bash 5.2 起 .* 不再匹配 . 和 ... [[:upper:]] 外层方括号是集合, 里面是字符类. 更稳的办法是 Tab 补全, 按回车前就看到结果.
+S wild | stern | * 和 ? |  | 任意多个字符, 一个字符.
+S wild | klasse | 字符类 |  | [[:upper:]] 这种写法.
+S wild | autogen | 通配符在任何命令里都会展开 | Automatische Dateinamengenerierung bei Kommanodaufrufen | 展开是 shell 做的.
+S wild | versteckt | 通配符与隐藏文件 | Wildcards bei Verborgenen Dateien | * 不匹配以点开头的名字.
+
+D lsl | ls -l zeigt Dateityp und Rechte, Referenzzähler, Besitzer, Gruppe, Größe, Änderungszeit und Namen; ls -lisg zeigt zusätzlich Inode-Nummer und Blockanzahl.
+X lsl | ls -a 列出隐藏文件, 每个目录里永远有 . 和 ..; -F 在名字后加 / (目录)、* (可执行)、@ (符号链接); 选项可以合写, ls -aF = ls -a -F. 长格式的前十个字符是一个类型字符加九个权限字符. 讲义图里写的「最后访问时间」不准确, ls -l 默认显示的是最后修改时间, 要看访问时间加 -u. ls -d 只列名字本身, -R 递归列出所有层级. 选项有短写 (-s value, 可以合并) 和长写 (--size=value) 两种.
+S lsl | lsopt | ls 的选项 | Das Anzeigen von Inhaltsverzeichnissen | -a、-l、-F.
+S lsl | listing | 列出目录内容 | Listing the Contents of a Directory | ls 也能列别的目录.
+S lsl | morels | ls 的更多用法 | More Fun with ls | 常用选项.
+S lsl | optarg | 选项与参数 | Options and Arguments | 短写可以合并, 长写不能.
+S lsl | merkmale | 文件属性一览 | Die einzelnen Merkmale einer Datei | inode 号、块数、权限、引用计数.
+S lsl | kopt | 选项的短写和长写 | Kommandooptionen | -k 2 与 --key=2.
+
+D link | Ein Hard Link ist ein weiterer Verzeichniseintrag für dasselbe Inode; ein Symbolic Link ist eine spezielle Datei, die den Pfad eines Ziels enthält.
+X link | 硬链接和原文件地位完全相同, 引用计数加一; inode 编号只在一个文件系统内唯一, 所以硬链接不能跨设备. 符号链接只存路径文字, 可以指向别的盘上的文件, 目标的引用计数不增加, 目标被删就断了; 长格式里类型字母是 l, 名字后面有 -> 目标, 大小就是路径文字的字节数. 用途: 让程序认的固定名字 foo 指向 foo-2.6, 升级只改链接. ln -s 目标 链接名, 顺序和 cp 一样.
+S link | hard | 硬链接 | Hard Link | 同一个 inode 的又一个名字.
+S link | sym | 符号链接 | Symbolic Link | 存着目标的路径.
+S link | crossdev | 符号链接可以跨设备 | Der Symbolic Link | 硬链接不能.
+
+D inode | Das Inode speichert die Merkmale einer Datei: Besitzer und Gruppe, Rechte, Größe, Blockadressen, drei Zeitstempel und den Referenzzähler, nicht aber den Namen.
+X inode | 名字存在目录里, 目录项把名字连到 inode 编号上, 所以一个 inode 可以有多个名字, 引用计数 (Referenzzähler) 就是有几个名字指向它. ls -i 显示 inode 号, ls -s 显示块数 (Blockanzahl).
+S inode | refz | 引用计数 | Referenzzähler | 硬链接数.
+S inode | block | 块数 | Blockanzahl | 占了多少磁盘块.
+
+D mount | Jede Festplattenpartition ist ein Gerät, das nach dem Anlegen eines Dateisystems mit mount an ein Verzeichnis des Baums gehängt wird.
+X mount | 分区要先用 mkfs 建立文件系统, 再 mount 设备 目录 挂到挂载点. 普通用户一般没有权限 mount. mount 不带参数列出已挂载的文件系统; df 显示用量, df -h 用 G、M 更好读, df . 只报告当前目录所在的文件系统. 已用加可用比总数少一点, 是给 root 预留的空间. 这也解释了硬链接为什么不能跨设备.
+S mount | df | df |  | 显示每个文件系统的用量.
+
+D cmdtypes | A command is one of four things: an executable program, a shell builtin, a shell function or an alias.
+X cmdtypes | 可执行程序是磁盘上的文件 (/usr/bin/ls), 可以是二进制也可以是脚本; 内建命令是 bash 自己实现的, cd 必须如此, 因为它要改 shell 自己的当前目录. type 能识别全部四类, 它揭示了 ls 在很多系统上是别名 ls --color=tty; which 只在搜索路径 PATH 里找程序文件, 所以对 cd 报找不到. 区分它们的意义: 查帮助的方法不同, 排查问题的方向也不同.
+S cmdtypes | builtin | 内建命令 | shell builtin | bash 自己实现.
+S cmdtypes | typewhich | type 与 which | Identifying Commands | type 识别四类, which 只找文件.
+
+D help | Builtins are documented with help, programs with --help and man pages; apropos searches the man page descriptions by keyword.
+X help | 读语法说明的约定: [ ] 可选, ∣ 二选一, ... 可重复. man 页按 NAME、SYNOPSIS、DESCRIPTION、OPTIONS、EXAMPLES、SEE ALSO 排, 是参考手册不是教程; 讲义推荐先看 EXAMPLES. whatis 给一行说明, info 是 GNU 带超链接的文档, /usr/share/doc 里有软件包附带的 README. -h 不是通用的: ls -h 是人类易读的大小, 拿不准时用 --help.
+S help | manp | 手册页 | man page | 正式的参考手册.
+S help | manhelp | man、info、--help | UNIX-Befehle · Hilfe | 查选项、参数和例子.
+S help | apropos | apropos、whatis、info | apropos · whatis · info · README | 按关键词找命令.
+
+D alias | alias name='string' creates a new command name for a string of commands.
+X alias | 等号两边不能有空格, 命令串用单引号括起来. 起名前先用 type 查有没有被占用. unalias 删除, 不带参数的 alias 列出全部. 在命令行定义的只在当前会话有效, 要永久保存写进 ~/.bashrc. 临时绕过别名: \rm、'rm'、"rm" 或写完整路径, 因为 bash 只在命令名是未加引号的普通单词时才查别名表.
+
+D stdio | Every program starts with three streams: standard input (file descriptor 0), standard output (1) and standard error (2).
+X stdio | 默认标准输入连键盘, 标准输出和标准错误都连屏幕. 程序的结果走 stdout, 状态和错误信息走 stderr, 所以只重定向 stdout 时错误仍然出现在屏幕上. 第 2 份合集里的 Python 程序同样有这三条流.
+
+D redir | Redirection changes where standard input, output or error go: > writes standard output to a file, >> appends, < reads standard input from a file, 2> redirects standard error.
+X redir | shell 在命令运行之前就打开并清空了 > 的目标文件, 所以单独一个 > 文件 就能清空它. > 文件 2>&1 先把 1 接到文件, 再让 2 接到 1 现在接的地方; 重定向从左到右执行, 写成 2>&1 > 文件 时错误仍在屏幕上. &> 文件 一次重定向两者. << 是 here document. 丢弃输出写 > /dev/null. cat 不给参数时读键盘, cat > 文件 是最简陋的文字处理器; cat < f 和 cat f 结果一样, 但打开文件的是 shell.
+S redir | out | 重定向标准输出 | Redirecting Standard Output | > 覆盖, >> 追加.
+S redir | err | 重定向标准错误 | Redirecting Standard Error | 2>、2>&1、&>.
+S redir | inp | 重定向标准输入 | Redirecting Standard Input · cat | < 文件.
+S redir | symbols | shell 与重定向符号一览 | Shells: bash, tcsh · piping · redirecting | >、>>、<、<<.
+S redir | null | 丢弃输出 | Wegwerfen der Ausgabe einer Datei | > /dev/null.
+
+D pipe | A pipeline connects the standard output of one command to the standard input of the next, without a temporary file.
+X pipe | ls -l /usr/bin ∣ less 让任何太长的输出分页显示. > 连接命令和文件, ∣ 连接命令和命令: 书里的真实事故, 管理员以 root 身份在 /usr/bin 里输入 ls > less, 用 ls 的输出覆盖了 less 程序本身. 管道可以连很多级, 词频表就是一条五级管道.
+S pipe | diff | > 和 ∣ 的区别 |  | 连文件还是连命令.
+S pipe | lesspipe | 长输出接到 less | More Befehl in Pipes | 一屏一屏地看.
+
+D filter | Filters read standard input, process it and write standard output: sort, uniq, wc, grep, head, tail and tee.
+X filter | sort 按行排序; uniq 去掉相邻的重复行, 所以前面要先 sort, -c 计数, -d 只显示重复的; wc 数行、词、字节, -l 只数行; grep 打印含有模式的行, -i 忽略大小写, -v 反选; head、tail 前后 10 行, tail -f 实时跟踪日志; tee 一份写文件、一份继续往下流, 像水管的三通.
+
+D expand | Before a command is executed, bash rewrites the command line: this is called expansion.
+X expand | echo 只是把收到的参数原样打印, 是观察展开结果的工具: echo * 没有打印星号, 因为 shell 先把 * 换成了文件名列表. 依次有: 花括号展开 ({A,B}、{1..5}, 不管文件存不存在, 只生成文字)、波浪号展开 (~ 换成家目录)、参数展开 ($USER; 变量名拼错不会报错, 只会变成空字符串)、算术展开 ($((5/2)) 得 2)、命令替换 ($(which cp), 旧写法是反引号)、分词 (按空白切成词)、路径名展开 (通配符). 作者认为这是学 shell 最重要的一章: 命令行为奇怪时, 把 echo 放到前面看 shell 实际传了什么.
+S expand | pathexp | 路径名展开 | Pathname Expansion | 通配符换成文件名.
+S expand | tilde | 波浪号展开 | Tilde Expansion | ~ 换成家目录.
+S expand | arith | 算术展开 | Arithmetic Expansion | $((…)) 整数运算.
+S expand | brace | 花括号展开 | Brace Expansion | 按模式生成字符串.
+S expand | param | 参数展开 | Parameter Expansion | $变量 换成值.
+S expand | cmdsub | 命令替换 | Command Substitution | $(命令) 换成输出.
+S expand | split | 分词 | word splitting | 按空白切成词.
+
+D quote | Quoting selectively suppresses expansions: double quotes suppress word splitting and pathname, tilde and brace expansion; single quotes suppress all expansions; a backslash escapes a single character.
+X quote | 双引号是弱引用, 保留参数展开、算术展开、命令替换和反斜杠转义; 用到变量或命令替换时几乎总要加双引号, 例如 echo "$(cal)" 保留换行. 单引号里一切按字面处理. 反斜杠让紧跟的一个字符失去特殊含义 (\*、\ ), 行尾的 \ 转义掉换行. 文件名 Mathe V1 含空格, 不加引号会被拆成两个参数. 反斜杠的第二个角色是表示控制字符 \n、\t, echo 要加 -e 才解释它们.
+S quote | dq | 双引号 | Double Quotes | 弱引用.
+S quote | sq | 单引号与转义 | Single Quotes · Escaping Characters | 一切按字面.
+S quote | sonder | 特殊字符 | Verwendung von Sonderzeichen | \c、行尾 \、"…"、~.
+S quote | meta | 单引号与反斜杠 | Metazeichen der SHELL um Dinge zu demaskieren | 去掉特殊含义.
+S quote | bses | 反斜杠转义序列 | Backslash Escape Sequences | 表示控制字符.
+
+D keys | Advanced keyboard tricks include cursor movement and editing, killing and yanking text, tab completion, using the history and recording a session with script.
+X keys | 剪切叫 kill, 粘贴叫 yank. Tab 补全: 只有一个候选时直接补全, 有好几个时先补到共同部分, 再按一次列出全部; 按回车前就看到结果, 比通配符更稳. history 列出用过的命令, Ctrl-R 反向搜索历史. script 把整个终端会话录进文件.
+S keys | cursor | 移动光标与编辑文字 | Cursor Movement · Modifying Text | 不用重敲.
+S keys | killyank | 剪切与粘贴 | Cutting and Pasting (Killing and Yanking) Text | kill 和 yank.
+S keys | compl | 自动补全 | Completion | Tab 补全.
+S keys | history | 使用历史 | Using History | history 和 Ctrl-R.
+S keys | scriptc | script | script | 录下整个会话.
+
+D textproc | With shell commands such as tr, sort and uniq, text can be tokenized, sorted and counted in a pipeline.
+X textproc | 比较文件: cmp 逐字节比较, 只报第一个不同的位置; diff 逐行比较, 列出所有不同的行. tr 只读标准输入, 逐个字符替换或删除: tr -d a 删字母, tr -s " " "\n" 把空格换成换行并压缩重复, 正好一行一个 token; tr '[a-z]' '[A-Z]' 转大写. GNU tr 按字节处理, ä 和 ß 不会被转换, 处理德语和中文用 sed 或 Python. sort -n 按数值, -r 倒序, -k 按列, -f 不分大小写; 字典序取决于 locale. uniq -c 计数. grep -oE '[[:alpha:]]+' 只取字母串, 也是一种分词.
+S textproc | tr | tr: 逐个字符替换 | Translate von Zeichen | 只读标准输入, 按字节处理.
+S textproc | sortc | sort: 排序 | Sortieren-einer-wortliste | -n、-r、-k、-f.
+S textproc | uniqc | uniq: 合并相邻的重复行 | Report und Unterdrücken von Zeilen | -c 计数, 前面先 sort.
+S textproc | tok | 分词 | Tokenisierung | 把文本切成一行一个词.
+
+D wordlist | A word frequency list is produced by the pipeline tr (one token per line) | sort | uniq -c | sort -nr | less.
+X wordlist | 每一级做一件事: 一行一个 token, 排序让相同的词挨在一起, 数每个词出现几次, 按次数从高到低排, 分页看或存进文件. 第二种写法用 sort -f 和 uniq -i 把 Die 和 die 合在一起数. 实际运行时 Maus. 和 Maus 被当成两个词, 连续空格产生空 token, 讲义样例输出第一行 174 后面没有词也是这个原因; 要干净的表就用正则只取字母串.
+
+D find | find durchsucht ab einem Startpunkt rekursiv den ganzen Teilbaum und kann für jede gefundene Datei einen Befehl ausführen.
+X find | find . -name "*.txt" -print: 模式要加引号, 否则 shell 先在当前目录展开, 子目录里的文件就找不到了. -exec 命令 '{}' \; 对每个文件执行一次命令, {} 换成路径, 分号要转义. find … ∣ xargs bzcat 把文件名收集起来一次交给命令, 更快; 文件名含空格时用 -print0 和 xargs -0. locate 查预先建好的数据库, 极快但查不到今天的新文件.
+
+D archive | Archivieren (tar) fasst viele Dateien zu einer zusammen, Komprimieren (gzip, bzip2, zip) macht eine Datei kleiner; .tar.gz bedeutet erst archivieren, dann komprimieren.
+X archive | tar 保留目录结构、时间、属主和权限, 但不变小. 选项字母: c 创建、x 解包、t 列内容三选一; f 后面紧跟文件名, 所以放最后; v 显示过程; z 用 gzip, j 用 bzip2. tar zcvf archiv.tgz dir1 打包并压缩. gzip datei 会把原文件换成 datei.gz, 想保留加 -k. zcat、bzcat 解压到标准输出, 处理大语料时直接接管道: bzcat korpus.txt.bz2 ∣ wc -l.
+S archive | tarc | tar | tar | 打包, 不变小.
+S archive | gz | gzip 与 bzip2 |  | 压缩, bzip2 更小更慢.
+
+D script | Ein Shell-Skript ist eine Datei mit einer Folge von Shell-Befehlen, die mit Variablen, Bedingungen und Schleifen gesteuert wird.
+X script | 脚本是为某一种 shell 写的 (sh、csh、ksh), 语法互不通用; bash 是 Bourne shell 的增强版, 系统自带的脚本在 bash 里也能跑. 由 shell 从上到下一行行解释执行, 不需要编译. 用途: 把经常重复的命令序列自动化、系统任务、用测试让命令序列不出错. 控制结构: if … then … fi、for … in … do … done、while、until、case … in … esac.
+
+D users | Intern kennt das System nur Nummern: jeder Benutzer hat eine UID und eine primäre GID, eingetragen in /etc/passwd; ein Benutzer kann mehreren Gruppen angehören.
+X users | 登录名只是 UID 的符号名. 组把几个用户归在一起, 写在 /etc/group; 密码信息在 /etc/shadow, 普通用户读不了. id 一次打印 UID、主组和所有附加组. UID 0 是超级用户 root. CIP 上账号来自网络目录服务 (LDAP), 用 getent passwd 查更可靠. chown 改属主只有 root 能做, 否则谁都能把大文件送给别人绕过配额; chgrp 改组, 属主只能改成自己所在的组.
+S users | uid | 用户号 | UID | 用户的数字编号.
+S users | gruppen | 用户、组与 /etc/passwd | Gruppen und Owner | 系统内部只认数字.
+S users | rootu | 超级用户 | root | UID 0.
+S users | chown | chown 与 chgrp | chown: Change File Owner and Group · chgrp | 改属主和属组.
+
+D rwx | Permissions are assigned to three classes (owner, group, others), each with read, write and execute; these nine characters form the file mode.
+X rwx | 同一个字母对文件和目录意思不同: 对文件, r 读内容, w 改内容, x 当程序运行 (脚本还要 r); 对目录, 目录是一张「名字 → 文件」的表, r 列出名字, w 新建删除改名 (同时要有 x), x 进入目录和访问里面的文件. 所以能不能删一个文件看所在目录的 w. 权限检查的顺序: 先看是不是属主, 再看组, 都不是看其他人; 只用第一个对上的那一类, 对上了就不再往下看.
+S rwx | three | 三类用户 |  | u 属主、g 属组、o 其他人.
+S rwx | dirperm | 目录的权限 |  | r 列名字, w 改表, x 进入.
+S rwx | order | 权限检查的顺序 | Strategie zum Test der Zugriffsrechte bei Dateien | 只用第一个对上的那一类.
+S rwx | linuxrights | 三类用户、三种权限 | Zugriffsrechte unter Linux | 九个权限字符.
+
+D chmod | chmod changes the file mode, either in octal notation (all nine bits at once) or in symbolic notation (who, how, which permissions).
+X chmod | 八进制: r = 4, w = 2, x = 1, 每类相加得一个 0–7 的数字. 644 是普通文件常见权限, 755 是程序、脚本和目录, 700 只给自己. 符号写法: u/g/o/a + (+ - =) + r/w/x; u 是属主, o 是 others 不是 owner, 这是最常见的误记. 只改一位用符号写法 (chmod u+x script.sh), 一次定死全部用八进制. 讲义例子: user rw = 6, group x = 1, other 0, 所以 chmod 610.
+S chmod | octal | 八进制写法 | chmod: Change File Mode — Octal | r = 4, w = 2, x = 1.
+S chmod | symbolic | 符号写法 | chmod — Symbolic Notation | 谁、怎么改、什么权限.
+
+D umask | umask is a mask of the bits that are removed from the permissions of newly created files and directories.
+X umask | 新文件的起点是 666, 新目录 777, 掩码里为 1 的位被清掉: 0002 得到 664, 0022 得到 644 和 755. 掩码只会去掉权限, 所以新文件永远不会自动带 x, 新写的脚本要自己 chmod u+x. umask 写成四位, 最前面一位管特殊权限.
+S umask | maske | 减法掩码 |  | 去掉哪些位, 不是给哪些位.
+
+D special | The special permissions are setuid (run with the owner's rights), setgid (new files in a directory belong to its group) and the sticky bit (only delete your own files).
+X special | setuid (4000) 让属主的 x 位显示成 s, 典型例子是 passwd: 普通用户运行它却能改只有 root 能写的密码文件; 有安全风险, 越少越好. setgid (2000) 设在目录上, 用于共享目录. sticky (1000) 让其他人的 x 位显示成 t, /tmp 就是这样: 人人可写, 但只能删自己的文件. 书里的共享音乐目录例子把整章串起来: 建组、chown :music、chmod 775、setgid, 再让两人都用 umask 0002.
+
+D sudo | su starts a new shell as another user (usually root); sudo executes a single command as another user.
+X sudo | su 要输入目标用户的密码, 知道密码就拥有全部权限, 提示符变成 #, 用完 exit; sudo 要输入自己的密码, 管理员可以在 /etc/sudoers 里限定能运行哪些命令, 几分钟内不会再问密码. 以 root 身份 sudo cp 复制的文件属于 root, 要再 sudo chown 给对方. passwd 改密码, 会拒绝太短或太像字典单词的密码.
+
+D proc | A process is a running instance of a program; processes start other processes, and each has a PID and an owner.
+X proc | 多任务是一种错觉: CPU 在各个程序之间飞快切换, 内核用进程组织它们. 开机时内核启动 init (PID 1), 它再启动在后台运行的守护进程 (daemon). 父进程产生子进程: 在 shell 里运行 ls, bash 就是 ls 的父进程. ps 只列当前终端的进程, ps aux 列所有用户的所有进程, STAT 常见 S (睡眠) 和 R (运行), Z 是僵尸进程. top 实时显示, 按 CPU 占用排序, 第一行有负载平均值. pstree 直观展示父子关系. killall 按名字给同名进程发信号; 关机和重启要超级用户.
+S proc | howworks | 进程如何工作 | How a Process Works | init 启动一切, 父进程产生子进程.
+S proc | ps | 查看进程 | Viewing Processes | ps aux.
+S proc | top | 动态查看 | Viewing Processes Dynamically with top | 按 CPU 占用排序.
+S proc | busy | 机器在忙什么 | Was ist los auf dem Rechner? | top、ps、kill、&.
+S proc | killall | killall 与关机 | killall · Shutting Down the System | 按名字发信号.
+S proc | daemon | 守护进程 | daemon | 后台运行的系统服务.
+
+D jobs | A program run normally is in the foreground; with & it runs in the background. Ctrl-Z stops the foreground program, bg and fg continue it.
+X jobs | [1] 28236 是作业号 1、PID 28236. jobs 列出当前终端启动的作业. 后台作业收不到键盘输入, Ctrl-C 也管不到它. fg %1 把 1 号作业拉回前台, bg %1 让暂停的作业在后台继续. 忘了加 & 就 Ctrl-Z 再 bg. 控制进程的按键: Ctrl-C 中断 (SIGINT), Ctrl-Z 暂停 (SIGTSTP), Ctrl-S 暂停终端输出、Ctrl-Q 恢复, 终端突然卡住时先试 Ctrl-Q.
+S jobs | bgfg | bg 与 fg |  | 在后台继续, 拉回前台.
+S jobs | ctrlkeys | 控制进程的按键 | Control zur Steuerung von Prozessen | Ctrl-C、Ctrl-Z、Ctrl-S、Ctrl-Q.
+
+D signal | Signals are one way the operating system communicates with programs; kill sends a signal, and most signals terminate the process by default.
+X signal | 信号可以写编号、名字或带 SIG 前缀的名字: kill -1 = kill -HUP. 目标可以是 PID 或作业号 %1. 先礼后兵: 先用默认的 TERM (15), 程序有机会保存和清理; 不理睬才用 KILL (9), 由内核强制结束. INT 是 Ctrl-C, TSTP 是 Ctrl-Z; STOP 和 KILL 不能被程序忽略; fg、bg 靠 CONT 让进程继续. 只能给自己的进程发信号.
+S signal | term | TERM 与 KILL |  | 先 15, 不行再 9.
+
+D load | Die load average gibt an, wie viele Prozesse im Mittel der letzten 1, 5 und 15 Minuten auf die CPU warten oder sie nutzen; der nice-Wert bestimmt die Priorität.
+X load | 负载要和 CPU 核数比: 负载 4 在 4 核机器上是满载, 在 32 核服务器上还很空; 核数用 nproc 查. nice 值从 −20 (优先级最高) 到 19, 越大越谦让, 分到的 CPU 越少; 普通用户只能调大自己的 nice 值. 在共用的 CIP 服务器上跑长任务, 用 nice -n 19 befehl 是礼貌的做法, renice 改已在运行的进程.
+S load | la | 平均负载 | load average | 和 CPU 核数比.
+S load | nicev | nice 值 | nice | 越大越谦让.
+
+D sprachen | Programmiersprachen bauen in Schichten aufeinander auf: Maschinensprache, Assemblersprache, höhere Sprachen und objektorientierte Sprachen.
+X sprachen | 机器语言是内存中的一串数字, 处理器直接执行, 每个处理器家族有自己的; 汇编和机器码一一对应, MOV EAX, 5 就是 B8 05 00 00 00. 编译型语言 (C、Rust) 先把整个程序翻成机器码, 快, 编译时就发现语法错误, 但只能在特定平台运行; 解释型语言直接处理源码, 较慢, 但装了解释器就能跑, 出错时给出有信息量的报错. Python 两步走: 先编译成与平台无关的字节码 (缓存在 .pyc), 再由 Python 虚拟机 (PVM) 逐条执行, 所以既是编译型也是解释型. Python 是严格的面向对象语言: 所有数据都是对象, 对象把属性和方法打包, 内部对外封装.
+S sprachen | masch | 机器语言与汇编 | Assembler & Maschinensprache | 一一对应.
+S sprachen | compiler | 编译型语言 | Compilersprachen | 先整体翻成机器码.
+S sprachen | interp | 解释型语言 | Interpreter-Sprachen | 直接处理源码.
+S sprachen | pyrun | Python 实际怎么运行 | PVM | 字节码加 PVM.
+S sprachen | oo | 面向对象 | Objektorientierung | 一切数据都是对象.
+
+D zahlen | Ein Computer stellt alle Information als Bitfolgen dar; Zahlen werden in Zahlensystemen mit Basis 10, 2, 8 oder 16 geschrieben, Zeichen als Unicode-Codepunkte gespeichert.
+X zahlen | 8 比特是 1 字节, 64 位计算机以 64 比特的机器字为单位运算. 每一位的值 = 数字 × 基数的位置次幂; Python 写法 183、0b10110111、0o267、0xB7 是同一个数. Python 的 int 长度不限, 2**1000 也能精确算出; float 是 64 位 IEEE 754 (1 位符号、11 位指数、52 位尾数), 约 15–16 位有效数字, 下溢变 0.0, 上溢变 inf. 字符编码: A–Z 是 65–90, a–z 是 97–122, 大小写相差 32, 字符 '9' 不等于数 9.
+S zahlen | bits | 位与字节 | Bits und Bytes | 8 比特 = 1 字节.
+S zahlen | basis | 数制 | Zahlensysteme | 十、二、八、十六进制.
+S zahlen | float | 浮点数 | Fließkommazahlen | 符号、指数、尾数.
+S zahlen | kod | 字符编码 | Zeichenkodierung | 字符存成码位.
+
+D vars | Eine Variable ist ein Name, der auf ein Objekt verweist; Python ist dynamisch, aber stark typisiert.
+X vars | 运算: ** 乘方, / 总得 float, // 整除, % 取余, divmod 一次得到商和余数; int 和 float 运算结果升为 float; 逻辑运算符是 and、or、not. a + c (int + str) 报 TypeError, 要写 str(a) + c, 这就是强类型. 动态类型: 变量本身没有类型, 对象才有; Python 的变量是贴在对象上的标签, C++ 的变量是规定了形状的盒子. id(a) == id(3) 说明变量存的是引用. 类型转换: int 截断 (3.7 → 3), round 四舍五入, bin/hex 返回字符串, ord 和 chr 互为反函数. 交互模式 >>> 里表达式的值自动显示.
+S vars | dyn | 动态类型 | dynamische Typisierung | 变量没有类型.
+S vars | konv | 数值与类型转换 | Zahlenkonvertierungen | int、float、round、str、ord、chr.
+S vars | varn | 变量 | Variablen | 指向对象的名字.
+
+D listen | Listen sind geordnete, veränderliche Folgen in eckigen Klammern mit Indizierung und Slicing.
+X listen | 下标从 0 开始, liste[-1] 是最后一个, 越界报 IndexError. 切片 liste[start:stop:step] 含头不含尾, [-1:] 是列表而 [-1] 是元素, [:] 是整个列表的副本. 列表可以放列表: [1,2,4,[8,16]] 只有 4 个元素, liste[-1][1] 是 16. 方法: append 加一个元素, extend 逐个加, pop 删并返回, insert 插入, count、index、remove (按值删第一个); sort、reverse 就地修改返回 None, sorted、reversed 不改原列表. 以 __ 开头的是内部用的方法.
+S listen | slicing | 切片 | Slicing | 含头不含尾.
+S listen | nested | 列表里放列表 | Listen mit Listen als Elementen | 先取外层再取内层.
+S listen | meth | 方法 | Methoden | append、extend、pop、insert.
+
+D alias2 | Aliasing: Eine Zuweisung wie liste2 = liste kopiert die Liste nicht, sondern lässt zwei Namen auf dasselbe Objekt verweisen.
+X alias2 | 这是本章最重要、最容易出错的一页. liste2[1] = 7 之后通过 liste 看到的也是 7. 真正复制用 liste2 = liste[:]、list(liste) 或 liste.copy(), 复制后两者独立. 给切片赋值能一次替换多个元素, 带步长的切片赋值要求两边个数相等. liste2 is liste 检查两个名字是否指向同一对象.
+
+D strts | Strings sind unveränderlich; Tupel sind unveränderliche Listen; Mengen sind ungeordnet und ohne Duplikate.
+X strts | 字符串和列表一样支持下标和切片, [::-1] 反转; sorted(string) 按码位排序, 大写在小写前. string[2] = 'z' 报 TypeError, 只能造新串. 常用方法: upper、lower、isalpha、isdigit ('12.3' 是 False)、startswith、replace、rjust、center. 两个字面量紧挨着写会自动拼接. 元组: (1) 只是数 1, (1,) 才是元组, 构成元组的是逗号. 集合: set('hallo') 去重得 4 个元素, 顺序不固定, 有差集、并集、交集运算.
+S strts | tup | 元组 | Tupel | 不可变的列表.
+S strts | menge | 集合 | set | 无序、元素不重复.
+
+D ifind | Der if-Befehl wählt von oben nach unten den ersten Zweig mit wahrer Bedingung aus; Codeblöcke werden durch Einrückung festgelegt.
+X ifind | elif 和 else 都可选, elif 可以写任意多个; 每个条件行末尾要冒号. 缩进相同的连续行属于同一个块, 回到最左边就已经不在 if 里. 不要混用 Tab 和空格, PEP 8 规定 4 个空格, 不一致报 IndentationError. 条件表达式 值1 if 条件 else 值2 在值之间选, 整个式子是一个表达式, else 必须写, 可以嵌套.
+S ifind | indent | 缩进 | Einrückung | 划定代码块.
+S ifind | condexpr | 条件表达式 |  | 值1 if 条件 else 值2.
+
+D funk | Funktionen werden mit def definiert; beim Aufruf werden die Argumente der Reihe nach den Parametern zugewiesen, return gibt das Ergebnis zurück.
+X funk | 调用必须带括号, 不带括号的是函数对象本身, 可以 f = sag_hallo 再起一个名字. pass 是占位语句. 参数个数不对会报 takes 1 positional argument but 2 were given 或 missing 1 required positional argument. Python 不检查类型: 同一个 addiere 对数字是加法、对字符串是拼接. 没有 return 返回 None; print 只显示, return 的结果可以继续计算.
+S funk | retpr | return 与 print |  | 交回结果还是只显示.
+S funk | passs | pass |  | 什么都不做的占位语句.
+
+D scope | Eine Variable, der in einer Funktion ein Wert zugewiesen wird, ist lokal; wird sie nur gelesen, wird die globale verwendet.
+X scope | 例 1: 函数里 z = x + y 新建了局部 z, 外面的 z 不变. 例 2: 只读 z 就用全局的, 定义时 z 还不存在也没关系, 调用时能找到就行. 例 3: global z 声明后赋值会修改外面的 z. 建议避免全局变量: 函数通过参数拿数据、通过 return 交回结果, 每个函数可以单独理解和测试. 注释从 # 到行尾; 函数或类第一行的三引号字符串是文档字符串, help 和编辑器会显示它, 例如 Google 风格的 Args 和 Returns.
+S scope | lokal | 局部变量 | lokale Variable | 在函数里赋值的变量.
+S scope | global | 全局变量 | globale Variable | 函数外定义的变量.
+S scope | doc | 注释与文档字符串 | Kommentare | # 注释, 三引号文档字符串.
+
+D loop | Die while-Schleife wiederholt den Rumpf, solange die Bedingung wahr ist; for weist nacheinander jedes Element eines iterierbaren Objekts zu.
+X loop | 忘了更新循环变量就成了死循环, 用 Ctrl+C 中断. 阶乘例子: f 从 1 开始, i 从 2 乘到 x. binär 函数用「除 2 取余」, divmod 加元组解包, while True + break 让输入 0 也执行一次. break 结束整个最内层循环, continue 只结束这一轮. input() 的结果总是字符串. for 不需要自己管下标, range(a, b, step) 不含 b. 可迭代对象包括列表、range、字符串、元组、集合、字典 (逐个键)、文件 (逐行).
+S loop | brk | break 与 continue |  | 结束整个循环还是这一轮.
+S loop | rng | range |  | range(a, b) 不含 b.
+
+D fstr | In einem f-String werden Ausdrücke in geschweiften Klammern zur Laufzeit ersetzt; nach einem Doppelpunkt folgt die Formatangabe. Escape-Sequenzen stehen für nicht druckbare Zeichen.
+X fstr | {3.14159:.2f} 得 3.14, {0.2375:.1%} 得 23.8%, {x:8} 宽度 8, :<、:>、:^ 左右居中, {14628913:,} 千位分隔符, {x=} 同时显示表达式和值 (调试用), {{ }} 输出花括号本身. \n 换行, \t 制表符 (TSV 的分隔符), \\ 反斜杠本身; Windows 行尾是 \r\n. r'\n' 是两个字符. 递归: 函数调用自身, 要有基础情况 (0! = 1) 和递归情况 (n! = n · (n−1)!).
+S fstr | fs | f-字符串 | f-String | 花括号里写表达式.
+S fstr | esc | 转义序列 | Escape-Sequenzen | \n、\t、\\.
+S fstr | rek | 递归 | Rekursion | 基础情况加递归情况.
+
+D bool | Vergleiche liefern True oder False; im logischen Kontext gelten Null und leere Objekte als falsch, alles andere als wahr.
+X bool | 在算术里 True = 1, sum(w > 3 for w in liste) 数满足条件的个数. 假: 0、0.0、空字符串、空列表、空元组、空集合、空字典、None、False; −1、' '、[[]] 都是真, 所以判断列表不为空写 if liste:. 链式比较 1 < 2 < 3. == 比较内容, is 比较是否同一个对象. and / or 返回操作数本身, 不一定是 True/False: False or 2 得 2; 这是短路求值, name = eingabe or 'Unbekannt' 给空输入一个默认值.
+S bool | truthy | 真值 |  | 零和空都算假.
+S bool | kurz | 短路求值 | Kurzschlussauswertung | and / or 返回操作数本身.
+
+D dict | Ein Dictionary bildet unveränderliche Schlüssel auf Werte ab und ist als Hash-Tabelle gespeichert.
+X dict | 列表的下标只能是整数, 字典的键几乎可以是任意不可变类型; 由键算出哈希值, 直接定位. d[key] = value 键不存在就新增、存在就覆盖; 读不存在的键报 KeyError; 集合可变, 不能做键, frozenset 可以. 从 Python 3.7 起字典保持插入顺序. 统计频率: 遍历每个字符, 在字典里就加 1, 否则设为 1; 更简洁的写法 f[c] = f.get(c, 0) + 1. 这就是 NLP 里词频统计的基本模式.
+S dict | hash | 哈希表 | Hash-Tabelle | 由键算出位置.
+S dict | haeuf | 用字典统计频率 | Häufigkeiten mit einem Dictionary berechnen | f.get(c, 0) + 1.
+
+D module | Ein Modul ist eine .py-Datei; die Standardbibliothek wird mit Python installiert.
+X module | import charcounts 之后用 charcounts.character_counts(...), from charcounts import character_counts 直接用名字. for k, v in d.items() 遍历键值对; enumerate 给元素配序号, 建「字母 → 编号」的字典, 就是 NLP 里建词表的做法. collections 是标准库: defaultdict(int) 访问不存在的键时自动给 0, 所以 count[c] += 1 不会 KeyError, defaultdict(list) 适合分组; Counter 一行计数. 文件用 with open(..., encoding='utf-8') 读写.
+S module | stdlib | 标准库 | Standardbibliothek | 随 Python 安装.
+S module | enum | enumerate |  | 给元素配序号.
+S module | ddict | defaultdict 与 Counter |  | 计数不会 KeyError.
+
+D kwargs | Positionsargumente werden der Reihe nach zugeordnet, Keyword-Argumente über ihren Namen; Parameter können Default-Werte haben.
+X kwargs | open('test.txt', encoding='utf-8') 跳过了 mode 和 buffering. open('test.txt', 'r', 'utf-8') 里第三个位置是 buffering, 所以报 TypeError; encoding 必须写成关键字参数. 关键字参数之后不能再写位置参数, 否则 SyntaxError. 定义时 def increment(x, incr=1), 有默认值的参数必须放在没有默认值的后面.
+
+D klassen | Eine Klasse ist eine Vorlage zum Erzeugen von Objekten (Instanzen); __init__ setzt beim Erzeugen die Attribute, self steht für die aktuelle Instanz.
+X klassen | class Student: 类名首字母大写. student.name() 等价于 Student.name(student). if __name__ == "__main__": 下的测试代码只在直接运行时执行. 定义了 __call__ 的类, 实例可以像函数一样调用, 是「带状态的函数». __str__ 决定 print 显示什么. 前后双下划线的方法叫 dunder methods, 由 Python 在特定场合自动调用. 实例属性每个实例一份, 类属性直接写在 class 下面、所有实例共用. print 的参数: *liste 解包, end、sep、file、flush; zip 按位置配对, del 删的是名字和引用.
+S klassen | init | __init__ |  | 创建实例时设置属性.
+S klassen | selfp | self |  | 代表当前实例.
+S klassen | dunder | 特殊方法 | dunder methods | __init__、__call__、__str__.
+S klassen | printb | print 的参数 | print-Befehle | sep、end、file、flush.
+
+D sortgen | sorted() sortiert mit einer key-Funktion; Lambda definiert anonyme Funktionen; Generatoren liefern Werte mit yield einzeln.
+X sortgen | 字符串按码位逐字符比较: 数字字符 < 大写 < 小写. key=len 按长度排, 长度相同保持原顺序, 这叫稳定排序; int 和 str 混在一起无法比较. 按值给字典排序: sorted(freq.items(), key=lambda x: x[1], reverse=True)[:10] 得到前 10 个高频词. 生成器函数用 yield 交出一个值后暂停, 下一次要值时继续, 任何时刻内存里只有当前一项, 适合大文件; 只能遍历一次. 推导式一行造出列表、集合或字典.
+S sortgen | stab | 稳定排序 |  | 相等的元素保持原顺序.
+S sortgen | lam | lambda | Lambda | 匿名函数.
+S sortgen | gen | 生成器 | Generatoren | 用 yield 逐个交出值.
+S sortgen | comp | 推导式 | Comprehensions | 一行造出列表.
+
+D cli | Kommandozeilenprogramme lesen Argumente über sys.argv oder argparse und verwenden stdin, stdout und stderr.
+X cli | sys.argv[0] 是程序名, 后面是参数, 都是字符串. shebang 加 chmod +x 就能 ./arguments.py 直接运行, #!/usr/bin/env python3 在虚拟环境里也能用对版本. argparse 自动解析参数、转换类型、给默认值、报错和生成 -h 帮助: 位置参数必须给, -n/--number 是可选参数, action='store_true' 是开关. > datei.txt 只重定向 stdout, 错误信息写到 stderr, 不会混进结果文件. echo Ben ∣ python test.py 把前一个命令的输出作为 stdin. fileinput 依次读命令行给的文件或标准输入.
+S cli | argv | sys.argv |  | 命令行参数列表.
+S cli | argp | argparse | Argparse | 自动生成帮助.
+S cli | streams | stdin、stdout、stderr |  | 三个始终打开的文件.
+
+D regex | Ein regulärer Ausdruck beschreibt ein Muster für eine Klasse von Zeichenketten.
+X regex | 基本元素: [abc] 字符类, [^abc] 取反, . 任意字符, + * ? 量词, {m,n} 次数, ( ) 分组并捕获, a∣b 或, ^ $ 开头结尾, \. 转义, \d \w \s. 先把小模式存成变量, 再用 rf'…' 拼成大模式, 例如邮箱地址的 username 和 domain. re.compile 预先编译, match 从开头匹配, 成功返回 Match 对象; 要写 $ 一直匹配到结尾. 圆括号按左括号的顺序编号, group(0) 是整个匹配, group(n) 是第 n 组.
+S regex | gruppe | 分组与捕获 |  | 按左括号顺序编号.
+S regex | rfstr | rf'…' |  | 原始加格式化字符串.
+
+D exc | Exceptions können mit try/except abgefangen werden; match … case vergleicht einen Wert mit Mustern; der else-Zweig einer Schleife läuft nur, wenn sie nicht mit break verlassen wurde.
+X exc | 出错时 Python 打印 Traceback, 指出文件、行号和位置. float('fünf') 报 ValueError, 打印友好提示后 sys.exit(1). as e 拿到异常对象. 只捕获预料到的具体异常, 裸写 except: 会吞掉所有错误. match … case (Python 3.10 起) 执行第一个匹配的分支, '401'∣'403' 任一匹配, case _ 匹配任何值, 模式可以绑定变量 (x, 0). for … else 可以读作「nobreak」: 三次密码都错, 循环正常结束才执行 else 锁定.
+S exc | tryex | try / except |  | 捕获具体的异常.
+S exc | matchc | match … case |  | 按模式分支.
+S exc | forelse | for … else |  | 没有 break 才执行 else.
+
+D vererb | Bei Vererbung übernimmt eine Unterklasse alle Attribute und Methoden der Oberklasse; Type Hints geben Typen an; ein Decorator erhält eine Funktion und gibt eine neue zurück.
+X vererb | class Brett(Produkt): 所有商品共有的编号、价格、库存只在 Produkt 里写一次. super().__init__(nummer, preis) 调用父类初始化, 少了这一行子类实例就没有 stückzahl. raise Exception('…') 主动抛出异常. 类型标注 x: float、-> float, 解释器完全忽略, addiere(2, 'drei') 照样运行, 但 VS Code 和 mypy 会提前标红; 常见写法 list[str]、int ∣ None. 装饰器 @changecase 等价于 myfunction = changecase(myfunction), 不改原函数代码就改变它的行为.
+S vererb | superi | super().__init__() |  | 调用父类初始化.
+S vererb | hints | 类型标注 | Type Hints | 解释器忽略, 编辑器检查.
+S vererb | deco | 装饰器 | Decorator | 接收函数、返回新函数.
+
+D pep8 | PEP 8 ist der offizielle Style-Guide für Python-Code.
+X pep8 | 缩进 4 个空格; 行宽最多 79 字符; 变量和函数用小写加下划线 (snake_case), 类每个单词首字母大写 (RaumNummer), 常量全大写; 二元运算符两边各一个空格, 括号内侧不加; import 放在文件开头, 每个单独一行, 顺序是标准库、第三方、本地; 顶层函数之间空 2 行. 括号里可以随意换行, 长表达式外面加括号, 运算符放在新行开头.
+
+D libs | Häufig verwendete Module der Standardbibliothek sind sys, math, collections, random und pathlib.
+X libs | sys.platform、sys.exit (消息写到 stderr, 退出码 1)、sys.path (import 时搜索的目录). math: log(x, 2) 以 2 为底, ceil、floor、trunc 三种取整 (负数时不同), nan 和 inf. collections.namedtuple 让元组的位置有名字. random: choices 有放回, sample 无放回 (k 不能超过长度), shuffle 就地打乱; random.seed(42) 让实验可复现, 划分训练集和测试集时很重要. pathlib 用对象表示路径: name、stem、suffix、parent.
+S libs | rnd | random |  | seed 让实验可复现.
+S libs | pth | pathlib |  | 用对象表示路径.
+
+D venv | Für jedes Projekt wird eine eigene virtuelle Umgebung angelegt, in deren Ordner .venv die Pakete installiert werden.
+X venv | 直接 pip install 会装进系统的 Python, 可能破坏系统自带的程序, 所以新版 Linux 拒绝 (externally-managed-environment). python3 -m venv .venv 每个项目一次; source .venv/bin/activate 每次新开终端, 提示符前出现 (.venv); pip install pandas 装包; pip freeze > requirements.txt 记下精确版本, 换机器时 pip install -r requirements.txt 一次装齐; deactivate 退出.
+S venv | req | requirements.txt |  | 记下包和版本.

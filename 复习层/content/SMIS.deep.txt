@@ -1,0 +1,261 @@
+# SMIS 深层内容 (v15e). 依据笔记三级小节整理.
+# D 概念 | 德语定义
+# X 概念 | 讲解: 讲清「为什么 / 怎么做 / 容易错在哪」, 关键术语带德语
+# S 父概念 | 子 id | 中文 | 外文 | 一句话
+
+D tokentype | Token sind die einzelnen Vorkommen von Wörtern im Text, Types die verschiedenen Wortformen.
+X tokentype | 统计语料的第一步就是分清两种「数法」: Token 是逐次出现, Type 是不同的词形. 两者之比 (Type-Token-Verhältnis) 随语料变大而下降, 因为新词越来越少. 只出现一次的 Type 叫孤例词 (Hapax Legomena), 它们往往占全部 Type 的一半左右, 这正是后面数据稀疏的根源.
+S tokentype | ttr | 词型词次比 | Type-Token-Verhältnis | Type 数除以 Token 数, 语料越大越小.
+S tokentype | hapax | 孤例词 | Hapax Legomena | 只出现一次的词, 约占 Type 的一半.
+S tokentype | freq2 | 二阶频率 | Häufigkeiten zweiter Ordnung | 统计「出现 r 次的词有多少个」, 记作 N_r.
+
+D zipf | Die Häufigkeit eines Wortes ist umgekehrt proportional zu seinem Rang in der Häufigkeitsliste.
+X zipf | 把词按频率从高到低排, 第 r 名的频率 f 大致满足 f · r ≈ K. 画在双对数坐标 (doppelt logarithmisch) 上近似一条斜率 −1 的直线. 含义是: 少数功能词极高频, 绝大多数词极罕见. 这决定了后面所有估计问题: 再大的语料, 也总有大量事件只见过一两次或没见过.
+S zipf | ranklist | 频率排序表 |  | 词按频率降序排列, 名次即 Rang.
+S zipf | loglog | 双对数图 | Doppelt logarithmische Darstellung | 齐普夫分布在这种图上接近直线.
+S zipf | longtail | 罕见词 | Seltene Wörter | 大量低频词合起来仍占可观的概率质量.
+
+D null | Die Nullhypothese ist die Annahme, die ein Test zu widerlegen versucht; signifikant ist ein Ergebnis, wenn es unter ihr sehr unwahrscheinlich ist.
+X null | 统计检验是反证思路: 先假设「没有效应」(零假设, Nullhypothese), 再算出在这个假设下得到当前或更极端结果的概率 (p 值). p 值小于事先约定的显著性水平 (Signifikanzniveau, 常为 0.05) 才拒绝零假设. 注意: 不显著不等于证明了零假设为真, 只是证据不够.
+S null | pval | p 值 | p-Wert | 零假设成立时出现这么极端结果的概率.
+S null | alpha | 显著性水平 | Signifikanzniveau | 事先定的阈值, 常用 0.05 或 0.01.
+S null | coin | 做过手脚的硬币 | Gezinkte Münze | 30 次里正面太多, 就怀疑硬币被做了手脚.
+
+D binom | Der Binomialtest berechnet, wie wahrscheinlich mindestens k Erfolge in n Versuchen unter der Nullhypothese sind.
+X binom | 把每次观察看成一次伯努利试验 (Bernoulli-Experiment), 零假设给出成功概率 p. 二项检验把二项分布从 k 加到 n, 得到「至少这么多次」的尾部概率, 再和显著性水平比较. 用在搭配抽取时, p 由两个词各自的频率在独立假设下算出.
+S binom | tail | 上尾概率 | Überschreitungswahrscheinlichkeit | Σ_{r≥k} b(r; n, p), 即单侧 p 值.
+S binom | bernoulli | 伯努利试验 | Bernoulli-Experiment | 只有成功和失败两种结果的单次试验.
+
+D kolloc | Kollokationsextraktion sucht Wortpaare, die häufiger gemeinsam auftreten, als bei statistischer Unabhängigkeit zu erwarten wäre.
+X kolloc | 只按共现频率排, 排在前面的全是 der Hund 这类功能词组合, 没有意义. 所以要把观察到的共现次数和「两个词互相独立时」的期望次数比较, 差得越显著, 越像固定搭配 (Kollokation). 不同度量 (二项检验、χ²、t 分数、对数似然比、点互信息) 对低频词对的偏好不同, 结果排序也不同.
+S kolloc | pairs | 高频词对 | Häufige Wortpaare | 只看频率会被功能词组合占满.
+S kolloc | tscore | t 分数 | t-Score | 用均值差除以标准差估计显著性, 偏爱高频词对.
+S kolloc | llr | 对数似然比 | Log-Likelihood-Ratio | 对低频词对也较稳, 常用的关联度量.
+S kolloc | pmi | 点互信息 | Pointwise Mutual Information | log p(x,y)/(p(x)p(y)), 高估罕见词对.
+
+D chi | Der χ²-Test vergleicht beobachtete und unter Unabhängigkeit erwartete Häufigkeiten einer Kontingenztabelle.
+X chi | 把两个词是否出现列成 2×2 列联表 (Kontingenztabelle), 每格算期望值 E = 行和 × 列和 / 总数, 再对 (O − E)² / E 求和. χ² 越大, 越不像独立. χ² 本身不是概率, 要查 χ² 分布表 (自由度 1) 换算成 p 值; 期望值太小时近似不可靠.
+S chi | ctab | 列联表 | Kontingenztabelle | 2×2 格: 两个词各自出现与否的组合频率.
+S chi | expect | 期望频率 | Erwartete Häufigkeit | 独立假设下每格应有的次数.
+
+D cond | Die bedingte Wahrscheinlichkeit p(A|B) ist die Wahrscheinlichkeit von A, wenn bekannt ist, dass B eingetreten ist.
+X cond | 条件概率是把样本空间缩小到 B 之后再看 A: p(A|B) = p(A∩B) / p(B). 课程里几乎所有模型都是条件概率的乘积. 估计时用相对频率: 联合频率除以条件的频率. 山羊问题 (Ziegenproblem) 是检验直觉的经典例子: 换门后赢的概率是 2/3.
+S cond | sample | 样本空间与事件 | Ergebnisraum & Ereignis | 随机试验所有结果的集合及其子集.
+S cond | goat | 山羊问题 | Ziegenproblem | 主持人开门提供了信息, 换门赢的概率是 2/3.
+S cond | joint | 联合分布 | Gemeinsame Verteilung | 多个随机变量同时取值的概率.
+S cond | marg | 边缘分布 | Randverteilung | 对其他变量求和得到单个变量的分布.
+
+D chain | Die Kettenregel zerlegt eine gemeinsame Wahrscheinlichkeit exakt in ein Produkt bedingter Wahrscheinlichkeiten.
+X chain | p(a, b, c) = p(a) · p(b|a) · p(c|a, b). 这一步本身没有任何近似, 只是把定义反复展开. 问题在后面: 条件越来越长, 根本估计不出来. 所以马尔可夫模型、HMM、PCFG 都是在链式法则之后加独立性假设, 把条件截短.
+S chain | exact | 精确分解 |  | 不做近似, 对变量个数没有限制.
+S chain | trunc | 缩短条件 |  | 马尔可夫假设只保留最近 k 个符号.
+
+D bayes | Das Theorem von Bayes kehrt eine bedingte Wahrscheinlichkeit um: p(x|y) = p(y|x) p(x) / p(y).
+X bayes | 我们想要的往往是「看到数据后哪个解释最可能」(后验, a-posteriori), 但能估计的是「每个解释产生这些数据的概率」(似然). 贝叶斯定理把两者连起来, 先验 p(x) 是解释本身的常见程度. 做消歧时分母 p(y) 对所有候选都一样, 求 argmax 时可以去掉. 罕见病检测例说明: 先验很小时, 阳性结果也可能多半是误报.
+S bayes | prior | 先验与后验 | A-priori & A-posteriori | 看数据之前和之后对假设的概率.
+S bayes | argmax | 省略分母 |  | p(y) 与候选无关, 比较时可省略.
+S bayes | disease | 罕见病检测 |  | 先验很小时阳性也未必患病.
+
+D indep | Zwei Ereignisse sind statistisch unabhängig, wenn ihre gemeinsame Wahrscheinlichkeit gleich dem Produkt der Einzelwahrscheinlichkeiten ist.
+X indep | 独立意味着知道一个变量不改变对另一个的判断: p(x|y) = p(x). 课程里它有两种用法: 一是作为要推翻的零假设 (搭配检验); 二是作为化简模型的假设 (朴素贝叶斯、HMM、PCFG). 第二种用法是有意的近似, 模型的很多弱点都来自它.
+S indep | asnull | 作为零假设 |  | 搭配检验假设两个词互不相关.
+S indep | asmodel | 作为模型假设 |  | 用独立性减少参数, 代价是忽略依赖.
+
+D mlest | Die Maximum-Likelihood-Schätzung wählt die Parameter, die die Trainingsdaten am wahrscheinlichsten machen; für diskrete Verteilungen sind das relative Häufigkeiten.
+X mlest | 对离散分布, 让训练数据概率最大的参数恰好就是相对频率 f(x,y)/f(x). 它简单、无偏于训练数据, 却有致命问题: 没见过的事件概率为 0, 一个零就会让整句概率变成 0. 这就是参数平滑 (Parameterglättung) 存在的原因.
+S mlest | relfreq | 相对频率 | Relative Häufigkeit | 事件频率除以总频率.
+S mlest | zero | 零概率问题 | Nullwahrscheinlichkeiten | 没见过的事件被估成 0.
+
+D binomd | Die Binomialverteilung gibt die Wahrscheinlichkeit an, in n unabhängigen Bernoulli-Versuchen genau r Erfolge zu erhalten.
+X binomd | b(r; n, p) = C(n, r) pʳ (1 − p)ⁿ⁻ʳ: 组合数数出 r 次成功的排列方式, 后面是每种排列的概率. 期望值是 np, 方差是 np(1 − p). 二项检验和符号检验都靠它算概率.
+S binomd | ev | 期望与方差 | Erwartungswert & Varianz | E = np, Var = np(1 − p).
+S binomd | randvar | 随机变量 | Zufallsvariable | 把试验结果映射成数值的函数.
+
+D entropy | Die Entropie misst die durchschnittliche Unsicherheit einer Zufallsvariable, also den mittleren Informationsgehalt eines Ereignisses.
+X entropy | 一个事件的信息量是 −log₂ p: 越不可能, 发生时带来的信息越多. 熵是信息量的期望. 它也是编码 (Kodierung) 的下限: 平均每个符号至少需要 H 比特. 均匀分布时熵最大, 确定事件熵为 0. 公平骰子的熵约 2.58 比特.
+S entropy | infoamt | 信息量 | Informationsgehalt | 事件概率的负对数 −log₂ p.
+S entropy | code | 最优编码 | Optimale Kodierung | 平均码长不能低于熵.
+S entropy | maxent | 最大熵 | Maximale Entropie | 均匀分布时不确定性最大.
+
+D condh | Die bedingte Entropie H(Y|X) ist die Unsicherheit über Y, die bleibt, wenn X bekannt ist.
+X condh | 联合熵 H(X, Y) 是两个变量一起的不确定性, 可以拆成 H(X) + H(Y|X): 先确定 X, 再看 Y 还剩多少不确定. 条件熵永远不大于 H(Y), 知道更多信息不会让不确定性变大 (平均意义上).
+S condh | jent | 联合熵 | Gemeinsame Entropie | 两个变量合起来的熵.
+S condh | chainh | 熵的链式法则 | Kettenregel der Entropie | H(X,Y) = H(X) + H(Y|X).
+
+D mi | Die Mutual Information misst, wie stark sich die Unsicherheit über eine Variable verringert, wenn man die andere kennt.
+X mi | I(X; Y) = H(X) − H(X|Y) = H(Y) − H(Y|X), 是对称的. 也可以看成联合分布与「假设独立」分布之间的 KL 距离, 所以独立时为 0. 对单个词对取点互信息 (PMI) 就得到一种搭配度量, 但它会高估只出现一两次的罕见词对.
+S mi | sym | 对称性 | Symmetrie | I(X;Y) = I(Y;X).
+S mi | pmi2 | 点互信息 | Punktweise MI | 单个事件对的 log 比值, 用作关联度量.
+
+D kl | Die relative Entropie (Kullback-Leibler-Abstand) misst, wie viele zusätzliche Bits man braucht, wenn man Daten aus p mit einem Code für q kodiert.
+X kl | D(p‖q) = Σ p(x) log (p(x)/q(x)). 它非负, p = q 时为 0, 但不对称 (D(p‖q) ≠ D(q‖p)), 也不满足三角不等式, 所以不是真正的距离. 直观上它是用错误分布 q 编码带来的额外码长.
+S kl | asym | 不对称 | Nicht symmetrisch | 交换 p 和 q 结果不同.
+S kl | extra | 额外比特 |  | 用 q 的编码表示 p 的数据多付的代价.
+
+D xent | Die Crossentropie ist die mittlere Kodierungslänge von Daten aus p mit einem Modell q; die Perplexität ist 2 hoch die Crossentropie.
+X xent | 真实分布 p 不知道, 但可以用测试数据估计交叉熵: −(1/N) Σ log₂ q(wᵢ). 它等于 H(p) + D(p‖q), 所以模型越接近真实分布越小. 困惑度 (Perplexität) = 2^H, 可以理解为模型每一步「平均在多少个词之间犹豫」. 只能在没见过的测试数据上比较.
+S xent | ppl | 困惑度 | Perplexität | 2 的交叉熵次方, 越小越好.
+S xent | testset | 在测试数据上估计 |  | 用训练数据估会严重偏低.
+
+D markov | Ein Markowmodell k-ter Ordnung nimmt an, dass jedes Symbol nur von den k vorhergehenden Symbolen abhängt.
+X markov | 链式法则之后加马尔可夫假设 (Markow-Annahme), 每个条件只保留前 k 个符号, k 阶模型就是 (k+1)-gram 模型. 句首补 k 个起始符, 句末加结束符 (Endesymbol), 这样不同长度的序列概率之和才是 1. 语种识别 (Sprachidentifizierung): 给每种语言训练一个字符级模型, 选让文本概率最大的语言.
+S markov | endsym | 结束符号 | Endesymbol | 保证所有长度的序列概率总和为 1.
+S markov | ngram | n 元组 | n-Gramm | k 阶马尔可夫模型 = (k+1)-gram.
+S markov | langid | 语种识别 | Sprachidentifizierung | 每种语言一个模型, 取概率最大者.
+S markov | wordmm | 词序列模型 | Markowmodelle über Wortfolgen | 符号换成词, 数据稀疏更严重.
+
+D sparse | Je höher die Ordnung eines Modells, desto mehr mögliche Ereignisse kommen in den Trainingsdaten nie vor.
+X sparse | 参数个数随阶数指数增长 (词表 V 的三元组有 V³ 个), 训练数据却是固定的, 所以大部分 n-gram 一次都没见过, 最大似然把它们估成 0. 选阶数就是在「上下文更准 (偏差小)」和「估计更稀疏 (方差大)」之间权衡.
+S sparse | params | 参数爆炸 |  | n-gram 数量随 n 指数增长.
+S sparse | tradeoff | 偏差与稀疏 |  | 阶数高更准但更稀疏.
+
+D addk | Bei der Add-λ Glättung wird zu jeder Häufigkeit eine Konstante λ addiert, bevor relative Häufigkeiten berechnet werden.
+X addk | p = (f(w) + λ) / (N + Bλ), B 是可能事件的个数. λ = 1 是拉普拉斯平滑 (Laplace-Glättung). 它等价于和均匀分布做线性插值, 属于线性折扣: 每个见过的事件都按比例让出概率. 对齐普夫分布的数据效果差: 让出的概率太多, 而且平均分给了海量没见过的事件.
+S addk | laplace | 加一平滑 | Laplace-Glättung | λ = 1 的特例.
+S addk | lindisc | 线性折扣 | Linear Discounting | 按比例从所有事件扣概率.
+
+D absd | Absolute Discounting zieht von jeder positiven Häufigkeit einen festen Betrag δ ab und verteilt die frei gewordene Masse auf ungesehene Ereignisse.
+X absd | 平滑实验 (Glättungsexperiment) 拿两个同样大的语料比较: 训练里出现 r 次的二元组, 在新语料里平均出现的次数总比 r 少一个大致固定的量 (约 0.75–0.8), 例如 5 次的平均只剩 4.21 次; 加一平滑的预测则完全对不上. 所以从每个频率减固定的 δ, 比按比例扣更符合齐普夫分布. δ 可以用二阶频率估计: δ = N₁ / (N₁ + 2N₂).
+S absd | experiment | 平滑实验 | Glättungsexperiment | 见过 r 次的二元组在新语料里约少 0.75–0.8 次.
+S absd | adelta | 折扣值估计 |  | δ = N₁ / (N₁ + 2N₂).
+
+D backoff | Backoff-Glättung greift auf ein Modell mit kürzerem Kontext zurück, wenn der längere Kontext zu selten beobachtet wurde.
+X backoff | 三元组没见过时, 用二元组甚至一元组的概率来补, 并乘一个回退因子 (Backoff-Faktor) 保证总和为 1. Katz 回退只给没见过的事件用回退分布; 插值回退 (interpoliert) 把回退概率加给所有事件, 通常略好. 回退分布本身也要平滑, 所以是递归的.
+S backoff | katz | Katz 回退 | Katz’sche Backoff-Glättung | 只对未见事件回退到短上下文.
+S backoff | interp | 插值回退 | Interpolierte Backoff-Glättung | 所有事件都混入回退概率.
+S backoff | bofactor | 回退因子 | Backoff-Faktor | 把让出的概率质量按比例分给回退分布.
+
+D kn | Die Kneser-Ney-Backoff-Verteilung schätzt die Wahrscheinlichkeit eines Wortes danach, in wie vielen verschiedenen Kontexten es vorkommt.
+X kn | 问题例子: Francisco 词频很高, 但几乎只跟在 San 后面. 普通回退会在任何没见过的上下文里给它高概率, 这是错的. Kneser-Ney 的回退分布不数词次, 而数「它跟在多少种不同的词后面」(Type 而不是 Token), 只在回退时用这个分布.
+S kn | francisco | San Francisco 问题 | San-Francisco-Problem | 高频但语境单一的词不该在回退时占优.
+S kn | contcount | 上下文种类数 |  | 用前接词的种类数估计回退概率.
+
+D nbwsd | Naïve-Bayes-Desambiguierung wählt die Bedeutung, die zusammen mit den Kontextwörtern am wahrscheinlichsten ist, unter der Annahme unabhängiger Kontextwörter.
+X nbwsd | 歧义词周围的实词当特征. 用贝叶斯定理 ŝ = argmax p(s) Π p(cᵢ|s), 「朴素」指假设各上下文词在给定词义下互相独立. 参数从标注了词义的语料用相对频率加平滑估计. 没有标注语料时可以造伪词 (Pseudowort): 把两个词合并, 再让模型把它们分开, 就有了现成的答案.
+S nbwsd | senses | 词义与翻译 | Wortbedeutungen & Übersetzung | 词义常以不同译文区分.
+S nbwsd | pseudo | 伪词评估 | Pseudowort-Evaluierung | 合并两个词制造人工歧义来评估.
+S nbwsd | nbparam | 参数估计 | Parameterschätzung | p(s) 与 p(c|s) 用相对频率加平滑.
+
+D hmm | Ein Hidden-Markow-Modell betrachtet die Wortartfolge als verborgene Zustandsfolge, aus der die Wörter emittiert werden.
+X hmm | 词性标注要选最可能的标签序列 t. 由贝叶斯得 argmax p(t) p(w|t), 再做两个假设: 标签只依赖前 k 个标签 (上下文概率 p(tᵢ|tᵢ₋₁)), 词只依赖自己的标签 (词汇概率 p(wᵢ|tᵢ)). 参数可以从标注语料直接数. 二元组标注器准确率约 95%–98%. 弱点: 右侧上下文 (rechter Satzkontext) 只能通过标签链间接影响.
+S hmm | ctxprob | 上下文概率 | Kontextwahrscheinlichkeit | p(tᵢ | tᵢ₋₁), 标签之间的转移.
+S hmm | lexprob | 词汇概率 | Lexikalische Wahrscheinlichkeit | p(wᵢ | tᵢ), 标签发射出词.
+S hmm | rightctx | 右侧上下文 | Rechter Satzkontext | 后面的词只能通过标签链影响当前决策.
+S hmm | posamb | 词性歧义 | Wortart-Ambiguität | 同一个词形可属于多个词类.
+
+D viterbi | Der Viterbi-Algorithmus findet die wahrscheinlichste Zustandsfolge mit dynamischer Programmierung, indem er pro Zustand nur das beste Präfix behält.
+X viterbi | 列举所有标签序列是指数级的. 关键观察: 到达某位置某标签的最佳路径, 一定由前一位置某标签的最佳路径延长而来 (可用反证法证明). 所以每个格子只存最佳概率 δ 和回指针, 时间复杂度对句长线性, 对标签数是 k+1 次方. 三元组标注器的状态是标签对.
+S viterbi | vdelta | Viterbi 概率 | Viterbi-Wahrscheinlichkeit | δₜ(k): 到位置 k 标签 t 的最佳前缀概率.
+S viterbi | backptr | 回溯指针 |  | 记录最佳前驱, 最后倒推出序列.
+S viterbi | proof | 反证法 | Widerspruchsbeweis | 证明最佳路径的前缀也必然最佳.
+S viterbi | complexity | 时间复杂度 | Rechenzeit-Komplexität | 句长线性, 标签数的 k+1 次方.
+
+D unk | Für unbekannte Wörter schätzt der Tagger die Wortart aus Merkmalen wie Großschreibung und Wortendung.
+X unk | 测试数据里总有训练没见过的词, p(w|t) 无法直接估计. 办法是借贝叶斯把 p(w|t) 换成 p(t|w)/p(t) (常数项可略), 再用词尾估 p(t|后缀): 后缀从长到短逐级回退, 长后缀更准但更稀疏. 大小写是另一个强特征.
+S unk | suffix | 后缀回退 | Suffix-Backoff | 从最长后缀逐级退到短后缀.
+S unk | caps | 大小写 | Großschreibung | 德语名词和专名的重要线索.
+
+D fb | Der Forward-Backward-Algorithmus berechnet die erwarteten Tag-Häufigkeiten über alle Tagfolgen mit dynamischer Programmierung.
+X fb | 前向概率 α 是「从句首到这里、停在这个标签」的所有路径概率之和, 后向概率 β 是「从这里到句尾」的总和. α · β / p(w) 就是该位置取该标签的概率, 把它当作「期望频率」, 不用列举所有序列. 公式结构和 Viterbi 一样, 只是把 max 换成求和.
+S fb | alpha | 前向概率 | Forward-Wahrscheinlichkeit | 到当前位置和标签的所有前缀概率之和.
+S fb | beta | 后向概率 | Backward-Wahrscheinlichkeit | 从当前位置到句尾的所有后缀概率之和.
+
+D em | Das EM-Verfahren schätzt Parameter auf unannotierten Daten, indem es abwechselnd erwartete Häufigkeiten berechnet (E-Schritt) und daraus neue Parameter schätzt (M-Schritt).
+X em | 没有标注语料时, 先随便给一组参数, E 步用当前参数算每种分析的权重 (期望频率), M 步把这些期望频率当真实频率做相对频率估计. 每轮数据似然都不会下降, 但只收敛到局部最大, 结果依赖初值. 实践中有监督训练通常更好, EM 常用来在少量标注之外补充.
+S em | estep | E 步 | E-Schritt | 用当前参数算期望频率.
+S em | mstep | M 步 | M-Schritt | 用期望频率重新做相对频率估计.
+S em | local | 局部最大值 | Lokales Maximum | 似然单调上升, 但不保证全局最优.
+
+D pcfg | Eine probabilistische kontextfreie Grammatik ordnet jeder Regel eine Wahrscheinlichkeit zu; die Wahrscheinlichkeit eines Parsebaums ist das Produkt seiner Regelwahrscheinlichkeiten.
+X pcfg | 句法歧义使一个句子有多棵分析树, 要选最可能的. PCFG 给每条规则 A → α 一个条件概率 p(α|A), 左部相同的规则概率之和为 1. 树概率是所用规则概率之积, 句子概率是所有分析树概率之和. 这背后是很强的独立性假设: 规则展开只看左部范畴, 不看位置和上下文.
+S pcfg | cfg | 上下文无关文法 | Kontextfreie Grammatik | 规则左部只有一个非终结符.
+S pcfg | deriv | 推导 | Ableitung | 从起始符逐步改写到句子, 对应一棵树.
+S pcfg | synamb | 句法歧义 | Syntaktische Ambiguität | 同一句子有多种合法结构.
+
+D treebank | Beim Baumbank-Training werden Regelwahrscheinlichkeiten als relative Häufigkeiten der Regeln in einer manuell annotierten Baumbank geschätzt.
+X treebank | 树库 (Baumbank) 是人工标好句法树的语料. 从中读出所有规则, 用 f(A → α) / f(A) 估计规则概率, 就是 PCFG 的最大似然估计. 建树库费时昂贵, 但树库训练明显好于只用无标注数据的 EM 训练. 简单树库文法的弱点在于范畴太粗.
+S treebank | readrules | 抽取规则 |  | 树里每个局部子树就是一条规则.
+S treebank | unannot | 无标注训练 | Training auf unannotierten Daten | 用 Inside-Outside 做 EM, 效果较差.
+
+D forest | Ein Parsewald repräsentiert alle Analysen eines Satzes kompakt, indem gemeinsame Teilbäume nur einmal gespeichert werden.
+X forest | 分析树的数量可能随句长指数增长, 但它们共享大量子树. 分析森林把相同跨度、相同范畴的子树合并成一个节点, 本身可以看成一部只生成这个句子的专用文法 (spezialisierte Grammatik). 在森林上可以高效地做 Viterbi (找最佳树) 和 Inside-Outside (算期望频率).
+S forest | special | 专用文法 | Spezialisierte Grammatik | 森林 = 只生成当前句子的文法.
+S forest | pviterbi | 森林上的 Viterbi | Viterbi auf Parsewäldern | 每个节点保留最佳子树概率.
+
+D io | Der Inside-Outside-Algorithmus berechnet für jeden Knoten des Parsewalds die Inside- und Outside-Wahrscheinlichkeit und daraus erwartete Regelhäufigkeiten.
+X io | Inside 概率 β(A) 是节点 A 下面所有子树的总概率 (自下而上算), Outside 概率 α(A) 是节点外面其余部分的总概率 (自上而下算). 某条规则在这个句子里的期望次数 = α · 规则概率 · 子节点 β 的乘积 / 句子概率. 这些期望频率进入 EM 的 M 步, 重新估计规则概率. 它是 PCFG 版的 Forward-Backward.
+S io | inside | Inside 概率 | Inside-Wahrscheinlichkeit | 节点内部所有推导的概率之和.
+S io | outside | Outside 概率 | Outside-Wahrscheinlichkeit | 节点之外部分的概率之和.
+S io | reest | 规则重估 | Neuschätzung der Regelwahrscheinlichkeiten | 期望规则频率归一化成新概率.
+
+D refine | Bei der Baumbank-Annotation werden Kategorien mit Kontextinformation angereichert, um die zu starken Unabhängigkeitsannahmen der PCFG abzuschwächen.
+X refine | 简单树库文法里, 主语 NP 和宾语 NP 是同一个范畴, 展开概率被平均掉了. 解决办法是把信息写进范畴名: 父节点标注 (Elternannotation, NP^S 与 NP^VP)、形态句法信息、论元信息等. 范畴变细后规则变多, 又会稀疏. 扁平树库的长规则用马尔可夫化 (Markowisierung) 拆成短的生成步骤.
+S refine | parent | 父节点标注 | Elternannotation | 给范畴加上父节点, 区分主语和宾语 NP.
+S refine | morphann | 形态句法标注 | Morphosyntaktische Annotation | 把格、数等信息并入范畴.
+S refine | markovize | 马尔可夫化 | Markowisierung | 把长规则分解成逐个生成子节点.
+
+D berkeley | Der Berkeley-Parser lernt verfeinerte Kategorien automatisch, indem er Kategorien wiederholt aufspaltet, mit EM trainiert und unnütze Aufspaltungen wieder vereinigt.
+X berkeley | 手工设计细化特征很费力. Berkeley 分析器把每个范畴自动一分为二 (如 NP-1, NP-2), 用 EM 训练子范畴的规则概率, 再把对似然贡献小的分裂合并回去 (Vereinigung), 如此递归多轮. 得到的子范畴往往对应语言学上可解释的区别.
+S berkeley | split | 分裂 | Aufspaltung | 每个范畴一分为二, 加一点随机扰动.
+S berkeley | merge | 合并 | Vereinigung | 撤销收益小的分裂, 控制文法规模.
+S berkeley | recur | 递归细化 | Rekursive Verfeinerung | Split → EM → Merge 重复多轮.
+
+D generative | Generative Modelle definieren eine gemeinsame Wahrscheinlichkeit p(d, c); diskriminative Modelle definieren direkt die bedingte Wahrscheinlichkeit p(c | d).
+X generative | 生成模型 (朴素贝叶斯、HMM、PCFG) 描述数据怎样「生成」出来, 要为输入本身建模. 想加一条新信息 (比如「词以 -ung 结尾」), 就得改写整个生成过程并处理特征之间的依赖. 判别模型只管给定输入时输出的概率, 可以随意加入互相重叠的特征 (Merkmale), 这是它的主要优势.
+S generative | feat | 特征 | Merkmal | 描述输入的指示函数, 可任意定义.
+S generative | gendis | 生成模型的缺点 | Nachteile generativer Modelle | 很难加入相互依赖的新信息.
+
+D linclf | Ein linearer Klassifikator berechnet für jede Klasse eine gewichtete Summe der Merkmalswerte und wählt die Klasse mit dem höchsten Score.
+X linclf | 每个特征有一个权重 (Gewicht), 分数 = 权重向量 · 特征向量. 正权重支持该类, 负权重反对. 多类问题 (Mehrklassen-Probleme) 时特征和类别成对定义, 取分数最高的类. 朴素贝叶斯取对数后也是线性形式, 只是权重被固定为对数概率.
+S linclf | fvec | 特征向量 | Merkmalsvektor | 每个维度一个特征的取值.
+S linclf | multi | 多类问题 | Mehrklassen-Problem | 每个类各算分数, 取最大.
+S linclf | nbcmp | 与朴素贝叶斯比较 | Vergleich mit Naive Bayes | 朴素贝叶斯是权重固定的线性分类器.
+
+D perceptron | Der Perzeptron-Algorithmus passt die Gewichte nur bei Fehlklassifikationen an: Merkmale der richtigen Klasse werden verstärkt, die der falschen geschwächt.
+X perceptron | 逐个看训练样本, 预测对了不动; 错了就把正确答案的特征向量加到权重上, 把错误答案的减掉. 数据线性可分时保证收敛. 数据不是线性可分时不会收敛, 一直训练又会过拟合, 所以停止条件 (Stoppkriterium) 是: 每遍历一遍训练数据 (Epoche) 就在留出数据上评估, 保留最好的那组权重. 缺点是不给概率.
+S perceptron | update | 更新规则 | Update-Regel | w ← w + f(x, y) − f(x, ŷ).
+S perceptron | stop | 停止条件 | Stoppkriterium | 每个 epoch 在留出数据上评估, 留最好的权重.
+
+D loglin | Ein log-lineares Modell wandelt die linearen Scores mit der Exponentialfunktion und Normierung in Wahrscheinlichkeiten um.
+X loglin | p(c|d) = exp(θ · f(d, c)) / Z(d), Z 把所有类的分数归一化. 也叫最大熵模型或多项逻辑回归. 训练目标是最大化训练数据的条件对数似然, 它对权重的偏导数有很漂亮的形式: 观察到的特征频率减去模型期望的特征频率. 两者相等时达到最优.
+S loglin | norm | 归一化 | Normierung | Z(d) 对所有类求和, 让概率之和为 1.
+S loglin | alias | 别名 | Maximum-Entropie-Modell | 也叫最大熵模型、多项逻辑回归.
+S loglin | deriv | 偏导数 | Partielle Ableitung | 观察特征频率 − 期望特征频率.
+
+D grad | Beim Gradientenanstieg werden die Parameter schrittweise in Richtung des Gradienten der Zielfunktion verändert.
+X grad | 梯度是各个偏导数组成的向量, 指向目标函数增长最快的方向. 每步把权重沿梯度走一小步 (学习率 η). 变体有批量 (Batch)、随机梯度 (SGD, 每个样本更新一次) 和小批量. 对数线性模型的对数似然是凹函数, 所以不会卡在局部最大.
+S grad | lr | 学习率 | Lernrate | 每步走多远, 太大会震荡.
+S grad | sgd | 随机梯度 | Stochastischer Gradientenanstieg | 每个样本就更新, 更快但更抖.
+
+D reg | Regularisierung bestraft große Gewichte in der Zielfunktion, um Überanpassung an die Trainingsdaten zu vermeiden.
+X reg | 特征很多时, 模型会给只在训练数据里偶然有用的特征很大的权重, 这是过拟合 (Overfitting). 在目标函数里减去权重的平方和 (L2, 高斯先验) 或绝对值和 (L1, 会让很多权重变成 0), 正则项的偏导数也很简单, 直接加进梯度里.
+S reg | l2 | L2 正则 | L2-Regularisierung | 惩罚权重平方, 让权重整体变小.
+S reg | l1 | L1 正则 | L1-Regularisierung | 惩罚绝对值, 产生稀疏权重.
+
+D crf | Ein Conditional Random Field ist ein log-lineares Modell über ganze Tagfolgen, dessen Merkmale benachbarte Tags und das Wort verbinden.
+X crf | 线性链 CRF (Linear-Chain CRF) 把整个标签序列当作一个「类」, 分数是每个位置局部特征的和, 所以可以用 Viterbi 找最佳序列. 训练时梯度要用期望特征频率, 而期望要对指数多的序列求和, 这一步借用 Forward-Backward 算. 它结合了 HMM 的序列结构和判别模型的任意特征.
+S crf | lcrf | 线性链 CRF | Linear-Chain CRF | 特征只连接相邻标签和当前位置的词.
+S crf | crfvit | CRF 的 Viterbi | Viterbi für CRFs | 局部分数相加, 动态规划求最佳序列.
+S crf | crftrain | CRF 训练 | Training von CRFs | SGD 加 Forward-Backward 算期望.
+
+D gold | Ein Modell wird auf Testdaten, die beim Training nicht verwendet wurden, mit einem manuell erstellten Goldstandard verglichen.
+X gold | 金标准 (Goldstandard) 是人工给出的正确答案. 评估必须在训练没用过的测试数据上做, 否则只测到了记忆能力. 调整元参数 (Metaparameter, 如平滑参数) 要用单独的开发数据 (Entwicklungsdaten), 测试数据只在最后用一次.
+S gold | dev | 开发数据 | Entwicklungsdaten | 用来调元参数, 和测试数据分开.
+S gold | meta | 元参数 | Metaparameter | 不由训练直接估计的设置, 如 λ.
+
+D prf | Precision ist der Anteil korrekter unter den gefundenen Elementen, Recall der Anteil gefundener unter den korrekten; der F-Score ist ihr harmonisches Mittel.
+X prf | 句法分析器评估时把每棵树拆成带标签的成分 (范畴 + 跨度), 和金标准树比较. 精确率 = 正确成分 / 系统给出的成分, 召回率 = 正确成分 / 金标准成分. F 值 = 2PR / (P + R). 只看一个指标会被钻空子: 少输出能提高精确率, 多输出能提高召回率.
+S prf | precision | 精确率 | Precision | 找出来的里面有多少是对的.
+S prf | recall | 召回率 | Recall | 该找的里面找到了多少.
+S prf | fscore | F 值 | F-Score | P 和 R 的调和平均.
+
+D sign | Der Vorzeichentest prüft, ob ein System bei den Fällen, in denen sich zwei Systeme unterscheiden, signifikant häufiger richtig liegt.
+X sign | 比较两个标注器时, 只看两者结果不同的句子或词: 记下 A 对 B 错和 B 对 A 错的次数. 零假设是两者一样好, 即每种情况概率 0.5, 于是用二项分布算出这种不平衡有多大可能是偶然的. 简单, 不需要假设分布形状.
+S sign | diffcases | 只计分歧样例 |  | 两个系统都对或都错的情况不计.
+
+D baseline | Die Baseline ist eine einfache Vergleichsmethode, die Obergrenze die Leistung, die ein perfektes oder menschliches System erreichen würde.
+X baseline | 只说「准确率 90%」没有意义, 要放在基线和上限之间看. 词义消歧的常用基线是总选最常见的词义 (most frequent sense), 上限可以用人在这个任务上的准确率. 例如一个词 80% 的时候是意义 A, 基线就已经有 80%. 模型只有明显超过基线才算有用.
+S baseline | mfs | 最高频词义 |  | 总选最常见词义的基线.
+S baseline | agree | 上限 | Obergrenze | 人在同一任务上的准确率作为上限.
+S refine | trace | 移位痕迹标注 | Spurmerkmal | 痕迹到填充词路径上的节点都带移位标记.
+S grad | other | 其他训练方法 | Andere Lernalgorithmen | 除梯度上升外还有 L-BFGS 等更快的优化方法.

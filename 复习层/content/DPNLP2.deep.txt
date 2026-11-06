@@ -1,0 +1,263 @@
+# DPNLP2 深层内容. 依据 DPNLP2 00–04 笔记. 外文写英语 (课件语言).
+# D 概念 | 英语定义   X 概念 | 讲解   S 父概念 | 子 id | 中文 | 外文 | 一句话
+
+D rnnlim | In an RNN, all information about the inputs up to step j is compressed into a single state vector, which becomes a bottleneck for long sequences, especially in encoder–decoder models.
+X rnnlim | 机器翻译 a great book ! → ein tolles buch !: 编码器逐词读入, 把整句压进最后的状态; 解码器从 BOS 开始, 每步经线性层和 softmax 输出下一个词的分布, 和真实词比较算负对数似然. 训练时解码器的输入是真实的前一个词 (教师强制), 推理时是自己贪心解码出的词. 整句源语言只能通过一个固定长度的向量传给解码器, 句子一长就丢信息.
+S rnnlim | encdec | 编码器–解码器 | encoder-decoder | 编码器读入, 解码器生成.
+S rnnlim | tf | 教师强制 | teacher forcing | 训练时输入真实的前一个词.
+
+D bahdanau | Bahdanau attention lets the decoder compute, at every step, a weighted sum over all encoder states (a context vector).
+X bahdanau | 编码器是双向 RNN, 每个位置的状态由前向和后向状态拼接; 解码器第 t 步对每个编码器状态算权重, 加权求和得到上下文向量. BLEU 随句长的曲线: 经典编码器–解码器在句长超过约 20 后迅速下降, 带注意力的 RNNsearch-50 几乎不降, 说明瓶颈真实存在, 注意力解决了它.
+
+D recipe | Attention scores a query against J keys with a scoring function, turns the scores into a distribution with softmax, and returns the weighted sum of the value vectors.
+X recipe | 配料: 查询 q, 键矩阵 K, 值矩阵 V, 打分函数 a. 打分函数: 点积 qᵀk (要求维度相同); 缩放点积 qᵀk/√dₖ (Transformer); 加性 vᵀtanh(W_q q + W_k k) (Bahdanau). 神经网络里 q、k、v 都是输入和可训练参数的函数, 哪些键对哪些查询重要是模型自己学的: 英法翻译的注意力图大体沿对角线, 但 European Economic Area 对应 zone économique européenne 时是反序, 这种软对齐没有任何对齐标注.
+S recipe | qkv | 查询、键、值 | query & key & value | 注意力的三种输入.
+S recipe | sdp | 缩放点积 | scaled dot product | Transformer 的打分函数.
+S recipe | softalign | 软对齐 |  | 从数据里学到的注意力分布.
+
+D crossself | In cross-attention the queries come from one sequence and the keys and values from another; in self-attention queries, keys and values all come from the same sequence.
+X crossself | Bahdanau 模型仍是 RNN, 只在上面加了注意力; Transformer (Vaswani 等 2017) 只由注意力组成, 没有循环, 更容易并行. 它几乎没有内置假设 (不知道哪些词相邻), 所以通常比 RNN 需要更多数据, 但数据够多时通常更好, 这是归纳偏置的取舍. 交叉注意力: 2 个查询、3 对键值, 输出数等于查询数; 自注意力: 每个输出都看所有输入.
+S crossself | cross | 交叉注意力 | cross-attention | Y 关注 X.
+S crossself | self | 自注意力 | self-attention | X 关注自己.
+
+D selfattn | Self-attention projects the token representations X into Q, K and V and computes softmax(QKᵀ/√dₖ) V, with the softmax applied row-wise.
+X selfattn | GPU 擅长矩阵乘法, 所以比逐步计算的 RNN 快得多. 但分数矩阵和注意力矩阵都是 J × J, 显存需求是序列长度的平方, 长序列是个大问题 (高效 Transformer、FlashAttention). 为什么除以 √dₖ: q、k 分量独立且方差为 1 时, 点积方差是 dₖ; 维度大时分数很大, softmax 极尖, 梯度几乎为 0; 除以 √dₖ 把方差拉回 1.
+S selfattn | quad | 平方复杂度 |  | 显存随序列长度平方增长.
+S selfattn | scale | 为什么除以 √dₖ |  | 把点积的方差拉回 1.
+
+D multihead | Multi-layer attention stacks attention layers; multi-head attention runs M heads in parallel, each of dimension d/M, concatenates their outputs and projects them with an output matrix.
+X multihead | Transformer 里堆叠的是 Transformer 块, 块内注意力的输出还要经过残差、LayerNorm 和前馈网络. 每个头的维度是 d/M, 所以多头的总计算量和一个全维度的头差不多. 多头让模型可以同时关注不同类型的关系: 句法、指代、相邻词.
+S multihead | mha | 多头注意力 | multi-head attention | 并行的多个头.
+
+D posenc | Self-attention is permutation equivariant and cannot model word order; adding a position embedding to each input embedding makes positions distinguishable.
+X posenc | 只有词嵌入加一层自注意力时, john loves mary 和 mary loves john 里 mary 的表示一模一样: 权重只取决于内容, 不取决于顺序, 把输入打乱, 输出也同样打乱. 给每个输入加上位置向量后, 同一个词在不同位置的输入就不同. 四种做法: 绝对位置编码、相对位置编码、ALiBi、RoPE.
+S posenc | perm | 置换等变 | permutation equivariant | 不知道词序.
+
+D abspos | Absolute positional encodings are either fixed sinusoidal encodings (original Transformer) or learned position embeddings (BERT, GPT-2).
+X abspos | 正弦编码: 位置 j 的偶数维用正弦、奇数维用余弦, 频率随维度增大而降低, 像一组不同转速的时钟; 任意位移 k 后的编码是原编码的线性函数 (旋转), 便于模型学相对位置. 可学习的位置嵌入是每个位置一行的参数矩阵, 处理不了超过最大长度的序列 (BERT 是 512).
+S abspos | sin | 正弦编码 | sinusoidal encoding | 固定的多频率编码.
+S abspos | learned | 可学习的位置嵌入 |  | 处理不了超过最大长度的序列.
+
+D relpos | Relative positional encodings (Shaw et al. 2018) put the relative distance i − j of two tokens directly into the attention computation.
+X relpos | 对每个距离学一个向量, 加到键和值上, 注意力权重直接取决于两个词相隔多远. 「前一个词」在句首和句末是同一种关系. 距离裁剪到 [−k, k], 表就是有限的, 也能处理更长的序列. 代价是每对 (i, j) 都要额外的项. DPNLP I 练习单里叫「相对位置编码」的其实是可学习的绝对位置嵌入.
+
+D alibi | ALiBi (Attention with Linear Biases) removes position embeddings and adds to each attention score a fixed bias proportional to the distance |i − j|.
+X alibi | 距离越远扣分越多. 斜率每个头不同、固定不训练, 取几何数列: 8 个头时是 1/2, 1/4, …, 1/256. 斜率 1/2 的头对距离 10 扣 5 分, softmax 后权重约为相邻词的 1%; 斜率 1/256 的头几乎不受距离影响. 没有额外参数, 外推能力强: 在 1024 上训练, 2048 以上也表现良好. MPT、BLOOM 用它.
+
+D rope | Rotary positional embeddings rotate pairs of query and key dimensions by position-dependent angles, so that the attention score depends only on the relative distance.
+X rope | 频率 θₘ = 10000^(−2m/d), 和正弦编码一样从快到慢. 旋转矩阵满足 R(i)ᵀR(j) = R(j−i), 所以 (R(i)q)ᵀ(R(j)k) = qᵀR(j−i)k; 实现上只需对每个位置的 q、k 各旋转一次, 不像相对位置编码那样要额外的项. 只作用于 q 和 k, 不改值向量; 旋转不改变向量长度. LLaMA、Qwen、Mistral 等几乎都用 RoPE.
+
+D armask | In autoregressive modelling the model always predicts the next token; masked self-attention sets future positions to −∞ before the softmax, so all positions can be trained in parallel without cheating.
+X armask | RNN 的状态只依赖已读过的输入, 天然不会作弊; 自注意力的每个输出都依赖所有输入, 包括要预测的那个词, 训练损失很快降到 0 却什么也没学到. 掩码矩阵是下三角全 1: 第 1 行只看第 1 个位置, 第 3 行看全部三个. 训练时并行; 推理时目标未知, 只能循环逐词解码, 每步取 argmax 或采样, 接到输入后面.
+S armask | ar | 自回归 | autoregressive | 始终预测下一个词.
+S armask | mask | 掩码自注意力 | masked self-attention | 未来位置设成 −∞.
+
+D arch | The Transformer encoder layer consists of multi-head self-attention and a feed forward network; the decoder layer adds masked self-attention and cross-attention to the encoder output; each sub-layer has a residual connection and layer normalisation.
+X arch | 编码器接收源序列 (输入嵌入加位置编码), N 层「多头自注意力 + Add & Norm + 前馈 + Add & Norm」; 解码器接收右移一位的目标序列, 每层三个子层; 最后经线性层和 softmax 得到输出概率. 分类、序列标注只用编码器 (BERT 式), 生成任务可以只用解码器 (GPT 式).
+S arch | enconly | 只用编码器 |  | BERT 式.
+S arch | deconly | 只用解码器 |  | GPT 式.
+
+D params | Multi-head attention has 4d² + 4d parameters, the feed forward network 8d² + 5d, LayerNorm 2d; an encoder layer has 12d² + 13d, a decoder layer 16d² + 19d.
+X params | 推导参数量要真正理解结构背后的数学, 各种模型都是同样的积木. 多头注意力: Q、K、V 每类合起来正好 d², 加输出投影共 4d², 和头数无关. 前馈网络 d → 4d → d, 约 8d². LayerNorm 每个分量一个 γ 和 β, 共 2d, μ、σ 是从数据算的不是参数. 省略偏置和 LayerNorm 时一对编码器层加解码器层约 28d²; 原版 base 精确值 44 138 496, 近似值 44 040 192, 只差 0.2%. 嵌入: 正弦位置编码不计入; 词元嵌入 37 000 × 512 ≈ 1900 万, 编码器、解码器和输出层共享同一个矩阵, 所以只算一次, 总计约 6300 万 (论文报告 65M).
+S params | mhap | 多头注意力的参数量 | Multi head attention | 4d², 和头数无关.
+S params | ffnp | 前馈网络与 LayerNorm | Feed forward network · Layer norm | 8d² 和 2d.
+S params | embp | 嵌入层的参数 | Embedding parameters | 共享矩阵只算一次.
+
+D toknz | Tokenization maps input text to a sequence of units (tokens) that the model knows, each with a fixed embedding; tokenization can be word-level, character- or byte-level, or subword-level.
+X toknz | 可能的输入文本有无穷多种, LLM 不能直接吃原始文本. OpenAI 的在线分词器显示: 英文常用词通常一个词元, 词前的空格并在词元里; 生僻词、数字、代码、中文切得更碎. 大多数 LLM 用子词级.
+S toknz | tokunit | 词元 | token | 有固定嵌入的单位.
+
+D wordlevel | Word-level tokenization splits text into words: each word has a complete representation, but the vocabulary is large and, by Heaps' law, there are always out-of-vocabulary words.
+X wordlevel | 嵌入矩阵和输出 softmax 都随词表线性增长, 计算代价高. Zipf 定律: 排名第 n 的词频率约与 1/n 成正比, 少数词极常见, 大多数词很少出现. Heaps 定律: 词汇量 V = K·n^β, β 通常 0.4–0.6, 读得越多新词越少, 但永远会遇到新词; 一百万词约 5 万个不同的词, 一亿词约 50 万个.
+S wordlevel | zipf | Zipf 定律 | Zipf's law | 频率与排名成反比.
+S wordlevel | heaps | Heaps 定律 | Heaps' law | 词汇量没有上限.
+S wordlevel | oov | 未登录词 | OOV | 不在词表里的词.
+
+D charsub | Character- or byte-level tokenization has a tiny vocabulary and no OOV words but long sequences; subword-level tokenization keeps frequent words whole and splits rare words into subwords and characters.
+X charsub | 字节只有 256 个, 但一个词的表示要由模型从字符组合出来, 序列长好几倍, 注意力的代价又是长度的平方. 子词词表 3 万到 10 万, 不会有 OOV, 但最复杂. 最常用的两种: BPE (GPT、Llama、Qwen) 和 Unigram (ALBERT、XLNet、T5, 通过 SentencePiece 实现). 每种方法都要回答: 训练时怎样定词表, 推理时怎样切文本.
+S charsub | subw | 子词级分词 | subword tokenization | 词、子词和字符的混合.
+
+D canon | Among all token sequences that concatenate to the same string, the one actually output by the tokenizer is the canonical tokenization; the others are non-canonical.
+X canon | 字符 s 属于基本字母表, 词元属于有限词表; 分词函数 h 把字符串映射成词元序列, 反分词函数 g 把词元拼回字符串. g 一般不是单射. 词表 {h, a, t, ha, at} 下 hat 有三种合法切分, 分词器选了 ⟨ha, t⟩. 模型自己生成时可能先输出 h 再输出 at, 拼出的字符串相同, 但训练时几乎没见过这种切法.
+S canon | canonical | 规范分词 | canonical tokenization | 分词器实际输出的切分.
+
+D bpe | Byte pair encoding starts from the characters and repeatedly merges the most frequent adjacent pair of tokens into a new token, recording the merge rules; inference applies the merges in the learned order.
+X bpe | BPE 最初是文本压缩算法 (Gage 1994), Sennrich 等 (2016) 用于分词. 先规范化和预分词 (按空格切, 合并不跨越预分词边界, GPT-2 把词前空格写成 Ġ). 每次合并后, 和被合并的两个词元有关的对的计数都要更新. 维基百科的例子里依次合并出 _t、_a、he、in、re、_the. 推理时按顺序应用合并规则, 结果就是规范分词; BPE 确定地挑出一种切分.
+S bpe | merges | 合并规则 | merge rule | 按学到的顺序应用.
+S bpe | pretok | 预分词 |  | 合并不跨越预分词边界.
+
+D bpeshort | BPE has a greedy training procedure without a global objective, a frequency bias, leftover intermediate tokens and deterministic inference.
+X bpeshort | 贪心: 每次只选一个合并, 选了就不撤销. 频率偏差: 由高频字节组成的对总是先被合并, 不管它们是否构成有意义的单位. 残留词元: 只是通往更长词元的垫脚石, 后来很少用到, 浪费词表名额. 确定性推理: 无法采样其他切分, 也就做不了子词正则化 (Kudo 2018). Unigram 正好针对这几点.
+S bpeshort | subreg | 子词正则化 | subword regularization | 采样不同切分做数据增强.
+
+D unigram | Unigram treats tokenization as inference in a latent variable model: the string is observed, its segmentation is latent, and tokens are drawn independently from a categorical distribution φ.
+X unigram | 训练同时学词表和 φ, 近似地最大化语料的对数似然; 推理选后验最大的切分. 字符串的概率是所有能拼出它的词元序列的概率之和, 这叫推前 (pushforward). 后验是切分的概率除以字符串的概率. hat 的例子: 三种切分概率 0.0075、0.05、0.045, 和 0.1025, 后验 0.073、0.488、0.439. ⟨h, a, t⟩ 后验很小, 尽管 h 和 t 概率最大: 三个数相乘比两个小得多, 所以 Unigram 天然偏好更少、更长的词元.
+S unigram | push | 推前 | pushforward | 词元序列的分布推到字符串上.
+S unigram | longer | 偏好更长的词元 |  | 相乘的因子越少概率越大.
+
+D viterbi | Unigram inference selects the segmentation with the highest product of token probabilities, computed efficiently by dynamic programming (Viterbi).
+X viterbi | 分母对所有候选都一样, 可以去掉. 候选切分随长度指数增长, 但 best[i] = max over 以 i 结尾的词元 w 的 best[i − |w|] · φ_w, 实际用对数相加避免下溢, 复杂度约为长度乘最长词元长度. 把 t 和 at 的概率对调后最优切分变成 ⟨h, at⟩: 切分由学到的概率决定, 不由合并顺序决定.
+
+D em | Unigram is trained top-down with expectation-maximisation: the E-step computes the posterior over segmentations and the expected token counts, the M-step re-estimates φ from these counts.
+X em | 从约 100 万个候选子串的大词表出发, 不在初始词表里的词元永远进不了最终词表. 鸡生蛋: 知道切分就能估计 φ, 知道 φ 又能推断切分. 目标对数似然里有对数套求和, 直接优化困难; Q 函数是在当前后验下对完全数据对数似然求期望. L = Q + 熵 + KL, KL ≥ 0 且在当前参数处为 0, 所以 Q 提高多少, L 至少提高同样多, EM 不会让似然下降; Q 加熵就是 ELBO. E 步的期望次数用前向–后向算法在网格上算, M 步是期望次数除以总期望次数. hat 一步 EM 的例子: 均匀初始化后 a 只在后验小的切分里, 概率骤降.
+S em | qfunc | Q 和 L 的关系 | How Q relates to L | L = Q + 熵 + KL.
+S em | estep | E 步与 M 步 | E-step · M-step | 期望次数, 再归一化.
+S em | fb | 前向–后向算法 | forward-backward algorithm | 在网格上算期望次数.
+
+D prune | Since EM does not change the vocabulary, after a few EM rounds the tokens whose removal reduces the likelihood least are pruned, until the target size is reached.
+X prune | 每次删掉例如 20%, 重新归一化 φ. 精确计算每个词元的损失太贵, 近似为把 v 的每次使用换成不用 v 时的最优切分. 单个字符永远不删, 保证任何字符串都能切分. 这也解决了 BPE 的残留词元问题.
+
+D bpeuni | Unigram segmentations align better with morphological structure than BPE segmentations, which may lead to better downstream performance.
+X bpeuni | furiously: BPE _fur / iously, Unigram _fur / ious / ly; tricycles: BPE _t / ric / y / cles, Unigram _tri / cycle / s; nanotechnology: BPE _n / an / ote / chn / ology, Unigram _nano / technology.
+
+D tokissues | Current issues in tokenization research include how LLMs internally recombine tokens into words and the multilingual unfairness of English-centric tokenizers.
+X tokissues | unhappiness 被切成几个词元, 模型仍把它当一个整体理解: 早期层先把信息聚合到最后一个词元上, 再由前馈网络像查词典一样检索整词的表示 (Kaplan 等 2025). 模型权重里有一个比词表大得多的软词典. 主要用英语训练的分词器把同样内容的其他语言切成多得多的词元: 按词元计费更贵、推理更慢、上下文里放得下的文本更少, 低资源语言和非拉丁文字尤其严重.
+S tokissues | softlex | 软词典 |  | 模型权重里的整词表示.
+S tokissues | unfair | 多语言不公平 | multilingual unfairness | 别的语言被切得更碎.
+
+D halluc | LLMs tend to hallucinate; retrieval-augmented generation provides relevant external knowledge at inference time instead of training time.
+X halluc | 两类幻觉: 事实性幻觉 (与事实矛盾) 和忠实性幻觉 (与上下文或指令不一致). 真实案例: 律师引用了 ChatGPT 编造的判例; 加拿大航空的客服机器人编造退款政策而败诉. 和微调相比, RAG 更新知识只需更新文档库, 答案还能附上来源; 代价是多了一个检索系统, 检索错了生成也跟着错.
+S halluc | hall | 幻觉 | hallucination | 与事实或上下文不一致.
+S halluc | bound | 检索质量决定生成质量的上限 | Retrieval Quality Bounds Generation Quality | 垃圾进, 垃圾出.
+
+D origrag | The original RAG model (Lewis et al. 2020) combines parametric memory (a seq2seq generator) with non-parametric memory (a dense document index) and is trained end to end.
+X origrag | 检索用 DPR, 文档索引是 2100 万段维基百科, 生成器是 BART-large. 输入 x 经查询编码器得到向量, 用最大内积搜索 (MIPS) 找出前 k 篇, 生成器把 x 和每篇文档一起生成答案, 再按检索概率加权求和. 梯度经过生成器和查询编码器, 文档编码器和索引不变, 否则每次更新都要重新编码 2100 万段.
+S origrag | param | 参数化记忆 | parametric memory | 知识在模型参数里.
+S origrag | nonparam | 非参数化记忆 | non-parametric memory | 知识在外部索引里.
+S origrag | mips | 最大内积搜索 | MIPS | 在索引里找内积最大的文档.
+
+D ragpipe | RAG first retrieves relevant documents as evidence and then generates a grounded answer; a typical two-stage pipeline is retriever → reranker → generator.
+X ragpipe | 检索器 (稀疏或稠密) 100–300 ms, 从全部文档里筛出几百篇, 优化召回率; 重排序器 100–2000 ms, 从几百篇筛到十几篇, 优化精确率; 生成器 1 秒以上, 负责答案质量. 漏斗的道理: 便宜的模型处理海量候选, 贵的模型只处理少量候选; 检索器漏掉的文档后面无法补回. 大多数 RAG 的失败都是检索的失败, 稠密检索器还有短文档偏差、位置偏差和字面匹配偏差.
+S ragpipe | funnel | 检索漏斗 |  | 越往后越贵、候选越少.
+
+D chunk | Before retrieval, documents are split into chunks, meaningful semantic units.
+X chunk | 长文档太占上下文, 切小了能更精确地检索. 权衡: 块小匹配精确但丢上下文, 块大保留上下文但混进噪声 (80 页说明书一整块就很难和保修期的问题对上). 五种策略: 固定长度 (可以重叠); 递归切分 (先按段落、再按行、再按空格); 按句子边界; 语义切块 (相邻句子相似度下降处切开); 父文档检索器 (索引小块, 交给生成器大段落).
+S chunk | ck | 块 | chunk | 检索的单位.
+S chunk | strat | 切块策略 | Document Chunking: Strategies | 固定、递归、按句、语义、父文档.
+
+D bm25 | BM25 represents documents as sparse vectors and scores them by summing, over the query terms, the IDF weight times a saturated, length-normalised term frequency.
+X bm25 | 三个直觉: 罕见词更重要 (IDF); 收益递减, 说 10 次 good 并不相关 10 倍; 长文档不该只因词多就得分高. k₁ (1.2–2.0) 控制词频多快饱和, b 控制长度归一化的强度. 优点: 快、可解释. 局限: 词汇不匹配, car 找不到只写 automobile 的文档. 稀疏指向量维度等于词表大小、绝大多数维是 0.
+S bm25 | idf | 逆文档频率 | IDF | 罕见词更重要.
+S bm25 | sparse | 稀疏检索 | sparse retrieval | 词表维度的向量.
+
+D dense | Embedding-based retrieval learns fixed-length sentence embeddings that can be precomputed, so that comparison only requires cosine similarity.
+X dense | 用 BERT 判断两句是否相似的交叉编码器需要两两比较, 1 万句里找最相似的一对要比较约 5000 万次, SBERT 论文里约 65 小时. 双编码器两句分别编码成向量, 每句只编码一次、存起来反复用. 稠密指 768 维这样每一维都有值的低维向量.
+S dense | biencoder | 双编码器 | bi-encoder | 分别编码再比较.
+S dense | crossenc | 交叉编码器 | cross-encoder | 两句一起进模型.
+S dense | dr | 稠密检索 | dense retrieval | 低维的文本嵌入.
+
+D sbert | Sentence-BERT encodes both sentences with the same BERT weights, trained on natural language inference and sentence similarity, and is used for symmetric search.
+X sbert | 训练时把 u、v 和 |u − v| 拼起来接 softmax 分类器 (蕴含 / 中立 / 矛盾), 推理时直接算余弦相似度; 1 万句找最相似的一对从 65 小时降到 5 秒. 非对称问题: SBERT 学的是一般的相似性, 但问题和文档不是一类文本 (巴黎是哪国首都? 和一段介绍巴黎的文字长得不像), 检索可能失败.
+S sbert | asym | 非对称问题 | SBERT: Asymmetry Problem | 问题和文档长得不像.
+
+D dpr | Dense Passage Retrieval uses separate BERT encoders for questions and passages, scores relevance by the dot product of their [CLS] vectors and is trained on question–answer pairs with a contrastive loss.
+X dpr | 和 SBERT 的区别: 两个编码器、在问答对上训练、非对称. 对一个问题, 正例段落和 m 个负例一起做 softmax. 难负例是 BM25 排得很靠前却不含答案的段落, 比随机负例有效得多; 批内负例是同一 batch 里其他问题的正例, 不用另外编码, 很便宜. 推理: 离线把全部段落编码一次, 在线只编码问题, 按点积取前 k.
+S dpr | hardneg | 难负例 | hard negative | BM25 排得高却不含答案.
+S dpr | inbatch | 批内负例 | in-batch negative | 同批其他问题的正例.
+
+D faiss | Approximate nearest neighbour search (e.g. FAISS) trades a little accuracy for a large speed-up when searching millions of encoded passages.
+X faiss | Flat 逐个精确计算, 召回 100%, 慢、内存大; IVF 先聚成若干簇, 查询时只搜最近的几个簇, 召回约 95%; IVF+PQ 再用乘积量化把向量压成几个字节, 召回约 90%, 很快、内存小. DPR + FAISS 能在毫秒级搜完 2100 万段. 相似度搜索已是成熟的基础设施.
+S faiss | ann | 近似最近邻 | approximate nearest neighbour | 用精确度换速度.
+
+D colbert | ColBERT keeps one vector per token and scores with MaxSim: for each query token the maximum similarity to any document token, summed over the query tokens.
+X colbert | 单向量嵌入把整段压成一个向量会丢信息. 交叉编码器是全交互, 每对 (查询, 文档) 都要重算; ColBERT 是延迟交互, 查询和文档各自编码, 交互推迟到最后一步的点积和取最大值. 速度能直接做检索, 质量接近交叉编码器; 代价是存储, ColBERTv2 用残差量化减少约 6–10 倍.
+S colbert | late | 延迟交互 | late interaction | 交互推迟到最后一步.
+
+D rerank | Reranking rescores the hundreds of retrieved candidates with a slower but more accurate model and keeps the top 5–20.
+X rerank | 检索器要快、追求召回, 重排序器可以慢、追求精确; 多花约 1–2 秒质量大幅提升. 交叉编码器把 [CLS] 查询 [SEP] 文档 [SEP] 一起输入, 取 [CLS] 输出过线性层和 sigmoid 得到相关概率; 不能直接用来检索, 因为每个候选都要跑一次 Transformer. LLM 重排序: 逐点 (单独打分, 可并行, 没有比较)、列表 (一起排序, 受上下文窗口限制)、滑动窗口列表 (RankGPT 从后往前移动窗口, 像冒泡一样把最相关的送到最前).
+S rerank | ce | 用交叉编码器重排序 | Cross-Encoders for Reranking | 给每对打相关概率.
+S rerank | llmrr | 基于 LLM 的重排序 | LLM-based Reranking | 逐点、列表、滑动窗口.
+
+D retmetrics | Retrievers are evaluated with Recall@k, MRR and nDCG@k, which measures ranking quality for graded relevance normalised by the ideal ranking.
+X retmetrics | Recall@k: 相关文档里有多少在前 k 个, 不管顺序. MRR: 第一篇相关文档名次的倒数的平均, 只奖励第一个命中. nDCG: 相关度分级 (0、1、2), 把每个名次的相关度除以 log₂(名次 + 1) 求和, 再用理想排序的 DCG 归一化, 取值 0 到 1. 基准: MTEB 覆盖 8 类以上任务和 58 个以上数据集, 是选嵌入模型的参考; BEIR 有 18 个不同领域的检索数据集, 测零样本跨领域泛化, 在领域外 BM25 常和稠密检索不相上下.
+S retmetrics | ndcg | 归一化折损累计增益 | nDCG | 分级相关度的排序指标.
+S retmetrics | bench | 基准: MTEB 与 BEIR | Benchmarks | 选模型和测跨领域泛化.
+
+D multihop | Single-hop questions can be answered from one document; multi-hop questions require chaining facts from several documents.
+X multihop | 《奥本海默》的导演出生在哪里? 文档 1 说诺兰执导了它, 由诺兰桥接到文档 2 说诺兰生于伦敦; 问题里根本没出现诺兰, 一步检索答不了. 三种类型: 桥接 (第一问的答案是下一步要查的实体)、交集 (同时满足两个条件)、比较 (分别检索再比较). 错误会累积, 第一跳错了后面全错.
+S multihop | bridge | 桥接、交集、比较 |  | 多跳推理的三种类型.
+
+D grounding | Grounded generation with source attribution can be done during generation, by planning sources before generation, or by post-hoc attribution.
+X grounding | 生成时: 训练或提示 LLM 一边生成一边引用 (WebGPT、GopherCite); 先推理再生成: 先挑出要用的来源、规划答案 (Attribute First, then Generate); 事后标注: 先生成, 再对每个论断检索核查, 补上或改正引用 (RARR). 检索到的文档怎样交给生成器也重要: 拼接是标准做法; Fusion-in-Decoder 把每个 (问题, 段落) 对分别编码再在解码器里融合, 没有长上下文自注意力的平方代价; 迭代设计在推理步骤中触发新的检索. 少而精的段落往往胜过多而杂的.
+S grounding | fid | Fusion-in-Decoder | Fusion-in-Decoder | 分开编码, 在解码器里融合.
+S grounding | promptd | 提示设计 | Prompt Design | 拼接、FiD、迭代.
+
+D faithful | Faithfulness means that the generator relies on the retrieved evidence instead of falling back on knowledge memorised in its parameters.
+X faithful | 办法: 带引用的训练或提示; Self-RAG 让模型自己决定何时检索, 并插入反思 token ([Retrieve]、[IsRel]、[IsSup]、[IsUse]) 自我评判; 约束解码只生成证据里出现过的 token; 独立的验证器把每个论断和段落对照. 检索质量决定上限, 忠实性技术帮生成器接近这个上限. 练习 2 里不检索的模型说 Dorothy 拿走的是 magic boots, 就是退回参数化记忆.
+S faithful | selfrag | Self-RAG |  | 反思 token 自我评判.
+
+D rageval | RAG generation is evaluated with exact match, BERTScore and faithfulness; each component should be evaluated separately to diagnose failures.
+X rageval | 精确匹配很严格: 答 Dorothy lives in Kansas. 而标准答案是 in Kansas, 意思对但 EM = 0; token F1 和 BERTScore 会给部分分. 忠实性看答案有没有被检索到的文档支持. 完整框架有 ARES 和 RAGAs, 后者用 LLM 自动给忠实性、答案相关性、上下文精确率和召回率打分.
+S rageval | em | 精确匹配 |  | 很严格.
+
+D hybridret | A practical retrieval pipeline sends the query to BM25 and dense retrieval, merges the rankings with reciprocal rank fusion and reranks the top results.
+X hybridret | BM25 抓精确匹配 (人名、型号、代码), 稠密嵌入抓语义匹配 (同义改写), 两者的失败方式互补, 召回率提高. RRF (Cormack 等 2009) 对每个排序列表加上 1/(k + rank), 常用 k = 60: 文档 A 在 BM25 第 1、稠密第 10 得约 0.0307, 文档 B 只在稠密第 1 得约 0.0164, 两边都靠前的胜出. RRF 只用名次不用分数, 量纲不同也没关系. 实践建议: 了解数据; 从 BM25 加基本切块的基线开始, 再加混合检索和重排序; 每一级单独监控.
+S hybridret | rrf | 倒数排名融合 | RRF | 用名次合并多个排序.
+
+D lostmid | Long-context LLMs use information placed in the middle of the context worst; accuracy as a function of the position of the relevant document follows a U-shaped curve.
+X lostmid | Liu 等 (2024) 把含答案的文档放到长上下文的不同位置, 周围放干扰文档: 开头最好 (首因效应), 结尾次之 (近因效应), 中间大幅下降, 32k 以上窗口的模型也一样. 20 篇文档时 gpt-3.5-turbo 在第 1 位约 76%, 第 10 位约 54%, 低于不给文档的闭卷约 56%. 两个假设: 注意力汇 (开头的 token 得到过多注意力) 和训练数据偏差 (答案通常在开头或结尾). 对策: 按重排序结果安排顺序, 截断到前 5–10 篇, 打乱顺序评估稳健性.
+S lostmid | ucurve | U 形曲线 |  | 开头最好, 中间最差.
+S lostmid | sink | 注意力汇 | attention sink | 开头的 token 得到过多注意力.
+
+D lvm | In a latent variable model, the observation is generated from an unobserved latent variable; the marginal probability sums or integrates over the latent variable.
+X lvm | Unigram 分词: 看得见的是字符串, 看不见的隐变量是分词; 似然是确定的 (拼出来是 s 就是 1), 所以边缘概率是所有分词的先验之和. EM 最大化 Q, 等式对数似然 = ELBO + KL 说明了为什么可行; Unigram 的后验能用前向–后向精确算出, 所以 KL 可以一步压到 0. 这个分解是整讲反复使用的工具.
+S lvm | lv | 隐变量 | latent variable | 看不见的变量.
+
+D deeplvm | A deep latent variable model draws z from a prior and lets a neural network define the likelihood of x; the marginal likelihood and the posterior are intractable.
+X deeplvm | z 表示 x 的抽象性质, 比如句子的意思. 积分里有神经网络, z 是几十上百维的连续向量, 没有闭式解, 数值积分也不现实; 后验的分母就是这个积分, 所以也算不出来, EM 的 E 步不能直接用. 记号: x 是观测, z 是隐变量, 解码器参数 θ, 近似后验 (编码器) 参数 φ.
+
+D elbo | For any distribution q(z∣x), log p(x) = ELBO + KL(q(z∣x) ‖ p(z∣x)); since the KL is non-negative, the ELBO is a lower bound on the log evidence.
+X elbo | 推导只用恒等变形: log p(x) 不含 z, 对任何分布求期望不变; 用贝叶斯公式, 分子分母同乘 q, 把 log 拆成两项, 第二项就是 KL. ELBO 是 evidence lower bound, evidence 指 log p(x). 对 φ 最大化: 总高不变, ELBO 变大只能是 KL 变小, q 接近真后验而不用算出真后验; 对 θ 最大化: 抬高对数似然的下界. 这正是 EM 两步的连续版, EM 是 q 恰好等于真后验的特例.
+S elbo | lowerb | 证据下界 | ELBO | 对数似然的下界.
+
+D vae | A variational autoencoder maximises the ELBO by gradient ascent jointly in the encoder q_φ(z∣x) and the decoder p_θ(x∣z).
+X vae | Kingma & Welling 和 Rezende 等在 2014 年各自独立提出. 名字里的「自编码」就是 x → z → x. 摊销推断: 不给每个样本单独优化 q 的参数, 而是训练一个网络对任何 x 直接输出它的 q. ELBO = 重建项 (编码器抽出的 z 要能让解码器还原 x) − 先验匹配项 (编码器给出的分布不能离先验太远). 为什么要贴近先验: 生成时没有编码器, 只能从先验抽 z; 它也是正则化, 防止退化成普通自编码器. 生成: 扔掉编码器, 从先验抽 z 直接解码.
+S vae | amort | 摊销推断 | amortized inference | 一个网络输出所有 q.
+S vae | recon | 重建项与先验匹配项 | VAE Objective | ELBO 的两项.
+S vae | vaeall | VAE 全貌 | Putting the VAE Together | 编码、采样、解码.
+
+D reparam | With a standard normal prior and a diagonal Gaussian encoder, the reparameterization trick writes z = μ + σ ⊙ ε with ε ~ N(0, I), so gradients can flow through the sampling step.
+X reparam | 两个高斯之间的 KL 有闭式解, 先验匹配项可以直接算; 重建项用蒙特卡洛估计, 常常只抽 L = 1 个样本. 「从 N(μ, σ²) 抽一个样本」对 μ、σ 没有梯度; 改成先抽和参数无关的噪声, 再算 z = μ + σ ⊙ ε, 分布相同, 但随机性都在 ε 里, 反向传播能穿过它.
+
+D hvae | Hierarchical VAEs have several layers of latent variables; in a Markovian HVAE each layer depends only on the layer directly above.
+X hvae | 越往上越抽象, 比如图像里从纹理到部件到物体 (NVAE). 马尔可夫性让编码器和解码器的联合分布都分解成相邻两层之间条件分布的乘积; ELBO 用 Jensen 不等式得到. T = 1 时就是普通 VAE. 难点: 2T 个条件分布要一起学, 层次一深就难训练, 上层隐变量常常学不到东西 (后验坍塌).
+S hvae | mhvae | 马尔可夫 HVAE | Markovian HVAEs | 每层只依赖上一层.
+S hvae | collapse | 后验坍塌 | posterior collapse | 解码器绕过上层隐变量.
+
+D diffhvae | A diffusion model is a Markovian HVAE with three restrictions: latents have the data's dimension, the encoder is fixed to add noise at each step, and after T steps the latent is approximately standard normal.
+X diffhvae | 隐变量不再是更抽象的表示, 而是加了噪声的数据, 改名 x₁ … x_T. 只有解码器要学, 2T 个条件分布减到 T 个, 而且可以共用一个网络. 上层没用上的问题也不存在了, 因为每层是什么样由固定的加噪过程决定. 直觉 (Ho 等 2020 的 DDPM): 把数据一点点变成噪声, 再学会把过程倒过来; 每一步只改一点, 每步去噪都是容易学的小问题.
+S diffhvae | ddpm | DDPM |  | 一点点加噪, 学会倒过来.
+
+D fwd | The forward process scales the previous step down slightly and adds Gaussian noise with variance βₜ; any step has a closed-form marginal q(xₜ∣x₀) = N(√ᾱₜ x₀, (1 − ᾱₜ) I).
+X fwd | 噪声表 βₜ 是事先定好的超参数, DDPM 从 10⁻⁴ 线性增到 0.02. 缩小再加噪: 两个系数平方和为 1, 方差保持为 1, 信号逐步被噪声替换, 最后正好落到标准正态 (variance preserving). 闭式边缘: 两个独立高斯噪声相加仍是高斯, 方差相加, 训练时想要第 500 步的样本一步就能抽出; ᾱ₁ ≈ 0.9999, ᾱ₅₀₀ ≈ 0.079, ᾱ₁₀₀₀ ≈ 4 × 10⁻⁵.
+S fwd | sched | 噪声表 | noise schedule | 各步噪声事先定好.
+S fwd | closed | 闭式边缘分布 | Closed-Form Marginals | 一步抽出任意步的样本.
+S fwd | vp | 方差保持 | variance preserving | 总方差不变.
+
+D bwd | The backward (generative) process is learned: each step is a Gaussian whose mean is predicted by a neural network, starting from standard normal noise.
+X bwd | 真正的反向一步要对所有可能的 x₀ 求平均, 算不出来, 一般也不是高斯; 但每步噪声很小时近似高斯, 这也是 T 要取得大 (DDPM 取 1000) 的原因. 瑞士卷的图: 前向把点云打散, 学到的反向从噪声把它重新聚成卷形 (Sohl-Dickstein 等 2015).
+
+D diffelbo | The diffusion ELBO decomposes into a reconstruction term, a prior matching term and denoising matching terms that compare each learned reverse step with the tractable reverse step conditioned on x₀.
+X diffelbo | 只给 xₜ 时反向一步算不出, 同时给出 x₀ 就能精确算. 用马尔可夫性白加条件 x₀, 再用贝叶斯公式把正向一步翻成反向一步, 连乘时比值伸缩相消, 分子分母都成了反向形式, 可以逐步配对. 先验匹配项没有参数、约等于 0, 可以丢掉. 推导只用了马尔可夫性和贝叶斯公式, 没用到高斯噪声, 所以换成掩码也成立. 可解的反向一步: 以 x₀ 为条件做贝叶斯, 三个已知高斯, 配方后还是高斯; 均值是 xₜ 和 x₀ 的加权组合 (从带噪点朝干净点走一小步), 方差只依赖噪声表.
+S diffelbo | terms | 三类项 |  | 重建、先验匹配、去噪匹配.
+S diffelbo | tract | 可解的反向一步 | Tractable Reverse Step | 以 x₀ 为条件时有闭式.
+
+D x0pred | The network predicts the clean data x̂_θ(xₜ, t) from the noisy data and the noise level; each denoising matching term becomes a weighted squared error between the prediction and x₀.
+X x0pred | 标准答案的方差可以照搬, 均值要用 x₀, 而生成时只有 xₜ, 所以网络真正要学的只剩一件事: 从 xₜ 猜 x₀. 两个方差相同的高斯之间 KL 只剩均值差的平方; 权重在噪声小时大几个数量级. 扩散模型本质上是一个在所有噪声等级上都会去噪的网络. 训练: 随机抽一个样本、一个噪声等级、一个噪声, 用闭式一步造出 xₜ, 对加权平方误差走一步梯度.
+
+D whytext | Text is discrete, so Gaussian noise does not apply; diffusion for text replaces adding noise by replacing tokens with [MASK], which allows parallel generation of many tokens with bidirectional context.
+X whytext | 大多数图像生成器 (如 DALL·E) 以扩散模型为核心. 自回归模型生成 n 个 token 要 n 步, 只看左边的上下文; 扩散模型一步可以揭开很多 token, 步数可以用质量换速度, 每个位置都能看到两侧的上下文. Mercury Coder 每秒输出约 750–1100 个 token, 其他小模型都在 200 以下.
+
+D masking | In the masking forward process each position independently keeps its token with probability ᾱₜ and becomes [MASK] otherwise; [MASK] is an absorbing state.
+X masking | 每个 token 写成扩充词表上的 one-hot 向量, xₜ 是概率向量为 ᾱₜ x₀ + (1 − ᾱₜ) m 的类别分布, m 是 [MASK] 的 one-hot. 和高斯情形对照: ᾱₜ 仍是还剩多少信号, 只是这里是概率的混合. 一旦变成 [MASK] 就不再变回, 终点全是 [MASK], 对应高斯情形的标准正态. 反向一步同样能精确算: 未被掩盖的 token 就是原 token, 被掩盖的以一定概率被揭开.
+S masking | absorb | 吸收态 | absorbing state | 变成 [MASK] 后不再变回.
+S masking | mrev | 掩码的反向一步 |  | 被掩盖的以一定概率揭开.
+
+D mdlm | The masked diffusion language model loss draws a random masking rate, masks the tokens accordingly, predicts the masked tokens with a bidirectional Transformer and divides the cross-entropy by the masking rate.
+X mdlm | 先验匹配项严格为 0 (两边都是全 [MASK]), 重建项并进了求和. 线性掩码表下权重是 1/t, 掩码少的输入权重大. 和 BERT 并排看: 都是掩盖一部分 token、用双向 Transformer 预测、算交叉熵; 区别只是掩码率不是固定的 15% 而是每次均匀抽取, 损失除以掩码率. 这让 MDLM 的损失成为负 ELBO, 最小化它就是做极大似然, 所以 MDLM 是真正的生成模型, 能算困惑度上界; BERT 没学过从全掩码出发, 不能从零生成.
+S mdlm | bertlike | MDLM 几乎就是 BERT | Surprise: MDLM Is (Almost) BERT! | 掩码率随机、损失加权.
+
+D dsample | Sampling starts from an all-[MASK] sequence of fixed length; at each step all masked positions are predicted in parallel and some of them are unmasked.
+X dsample | 按反向过程, 已揭开的 token 不再改; 实践中常先揭开最有把握的位置 (LLaDA). 同一步揭开的 token 彼此独立抽样: 「I live in」后两个空位可能抽出 San York, 一步揭开越多越严重, 这就是速度和质量的权衡. 其他方案: 均匀扩散把 token 换成随机的别的 token, 天然支持自我修正但更难学, 目前掩码扩散效果更好; 这是非常活跃的研究方向 (D3PM、SEDD、MDLM、LLaDA).
+S dsample | sanyork | 同一步的独立抽样 |  | 可能出现 San York.
+S dsample | alt | 其他方案与研究现状 | Alternatives to Masked Diffusion | 均匀扩散等.

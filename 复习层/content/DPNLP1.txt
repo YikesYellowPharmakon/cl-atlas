@@ -1,0 +1,556 @@
+# DPNLP1 · 读笔记后整理的知识网和术语. 课件英语, 外文写英语. 字段说明见 SMIS.txt.
+# 依据 DPNLP1 01–15 (2026-11-06): 基础、深度学习基础、Transformer、BERT、后 BERT、GPT、解码、大语言模型、预训练、后训练、多语言、评估、可解释性、AI 文本检测.
+L EN
+H 从词嵌入、RNN 和注意力出发, 经过 Transformer、BERT 和 GPT, 讲到大语言模型的解码、训练规模、对齐、评估、可解释性和文本检测.
+
+B base | NLP 与学习范式 | Learning Paradigms and NLP Tasks | 学习范式、NLP 任务的分类、神经概率语言模型和词嵌入.
+B seq | 深度学习基础 | RNNs, Attention and Tokenization | RNN、注意力、语境化嵌入 ELMo 和子词分词.
+B trafo | Transformer | Transformer | 编码器的自注意力、解码器的掩码、参数量, 以及长序列和效率问题.
+B bert | BERT 与迁移学习 | BERT and Transfer Learning | 自回归与掩码语言模型、评价指标、BERT 的结构和预训练, 以及迁移学习的分类.
+B post | 后 BERT 时代 | Post-BERT Architectures | RoBERTa、ALBERT、蒸馏、ELECTRA、XLNet 和文本到文本的 T5.
+B gpt | GPT 系列 | GPT Series | 只用解码器的自回归模型: 零样本、上下文学习、规模和伦理问题.
+B dec | 解码与生成评价 | Decoding and Evaluation Metrics | 贪心、束搜索和采样等解码策略, 以及有无参考答案的生成评价.
+B align | 提示、对齐与推理 | Prompting, Alignment and Reasoning | 多任务微调、思维链、指令微调、RLHF 和 DPO, 以及推理模型.
+B scale | 训练规模与资源 | Training LLMs: Compute, Memory and Scaling | 计算量和显存的估算、规模定律、分布式训练和 FlashAttention.
+B multi | 多语言与跨语言迁移 | Multilinguality and Cross-Lingual Transfer | 跨语言词嵌入、多语言 Transformer 和零样本跨语言迁移.
+B eval | 评估、解释与检测 | Evaluation, Explainability and Detection | 评估 LLM 的基准和评委、特征归因和机制可解释性、AI 文本检测和水印.
+
+N paradigm | base | 学习范式 | Learning Paradigms | 01:s12-cat | 嵌入、预训练加微调、提示、对话和智能体, 按需要的标注数据量区分. | 选范式看任务、数据量和有没有标签 ;; 主线是从「每个任务大量标注」走向「预训练 + 少量标注」
+N emb | base | 嵌入 | Embedding | 01:s12-emb | 把词和文档表示成稠密向量, 相似的东西向量相近. | 独热向量两两正交, 表示不了相似 ;; 词袋只数次数 ;; 稠密嵌入可用于检索
+N ptft | base | 预训练与微调 | Pre-train / Fine-tune | 01:s12-ptft | 先用海量无标注文本学通用知识, 再用少量标注数据适配具体任务. | 标注数据稀缺又昂贵 ;; 自监督目标不需要人工标签 ;; 下游任务只需少量样本
+N prompt | base | 提示 | Prompting | 01:s12-prompt | 不更新参数, 只把任务描述和示范放进输入, 做零样本或少样本迁移. | 好的预训练更关键 ;; 提示微调学的是软提示
+N agent | base | 智能体 | Agents | 01:s12-agents | LLM 在环境里行动、观察结果, 再决定下一步. | 对话时参数不变, 前文靠上下文窗口 ;; AgentBench 测真实世界任务
+N nlptask | base | NLP 任务的分类 | Categorization of NLP tasks | 01:s13-cat | 按输出形式分: 语言建模、词元级分类、序列级分类、检索和文本生成. | 低层任务是语言学分析 ;; 高层任务是用户要的产品
+N tagging | base | 序列标注与结构预测 | Sequence tagging / Structure prediction | 01:s13-pos | 词性标注和命名实体识别给每个词一个标签, 句法分析输出一个结构. | NER 用 BIO 标注变成序列标注 ;; 歧义句 Time flies like an arrow
+N seq2seq | base | 序列到序列建模 | Seq2seq modeling | 01:s13-s2s | 编码器读完输入, 解码器逐词生成长度不同的输出. | 机器翻译从规则到统计再到神经 ;; 解码器把刚输出的词作为下一步输入
+N bench | base | 基准测试 | Benchmarking | 01:s13-bench | GLUE 和 SuperGLUE 用一组理解任务和排行榜比较模型. | GLUE 有 9 个单句或句对任务 ;; CoLA 用 Matthews 相关系数
+N lm | base | 语言模型 | Language model | 01:s14-lm | 词序列上的概率分布; 用链式法则拆成逐词的条件概率. | 给整句打分和预测下一个词是同一件事 | P(w₁…w_T) = Π P(w_t ∣ w₁…w_{t−1})
+N ngram | base | 马尔可夫假设与 n-gram | Markov-assumption | 01:s14-markov | 下一个词只取决于前 k 个词, 用语料频次估计概率. | 参数随上下文长度指数增长 ;; 稀疏: 多数组合从未出现
+N nplm | base | 神经概率语言模型 | Neural probabilistic language model | 01:s14-nplm | 查表得到前 n−1 个词的向量, 经非线性层和 softmax 预测下一个词. | 参数随上下文线性增长 ;; 相似的词泛化 ;; softmax 每步 O(∣V∣) | P(w_t ∣ ·) = softmax(W h + b)
+N w2v | base | word2vec | Word2Vec | 01:s15-w2v | 用假任务训练词向量: skip-gram 由中心词预测上下文, CBOW 反过来. | 每个词两套向量 ;; 负采样代替完整 softmax ;; 依据分布假设
+N negsamp | base | 负采样 | Negative sampling | 01:s15-neg | 把多分类换成区分真实上下文词和随机抽的噪声词的二分类. | 噪声对比估计的变体 ;; 不再是语言模型, 只要词向量
+N fasttext | base | fastText | FastText | 01:s15-ft | 词向量是字符 n-gram 向量之和, 能给没见过的词造向量. | 解决 OOV ;; 利用词形信息
+N analogy | base | 类比挖掘 | Analogy mining | 01:s15-analogy | 用向量加减解类比题. | king − man + woman ≈ queen ;; 学到的是关系方向
+
+N rnn | seq | 循环神经网络 | Recurrent Neural Networks | 02:s21-what | 按顺序读入词嵌入, 用同一组参数更新状态. | 参数和序列长度无关 ;; 可做标注、语言建模和 seq2seq | h⁽ʲ⁾ = tanh(W x⁽ʲ⁾ + V h⁽ʲ⁻¹⁾ + b)
+N vanish | seq | 梯度消失与梯度爆炸 | Vanishing / exploding gradients | 02:s21-vanish | 往回传梯度要连乘许多雅可比矩阵, 会指数级变小或变大. | 爆炸用梯度裁剪 ;; 消失让远距离依赖学不到
+N lstm | seq | LSTM | Long-Short Term Memory network | 02:s21-lstm | 用门控的单元状态做长期记忆, 缓解梯度消失. | 输入门、遗忘门、输出门 ;; 单元状态只经加法更新
+N birnn | seq | 多层与双向 RNN | Multi-layer RNNs / Bidirectional RNNs | 02:s21-bi | 叠几层 RNN 学更抽象的表示; 双向 RNN 让每个位置同时看到左右文. | 两个方向参数独立 ;; 双向不能直接做语言建模
+N rnnencdec | seq | RNN 编码器-解码器及其局限 | Encoder-decoder with RNNs | 02:s22-encdec | 编码器只把最后一个状态交给解码器, 长句时成了瓶颈. | 整句信息压进一个固定向量
+N bahdanau | seq | Bahdanau 注意力 | Bahdanau attention | 02:s22-bahdanau | 解码器每一步对编码器所有状态加权求和, 得到这一步的上下文向量. | 权重和为 1 ;; 软对齐从数据学出
+N attrecipe | seq | 注意力的基本配方 | Attention: the basic recipe | 02:s22-recipe | 查询和每个键打分, softmax 得到权重, 再对值加权求和. | 打分函数可以是点积或小网络 ;; 键和值一一对应 | o = Σⱼ softmax(a(q, kⱼ)) vⱼ
+N elmo | seq | ELMo | Embeddings from Language Models | 02:s23-elmo | 双向 LSTM 语言模型, 同一个词在不同语境里得到不同的向量. | 前向和后向语言模型的对数似然相加 ;; 下游取各层加权和
+N ctxemb | seq | 上下文无关与语境化嵌入 | Contextuality | 02:s23-ctx | word2vec 每个词只有一个向量, 语境化嵌入随句子变化. | 多义词需要语境化 ;; ELMo 是基于特征的迁移
+N tok | seq | 分词 | Tokenization | 02:s24-what | 把文本切成词元并编码成 ID, 是嵌入层的输入. | 粒度: 句子、词、子词、字符 ;; 词表太大或 OOV 是两难
+N bpe | seq | 字节对编码 BPE | Byte Pair Encoding (BPE) | 02:s24-bpe | 从字符开始, 反复合并最频繁的相邻符号对, 直到词表够大. | 源自数据压缩算法 ;; 常见词整体保留, 罕见词切成子词
+N wordpiece | seq | WordPiece | WordPiece | 02:s24-wp | 和 BPE 类似, 但按合并后语言模型似然的增益选择合并. | BERT 用它 ;; 词内续接的片段带 ## 前缀
+
+N trafoarch | trafo | Transformer 架构总览 | The Transformer architecture | 03:s32-arch | 编码器和解码器各由 N 个相同的块组成, 块里是多头注意力和前馈网络. | 只有注意力, 没有循环 ;; 易于并行 ;; 用于翻译之外的视觉和多模态
+N crossatt | trafo | 交叉注意力 | Cross-attention | 03:s32-cross | 查询来自一个序列, 键和值来自另一个序列. | 翻译时目标词去源句里找相关词 ;; 三个可训练投影矩阵
+N selfatt | trafo | 自注意力 | Self-attention | 03:s32-self | 查询、键、值都来自同一个序列, 序列内部互相看. | 本身不区分词序 ;; 用矩阵一次算完 | Attention(Q, K, V) = softmax(QKᵀ / √d_k) V
+N posemb | trafo | 位置嵌入 | Position embeddings | 03:s32-pos | 给词嵌入加上位置向量, 让自注意力能区分词序. | 正弦位置嵌入不用训练 ;; 也可以学出来
+N mha | trafo | 多层与多头注意力 | Multi-layer and multi-head attention | 03:s32-multi | 多个头在不同子空间里并行做注意力, 再拼接投影. | 头数不改变参数量 ;; 叠多个 Transformer 块
+N masked | trafo | 掩码自注意力 | Masked self-attention | 03:s33-mask | softmax 之前把未来位置的分数设为负无穷, 防止解码时偷看. | 自回归语言建模必须用 ;; 训练时仍可并行
+N resln | trafo | 残差连接与层归一化 | Additional subtleties | 03:s33-sub | 子层输出加回输入, 再做层归一化, 让深网络易于训练. | 子层只学增量 ;; 梯度可沿捷径回传
+N encdecatt | trafo | 编码器与解码器的连接 | Encoder-decoder attention | 03:s33-encdec | 解码器块有三层: 掩码自注意力、对编码器输出的交叉注意力、前馈网络. | 交叉注意力不需要掩码
+N params | trafo | 参数量 | Parameter Count | 03:s34-total | 参数几乎全在注意力投影和前馈网络里, 每层约 12 d_model². | 前馈网络参数是注意力的两倍 ;; 一次项可忽略 | ≈ 12 · n_layers · d_model²
+N txl | trafo | Transformer-XL | Transformer-XL | 03:s35-xl | 缓存上一片段的隐状态并用相对位置编码, 处理超过片段长度的上下文. | 片段循环 ;; 上一片段不传梯度 ;; 绝对位置在片段间会冲突
+N n2 | trafo | O(n²) 问题 | The O(n²) problem | 03:s36-n2 | 自注意力的时间和显存随序列长度平方增长. | 稀疏、低秩、核化等高效 Transformer ;; 限制了上下文长度
+N flash | trafo | FlashAttention | FlashAttention | 03:s36-flash | 分块计算注意力, 减少显存读写, 快而精确. | 很多情况访存受限而非计算受限 ;; 显存从 O(n²) 降到 O(n)
+
+N arlm | bert | 自回归语言模型 | Auto-regressive LMs | 04:s41-arlm | 由前面的词预测下一个词, 重复即可生成整段文本. | GPT 属于这一类 ;; 只看左侧上下文
+N mlm | bert | 掩码语言模型 | Masked language models (MLM) | 04:s41-mlm | 遮住一些词, 用两侧上下文预测它们. | BERT 属于这一类 ;; 不能直接给句子概率
+N clsmetric | bert | 分类与排序的评价 | Task-specific evaluation | 04:s42-cls | 分类看准确率、精确率、召回率和 F1, 排序看 MAP、MRR 和 Precision@k. | 多分类分 micro 和 macro 平均 ;; 排序还要看排在哪里
+N ppl | bert | 困惑度 | Perplexity | 04:s42-ppl | 平均负对数似然的指数, 衡量模型看到文本时有多「惊讶」. | 对 ARLM 定义明确 ;; 依赖分词, 不同词表不能直接比 | PPL = exp(−1/T Σ log P(w_t ∣ ·))
+N gentxt | bert | 评价生成文本 | Evaluating generated text | 04:s42-gen | 生成任务用 n-gram 重合 (BLEU、ROUGE) 或基于嵌入的指标评价. | BLEU 偏精确率, 有简短惩罚 ;; ROUGE 偏召回率
+N bertarch | bert | BERT 的架构 | The Architecture | 04:s43-key | 只用 Transformer 编码器, 每个词元的表示同时取决于左右文. | 输入 = 词元 + 片段 + 位置嵌入 ;; [CLS] 和 [SEP] 特殊词元 ;; Base 1.1 亿、Large 3.4 亿参数
+N causal | bert | 关于「因果性」 | A remark on "causality" | 04:s43-causal | 双向自注意力里每个位置已混入下一个词, 不能用预测下一个词的目标. | 所以要改输入: 遮住词再预测
+N bertpt | bert | 预训练 BERT | Pre-training BERT | 04:s44-mlm | 用掩码语言建模和下一句预测两个任务预训练. | 遮 15% 的词元, 其中 80% 换 [MASK] ;; NSP 判断第二句是否紧跟第一句
+N bertft | bert | 微调 BERT | Fine-tuning BERT | 04:s44-ft | 在输出端加一个小层, 整个模型一起在任务上训练. | 序列级任务用 [CLS] ;; 词元级任务用每个位置的输出 ;; 也可只抽特征
+N tl | bert | 迁移学习 | Transfer Learning | 04:s45-kinds | 把在源任务上学到的知识用到目标任务, 分基于特征和微调两种. | word2vec 迁移一张表, ELMo 迁移整个模型 ;; BERT 整体微调
+N tltax | bert | 迁移学习的分类 | Taxonomy of transfer learning | 04:s45-tax | 直推式迁移换领域或语言, 归纳式迁移换任务, 后者再分多任务和顺序迁移. | 领域自适应 ;; 跨语言学习 ;; 多任务同时学
+N selfsup | bert | 自监督 | Self-supervision | 04:s45-ss | 没有外部标签, 从数据本身的结构生成标签, 技术上是有监督学习. | 语言建模、MLM、skip-gram 都是自监督
+
+N bertology | post | BERTology | BERTology | 05:s51-bertology | 研究 BERT 这类大模型内部掌握了什么、存在哪里. | 探测句法、语义和世界知识 ;; 研究各层各头的作用
+N bertimpl | post | 影响与局限 | Implications / Limitations | 05:s51-impl | BERT 一夜改变了 NLP 研究方式, 也带来语言单一、算力和可解释性等问题. | 范式变为预训练加微调 ;; 多数模型只有英语
+N roberta | post | RoBERTa | RoBERTa | 05:s52-roberta | 调好超参数、去掉 NSP、用动态掩码和更多数据重新训练 BERT. | 原始 BERT 训练不足
+N albert | post | ALBERT | ALBERT | 05:s52-albert | 嵌入维度和隐藏维度解耦、层间参数共享, 用 SOP 代替 NSP. | 参数大大减少 ;; 计算量不减
+N distil | post | 模型蒸馏 | Model distillation | 05:s53-dist | 小的学生模型学大的教师模型的软目标. | 软目标带有类别相似性信息 ;; 温度让分布更平 ;; DistilBERT 层数减半, 保留 97% 性能
+N compress | post | 其他压缩方法 | Related approaches | 05:s53-other | 量化降低数值精度, 剪枝去掉不重要的权重. | int8 比 float32 省 3/4 显存
+N electra | post | ELECTRA | ELECTRA | 06:s61-electra | 小生成器填 [MASK], 判别器判断每个词元是否被替换过. | 所有位置都参与损失, 更省数据 ;; 不是对抗训练
+N arae | post | 自回归与自编码 | Different pre-training regimes | 06:s61-arae | 两大预训练范式: 自回归用链式法则只能单向, 去噪自编码重建被破坏的输入. | GPT 是自回归 ;; BERT 是自编码 ;; [MASK] 带来预训练和微调不一致
+N xlnet | post | 排列语言建模 (XLNet) | Permutation language modeling (PLM) | 06:s61-xlnet | 按随机排列的顺序做自回归, 不用 [MASK] 也能利用双向上下文. | 内容流和查询流两条注意力 ;; 只预测排列末尾的词
+N t2t | post | 文本到文本 | Revisiting text-to-text tasks | 06:s62-t2t | 把所有任务都写成输入文本到输出文本, 一个模型做多个任务. | BERT 每个任务要一个专门的输出层 ;; 任务前缀告诉模型做什么
+N t5 | post | T5 | Text-to-Text Transfer Transformer | 06:s63-t5 | 完整的编码器-解码器, 用片段破坏预训练, 任务前缀区分任务. | 标签和分数也写成字符串 ;; C4 语料 ;; 最大 110 亿参数
+
+N gpt1 | gpt | GPT-1 | GPT-1 (2018) | 07:s71 | 只用 Transformer 解码器做自回归预训练, 微调时把各种任务改写成一条输入. | 12 层掩码自注意力 ;; 语言建模作辅助目标
+N gpt2 | gpt | GPT-2 | GPT-2 (2019) | 07:s72-arch | 更大的解码器在 WebText 上训练, 不微调就能零样本做任务. | 字节级 BPE ;; 分阶段发布引发争议 ;; 事实知识随规模增长
+N zeroshot | gpt | 零样本能力 | Capabilities – Zero-shot | 07:s72-zs | 只给任务描述, 不给示范, 也不更新参数. | 少样本可以给几个示范 ;; 都不做梯度更新
+N gpt3 | gpt | GPT-3 | GPT-3 (2020) | 07:s73-arch | 1750 亿参数的解码器, 少样本上下文学习随规模显著变强. | 8 个尺寸 ;; 少样本 > 单样本 > 零样本
+N icl | gpt | 上下文学习 | In-context learning | 07:s73-icl | 把示范放进提示, 模型在一次前向传播里「学会」任务. | 参数不变 ;; 也许只是识别出已会的任务
+N gpttasks | gpt | GPT-3: 任务与表现 | GPT-3: Tasks & Performance | 07:s74-superglue | 在语言建模、闭卷问答、翻译、常识和 SuperGLUE 上比较三种设置. | 翻译成英语好, 翻出去差 ;; 少样本接近部分微调模型 ;; NLI 和 WiC 弱
+N gptlim | gpt | 局限 | Limitations | 07:s75-lim | 重复、矛盾、物理常识和比较类任务上出错. | Marcus 和 Davis 的反例 ;; 上下文里的「学习」不留下任何东西
+N gptethics | gpt | 伦理与成本 | GPT-3: Ethics & Cost | 07:s75-bias | 模型继承训练数据的偏见, 会被滥用, 训练成本和能耗巨大. | 性别、宗教偏见 ;; 一次训练约 460 万美元
+
+N decoding | dec | 解码策略 | What is Decoding? | 08:s81 | 模型给出下一个词元的分布, 解码策略决定实际选哪个. | 确定性的: 贪心和束搜索 ;; 随机的: 采样
+N greedy | dec | 贪心搜索 | Greedy search | 08:s82-greedy | 每一步选概率最大的词元. | 局部决策 ;; 容易重复
+N beam | dec | 束搜索 | Beam search | 08:s82-beam | 同时保留 k 个累积概率最高的候选序列. | k = 1 就是贪心 ;; 输出仍偏平淡和重复
+N sampling | dec | 采样 | Sampling | 08:s83-samp | 按分布随机抽词元, 用温度、top-k 和 top-p 控制随机程度. | 温度低接近贪心 ;; top-p 只在累积概率达到 p 的最小集合里抽
+N contrast | dec | 对比搜索与对比解码 | Contrastive search and Contrastive decoding | 08:s83-cs | 对比搜索惩罚和前文太像的候选, 对比解码用大模型减小模型的对数似然. | 兼顾连贯和多样 ;; 小模型也会犯的错被抵消
+N genparams | dec | 解码超参数 | Decoding Hyperparameters | 08:s84 | generate() 的参数分别对应各种解码策略, 并控制输出长度. | do_sample、num_beams、temperature、top_k、top_p
+N refmetric | dec | 有参考答案的指标 | BLEU, ROUGE | 08:s85-ref | BLEU 和 ROUGE 比较生成句和参考句的 n-gram 重合. | 同义改写得分低 ;; 只适合有标准答案的任务
+N norefmetric | dec | 无参考答案的指标 | Metrics without a gold reference | 08:s85-noref | 开放式生成用多样性、连贯性和 MAUVE 评价. | rep-n 衡量重复 ;; MAUVE 比较模型和人类文本的分布
+N humaneval | dec | 人工评价 | Human evaluation | 08:s85-human | 质量是主观的, 由专家或众包评流畅、连贯和多样. | 要算评估者间一致性 ;; 贵且慢
+
+N waystask | align | 用语言模型解决任务的方式 | How to solve a task with language models? | 09:s91-ways | 单任务微调、少样本提示、多任务指令微调, 以及继续预训练. | 语言建模目标本身不包含任务 ;; 每种方式需要的数据不同
+N flan | align | 多任务微调 | Multi-task learning: FLAN / T0 / T5 | 09:s91-mt | 在许多写成指令的任务上微调, 模型能泛化到没见过的任务. | FLAN、T0 ;; 介于微调和提示之间
+N cot | align | 思维链少样本提示 | Chain-of-thought few-shot prompting | 09:s92-cot | 示范里先写推理步骤再写答案, 模型模仿着先推理. | 对算术和常识推理有效 ;; 大模型才有效果
+N tot | align | 思维树 | Tree-of-thought | 09:s92-tot | 同时保留和评估多个想法, 能向前看或回溯. | 适合开头决定关键或需要探索的任务 ;; 像以想法为单位的束搜索
+N instr | align | 指令微调 | Instruction Tuning | 09:s93-why | 在大量 (指令, 回答) 对上训练, 让模型遵循指令, 成为助手. | 预训练只会续写 ;; InstructGPT 更灵活
+N sft | align | 有监督微调 (SFT) | Supervised fine-tuning | 11:s11p-sft | 标注员写出理想回答, 用预测下一个词的目标在这些示范上微调. | RLHF 的第一步 ;; 数据贵 ;; 难以规定「什么不该说」
+N rlhf | align | 基于人类反馈的强化学习 | RLHF | 09:s93-rl | 先训练奖励模型模仿人类偏好, 再用强化学习优化模型的回答. | 三步: SFT、奖励模型、PPO ;; 源自教机器人后空翻
+N rm | align | 奖励模型 | Reward model | 11:s11p-rm | 输入提示和回答, 输出标量奖励, 用成对偏好按 Bradley-Terry 模型训练. | 去掉词表输出层换成标量 ;; 人只需说哪个更好 | P(y_w ≻ y_l) = σ(r(x, y_w) − r(x, y_l))
+N ppo | align | 从奖励模型到强化学习 | From reward model to reinforcement learning | 11:s11p-rl | 用 PPO 最大化奖励, 同时用 KL 惩罚防止偏离 SFT 模型太远. | KL 项防止奖励作弊 ;; PPO-ptx 混入预训练梯度保住能力
+N dpo | align | 直接偏好优化 (DPO) | Direct preference optimization | 11:s11p-dpo | 不训练奖励模型, 直接用偏好数据上的分类式损失优化策略. | 奖励由策略和参考模型的对数比隐式给出 ;; 更简单稳定
+N aligntrade | align | 对齐的权衡 | Reward hacking | 11:s11p-trade | 安全训练可能过度拒答, 模型会奖励作弊和谄媚, 多个目标互相冲突. | 有用和无害要平衡 ;; 对齐给谁也是问题
+N hall | align | 幻觉 | Hallucination | 09:s94-hall | LLM 把虚假、误导或无依据的陈述当作事实说出来. | 两个条件缺一不可 ;; 部分来自奖励作弊
+N reasoning | align | 把推理作为后训练 | Reasoning as post-training | 11:s11p-reason | 用 SFT 和强化学习把模型训练成先写推理轨迹再回答. | DeepSeek 只约束 think/answer 格式 ;; 可验证的奖励 ;; 自己学会反思和回溯
+N unfaith | align | 推理过程不一定忠实 | Reasoning traces are not necessarily faithful | 11:s11p-faith | 模型写出的推理不一定是它实际的计算过程. | 36 + 59 的例子 ;; 内部归因图和说法不同
+
+N compute | scale | 训练计算量 | Training compute | 10:s101-compute | 训练一个 Transformer 约需 6PD 次浮点运算: 前向 2PD, 反向 4PD. | P 是参数量, D 是词元数 ;; 训练时间 = 计算量 / 吞吐量 | C ≈ 6 P D
+N memory | scale | 显存需求 | Memory requirements | 10:s101-memory | 训练时显存装参数、梯度、优化器状态和激活值. | 混合精度 Adam 每参数约 16 字节 ;; 激活值随批大小和序列长度增长
+N fp | scale | 浮点精度 | Floating-point precision | 10:s101-fp | fp32、fp16、bf16 的字节数和数值范围不同, 混合精度训练兼顾速度和稳定. | bf16 指数位和 fp32 一样多 ;; 主权重常保留 fp32
+N scaling | scale | 规模定律 | Scaling laws | 10:s102-what | 测试损失随参数量、数据量和计算量呈幂律下降. | 双对数图里是直线 ;; 只扩一样会遇到瓶颈 ;; 和模型形状关系弱 | L(N) ∝ N^(−α)
+N chinchilla | scale | 算力最优训练与 Chinchilla | Compute-optimal training | 10:s102-chin | 固定算力时参数量和词元数应同比例增长, 约每参数 20 个词元. | Kaplan 偏向大模型 ;; Chinchilla 更小却更好
+N emerge | scale | 涌现能力, 还是度量造成的假象 | Emergence | 10:s102-emerge | 一些能力看似在某个规模突然出现, 换成连续度量后常变平滑. | 精确匹配等不连续指标会造成跳变
+N ptdata | scale | 预训练数据 | Pretraining data | 10:s102-data | 预训练数据是多来源的混合, 要筛选质量、去重, 数据不够时可以重复几轮. | 重复约 4 轮以内损失几乎不变 ;; OLMo 2 公开了全部细节
+N dist | scale | 分布式训练 | Distributed training | 10:s103-dp | 数据并行复制模型分数据, 张量并行把一层的参数分到多块 GPU 上. | 数据并行要同步梯度 ;; 模型放不进一块 GPU 时用张量并行
+N moe | scale | 混合专家 (MoE) | Mixture-of-Experts | 10:s103-moe | 每个词元只经过路由选出的少数几个专家前馈网络. | 总参数大, 每个词元的计算少 ;; Mixtral 每层 8 选 2
+
+N multiling | multi | 为什么需要多语言 NLP | Why Multilingual NLP? | 12:s121-why | 世界上语言众多, 多数资源匮乏, 需要把高资源语言的知识迁移过去. | 跨语言迁移 ;; 符号方法和表示学习两条路
+N clwe | multi | 跨语言词嵌入 | Cross-Lingual (Word) Embeddings | 12:s121-clwe | 把不同语言的词放进同一个向量空间, 翻译对彼此相近. | 联合训练或事后对齐 ;; 用双语词典诱导评估
+N procrustes | multi | 投影与 Procrustes 问题 | Post-hoc embedding alignment | 12:s121-procrustes | 用一个正交矩阵把一种语言的嵌入空间旋转到另一种上, 有 SVD 闭式解. | 只需少量种子词典 ;; 无监督版本从对抗训练或相似度结构起步 | W* = UVᵀ, UΣVᵀ = SVD(YXᵀ)
+N mmt | multi | 大规模多语言 Transformer | Massively Multilingual Transformers | 12:s121-mmt | mBERT、XLM-R 在一百多种语言上联合预训练, 能零样本跨语言迁移. | 在英语上微调, 直接用于其他语言 ;; 语言越远效果越差
+N clsample | multi | 跨语言迁移实验怎样选语言 | Choosing a Language Sample | 12:s121-sample | 测试语言要在类型和语系上足够多样, 否则结论不可靠. | 只测相近语言会高估迁移能力
+
+N evalllm | eval | 评估大语言模型 | Evaluating Large Language Models | 13:s131-goals | 从选择题基准、开放式评委、人类偏好、可验证指令到按执行结果评估. | 评估的是能力还是行为要分清 ;; 每种范式有各自的盲点
+N mmlu | eval | MMLU 和 MMLU-Pro | MMLU | 13:s131-mmlu | 57 个学科的四选一题, 格式简单, 覆盖面广. | MMLU-Pro 改成十选一, 题更难 ;; 已接近饱和
+N judge | eval | LLM 当评委 | LLM-as-a-judge | 13:s131-mtb | 用强模型给开放式回答打分或两两比较. | 和人的一致率接近人与人之间 ;; 有位置偏差、长度偏差和自我偏好
+N arena | eval | Chatbot Arena 与 Bradley–Terry | Chatbot Arena | 13:s131-arena | 用户盲比两个模型的回答, 用 Bradley–Terry 模型把胜负换算成排名. | 大规模人类偏好 ;; 和 RLHF 奖励模型同一个模型
+N calib | eval | 校准 | Calibration | 13:s131-calib | 模型给的置信度应当等于它实际答对的比例. | 用 Brier 分数和可靠性图衡量 ;; RLHF 后常变得过度自信
+N contam | eval | 基准污染 | Benchmark Contamination | 13:s131-contam | 测试题出现在预训练数据里, 分数虚高. | 检测方法: n-gram 重合、补全测试 ;; 动态或私有基准
+N attrib | eval | 特征归因 | Feature attribution | 14:s141-grad | 给每个输入词元一个分数, 说明它对预测贡献多大. | 基于梯度: 梯度乘输入、积分梯度 ;; 基于扰动: LIME、SHAP
+N shap | eval | SHAP 与 LIME | SHAP / LIME | 14:s141-shap | LIME 在局部扰动上拟合简单模型, SHAP 用 Shapley 值公平分配贡献. | Shapley 值对所有子集取加权平均 ;; Kernel SHAP 是加权回归
+N tda | eval | 训练数据归因: 影响函数 | Training data attribution | 14:s141-tda | 估计某个训练样本被去掉后预测会怎样变. | 影响函数用 Hessian 近似重训练 ;; 大模型上很贵
+N attnexp | eval | 注意力能当解释吗 | Attention as explanation? | 14:s141-attn | 注意力权重不一定反映重要性, 换一套权重预测可以不变. | 探针检测表示里是否编码了某种信息
+N mechinterp | eval | 机制可解释性 | Mechanistic interpretability | 14:s141-mech | 找出模型内部实现某种行为的回路. | IOI 任务里的名字移动头和抑制头 ;; ACDC 自动发现回路 ;; 稀疏自编码器找可解释特征
+N faith | eval | 忠实性与评估 | Plausible ≠ faithful | 14:s141-faith | 看起来合理的解释不一定忠实于模型的真实计算. | 用删除或插入测试忠实性 ;; 思维链可能不忠实
+N detect | eval | AI 文本检测 | AI Text Detectors | 15:s151-goals | 被动检测判断文本是否由模型生成, 水印则在生成时主动埋入信号. | 两个不同的问题 ;; 文体学是经典起点
+N likedetect | eval | 基于似然的检测 | Likelihood and perplexity | 15:s151-ppl | 模型生成的文本困惑度低; DetectGPT 看扰动后对数概率是否下降. | GLTR 看词元排名 ;; 改写后容易失效
+N detectlim | eval | 检测器的局限 | Theoretical limit | 15:s151-limit | 检测器跨领域迁移差, 基础率低时「99% AI」不可信, 理论上可能无法区分. | 非母语者的文本常被误判 ;; 改写攻击 ;; 混合作者
+N watermark | eval | 水印 | Watermarking | 15:s151-wm | 生成时偏向一份按前文伪随机划分的绿名单, 检测时数绿色词元. | 用 z 检验判断 ;; 质量和可检测性要权衡 ;; 改写会削弱
+N synthid | eval | SynthID-Text | SynthID-Text | 15:s151-synth | 用锦标赛采样嵌入水印, 几乎不影响质量. | 多轮比较打分 ;; 可在生产系统部署
+
+E paradigm > emb | 第一种范式.
+E paradigm > ptft | 第二种范式.
+E paradigm > prompt | 不微调的范式.
+E prompt > agent | 从回答走向行动.
+E nlptask > tagging | 低层任务.
+E nlptask > seq2seq | 生成任务.
+E nlptask > bench | 用基准比较模型.
+E nlptask > lm | 语言建模是其中一类任务.
+E lm > ngram | 用马尔可夫假设近似.
+E ngram > nplm | 用神经网络克服维数灾难和稀疏.
+E nplm > w2v | 嵌入层就是查找表.
+E w2v > negsamp | 加速训练.
+E w2v > fasttext | 补上没见过的词.
+E w2v > analogy | 词向量的可加性.
+E emb > w2v | 怎样学出词嵌入.
+
+E nplm > rnn | 不再固定上下文长度.
+E rnn > vanish | 沿时间连乘雅可比矩阵.
+E vanish > lstm | 门控缓解梯度消失.
+E rnn > birnn | 叠层和双向.
+E seq2seq > rnnencdec | 用 RNN 实现编码器-解码器.
+E rnnencdec > bahdanau | 注意力解决瓶颈.
+E bahdanau > attrecipe | 抽象成查询、键、值.
+E birnn > elmo | ELMo 用双向 LSTM 语言模型.
+E w2v ~ ctxemb | 上下文无关和语境化.
+E ctxemb > elmo | ELMo 给出语境化嵌入.
+E tok > bpe | 子词分词.
+E bpe ~ wordpiece | 合并标准不同.
+E w2v > tok | 嵌入层的输入是词元 ID.
+E fasttext ~ bpe | 都用子词处理没见过的词.
+
+E attrecipe > trafoarch | 只用注意力的架构.
+E attrecipe > crossatt | 查询和键值来自不同序列.
+E crossatt > selfatt | 令两个序列相同.
+E selfatt > posemb | 自注意力不区分词序.
+E selfatt > mha | 并行多个头.
+E selfatt > masked | 解码时不能看未来.
+E trafoarch > resln | 每个子层的细节.
+E crossatt > encdecatt | 解码器怎样看编码器.
+E masked > encdecatt | 解码器块的第一层.
+E mha > params | 参数在投影矩阵里.
+E selfatt > n2 | 两两相连的代价.
+E posemb > txl | 改用相对位置编码.
+E n2 > txl | 处理长序列的一种办法.
+E n2 > flash | 减少显存读写.
+
+E lm > arlm | 传统的语言模型.
+E arlm ~ mlm | 只看左边与看两侧.
+E masked ~ mlm | 两个不同的「掩码」.
+E arlm > ppl | 困惑度对 ARLM 定义明确.
+E bench > clsmetric | 任务各有指标.
+E clsmetric > gentxt | 生成任务另有指标.
+E trafoarch > bertarch | BERT 只用编码器.
+E mlm > bertarch | BERT 是掩码语言模型.
+E bertarch > causal | 双向结构不能预测下一个词.
+E causal > bertpt | 所以要遮住词再预测.
+E wordpiece > bertarch | BERT 用 WordPiece 分词.
+E bertpt > bertft | 先预训练再微调.
+E ptft > bertft | 预训练加微调范式.
+E elmo > tl | 基于特征的迁移.
+E bertft > tl | 基于微调的迁移.
+E tl > tltax | 迁移学习的分类.
+E selfsup > bertpt | 预训练任务是自监督的.
+E ptft > selfsup | 无标注数据靠自监督利用.
+
+E bertarch > bertology | 研究 BERT 内部.
+E bertarch > bertimpl | 对研究方式的影响.
+E bertpt > roberta | 改进预训练.
+E params > albert | 减少参数.
+E bertarch > distil | 把 BERT 压小.
+E distil > compress | 其他压缩办法.
+E bertpt > electra | 换成替换词元检测.
+E mlm > arae | 自编码范式.
+E arlm > arae | 自回归范式.
+E arae > xlnet | 兼得两者之长.
+E bertft > t2t | 不再为每个任务接输出层.
+E t2t > t5 | 一切任务都是文本到文本.
+E tltax > t5 | 多任务同时学.
+
+E arlm > gpt1 | GPT 是自回归语言模型.
+E masked > gpt1 | 只用解码器.
+E gpt1 > gpt2 | 放大规模.
+E gpt2 > zeroshot | 不微调做任务.
+E gpt2 > gpt3 | 再放大.
+E prompt > icl | 示范放进提示.
+E gpt3 > icl | 少样本上下文学习.
+E zeroshot ~ icl | 零样本与少样本.
+E gpt3 > gpttasks | 各种任务上的表现.
+E gpt3 > gptlim | 局限.
+E gpt3 > gptethics | 偏见和成本.
+E bench > gpttasks | SuperGLUE 等基准.
+
+E arlm > decoding | 从分布里选词元.
+E decoding > greedy | 确定性解码.
+E greedy > beam | 保留多个候选.
+E decoding > sampling | 随机解码.
+E greedy ~ sampling | 确定与随机.
+E sampling > contrast | 兼顾连贯和多样.
+E decoding > genparams | 在代码里选择策略.
+E gentxt > refmetric | 有参考答案时.
+E refmetric ~ norefmetric | 开放式生成没有参考答案.
+E norefmetric > humaneval | 自动指标抓不住的地方.
+E distil ~ sampling | 两处都用温度.
+
+E icl > waystask | 提示是其中一种方式.
+E bertft > waystask | 单任务微调是另一种.
+E waystask > flan | 多任务指令微调.
+E t5 > flan | T5 也是多任务.
+E icl > cot | 示范里加推理步骤.
+E cot > tot | 保留多个想法.
+E beam ~ tot | 同一个思路, 单位不同.
+E flan > instr | 更灵活的指令数据.
+E instr > sft | 第一步是有监督微调.
+E sft > rlhf | 再用人类反馈.
+E rlhf > rm | 奖励模型.
+E rm > ppo | 用强化学习优化.
+E rm > dpo | 不要奖励模型.
+E ppo > aligntrade | 奖励作弊.
+E rlhf > hall | 幻觉部分来自奖励作弊.
+E cot > reasoning | 从提示变成训练.
+E rlhf > reasoning | 用强化学习训练推理.
+E reasoning > unfaith | 推理轨迹不一定忠实.
+
+E params > compute | 参数量决定每个词元的计算.
+E params > memory | 参数量决定显存.
+E memory > fp | 每个数占几个字节.
+E compute > scaling | 固定算力怎样分配.
+E scaling > chinchilla | 参数和数据同比例增长.
+E scaling > emerge | 规模带来新能力吗.
+E chinchilla > ptdata | 数据也要够多够好.
+E memory > dist | 放不进一块 GPU.
+E flash > dist | 减少注意力的显存.
+E params > moe | 参数多但计算少.
+E gpt3 > compute | GPT-3 的计算量.
+
+E tltax > multiling | 跨语言学习是直推式迁移.
+E multiling > clwe | 共享的向量空间.
+E clwe > procrustes | 事后对齐.
+E bertarch > mmt | 多语言版 BERT.
+E clwe > mmt | 从词级到语境化的跨语言表示.
+E mmt > clsample | 实验设计.
+
+E bench > evalllm | 从 GLUE 到 LLM 评估.
+E evalllm > mmlu | 选择题基准.
+E evalllm > judge | 开放式评估.
+E judge > arena | 人类偏好.
+E rm ~ arena | 都用 Bradley-Terry 模型.
+E evalllm > calib | 置信度是否可信.
+E evalllm > contam | 分数可能虚高.
+E attrib > shap | 基于扰动的归因.
+E attrib > tda | 归因到训练数据.
+E attrib > attnexp | 注意力权重当解释.
+E attnexp > mechinterp | 找内部回路.
+E attrib > faith | 解释是否忠实.
+E unfaith ~ faith | 推理轨迹也要看忠实性.
+E detect > likedetect | 被动检测.
+E ppl > likedetect | 生成文本困惑度低.
+E likedetect > detectlim | 检测器的局限.
+E detect > watermark | 主动嵌入信号.
+E watermark > synthid | 锦标赛采样.
+E sampling > watermark | 水印改的是采样.
+
+T one-hot vector |  |  | 独热向量 | base | A vector with a single 1 at the index of the word. | 只在词的位置为 1 的向量. | dense embedding | 01:s12-emb
+T bag-of-words |  |  | 词袋 | base | Represents a document by how often each word occurs. | 用每个词的出现次数表示文档. |  | 01:s12-emb
+T dense embedding |  |  | 稠密嵌入 | base | A low-dimensional real-valued vector representation. | 低维实数向量表示. | one-hot vector | 01:s12-emb
+T document retrieval |  |  | 文档检索 | base | Finds documents similar to a query by comparing their embeddings. | 比较嵌入, 找出和查询相似的文档. |  | 01:s12-emb
+T pre-training |  |  | 预训练 | base | Learning general knowledge from large unlabelled text. | 从大规模无标注文本学通用知识. | fine-tuning | 01:s12-ptft | pretraining
+T fine-tuning |  |  | 微调 | base | Continues training a pre-trained model on labelled data of a task. | 在任务的标注数据上继续训练预训练模型. | pre-training | 01:s12-ptft
+T self-supervised objective |  |  | 自监督目标 | base | A training objective whose labels come from the data itself. | 标签来自数据本身的训练目标. |  | 01:s12-ptft
+T downstream task |  |  | 下游任务 | base | The task a pre-trained model is adapted to. | 预训练模型要适配的任务. |  | 01:s12-ptft
+T zero-shot |  |  | 零样本 | base | Solving a task without any labelled example. | 不用任何标注样本完成任务. | few-shot | 01:s12-prompt
+T few-shot |  |  | 少样本 | base | Solving a task with a few examples, usually given in the input. | 用几个样本完成任务, 通常放在输入里. | zero-shot | 01:s12-prompt | few-shot learning
+T prompt engineering |  |  | 提示工程 | base | Designing the wording of prompts to get better outputs. | 设计提示的措辞以得到更好输出. |  | 01:s12-prompt
+T prompt tuning |  |  | 提示微调 | base | Learns a soft prompt while the model stays frozen. | 模型冻结, 只学软提示. |  | 01:s12-prompt
+T soft prompt |  |  | 软提示 | base | Trainable vectors prepended to the input instead of words. | 加在输入前面、可训练的向量, 不是词. |  | 01:s12-prompt
+T agent |  |  | 智能体 | base | An LLM that acts in an environment and reacts to observations. | 在环境里行动并根据观察反应的 LLM. |  | 01:s12-agents
+T token-level classification |  |  | 词元级分类 | base | Assigns a label to every token. | 给每个词元一个标签. | sequence-level classification | 01:s13-cat
+T sequence-level classification |  |  | 序列级分类 | base | Assigns one label to a whole text. | 给整段文本一个标签. | token-level classification | 01:s13-seqcls
+T POS-tagging |  |  | 词性标注 | base | Assigns a part-of-speech tag to each word. | 给每个词标词性. |  | 01:s13-pos
+T sequence tagging |  |  | 序列标注 | base | n input words get n output labels. | 输入 n 个词, 输出 n 个标签. |  | 01:s13-pos
+T structure prediction |  |  | 结构预测 | base | The output is a structure such as a tree rather than a sequence of labels. | 输出是树这样的结构, 不是一串标签. |  | 01:s13-parse
+T chunking |  |  | 组块分析 | base | Splits a sentence into flat phrases such as NP and VP. | 把句子切成 NP、VP 这样的平面短语. | parsing | 01:s13-parse
+T parsing |  |  | 句法分析 | base | Builds the full syntactic tree of a sentence. | 建出句子完整的句法树. | chunking | 01:s13-parse
+T word sense disambiguation |  |  | 词义消歧 | base | Decides which sense of an ambiguous word is used in context. | 判断多义词在语境里用的是哪个义项. |  | 01:s13-wsd
+T named entity recognition |  |  | 命名实体识别 | base | Finds names of persons, places and organizations in text. | 找出文本里的人名、地名、机构名. |  | 01:s13-ner | NER
+T BIO |  |  | BIO 标注 | base | Encodes entity spans as tags: beginning, inside, outside. | 用开始、内部、外部三种标签编码实体. |  | 01:s13-ner
+T textual entailment |  |  | 文本蕴含 | base | Decides whether sentence A implies sentence B. | 判断句子 A 能否推出句子 B. |  | 01:s13-high
+T argumentation mining |  |  | 论辩挖掘 | base | Finds claims and premises in text. | 找出文本里的论点和论据. |  | 01:s13-high
+T paraphrase |  |  | 复述 | base | Two sentences that mean the same. | 意思相同的两个句子. |  | 01:s13-bench
+T GLUE |  |  | GLUE | base | A benchmark of nine sentence and sentence-pair understanding tasks. | 9 个单句和句对理解任务组成的基准. | SuperGLUE | 01:s13-bench
+T Markov assumption |  |  | 马尔可夫假设 | base | Given the present, the future is independent of the past. | 已知现在, 未来与过去无关. |  | 01:s14-markov
+T count-based |  |  | 基于计数 | base | Estimates probabilities from corpus frequencies. | 用语料频次估计概率. |  | 01:s14-markov
+T curse of dimensionality |  |  | 维数灾难 | base | The number of parameters grows exponentially with the context length. | 参数随上下文长度指数增长. |  | 01:s14-prob
+T sparsity |  |  | 稀疏性 | base | Most word combinations never occur in the corpus. | 大多数词组合在语料里从未出现. |  | 01:s14-prob
+T hierarchical softmax |  |  | 层次 softmax | base | Organizes the vocabulary as a binary tree to make softmax cheaper. | 把词表组织成二叉树, 让 softmax 更便宜. | negative sampling | 01:s14-cost
+T distributional hypothesis |  |  | 分布假设 | base | Words that occur in similar contexts have similar meanings. | 出现在相似语境里的词意思相近. |  | 01:s15-motiv
+T cosine similarity |  |  | 余弦相似度 | base | The cosine of the angle between two vectors. | 两个向量夹角的余弦. |  | 01:s15-motiv
+T skip-gram |  |  | skip-gram | base | Predicts the context words from the center word. | 由中心词预测上下文词. | CBOW | 01:s15-sg
+T CBOW |  |  | 连续词袋 | base | Predicts the center word from the summed context vectors. | 由上下文向量之和预测中心词. | skip-gram | 01:s15-cbow | continuous bag of words
+T negative sampling |  |  | 负采样 | base | Replaces the softmax by telling real context words from random noise words. | 用区分真实上下文词和随机噪声词代替 softmax. | hierarchical softmax | 01:s15-neg
+T noise contrastive estimation |  |  | 噪声对比估计 | base | Learns a model by discriminating data from noise samples. | 通过区分数据和噪声样本来学习模型. |  | 01:s15-neg
+T out-of-vocabulary |  |  | 未登录词 | base | A word that does not occur in the vocabulary. | 词表里没有的词. |  | 01:s15-ft | OOV
+T analogy mining |  |  | 类比挖掘 | base | Solves analogies with vector arithmetic. | 用向量加减解类比题. |  | 01:s15-analogy
+T query expansion |  |  | 查询扩展 | base | Adds similar words to a search query. | 给检索查询加上相似的词. |  | 01:s15-use
+
+T recurrent neural network |  |  | 循环神经网络 | seq | Processes a sequence step by step with the same parameters and a state. | 用同一组参数和状态逐步处理序列. |  | 02:s21-what | RNN
+T vanilla RNN |  |  | 普通 RNN | seq | The simplest RNN: input term plus recurrent term plus bias, passed through tanh. | 最简单的 RNN: 输入项加循环项加偏置, 再过 tanh. |  | 02:s21-vanilla
+T vanishing gradients |  |  | 梯度消失 | seq | Inputs far from the loss in the computational graph have little influence on its gradient. | 计算图里离损失越远的输入, 对梯度影响越小. | exploding gradients | 02:s21-vanish | vanishing gradient
+T exploding gradients |  |  | 梯度爆炸 | seq | Gradients grow exponentially when propagated back through many steps. | 梯度往回传多步后指数增长. | vanishing gradients | 02:s21-vanish
+T gradient clipping |  |  | 梯度裁剪 | seq | Rescales the gradient when its norm is too large. | 梯度范数过大时把它缩小. |  | 02:s21-vanish
+T cell state |  |  | 单元状态 | seq | The long-term memory of an LSTM. | LSTM 的长期记忆. |  | 02:s21-lstm
+T gate |  |  | 门 | seq | A sigmoid vector that controls how much information passes. | 控制信息通过多少的 sigmoid 向量. |  | 02:s21-lstm
+T bidirectional RNN |  |  | 双向 RNN | seq | Two independent RNNs read left-to-right and right-to-left. | 两个独立的 RNN 分别从左往右和从右往左读. |  | 02:s21-bi
+T encoder |  |  | 编码器 | seq | Reads the input sequence into a representation. | 把输入序列读成表示. | decoder | 02:s22-encdec
+T decoder |  |  | 解码器 | seq | Generates the output sequence from the representation. | 根据表示生成输出序列. | encoder | 02:s22-encdec
+T query |  |  | 查询 | seq | The vector that asks what to look for. | 表示「要找什么」的向量. | key | 02:s22-recipe
+T key |  |  | 键 | seq | The vector compared with the query. | 和查询比对的向量. | value | 02:s22-recipe
+T value |  |  | 值 | seq | The content that is retrieved, weighted by attention. | 按注意力加权取出的内容. | key | 02:s22-recipe
+T attention weights |  |  | 注意力权重 | seq | The softmax-normalized scores between query and keys. | 查询和各键的分数经 softmax 归一化后的权重. |  | 02:s22-recipe
+T contextual embedding |  |  | 语境化嵌入 | seq | A word vector that depends on the sentence it occurs in. | 随所在句子变化的词向量. |  | 02:s23-ctx | contextualized embedding
+T feature-based transfer |  |  | 基于特征的迁移 | seq | The pre-trained model only provides features and is not trained further. | 预训练模型只提供特征, 不再训练. | fine-tuning | 02:s23-task | feature-based
+T token |  |  | 词元 | seq | A discrete unit of text produced by tokenization. | 分词得到的离散文本单位. |  | 02:s24-what
+T subword tokenization |  |  | 子词分词 | seq | Splits words into smaller units such as morphemes. | 把词切成词素这类更小的单位. |  | 02:s24-types | subword
+T morpheme |  |  | 词素 | seq | The smallest meaningful unit of a word. | 词里最小的有意义单位. |  | 02:s24-types
+T byte pair encoding |  |  | 字节对编码 | seq | Builds a subword vocabulary by repeatedly merging the most frequent adjacent pair. | 反复合并最频繁的相邻对, 构造子词词表. | WordPiece | 02:s24-bpe | BPE
+T WordPiece |  |  | WordPiece | seq | Chooses merges by the gain in language model likelihood. | 按语言模型似然的增益选择合并. | byte pair encoding | 02:s24-wp
+
+T cross-attention |  |  | 交叉注意力 | trafo | Queries come from one sequence, keys and values from another. | 查询来自一个序列, 键和值来自另一个. | self-attention | 03:s31-mt
+T self-attention |  |  | 自注意力 | trafo | Queries, keys and values all come from the same sequence. | 查询、键、值都来自同一个序列. | cross-attention | 03:s32-kinds
+T scaled dot product |  |  | 缩放点积 | trafo | Divides the dot products by √d_k before the softmax. | softmax 之前把点积除以 √d_k. |  | 03:s34-mha | scaled dot-product attention
+T positional encoding |  |  | 位置编码 | trafo | A vector added to each token embedding that encodes its position. | 加在词元嵌入上、编码位置的向量. |  | 03:s32-pos | position embeddings
+T multi-head attention |  |  | 多头注意力 | trafo | Several attention heads in parallel, then concatenated and projected. | 并行的几个注意力头, 再拼接投影. |  | 03:s34-mha
+T masked self-attention |  |  | 掩码自注意力 | trafo | Self-attention in which positions cannot attend to later positions. | 位置不能注意后面位置的自注意力. | masked language modeling | 03:s33-mask
+T residual connection |  |  | 残差连接 | trafo | Adds the input of a sublayer to its output. | 把子层的输入加到输出上. |  | 03:s33-sub
+T layer normalization |  |  | 层归一化 | trafo | Normalizes the activations of each position over its features. | 在每个位置的特征上标准化激活. |  | 03:s33-sub
+T segment recurrence |  |  | 片段循环 | trafo | Reuses the cached hidden states of the previous segment as extra context. | 把上一片段缓存的隐状态当作额外上下文. |  | 03:s35-rec
+T relative positional encoding |  |  | 相对位置编码 | trafo | Encodes the distance between query and key instead of absolute positions. | 编码查询和键之间的距离, 而不是绝对位置. |  | 03:s35-rel | relative positional encodings
+T Vision Transformer |  |  | Vision Transformer | trafo | Splits an image into patches and treats them like tokens. | 把图像切成小块, 当作词元处理. |  | 03:s31-beyond | ViT
+
+T masked language modeling |  |  | 掩码语言建模 | bert | Predicts masked tokens from both sides of context. | 用两侧上下文预测被遮住的词元. | masked self-attention | 04:s44-mlm | MLM
+T next sentence prediction |  |  | 下一句预测 | bert | Decides whether the second sentence follows the first. | 判断第二句是否紧跟第一句. | sentence-order prediction | 04:s44-nsp | NSP
+T accuracy |  |  | 准确率 | bert | The share of correct predictions. | 预测对的比例. |  | 04:s42-cls
+T precision |  |  | 精确率 | bert | The share of predicted positives that are positive. | 预测为正里真正为正的比例. | recall | 04:s42-cls
+T recall |  |  | 召回率 | bert | The share of positives that are found. | 真正为正里被找出的比例. | precision | 04:s42-cls
+T macro-averaged F1 |  |  | Macro 平均 F1 | bert | Averages the F1 scores of all classes equally. | 各类 F1 等权平均. | micro-averaged F1 | 04:s42-cls | macro
+T micro-averaged F1 |  |  | Micro 平均 F1 | bert | Computes F1 from the pooled counts of all classes. | 把所有类的计数合起来再算 F1. | macro-averaged F1 | 04:s42-cls | micro
+T reciprocal rank |  |  | 倒数排名 | bert | One over the rank of the first relevant result. | 第一个相关结果排名的倒数. |  | 04:s42-rank | MRR
+T average precision |  |  | 平均精确率 | bert | Averages the precision at each relevant position in the ranking. | 在排名中每个相关位置上的精确率取平均. |  | 04:s42-rank | MAP
+T perplexity |  |  | 困惑度 | bert | The exponentiated average negative log-likelihood per token. | 每个词元平均负对数似然的指数. |  | 04:s42-ppl | PPL
+T BLEU |  |  | BLEU | bert | A precision-oriented n-gram overlap metric with a brevity penalty. | 偏精确率、带简短惩罚的 n-gram 重合指标. | ROUGE | 04:s42-gen
+T ROUGE |  |  | ROUGE | bert | A recall-oriented n-gram overlap metric, used for summarization. | 偏召回率的 n-gram 重合指标, 用于摘要. | BLEU | 08:s85-ref
+T brevity penalty |  |  | 简短惩罚 | bert | Penalizes outputs that are shorter than the reference. | 惩罚比参考句短的输出. |  | 04:s42-gen
+T extractive |  |  | 抽取式 | bert | The answer is a span copied from the source text. | 答案是从原文里截出的一段. | abstractive | 04:s42-gen
+T abstractive |  |  | 生成式 | bert | The answer is generated in new words. | 答案用自己的话生成. | extractive | 04:s42-gen
+T BERT |  |  | BERT | bert | Bidirectional Encoder Representations from Transformers, a pre-trained Transformer encoder. | 预训练的双向 Transformer 编码器. | GPT | 04:s43-key
+T transfer learning |  |  | 迁移学习 | bert | Uses knowledge from a source task or domain for a target task or domain. | 把源任务或领域的知识用到目标任务或领域. |  | 04:s45-kinds
+T domain adaptation |  |  | 领域自适应 | bert | The same task is transferred from one domain to another. | 同一任务从一个领域迁移到另一个领域. | cross-lingual learning | 04:s45-tax
+T cross-lingual learning |  |  | 跨语言学习 | bert | The same task is transferred from one language to another. | 同一任务从一种语言迁移到另一种. | domain adaptation | 04:s45-tax
+T multi-task learning |  |  | 多任务学习 | bert | Several tasks are learned simultaneously. | 同时学多个任务. | sequential transfer learning | 04:s45-tax
+T sequential transfer learning |  |  | 顺序迁移学习 | bert | Tasks are learned one after another: pre-train, then fine-tune. | 任务依次学: 先预训练, 再微调. | multi-task learning | 04:s45-tax
+T self-supervision |  |  | 自监督 | bert | Labels are generated from the known structure of the data itself. | 从数据本身的已知结构生成标签. |  | 04:s45-ss | self-supervised learning
+
+T dynamic masking |  |  | 动态掩码 | post | A sequence is masked differently every time it is seen. | 同一序列每次看到时遮法都不同. |  | 05:s52-roberta
+T sentence-order prediction |  |  | 句序预测 | post | Decides whether two consecutive segments are in the right order. | 判断两个相邻片段的顺序是否正确. | next sentence prediction | 05:s52-albert | SOP
+T knowledge distillation |  |  | 知识蒸馏 | post | A small student is trained on the soft targets of a large teacher. | 小学生模型在大教师模型的软目标上训练. |  | 05:s53-dist | model distillation
+T soft targets |  |  | 软目标 | post | The full output distribution of the teacher, not only the hard label. | 教师的完整输出分布, 不只是硬标签. |  | 05:s53-dist
+T quantization |  |  | 量化 | post | Converts high-precision numbers to a low-precision format. | 把高精度数转成低精度格式. | pruning | 05:s53-other
+T pruning |  |  | 剪枝 | post | Removes unimportant weights or units. | 去掉不重要的权重或单元. | quantization | 05:s53-other
+T replaced token detection |  |  | 替换词元检测 | post | The ELECTRA discriminator decides for each token whether it was replaced. | ELECTRA 判别器判断每个词元是否被替换过. |  | 06:s61-electra
+T pretrain-finetune discrepancy |  |  | 预训练-微调不一致 | post | The [MASK] token appears in pre-training but never in fine-tuning. | [MASK] 只在预训练出现, 微调时没有. |  | 06:s61-xlnet
+T task prefix |  |  | 任务前缀 | post | A short text before the input that tells T5 which task to solve. | 输入前的一小段文字, 告诉 T5 做哪个任务. |  | 06:s63-t5
+T span corruption |  |  | 片段破坏 | post | Replaces spans of the input by sentinel tokens that the model must fill in. | 把输入的片段换成哨兵词元, 让模型补出. |  | 06:s63-t5
+T adapter |  |  | adapter 层 | post | A small trainable layer inserted into a frozen model. | 插进冻结模型的小可训练层. |  | 06:s62-prob
+
+T GPT |  |  | GPT | gpt | Generative Pre-trained Transformer, an autoregressive Transformer decoder. | 生成式预训练 Transformer, 自回归的解码器. | BERT | 07:s73-recap
+T in-context learning |  |  | 上下文学习 | gpt | The model performs a task from demonstrations in the prompt without updating its parameters. | 模型凭提示里的示范完成任务, 不更新参数. |  | 07:s73-icl
+T closed-book question answering |  |  | 闭卷问答 | gpt | Answers questions only from knowledge stored in the parameters. | 只靠参数里存的知识回答问题. |  | 07:s74-qa | closed book
+T SuperGLUE |  |  | SuperGLUE | gpt | A harder successor of the GLUE benchmark. | 比 GLUE 更难的后继基准. | GLUE | 07:s74-superglue
+
+T greedy search |  |  | 贪心搜索 | dec | Picks the most probable token at every step. | 每一步选概率最大的词元. | beam search | 08:s82-greedy | greedy decoding
+T beam search |  |  | 束搜索 | dec | Keeps the k most probable partial sequences at every step. | 每一步保留 k 个最可能的部分序列. | greedy search | 08:s82-beam
+T temperature |  |  | 温度 | dec | Divides the logits before the softmax; low values sharpen the distribution. | softmax 前除以它, 值小时分布更尖. |  | 08:s83-samp
+T top-k sampling |  |  | top-k 采样 | dec | Samples only from the k most probable tokens. | 只在概率最高的 k 个词元里抽. | top-p sampling | 08:s83-samp | top-k
+T top-p sampling |  |  | 核采样 | dec | Samples from the smallest set of tokens whose probabilities sum to p. | 在累积概率达到 p 的最小词元集合里抽. | top-k sampling | 08:s83-samp | top-p; nucleus sampling
+T contrastive search |  |  | 对比搜索 | dec | Penalizes candidates that are too similar to the previous context. | 惩罚和前文太像的候选. | contrastive decoding | 08:s83-cs
+T contrastive decoding |  |  | 对比解码 | dec | Chooses tokens that maximize the log-likelihood difference between an expert and an amateur model. | 选使专家模型和业余模型对数似然之差最大的词元. | contrastive search | 08:s83-cd
+T MAUVE |  |  | MAUVE | dec | Measures the gap between the model's text distribution and human text. | 衡量模型文本分布和人类文本分布的差距. |  | 08:s85-mauve
+
+T chain-of-thought |  |  | 思维链 | align | A sequence of reasoning steps written before the final answer. | 写在最终答案之前的一串推理步骤. |  | 09:s92-cot
+T tree-of-thought |  |  | 思维树 | align | Explores and evaluates several reasoning paths with lookahead and backtracking. | 探索并评估多条推理路径, 可以前瞻和回溯. |  | 09:s92-tot
+T instruction tuning |  |  | 指令微调 | align | Trains a language model on many instruction-response pairs. | 在大量指令–回答对上训练语言模型. |  | 09:s93-why
+T supervised fine-tuning |  |  | 有监督微调 | align | Fine-tunes on demonstrations written by annotators. | 在标注员写的示范上微调. |  | 09:s93-sft | SFT
+T reinforcement learning from human feedback |  |  | 基于人类反馈的强化学习 | align | Optimizes a model with reinforcement learning against a reward model trained on human preferences. | 用强化学习针对由人类偏好训练的奖励模型优化模型. |  | 09:s94-hf | RLHF
+T reward model |  |  | 奖励模型 | align | Outputs a scalar score for a prompt and a response. | 对提示和回答输出一个标量分数. |  | 09:s94-rm | RM
+T Bradley-Terry model |  |  | Bradley-Terry 模型 | align | Models the probability that one item beats another through the difference of their scores. | 用两者分数之差建模一方胜过另一方的概率. |  | 09:s94-rm | Bradley-Terry; Bradley–Terry
+T PPO |  |  | PPO | align | Proximal policy optimization, the reinforcement learning algorithm used in RLHF. | 近端策略优化, RLHF 用的强化学习算法. |  | 09:s94-rm
+T reward hacking |  |  | 奖励作弊 | align | The model exploits the reward to score high without solving the task. | 模型钻奖励的空子拿高分, 却没解决问题. |  | 09:s94-epi
+T sycophancy |  |  | 谄媚 | align | The model tells users what they want to hear. | 模型说用户想听的话. |  | 11:s11p-trade
+T preference data |  |  | 偏好数据 | align | Pairs of responses with a judgement which one is better. | 成对的回答加上哪个更好的判断. |  | 11:s11p-pref
+T direct preference optimization |  |  | 直接偏好优化 | align | Optimizes the policy directly on preference pairs without a reward model. | 不要奖励模型, 直接在偏好对上优化策略. |  | 11:s11p-dpo | DPO
+T hallucination |  |  | 幻觉 | align | A false, misleading or unsupported statement presented as fact. | 当作事实说出的虚假、误导或无依据陈述. |  | 09:s94-hall
+T reasoning trace |  |  | 推理轨迹 | align | The written reasoning a model produces before its answer. | 模型在回答前写出的推理过程. |  | 09:s95-trace
+
+T mixed precision |  |  | 混合精度 | scale | Trains in low precision while keeping a high-precision master copy of the weights. | 用低精度训练, 同时保留高精度的主权重. |  | 10:s101-fp
+T optimizer states |  |  | 优化器状态 | scale | The extra values the optimizer stores per parameter, such as Adam's moments. | 优化器为每个参数额外存的值, 如 Adam 的矩估计. |  | 10:s101-memory
+T activations |  |  | 激活值 | scale | Intermediate results of the forward pass stored for the backward pass. | 为反向传播保存的前向中间结果. |  | 10:s101-memory
+T Kaplan scaling laws |  |  | Kaplan 规模定律 | scale | Loss falls as a power law in parameters, data and compute; favours large models. | 损失随参数、数据和计算按幂律下降, 偏向大模型. | Chinchilla | 09:s96-kaplan
+T Chinchilla |  |  | Chinchilla | scale | A 70B model trained compute-optimally on about 20 tokens per parameter. | 按每参数约 20 个词元算力最优训练的 700 亿参数模型. | Kaplan scaling laws | 09:s96-chin
+T emergent abilities |  |  | 涌现能力 | scale | Abilities that seem to appear suddenly above a certain scale. | 似乎在某个规模以上突然出现的能力. |  | 10:s102-emerge
+T data parallelism |  |  | 数据并行 | scale | Every GPU holds a model copy and processes a different part of the batch. | 每块 GPU 一份模型, 处理批次的不同部分. | tensor parallelism | 09:s98-dist
+T tensor parallelism |  |  | 张量并行 | scale | Splits the parameters of a layer across several GPUs. | 把一层的参数分到几块 GPU 上. | data parallelism | 10:s103-tp
+T mixture of experts |  |  | 混合专家 | scale | Routes each token to a few expert feed-forward networks. | 把每个词元路由到少数几个专家前馈网络. |  | 10:s103-moe | MoE
+
+T cross-lingual word embeddings |  |  | 跨语言词嵌入 | multi | Word vectors of several languages in one shared space. | 几种语言的词向量放在同一个空间里. |  | 12:s121-clwe | CLWE
+T Procrustes problem |  |  | Procrustes 问题 | multi | Finds the orthogonal matrix that best maps one embedding space onto another. | 找把一个嵌入空间最好地映到另一个上的正交矩阵. |  | 12:s121-procrustes
+T zero-shot cross-lingual transfer |  |  | 零样本跨语言迁移 | multi | Fine-tune on one language and apply directly to others. | 在一种语言上微调, 直接用于其他语言. |  | 12:s121-limits
+
+T MMLU |  |  | MMLU | eval | A multiple-choice benchmark over 57 subjects. | 覆盖 57 个学科的选择题基准. |  | 13:s131-mmlu
+T LLM-as-a-judge |  |  | LLM 当评委 | eval | A strong LLM rates or compares the outputs of other models. | 用强 LLM 给其他模型的输出打分或比较. |  | 13:s131-mtb | LLM judge
+T Chatbot Arena |  |  | Chatbot Arena | eval | Users compare two anonymous models and vote for the better answer. | 用户盲比两个匿名模型, 投票选更好的回答. |  | 13:s131-arena
+T IFEval |  |  | IFEval | eval | Evaluates instruction following with automatically verifiable instructions. | 用可自动验证的指令评估遵循指令的能力. |  | 13:s131-ifeval
+T calibration |  |  | 校准 | eval | Stated confidence matches the actual accuracy. | 给出的置信度和实际准确率相符. |  | 13:s131-calib
+T benchmark contamination |  |  | 基准污染 | eval | Test data appeared in the training data. | 测试数据出现在训练数据里. |  | 13:s131-contam
+T feature attribution |  |  | 特征归因 | eval | Assigns each input feature a score for its contribution to the prediction. | 给每个输入特征一个对预测贡献的分数. |  | 14:s141-grad
+T LIME |  |  | LIME | eval | Fits a simple local model on perturbations of one input. | 在一个输入的扰动上拟合局部简单模型. | SHAP | 14:s141-lime
+T SHAP |  |  | SHAP | eval | Attributes the prediction with Shapley values from cooperative game theory. | 用合作博弈论的 Shapley 值分配预测. | LIME | 14:s141-shap
+T influence functions |  |  | 影响函数 | eval | Approximate how removing a training example would change the model. | 近似去掉一个训练样本后模型会怎样变. |  | 14:s141-tda
+T probing |  |  | 探针 | eval | Trains a simple classifier on hidden representations to test what they encode. | 在隐藏表示上训练简单分类器, 检验里面编码了什么. |  | 14:s141-attn | probe
+T sparse autoencoder |  |  | 稀疏自编码器 | eval | Decomposes activations into many sparse, interpretable features. | 把激活分解成许多稀疏、可解释的特征. |  | 14:s141-sae
+T mechanistic interpretability |  |  | 机制可解释性 | eval | Reverse-engineers the circuits inside a model. | 逆向分析模型内部的回路. |  | 14:s141-mech
+T circuit |  |  | 回路 | eval | A small subgraph of components that implements a behaviour. | 实现某种行为的一小组部件. |  | 14:s141-acdc
+T faithfulness |  |  | 忠实性 | eval | An explanation reflects the model's actual computation. | 解释反映模型的真实计算. |  | 14:s141-faith | faithful
+T stylometry |  |  | 文体学 | eval | Identifies authors from stylistic features of text. | 从文本的风格特征识别作者. |  | 15:s151-stylo
+T DetectGPT |  |  | DetectGPT | eval | Detects generated text from the drop in log-probability under perturbations. | 根据扰动后对数概率的下降检测生成文本. |  | 15:s151-detectgpt
+T base rate |  |  | 基础率 | eval | The share of AI-written texts in the population, which decides how reliable a positive result is. | 总体中 AI 文本的比例, 决定阳性结果有多可信. |  | 15:s151-metrics
+T watermark |  |  | 水印 | eval | A signal embedded during generation that a detector can find later. | 生成时嵌入、之后能被检测出的信号. |  | 15:s151-wm | watermarking
+T green list |  |  | 绿名单 | eval | The pseudo-randomly chosen part of the vocabulary that the watermark favours. | 水印偏向的、伪随机选出的那部分词表. |  | 15:s151-wm
+T tournament sampling |  |  | 锦标赛采样 | eval | SynthID picks tokens through several rounds of scored comparisons. | SynthID 通过多轮打分比较选出词元. |  | 15:s151-synth
+
+DE 分支名, 几讲内容的合称 | Learning Paradigms and NLP Tasks; RNNs, Attention and Tokenization; BERT and Transfer Learning; Decoding and Evaluation Metrics; Training LLMs: Compute, Memory and Scaling; Evaluation, Explainability and Detection
+ZH 分支名, 几讲内容的合称 | 解码与生成评价; 训练规模与资源
+ZH 笔记加粗词 (gradient clipping 梯度裁剪, 在讲解框里) | 梯度裁剪
+
+SKIP 课程组织, 不是知识点 | s11; s11-people; s11-prereq; s11-expect
+SKIP 章节标题或引入, 内容在各小节 | s13; s22; s31; s36; s42; s85; s95; s97; s98; s101; s103; s121; s121-goals
+SKIP 小结, 内容在各小节 | s102-take; s11p-take; s131-take
+SKIP 归入 NLP 任务的分类 | s13-levels
+SKIP 归入 嵌入 (同一张检索图) | s13-retr
+SKIP 引子, 归入 Transformer 架构总览 | s22-trafo
+SKIP 归入 GPT-2 (发布争议和分阶段发布) | s72-contro; s72-later
+SKIP 归入 用语言模型解决任务的方式 | s91-issues
+SKIP 引入, 归入 思维链少样本提示 | s92-motiv
+SKIP 归入 基于人类反馈的强化学习 (InstructGPT 的人类评估) | s94-eval
+SKIP 归入 把推理作为后训练 (DeepSeek 学到的推理行为) | s95-learn
+SKIP 归入 SynthID-Text (实验结果) | s151-results
+
+DROP 抓取格式残缺 (英文和中文混在一起), 对应术语已收录 | AP@k (Average Precision at k,; BPE (Byte Pair Encoding); MoE (Mixture of Experts,; NSP (Next Sentence Prediction,; RNN (Recurrent Neural Network); RR (Reciprocal Rank,; SOP (Sentence-Order Prediction,; Autoregressive; Transductive; Inductive; masked word prediction; source task / domain; target task / domain
+DROP 抓取误差, 不是术语 | B; S; k; GPU; FP32; IOI; SAT; KL; Brier; Matthews; ROC; n-gram; Transformer
+DROP 先修知识或太笼统 | backpropagation; gradient descent; loss function; regularization; baseline; NLL; PCA; Prompt; Code generation
+DROP 并入其他概念 | language modeling; seq2seq; text generation
+
+# 读过后判定不适合当例句的课件原句 (说的是别的意思, 如 chunking 指矩阵分块、value 指价值观、sparsity 指注意力矩阵)
+NOQ chunking; paraphrase; sparsity; next sentence prediction; precision; contextual embedding; value; decoder; encoder; supervised fine-tuning; fine-tuning
+
+# 术语 → 概念
+M dense embedding | emb
+M pre-training | ptft
+M fine-tuning | ptft
+M prompt engineering | prompt
+M prompt tuning | prompt
+M sequence tagging | tagging
+M structure prediction | tagging
+M chunking | tagging
+M BIO | tagging
+M argumentation mining | nlptask
+M count-based | ngram
+M cosine similarity | w2v
+M morpheme | tok
+M byte pair encoding | bpe
+M accuracy | clsmetric
+M precision | clsmetric
+M recall | clsmetric
+M reciprocal rank | clsmetric
+M average precision | clsmetric
+M extractive | gentxt
+M abstractive | gentxt
+M BERT | bertarch
+M adapter | t2t
+M GPT | gpt1
+M SuperGLUE | gpttasks
+M chain-of-thought | cot
+M reasoning trace | reasoning
+M activations | memory
+M Kaplan scaling laws | scaling
+M Chinchilla | chinchilla
+M emergent abilities | emerge
+M Procrustes problem | procrustes
+M zero-shot cross-lingual transfer | mmt
+M SHAP | shap
+M influence functions | tda
+M circuit | mechinterp
+M faithfulness | faith
+NOQ adapter; query expansion
