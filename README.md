@@ -1,15 +1,7 @@
-# LMU 计算语言学 · 课程笔记
+# Atlas
 
-**在线使用: https://yikesyellowpharmakon.github.io/lmu-cl-notes/**
+Notes for the Computational Linguistics programme at LMU Munich, with a knowledge graph and a term list for every course.
 
-打开就能用, 不用下载. 首页 **Atlas · 知识图册** 分三栏:
+**https://yikesyellowpharmakon.github.io/lmu-cl-notes/**
 
-- **笔记**: 所有课件笔记、练习单和文献, 按课程排列, 中文讲解 + 原文卡片.
-- **图谱**: 每门课的知识网 (概念、先修关系、学习路线), 以及不同课程之间相通的概念.
-- **术语**: 每门课的原文术语, 德语附冠词和复数; 可以隐藏术语或释义来自测.
-
-## 仓库里有什么
-
-- `HP01 EIP/` 等: 每门课的笔记, 单文件 HTML. 编号: HP / NP / NWP = 本科, X = 跨专业补充, P = 硕士, OC = 公开课自学.
-- `index.html`: 首页 Atlas.
-- `atlas/`: 首页的源码、图谱和术语的内容、数据. 说明见 [atlas/README.md](atlas/README.md).
+The notes are written in Chinese next to the original slide text. Each course has its own folder; `atlas/` holds the source of the homepage.
