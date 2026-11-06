@@ -38,7 +38,15 @@
   /* 同时只跑一个过渡: 新的开始前先跳过旧的. 页面已经滚下去时不配对元素 (位置差太大会乱飞), 只做整页淡入 */
   var VT = null;
   /* v15s: 不再让标题文字在新旧页面之间飘移 (用户不喜欢文字滞留). 页头和筛选行原地不动; 旧内容快速淡出, 新内容按版块依次升起 (见 stagger) */
-  function trans(fn) { window.__vtForce = 0; if (VT) { try { VT.skipTransition(); } catch (e) {} VT = null; } if (!D.startViewTransition || CALM) return fn(); H.dataset.vtp = '1'; var vt = VT = D.startViewTransition(fn); vt.finished.finally(function () { if (VT === vt) { VT = null; delete H.dataset.vtp; } }); }
+  /* 2026-11-06: 视图过渡只在 Chromium 内核里用 (Chrome / Edge / Arc / Brave…). Safari 等其他内核的实现会在快照交接时闪一帧,
+     改成普通的淡入淡出: 旧内容 110ms 淡出 → 换内容 → 新内容 220ms 淡入. 测试可设 window.__VTOFF = true 强制走这条路. */
+  var VTOK = !!(window.chrome || (navigator.userAgentData && (navigator.userAgentData.brands || []).some(function (b) { return /Chromium/.test(b.brand); }))), XF = null;
+  function fadeSwap(fn) {
+    if (XF) { clearTimeout(XF.t); clearTimeout(XF.u); var f0 = XF.fn; XF = null; if (f0) f0(); }
+    var x = XF = { fn: fn }; H.classList.remove('xfi'); H.classList.add('xfo');
+    x.t = setTimeout(function () { x.fn = null; fn(); H.classList.remove('xfo'); void D.body.offsetWidth; H.classList.add('xfi'); x.u = setTimeout(function () { H.classList.remove('xfi'); if (XF === x) XF = null; }, 260); }, 110);
+  }
+  function trans(fn) { window.__vtForce = 0; if (VT) { try { VT.skipTransition(); } catch (e) {} VT = null; } if (CALM) return fn(); if (!D.startViewTransition || !VTOK || window.__VTOFF) return fadeSwap(fn); H.dataset.vtp = '1'; var vt = VT = D.startViewTransition(fn); vt.finished.finally(function () { if (VT === vt) { VT = null; delete H.dataset.vtp; } }); }
   function stagger(el) { if (CALM) return; var bl = $$('.sc > .grp, .tx9 > .tx9h, .tx9 > .grp, .lb7 > .sh, .lbw > .lbh, .lbw > .lbsn9, .lbw > .lbg, .lbs9 > *', el).slice(0, 14); bl.forEach(function (b, i) { b.style.setProperty('--d', i); b.classList.add('blk9'); }); clearTimeout(stagger.t); stagger.t = setTimeout(function () { bl.forEach(function (b) { b.classList.remove('blk9'); }); }, 1300); }
   /* 切栏目: 笔记页展开的课程全部收回, 检索清空 */
   function page(p) { if (p === R.p) return; morph(); OPEN = {}; clearQ(); trans(function () { R.p = p; R.node = ''; scrollTo(0, 0); return render(false); }); }

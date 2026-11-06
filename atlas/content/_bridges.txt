@@ -167,3 +167,7 @@ X DPNLP1:hall ~ DPNLP2:halluc | 幻觉是 RAG 的动机.
 X DPNLP1:faith ~ DPNLP2:faithful | 忠实性.
 X DPNLP1:mlm ~ DPNLP2:masking | 掩码扩散语言模型的前向过程就是掩码.
 X DPNLP1:clsmetric ~ DPNLP2:retmetrics | 检索的评估指标.
+X MGTN:quant ~ DBS:quantor | 同一对量词: MGTN 讲逻辑, DBS 用它写查询.
+X MGTN:junktor ~ DBS:impl | 蕴含只在前提真、结论假时为假, 两门课用同一张真值表.
+X MGTN:darst ~ DBS:trc | 元组演算的 {t ∣ Ψ(t)} 就是内涵式写法.
+X MGTN:aussage ~ DBS:freebound | 带自由变量的公式还不是命题, 代入以后才有真值.

@@ -209,3 +209,78 @@ S kombi | push | 先选择再连接 |  | 中间结果更小.
 D baum | Ausdrücke der relationalen Algebra lassen sich als Baum darstellen: Knoten sind Operationen, Kanten den Datenfluss zwischen Operationen.
 X baum | 运算树的叶子是关系, 数据从下往上流, 根节点的输出就是查询结果. SELECT A₁, …, Aₙ FROM R₁, …, Rₘ WHERE p 的标准翻译是 π_A(σ_p(R₁ × … × Rₘ)): FROM → 积, WHERE → 选择, SELECT → 投影. 数据库就在这样的树上做优化, 例如把选择挪到积的下面, 或把积加选择换成连接; 树的形状变了, 结果不变.
 S baum | sqltrans | SQL 的标准翻译 |  | FROM → 积, WHERE → 选择, SELECT → 投影.
+
+D kalkuel | Ein Kalkül ist ein formales System aus Symbolen und Regeln, mit denen sich Ausdrücke bilden und nach festgelegten Regeln umformen oder Aussagen ableiten lassen.
+X kalkuel | 演算 (Kalkül) 是一套符号加规则: 按规则构造表达式, 再按规则变形或推出结论. 本章的目标是用这样的演算写数据库查询. 数学里的样板是谓词演算 (Prädikatenkalkül): 集合 {x² ∣ x ∈ ℕ ∧ x³ > 0 ∧ x³ < 1000} 有变量和取值范围、选择条件、可能的量词、逻辑运算符和结果计算这几部分, 它们后来分别对应元组变量、WHERE 条件、EXISTS 和 SELECT 列表. 这个例子的结果是 1 到 81 的 9 个平方数.
+S kalkuel | bestand | 演算的组成部分 |  | 变量和取值范围、谓词、量词、逻辑运算符、结果计算.
+S kalkuel | praedk | 谓词演算 | Prädikatenkalkül | 一阶逻辑, 关系演算的数学原型.
+
+D relkalk | Der Relationenkalkül ist eine deklarative Sprache: Ein Ausdruck beschreibt, welche Eigenschaften die Tupel der Ergebnisrelation haben sollen, ohne zu sagen, wie das Ergebnis erzeugt wird.
+X relkalk | 关系代数是过程式的 (prozedural), 表达式写出用哪些运算算结果; 关系演算 (Relationenkalkül) 是声明式的 (deklarativ), 只描述结果元组的性质. 演算有两种: 元组演算 (TRC) 的变量是整行, 域演算 (DRC) 的变量是单个属性值. SQL 的写法来自元组演算, QBE 来自域演算, 而数据库内部执行时用的是关系代数的运算树. 在数据库查询里, 条件可以引用关系 (t ∈ Department), 原子公式是数据类型上的比较, 再用 ∧ ∨ ¬ ∃ ∀ 组合.
+S relkalk | trcdrc | 两种关系演算 | TRC / DRC | 变量类型不同: 元组或单个值.
+S relkalk | wiewas | 「怎样」与「什么」 |  | 代数是过程式, 演算是声明式.
+
+D trc | Der Tupelkalkül beschreibt mit einem Ausdruck { t ∣ Ψ(t) } die Menge der Tupel, die eine Formel Ψ erfüllen; t ist die einzige freie Variable.
+X trc | 元组演算 (Tupelkalkül) 由 Codd 在 70 年代初提出, 是 QUEL 和 SQL 的灵感来源. 元组变量 (Tupelvariable) 有确定的模式, 属性用 t.A、t[A] 或按位置 t[1] 取. 表达式 {t ∣ Ψ(t)} 表示所有使 Ψ 为真的元组, 竖线左边的 t 必须是 Ψ 里唯一的自由变量. 例: {s.name ∣ student(s) ∧ ∃e(einschreibung(e) ∧ ∃k(kurs(k) ∧ s.mnr = e.mnr ∧ k.knr = e.knr ∧ k.kursname = 'Datenstrukturen'))} 找选了 Datenstrukturen 的学生, 翻成 SQL 就是外层 FROM student s 加 EXISTS 子查询. 演算分语法 (Syntax, 怎样构造) 和语义 (Semantik, 表示什么) 两部分讲.
+S trc | tvar | 元组变量 | Tupelvariable | 代表一整行, 有固定模式.
+S trc | attrz | 属性访问 | Attributzugriff | t.A、t[A] 或 t[1].
+S trc | allq | 全称查询 |  | 选了所有课程: ∀k(kurs(k) ⇒ ∃e …), 对应除法.
+
+D freebound | Eine freie Variable steht für die Tupel, die das Ergebnis der Anfrage bilden; eine gebundene Variable ist nur innerhalb einer logischen Formel lokal definiert (z. B. innerhalb eines Quantors).
+X freebound | 变量紧跟在某个量词后面、出现在它的作用范围里, 就是约束变量 (gebundene Variable); 没有量词约束它, 就是自由变量 (freie Variable). 没有自由变量的公式是封闭的 (geschlossen), 本身有真值, 如 ∀x(Mensch(x) ⇒ sterblich(x)); 有自由变量的公式是开放的 (offen), 真假取决于代入什么. ∀y(Mensch(y) ⇒ liebt(y, x)) 里 y 约束、x 自由, 描述的是 x 的性质「所有人都爱 x」. 查询 {t ∣ Ψ(t)} 就是一个只有 t 自由的开放公式.
+S freebound | frei | 自由变量 | freie Variable | 没被量词约束, 代表结果.
+S freebound | gebunden | 约束变量 | gebundene Variable | 被量词约束, 只在公式内部有定义.
+S freebound | geschl | 封闭与开放的公式 |  | 封闭的有真值, 开放的取决于代入.
+
+D atom | Atome sind die Relationszugehörigkeit R(t), der Vergleich zweier Attribute t.A Θ s.B und der Vergleich eines Attributs mit einer Konstante t.A Θ c.
+X atom | 原子 (Atom) 是公式最小的单位, 只有三种: 关系成员 R(t) (也写 t ∈ R), 两个属性比较 t.A Θ s.B, 属性和常量比较 t.A Θ c, 其中 Θ 是 =、<、>、≥、≤、≠ 之一. 第二种对应 SQL 的连接条件 (t.AbtNr = u.AbtNr), 第三种对应普通过滤 (t.Gehalt > 50000). 原子里出现的变量都是自由的.
+S atom | relzug | 关系成员 | Relationszugehörigkeit | R(t): 元组 t 在关系 R 里.
+S atom | attrvgl | 两个属性比较 |  | t.A Θ s.B, 对应连接条件.
+S atom | konstvgl | 属性和常量比较 |  | t.A Θ c, 对应过滤条件.
+
+D formel | Der Aufbau von Formeln Ψ ist rekursiv definiert: Jedes Atom ist eine Formel; mit Ψ₁, Ψ₂ sind auch ¬Ψ₁, (Ψ₁ ∧ Ψ₂), (Ψ₁ ∨ Ψ₂) und (∃t)(Ψ), (∀t)(Ψ) Formeln.
+X formel | 公式 (Formel) 按递归 (rekursiv) 定义: 先规定原子是公式, 再规定用 ¬、∧、∨ 组合公式、给自由变量加量词仍得到公式. 逻辑运算符不改变变量的自由 / 约束身份, 加量词是变量变成约束的唯一途径. 常用简写: Ψ₁ ⇒ Ψ₂ 是 ¬Ψ₁ ∨ Ψ₂; ∃t₁, …, tₖ 合并连续的量词; ∃t ∈ R 展开成 ∃t(R(t) ∧ …), ∀t ∈ R 展开成 ∀t(R(t) ⇒ …).
+S formel | rek | 递归构造 | rekursiv | 原子 → 逻辑运算符 → 量词.
+S formel | kurz | 公式简写 | Formelvereinfachungen | ⇒、合并量词、带范围的量词.
+
+D quantor | Ist Ψ eine Formel mit t als freier Variable, so sind (∃t)(Ψ) und (∀t)(Ψ) Formeln; der Allquantor entspricht implizit einer UND-, der Existenzquantor einer ODER-Verknüpfung.
+X quantor | 量词 (Quantor) 约束一个变量. 全称量词 (Allquantor) ∀ 相当于对所有取值做「且」, 存在量词 (Existenzquantor) ∃ 相当于做「或」, 由此得到 ¬∀xΨ ⇔ ∃x¬Ψ 和 ¬∃xΨ ⇔ ∀x¬Ψ. 量词的顺序有含义: ∀x ∃y Vater(y, x) 是「每人都有父亲」, ∃y ∀x 是「有一个人是所有人的父亲」. SQL 没有 ∀, 「选了所有课程」只能写成「不存在一门课, 使得不存在选课记录」, 即双重 NOT EXISTS.
+S quantor | allq2 | 全称量词 | Allquantor | ∀, 相当于所有取值的「且」.
+S quantor | exq | 存在量词 | Existenzquantor | ∃, 相当于所有取值的「或」.
+S quantor | demorgan | 量词的否定 |  | 否定穿过量词时 ∀ 和 ∃ 互换.
+
+D impl | Eine Aussage A ⇒ B ist nur dann false, wenn A true und B false ist; A ⇒ B kann als Vereinfachung von ¬A ∨ B eingesetzt werden.
+X impl | 蕴含 (Implikation) 读作「如果 A 成立, B 也必须成立」, 真值表和 ¬A ∨ B 完全相同. 前件为假时蕴含自动为真, 这正是元组演算里 ∀ 和 ⇒ 搭配的原因: ∀t(t ∈ Employee ⇒ t.Gehalt > 50000) 把要求限制在 Employee 的元组上, 不在表里的元组 (像不在公司的 Clara) 不会让整个 ∀ 变假. 反过来, ∃ 要配 ∧: ∃x(Mensch(x) ⇒ Philosoph(x)) 只要有一个非人的东西就为真, 意思就错了.
+S impl | allimpl | ∀ 配 ⇒ |  | 把要求限制在某个关系的元组上.
+S impl | exund | ∃ 配 ∧ |  | 找一个满足条件的元组.
+
+D semantik | Semantik ist die Bedeutung, die einem korrekt aufgebauten Ausdruck zugeordnet ist: Tupelvariablen werden konkrete Tupel, Formeln true oder false, Ausdrücke Relationen.
+X semantik | 语义 (Semantik) 分三层: 变量赋值 (Variablenzuweisung) Ψ(r ∣ t) 把 t 的每个自由出现换成具体元组 r; 解释 (Interpretation) I 按公式的结构递归求真值, R(r) 为真当且仅当 r 在 R 里; 量词 ∃s / ∀s 让 s 跑遍整个值域 D₁ × D₂ × …. 表达式 {t ∣ Ψ(t)} 的含义是所有使 I(Ψ(r ∣ t)) = true 的元组 r, 而且 r 不限于数据库里存的元组. 例: Ψ(t) = student(t) ∧ t.alter ≥ 21, 代入 Alice (20)、Bob (22)、Carol (19)、Dave (21), 结果是 Bob 和 Dave.
+S semantik | zuweis | 变量赋值 | Variablenzuweisung | Ψ(r ∣ t): 用 r 代替 t 的自由出现.
+S semantik | interp | 解释 | Interpretation | 按结构递归求真值.
+S semantik | ausdrsem | 表达式的含义 |  | 所有使公式为真的元组, 不只是库里的.
+
+D sicher | Eine sichere Anfrage beschränkt ihre Ergebnisse auf Werte aus der Datenbank und der Anfrage.
+X sicher | 因为变量跑遍整个值域, 有些语法正确的表达式结果是无穷的: {t ∣ t.1 = t.2} 是所有两个分量相同的字符串对, {t ∣ ¬(t ∈ Studierende)} 是所有不在学生表里的元组. 这种结果既存不下也算不完, 所以只允许安全表达式 (sichere Ausdrücke): 结果只含数据库里的值和查询里的常量. 实用判断: 每个自由变量都要被一个正的关系原子限定, 否定只用在已经限定的变量上. 关系代数没有补集运算, 天生安全; 安全的演算和关系代数表达能力 (Ausdrucksstärke) 相同.
+S sicher | unendl | 无穷的结果 |  | 不受限的变量或否定会得到无穷关系.
+S sicher | aequiv | 和关系代数等价 | Ausdrucksstärke | 只对安全的演算成立.
+
+D drc | Im Domänenkalkül stehen Domänenvariablen x₁ : D₁, x₂ : D₂, … für einzelne Attribute; ein Ausdruck hat die Form { x₁, x₂, … ∣ Ψ(x₁, x₂, …) }.
+X drc | 域演算 (Domänenkalkül) 的变量是单个属性值, 原子 R(x₁, x₂, …) 按位置对应 R 的属性, 公式的构造和元组演算一样. 常量可以直接写进原子: student(x₁, x₂, x₃, 'Mathematik'). 同一个变量出现在两个原子里就表示这两个位置相等, 也就是等值连接, 不用写等式. 「只由 SPD 执政的州」写成 {x₁ ∣ ∃x₂ : Bundesland(x₁, x₂, SPD) ∧ ¬∃y₃ : (Bundesland(x₁, x₂, y₃) ∧ y₃ ≠ SPD)}: 有, 并且没有别的.
+S drc | dvar | 域变量 | Domänenvariable | 代表单个属性值.
+S drc | posat | 按位置的原子 |  | R(x₁, x₂, …) 按列的顺序对应.
+S drc | equij | 同一变量表示连接 | Equi-Join | 两个原子共用一个变量.
+
+D qbe | Query By Example basiert auf dem Domänenkalkül; dem Benutzer wird ein Tabellenskelett angeboten, das bearbeitet werden kann, und das System ergänzt die restliche Tabelle.
+X qbe | QBE (Query By Example) 是 IBM 70 年代提出的图形化查询语言, 面向偶尔查数据的用户. 用户在表格骨架 (Tabellenskelett) 里填写: 命令 P. (输出, 同时起投影作用)、I. 插入、D. 删除、U. 更新; 以下划线开头的域变量 (_x), 两格填同一个变量表示连接; 常量和比较 (<0、≥5); 格子放不下的条件写进条件框 (Bedingungsfeld), 只有 AND 和 OR. 否定用开头写 ¬ 的一行, 表示「不存在这样的元组」. 跨两张表输出时要新建一张结果表; QBE 自动去重.
+S qbe | befehle | QBE 命令 |  | P. 输出, I. 插入, D. 删除, U. 更新.
+S qbe | qvar | QBE 的域变量 |  | 下划线开头, 同一变量 = 连接.
+S qbe | bedf | 条件框 | Bedingungsfeld | 只有 AND、OR, 没有 NOT.
+S qbe | negz | 否定行 |  | 行首写 ¬: 不存在这样的元组.
+S qbe | ergtab | 结果表 |  | 输出来自两张表的列时要新建.
+
+D qbevgl | Konstanten und Domänenvariablen entsprechen sich; leere Spalten sind paarweise verschiedene, ∃-quantifizierte Domänenvariablen, Spalten mit P. freie und Spalten ohne P. ∃-quantifizierte Variablen.
+X qbevgl | QBE 和域演算一一对应, 所以 QBE 查询能机械地翻译: 给每一行的每一列一个变量; 带 P. 的列进结果列表 (自由变量), 其余列和自己起名的变量用 ∃ 约束; 每一行变成一个关系原子, 用 ∧ 连起来; 格子里的常量、比较、变量变成条件 (x₅ = Huber, x₇ ≥ 5, w = x₃); 条件框也用 ∧ 接上; 最后代掉等式化简. QBE 是关系完备 (relational vollständig) 的, 但有些代数查询要拆成几个 QBE 查询.
+S qbevgl | leer | 空列 |  | 互不相同的 ∃ 变量.
+S qbevgl | algo | 翻译步骤 | Realisierung einer QBE-Abfrage | 列 → 变量 → 量词 → 原子 → 条件 → 化简.
+S qbevgl | relvoll | 关系完备 | relational vollständig | 能表达所有关系代数查询.

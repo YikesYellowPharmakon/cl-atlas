@@ -1147,3 +1147,6 @@ svg.gv { transform-origin: 0 0; will-change: transform; overflow: visible; }
 
 /* v16g: 术语详情收起时的临时垫块 */
 .tsp9 { display: block; pointer-events: none; }
+
+/* 非 Chromium 浏览器的切换过渡 (代替视图过渡, 见 core.js fadeSwap): 只动正文, 页头和筛选行不动 */
+html.xfo #main { opacity: 0; transition: opacity .11s cubic-bezier(.4, 0, 1, 1); } html.xfi #main { animation: xf9in .22s ease both; } @keyframes xf9in { from { opacity: 0; } to { opacity: 1; } }
