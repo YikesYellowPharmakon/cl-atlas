@@ -1157,3 +1157,7 @@ html.xfo #main { opacity: 0; transition: opacity .11s cubic-bezier(.4, 0, 1, 1);
 /* 2026-11-06 收放结尾跳 6px: 组标题下距 10px 和行上距 6px 靠外边距折叠合并; 第一行收到高度 0 但还没隐藏时折叠失效 (10+6), 隐藏瞬间又弹回.
    改成不折叠的写法 (4+6=10), 最终版面不变, 全程没有跳动 */
 .sc > .grp[data-g] { display: flex; flex-direction: column; } .sc > .grp[data-g] > * { flex: none; min-width: 0; } .sc > .grp[data-g] > .sh { margin-bottom: 4px; }
+
+/* 2026-11-07 筛选收放时文字上下抖动: 行靠逐帧改高度移动, 落在小数位置, 浏览器给每一行文字各自取整到像素, 同一行里中文、外文、编号就各跳各的 (相差 1px).
+   每行自成图层, 文字作为一个整体移动, 像素级测试 tests/jit.mjs 确认相对距离不再变化. 常驻不切换, 否则进出图层的瞬间还会跳一下 */
+.sc > .grp > .sh, .sc > .grp .cr, .tx9 .cr.ts9, .tx9 .tg9k { will-change: transform; }
