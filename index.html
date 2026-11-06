@@ -2433,8 +2433,21 @@ window.IDX={"courses": [{"code": "EIP", "mod": "HP1", "g": "HP", "zh": "计算�
   /* 笔记页: 所有课程行一直在页面上. 筛选 = 同一个列表收起和展开 (不换页, 没有淡入淡出的幻影); 连续点击时从当前高度接着动 */
   var NOTESF = null;
   function notes(el) { el.innerHTML = IDX.groups.map(function (g) { return { g: g, l: CS.filter(function (c) { return c.g === g.k; }) }; }).filter(function (x) { return x.l.length; }).map(function (x, i) { return '<section class="grp" data-g="' + x.g.k + '">' + shHead(x.g, i === 0, x.l) + x.l.map(function (c) { return '<div class="cr cx-' + c.code + '" style="--vn:c-' + c.code + '" data-nopen="' + c.code + '">' + crHead(c) + '<div class="cb"><div class="nbox"></div></div></div>'; }).join('') + '</section>'; }).join('');
-    var openT = 0;
-    function applyF(anim) { clearTimeout(openT); spDrop(); foldList(el, function (r) { return r.dataset.nopen; }, anim);
+    var openT = 0, prevF = R.f;
+    /* 2026-11-06: 同一大类里从一门课换到另一门课 (如 HP 里 EICL → SNS): 原地替换, 不再「旧行收起 + 新行展开 + 0.2 秒后再展开笔记列表」两段跳.
+       新课程连同笔记列表一步到位, 只做淡入 + 轻微上浮; 所在组的高度从旧高度平滑过渡到新高度. */
+    function swapCourse(from, to) { var o = el.querySelector('[data-nopen="' + from + '"]'), n = el.querySelector('[data-nopen="' + to + '"]'), g = n && n.closest('.grp');
+      if (!o || !g || o.closest('.grp') !== g || g.classList.contains('k5off')) return false;
+      (g.getAnimations ? g.getAnimations() : []).forEach(function (a) { if (a.id === 'swap') a.cancel(); }); var h0 = g.getBoundingClientRect().height;
+      foldList(el, function (r) { return r.dataset.nopen; }, false);
+      o.classList.remove('open'); delete OPEN[from]; var cb = $('.cb', n); cb.style.transition = 'none'; show(n, true); OPEN[to] = 1; void cb.offsetHeight; cb.style.transition = '';
+      var h1 = g.getBoundingClientRect().height; g.style.overflow = 'clip';
+      var a = g.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 300, easing: 'cubic-bezier(.22,.8,.24,1)' }); a.id = 'swap'; a.onfinish = a.oncancel = function () { g.style.overflow = ''; };
+      n.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.22,.8,.24,1)' });
+      return true; }
+    function applyF(anim) { clearTimeout(openT); spDrop(); var from = prevF; prevF = R.f;
+      if (anim && !CALM && BY[from] && BY[R.f] && from !== R.f && swapCourse(from, R.f)) return;
+      foldList(el, function (r) { return r.dataset.nopen; }, anim);
       if (anim) { $$('.cr.open', el).forEach(function (cr) { if (cr.dataset.nopen !== R.f) cr.classList.remove('open'); }); if (BY[R.f]) openT = setTimeout(function () { var cr = el.querySelector('[data-nopen="' + R.f + '"]'); if (cr && cr.isConnected && !cr.classList.contains('open')) cr.querySelector('.ch').click(); }, CALM ? 0 : 200); } }
     NOTESF = applyF; CLEAN.push(function () { NOTESF = null; clearTimeout(openT); }); applyF(false);
     function show(cr, on) { cr.classList.toggle('open', on); if (on) fill($('.nbox', cr), cr.dataset.nopen); }
