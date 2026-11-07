@@ -78,6 +78,10 @@ if '--nogate' not in sys.argv:
     _bad = {code: _g for code, _g in ((c, _CV.report(c)['gate']) for c in REPORT) if _g}
     if _bad: raise SystemExit('闸门未通过, 详情见 cand/<课>.cover.txt: ' + str(_bad))
 [os.remove(f) for f in glob.glob(DATA + '/*.js')]; [shutil.move(f, DATA) for f in glob.glob(TMPD + '/*.js')]; shutil.rmtree(TMPD, ignore_errors=True)
+# 视觉层 (来自 skill, 笔记也用) 的手机判断在 Atlas 里换成 shell.html 开头的统一判断: iPad 和手机请求桌面网站都走桌面效果. 只改这个页面, 不动 skill
+_LITE = "var LITE = matchMedia('(max-width: 640px) and (hover: none) and (pointer: coarse)').matches;"
+if page.count(_LITE) != 1: raise SystemExit('视觉层的手机判断找不到了, 检查 glass 脚本')
+page = page.replace(_LITE, 'var LITE = !!window.__LITE;')
 open(PAGE, 'w', encoding='utf-8').write(page)
 if REPO_PAGE:
     rp = page

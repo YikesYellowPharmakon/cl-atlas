@@ -1177,3 +1177,14 @@ svg.gv.fd { animation: gfade .32s ease both; }
 /* 2026-11-07 遮罩期间: 笔记不做自身的淡入 (rdqn); 遮罩盖住后隐藏底下的页面 (rdq), 减少 GPU 负担 */
 html.rdqn #rd { transition: none !important; }
 html.rdq #main, html.rdq #top, html.rdq #rail, html.rdq #toc-pill, html.rdq #bgfield, html.rdq #bg, html.rdq #progress { visibility: hidden; }
+
+/* ===== 手机精简 (2026-11-07): html.lite 只在手机默认视图 (判断见 shell.html); 平板、手机请求桌面网站、电脑都不受影响. 去掉 GPU 开销大的装饰, 只留清晰的层次 ===== */
+html.lite, html.lite[data-mode="day"] { background: var(--bg-a); background-attachment: scroll; }
+html.lite .sc > .grp > .sh, html.lite .sc > .grp .cr, html.lite .tx9 .cr.ts9, html.lite .tx9 .tg9k { will-change: auto; }
+html.lite .cr::after { display: none !important; }
+html.lite .cr, html.lite[data-mode="day"] .cr { box-shadow: 0 0 0 1px var(--ring) !important; }
+html.lite .sh::before { -webkit-mask: none; mask: none; height: 1px; opacity: .45; }
+html.lite #top::before { -webkit-mask: none; mask: none; height: 110px; background: linear-gradient(var(--bg-a) 62%, transparent); }
+html.lite .key { box-shadow: 0 0 0 1px color-mix(in srgb, var(--dv, var(--k-ans2)) 28%, transparent); }
+html.lite .key::before, html.lite .key::after { box-shadow: none !important; }
+
