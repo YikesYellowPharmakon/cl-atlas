@@ -17,7 +17,7 @@
     /* 拖动/缩放/镜头飞行期间不重画 SVG (节点多时每帧重画上千个元素会卡): 整张图层用 GPU 平移缩放;
        停下 150ms 后才把真实变换写回 #cam、重排标签. force = 立刻写回 (需要量位置的地方用). */
     function commitCam() { clearTimeout(apply.cm); svg.style.transform = ''; cam.setAttribute('transform', 'translate(' + f1(W / 2 + cx) + ' ' + f1(HH / 2 + OY + cy) + ') scale(' + k.toFixed(4) + ')'); apply.c = { cx: cx, cy: cy, k: k }; /* 子概念层在镜头停下后才建、才显示 (飞行中建上百个元素会卡一下) */ var z2 = k > fitK * 1.55; gs.classList.toggle('z2', z2); if (z2 && X.buildSubs && !X.subsBuilt && !X.subsQ) { X.subsQ = 1; var bs = X.buildSubs; (window.requestIdleCallback || function (f) { return setTimeout(f, 80); })(function () { X.subsQ = 0; if (X.buildSubs === bs && gs.classList.contains('z2')) bs(); }, { timeout: 300 }); } syncPins(); }
-    function apply(force) { gs.classList.add('mv'); clearTimeout(mvT); mvT = setTimeout(function () { gs.classList.remove('mv'); }, 180); clampXY();
+    function apply(force) { apply.last = performance.now(); gs.classList.add('mv'); clearTimeout(mvT); mvT = setTimeout(function () { gs.classList.remove('mv'); }, 180); clampXY();
       if (force || !apply.c || CALM) commitCam(); else { var C = apply.c, s = k / C.k; if (Math.abs(s - 1) > .002) { gs.classList.add('zm'); clearTimeout(apply.zm); apply.zm = setTimeout(function () { gs.classList.remove('zm'); }, 280); } var tx = (W / 2 + cx) - s * (W / 2 + C.cx), ty = (HH / 2 + OY + cy) - s * (HH / 2 + OY + C.cy); svg.style.transform = 'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')'; clearTimeout(apply.cm); apply.cm = setTimeout(commitCam, 150); }  clearTimeout(cullT); cullT = setTimeout(cull, 170); if (X.loc) locPos(); }
     function syncPins() { if (apply.k === k && apply.n === CSN.length) return; apply.k = k; apply.n = CSN.length; var s = (1 / k).toFixed(4); for (var i = 0; i < CSN.length; i++) CSN[i].setAttribute('transform', 'translate(' + CSN[i]._x + ' ' + CSN[i]._y + ') scale(' + s + ')'); }
     function zoomTo(nk, mx, my, ms) { nk = Math.max(fitK * .8, Math.min(fitK * 6, nk)); mx = mx || 0; my = my || 0; var tc = mx - (mx - cx) * nk / k, ty = my - (my - cy) * nk / k; if (ms) tween(tc, ty, nk, ms); else { cancelAnimationFrame(raf); cx = tc; cy = ty; k = nk; req(); } }
@@ -34,6 +34,8 @@
     function clear() { apply.k = 0; apply.c = null; clearTimeout(apply.cm); svg.style.transform = ''; cam.textContent = ''; defs.textContent = ''; CSN = []; X = {}; say(''); hov = null; gs.classList.remove('hv', 'fzm', 'trm', 'brv'); fzx.hidden = true; tb.hidden = true; lc.hidden = true; lc.innerHTML = ''; gs.classList.remove('lcm'); if (BV) { BV.remove(); BV = null; } }
     /* 标签避让: 按优先级放, 和已放的标签相交就先藏起来; 悬停或放大后再出现 */
     var OBS = null, OBK = '', G0 = null, cullR = 0; function cullSoon() { if (!cullR) cullR = requestAnimationFrame(function () { cullR = 0; cull(); }); }
+    /* 2026-11-07 文字闪烁: 换场景时标签全部先显示再被碰撞检测藏掉一部分, 看起来闪一下. 换场景时先藏住 (.lh0), 镜头停稳、第一次放置算完才淡入放得下的那些; 放置规则不变 */
+    var lh0T = 0; function holdLabs() { if (CALM) return; gs.classList.add('lh0'); clearTimeout(lh0T); lh0T = setTimeout(function () { if (!gs.isConnected) return; cull(); gs.classList.remove('lh0'); }, 800); cullSoon(); }
     function cull() { var ck = [W, HH, cx.toFixed(0), cy.toFixed(0), k.toFixed(3), scrollY].join(); if (ck !== OBK) { OBK = ck; OBS = null; G0 = null; } if (!G0) G0 = gs.getBoundingClientRect(); var placed = [], sx0 = W / 2 + cx, sy0 = HH / 2 + OY + cy, g0 = G0;
       if (!OBS) { OBS = [];
       /* 标题在做升起动画时 (core.js stagger), 量到的位置会偏下; 按 offsetTop (不含 transform) 扣回去, 避让区域始终是标题的最终位置 */
@@ -50,11 +52,11 @@
           opt = [[0, 0, [sx - w, sy + a0, sx + w, sy + a1]], [0, -(a0 + a1), [sx - w, sy - a1, sx + w, sy - a0]], [d + 4 + w, -mid, [sx + d + 2, sy - h2, sx + d + 6 + 2 * w, sy + h2]], [-(d + 4 + w), -mid, [sx - d - 6 - 2 * w, sy - h2, sx - d - 2, sy + h2]]], pick = null;
         var was = !g.classList.contains('lh'), m = -1, ord = [0, 1, 2, 3]; if (was && g._pi != null) { ord.splice(ord.indexOf(g._pi), 1); ord.unshift(g._pi); } /* 先试上次的位置; 原来显示的留一点余量, 原来藏着的要多一点空间才出来 — 缩放时不来回跳 */
         for (var oj = 0; oj < 4; oj++) { var oi = ord[oj], bx = opt[oi][2], bb = [bx[0] - 2 - m, bx[1] - 2 - m, bx[2] + 2 + m, bx[3] + 2 + m]; if (bx[0] >= 2 && bx[2] <= W - 2 && !hit(bb)) { pick = opt[oi]; g._pi = oi; break; } } var onScr = sx > -40 && sx < W + 40 && sy > -40 && sy < HH + 40; g._hc = !pick && onScr ? 1 : 0; /* 只因在屏幕外而藏的, 回来时不加门槛 */
-        g.classList.toggle('lh', !pick); if (pick) { placed.push([pick[2][0] - 2, pick[2][1] - 2, pick[2][2] + 2, pick[2][3] + 2]); var pk = pick[0] + ',' + pick[1]; if (g._pk !== pk) { g._pk = pk; if (!g._lg) g._lg = $('.lab', g); if (g._lg) g._lg.setAttribute('transform', pick[0] || pick[1] ? 'translate(' + pick[0].toFixed(1) + ' ' + pick[1].toFixed(1) + ')' : ''); } } }); }
+        g.classList.toggle('lh', !pick); if (pick) { placed.push([pick[2][0] - 2, pick[2][1] - 2, pick[2][2] + 2, pick[2][3] + 2]); var pk = pick[0] + ',' + pick[1]; if (g._pk !== pk) { g._pk = pk; if (!g._lg) g._lg = $('.lab', g); if (g._lg) g._lg.setAttribute('transform', pick[0] || pick[1] ? 'translate(' + pick[0].toFixed(1) + ' ' + pick[1].toFixed(1) + ')' : ''); } } }); if (gs.classList.contains('lh0') && performance.now() - (apply.last || 0) >= 150) { clearTimeout(lh0T); gs.classList.remove('lh0'); } }
 
     /* ===== 一门课 ===== */
     function drawCourse(c, focus, from) {
-      scene = 'course'; cur = c; clear(); back.hidden = false; gs.classList.remove('allv'); gs.classList.add('crs'); WX = (RB + 36) * EX * 2 + 120; WY = (RB + 70) * 2 + 30; size();
+      scene = 'course'; cur = c; holdLabs(); clear(); back.hidden = false; gs.classList.remove('allv'); gs.classList.add('crs'); WX = (RB + 36) * EX * 2 + 120; WY = (RB + 70) * 2 + 30; size();
       tit.innerHTML = '<b>' + esc(c.zh) + '</b><small>' + esc(c.mod + ' · ' + c.code + ' · ' + c.fo) + '</small>';
       leg.innerHTML = '<span>越靠内越基础</span><span><i class="lgp"></i>先修</span><span><i class="lgr"></i>对照</span><span class="lk">单击概念聚焦 · 双击看详情 · 点分支名看分支 · 点中心走学习路线</span>';
       var B = c.branches, BI = {}, P = {}, deg = {}, pre = {}, nb = {}; B.forEach(function (b, i) { BI[b.id] = i; b.am = (b.a0 + b.a1) / 2; });
@@ -160,7 +162,7 @@
     /* 总览标题: 全部 = 全部课程; 选了 HP / NP 等 = 这一类的名字 */
     function allTit() { var g = IDX.groups.filter(function (x) { return x.k === String(R.f).replace(/^g:/, ''); })[0]; tit.innerHTML = g ? '<b>' + esc(g.zh) + '</b><small>' + esc(g.de) + '</small>' : '<b>全部课程</b><small>Alle Kurse</small>'; }
     function drawAll(from, back0) {
-      scene = 'all'; cur = null; clear(); back.hidden = true; gs.classList.add('allv'); gs.classList.remove('crs');
+      scene = 'all'; cur = null; holdLabs(); clear(); back.hidden = true; gs.classList.add('allv'); gs.classList.remove('crs');
       var act = CS.filter(function (c) { return c.has && c.loaded; }), n = act.length, pend = CS.filter(function (c) { return !c.has && !c.nog; }).length, PR = X.PR = PAIRS();
       var AR = Math.max(.9, Math.min(1.6, (W || 712) / Math.max(320, (HH || 600) - 120)));
       var CL = act.map(function (c) { var R = 17 + 3.5 * Math.sqrt(c.nodes.length), lw = Math.max(c.zh.length * 13.5, 70); return { c: c, R: R, w: Math.max(2 * R, lw) + 6, h: 2 * R + 40, dy: 20 }; });

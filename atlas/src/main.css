@@ -1161,3 +1161,6 @@ html.xfo #main { opacity: 0; transition: opacity .11s cubic-bezier(.4, 0, 1, 1);
 /* 2026-11-07 筛选收放时文字上下抖动: 行靠逐帧改高度移动, 落在小数位置, 浏览器给每一行文字各自取整到像素, 同一行里中文、外文、编号就各跳各的 (相差 1px).
    每行自成图层, 文字作为一个整体移动, 像素级测试 tests/jit.mjs 确认相对距离不再变化. 常驻不切换, 否则进出图层的瞬间还会跳一下 */
 .sc > .grp > .sh, .sc > .grp .cr, .tx9 .cr.ts9, .tx9 .tg9k { will-change: transform; }
+
+/* 2026-11-07 图谱换场景: 标签等放置算完再淡入 (graph.js holdLabs) */
+.gs.lh0 .n .lab { opacity: 0 !important; transition: none !important; }
