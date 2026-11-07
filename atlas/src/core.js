@@ -43,8 +43,10 @@
   var VTOK = !!(window.chrome || (navigator.userAgentData && (navigator.userAgentData.brands || []).some(function (b) { return /Chromium/.test(b.brand); }))), XF = null;
   function fadeSwap(fn) {
     if (XF) { clearTimeout(XF.t); clearTimeout(XF.u); var f0 = XF.fn; XF = null; if (f0) f0(); }
-    var x = XF = { fn: fn }; H.classList.remove('xfi'); H.classList.add('xfo');
-    x.t = setTimeout(function () { x.fn = null; fn(); H.classList.remove('xfo'); void D.body.offsetWidth; H.classList.add('xfi'); x.u = setTimeout(function () { H.classList.remove('xfi'); if (XF === x) XF = null; }, 260); }, 110);
+    var x = XF = { fn: fn }; H.classList.add('xfo');
+    /* 2026-11-07 手机端闪烁: 原来换完内容马上淡入, 术语 / 图谱的内容要等数据, 先淡入一个空页面, 内容来了再升起一次, 看起来闪两下; 笔记则淡入和分块升起叠加.
+       改成等内容真正到位才露出, 只留分块升起这一个效果 */
+    x.t = setTimeout(function () { x.fn = null; var show = function () { H.classList.remove('xfo'); if (XF === x) XF = null; }; Promise.resolve(fn()).then(show, show); }, 150); /* 比 110ms 的淡出多留一点: 淡出下一帧才开始, 等它真正到 0 再清内容 */
   }
   function trans(fn) { window.__vtForce = 0; if (VT) { try { VT.skipTransition(); } catch (e) {} VT = null; } if (CALM) return fn(); if (!D.startViewTransition || !VTOK || window.__VTOFF) return fadeSwap(fn); H.dataset.vtp = '1'; var vt = VT = D.startViewTransition(fn); vt.finished.finally(function () { if (VT === vt) { VT = null; delete H.dataset.vtp; } }); }
   function stagger(el) { if (CALM) return; var keep = window.__keepHead; window.__keepHead = 0; /* 术语同组换科目: 标题和分支条不动, 只有列表升起 */ var bl = $$(keep ? '.lbw > .lbsn9, .lbw > .lbg, .lbs9 > *' : '.gs > .gtop > .gtit, .sc > .grp:not(.lb7), .tx9 > .tx9h, .tx9 > .grp, .lb7 > .sh, .lbw > .lbh, .lbw > .lbsn9, .lbw > .lbg, .lbs9 > *', el).slice(0, 14); bl.forEach(function (b, i) { b.style.setProperty('--d', i); b.classList.add('blk9'); }); clearTimeout(stagger.t); stagger.t = setTimeout(function () { bl.forEach(function (b) { b.classList.remove('blk9'); }); }, 1300); }
@@ -189,8 +191,9 @@ __TOUCH__
   function reader(href, hit, a) { var c = hit[0], y0 = scrollY; RDR = { y: y0, code: c.code };
     morph(); H.dataset.course = c.code; if (window.__bgRepal) window.__bgRepal(); H.classList.add('reading');
     /* 加载遮罩: 星座 A 盖住画面, 笔记加载完并停在目标位置后退场 (intro.js) */
-    var mk = window.AtlasMark ? AtlasMark.play({ hold: true, fadeIn: true }) : null; RDR.mk = mk;
-    var f = D.createElement('iframe'); f.id = 'rd'; f.title = hit[1].t; f.src = href; D.body.appendChild(f); RDR.f = f;
+    var mk = window.AtlasMark ? AtlasMark.play({ hold: true, fadeIn: true, est: hit[1].z ? 800 + hit[1].z / 1048576 * 150 : 1500 }) : null; RDR.mk = mk;
+    /* 2026-11-07: 遮罩的动画先起跑, 下一帧才开始加载笔记 (解析会占住主线程, 先开始加载的话动画第一帧就卡) */
+    var f = D.createElement('iframe'); f.id = 'rd'; f.title = hit[1].t; f.src = href; RDR.f = f; var ins = function () { if (RDR && RDR.f === f) D.body.appendChild(f); }; if (mk) requestAnimationFrame(function () { setTimeout(ins, 0); }); else ins();
     if (mk) f.addEventListener('load', function () { settle(f, function () { mk.ready(); }); }, { once: true });
     var bar = D.createElement('div'); bar.id = 'rdb'; bar.innerHTML = '<button class="rdx" aria-label="回到笔记目录" title="回到笔记目录 (Esc)"><i class="rdi"></i></button>'; D.body.appendChild(bar); RDR.b = bar; $('.rdx', bar).onclick = leaveReader;
     /* 目录完全淡出 (260ms) 之后笔记才开始淡入, 两层不会叠在一起 */

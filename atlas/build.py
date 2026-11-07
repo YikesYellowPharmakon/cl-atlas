@@ -36,7 +36,7 @@ for folder, path in SR.course_dirs():
     base = '/'.join(urllib.parse.quote(x) for x in os.path.relpath(path, ROOT).split(os.sep)) + '/'; notes = []; REPO_BASE[base] = urllib.parse.quote(re.sub(r'^([A-Z]+)(\d)(?!\d)', r'\g<1>0\2', unicodedata.normalize('NFC', folder).strip())) + '/'  # 仓库里课程文件夹编号补零 (同 sync_repo.repo_name)  # 相对主页的路径: 整个文件夹搬到哪里都能打开
     for f in files:
         t = SR.title_of(os.path.join(path, f))[0]; k = SR.note_type(f)[1]
-        notes.append({'f': base + urllib.parse.quote(f), 'fn': f, 't': t, 'k': 'ex' if k == 'Exercises' or re.search(r'R ?实践', f) else 'lit' if '文献' in f else 'lec'})
+        notes.append({'f': base + urllib.parse.quote(f), 'fn': f, 't': t, 'z': os.path.getsize(os.path.join(path, f)), 'k': 'ex' if k == 'Exercises' or re.search(r'R ?实践', f) else 'lit' if '文献' in f else 'lec'})
     has = os.path.exists(f'{HERE}/content/{code}.txt'); hub = ''
     if has and code in NOGRAPH: raise SystemExit(f'{code} 属于不做图谱和术语的课 (candidates_rules.NOGRAPH), 不应有 content/{code}.txt')
     if has:

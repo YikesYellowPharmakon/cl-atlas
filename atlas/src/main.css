@@ -1149,7 +1149,7 @@ svg.gv { transform-origin: 0 0; will-change: transform; overflow: visible; }
 .tsp9 { display: block; pointer-events: none; }
 
 /* 非 Chromium 浏览器的切换过渡 (代替视图过渡, 见 core.js fadeSwap): 只动正文, 页头和筛选行不动 */
-html.xfo #main { opacity: 0; transition: opacity .11s cubic-bezier(.4, 0, 1, 1); } html.xfi #main { animation: xf9in .22s ease both; } @keyframes xf9in { from { opacity: 0; } to { opacity: 1; } }
+html.xfo #main { opacity: 0; transition: opacity .11s cubic-bezier(.4, 0, 1, 1); }
 
 /* 2026-11-06 三栏左上标题位置统一: 图谱标题下移 10px, 与笔记 / 术语 (#main 上内边距 10px) 对齐 */
 .gtop { margin-top: 10px; }
@@ -1167,3 +1167,6 @@ html.xfo #main { opacity: 0; transition: opacity .11s cubic-bezier(.4, 0, 1, 1);
 
 /* 2026-11-07 总览换筛选: 课程名、缩略图、连线的淡显用过渡, 不瞬间跳变 */
 .gs.allv .thl, .gs.allv .cth, .gs.allv .crb2, .gs.allv .thd { transition: opacity .24s ease; }
+
+/* 2026-11-07 图谱圆圈标题闪动: 淡入加在 #cam 上时, 文字走临时图层绘制, 动画结束切回常规绘制, 上万个像素跳变. 淡入放到 SVG 外层, 全程同一种绘制 (graph.js fadeIn) */
+svg.gv.fd { animation: gfade .32s ease both; }

@@ -11,7 +11,9 @@
     var gs = $('#gs'), svg = $('.gv', gs), defs = $('#gdf', gs), cam = $('#cam', gs), ro = $('#gro', gs), tit = $('.gtit', gs), back = $('.gback', gs), leg = $('.gleg', gs), fzx = $('.gfzx', gs), tb = $('.gtb', gs), lc = $('.glc', gs), BV = null, LOCL = null;
     var W = 0, HH = 0, cx = 0, cy = 0, k = 1, fitK = 1, OY = 0, WX = 1500, WY = 1160, scene = '', cur = null, raf = 0, CSN = [], hov = null, cullT = 0, X = {};
     function size() { var t = $('#rail').getBoundingClientRect(); gs.style.height = Math.max(440, innerHeight - (t.bottom + scrollY) - 10) + 'px'; var r = gs.getBoundingClientRect(); W = r.width; HH = r.height; svg.setAttribute('width', W); svg.setAttribute('height', HH); var top = W < 640 ? 70 : 64, bot = W < 640 ? 46 : 54; OY = (top - bot) / 2; fitK = Math.min(W / WX, (HH - top - bot) / WY); }
-    function fadeIn() { if (CALM) return; cam.classList.remove('fd'); void cam.getBoundingClientRect(); cam.classList.add('fd'); clearTimeout(fadeIn.t); fadeIn.t = setTimeout(function () { cam.classList.remove('fd'); }, 360); }
+    function fadeIn() { if (CALM) return; svg.classList.remove('fd'); void svg.getBoundingClientRect(); svg.classList.add('fd'); clearTimeout(fadeIn.t); fadeIn.t = setTimeout(function () { svg.classList.remove('fd'); }, 360); }
+    /* 2026-11-07 总标题、大类标题、科目标题同一个切换效果: 主标题换了才淡入; 刚进栏目时 (还是空的) 由 stagger 负责升起 */
+    function setTit(h) { var o = $('b', tit), old = o ? o.textContent : '', had = !!o; tit.innerHTML = h; var n = $('b', tit); if (had && !CALM && n && n.textContent !== old) tit.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: 'ease-out' }); }
     function clampXY() { var lx = Math.max(0, (WX * k - W) / 2) + W * .28, ly = Math.max(0, (WY * k - HH) / 2) + HH * .28; cx = Math.max(-lx, Math.min(lx, cx)); cy = Math.max(-ly, Math.min(ly, cy)); }
     var pend = 0, mvT = 0; function req() { if (!pend) pend = requestAnimationFrame(function () { pend = 0; apply(); }); }
     /* 拖动/缩放/镜头飞行期间不重画 SVG (节点多时每帧重画上千个元素会卡): 整张图层用 GPU 平移缩放;
@@ -57,7 +59,7 @@
     /* ===== 一门课 ===== */
     function drawCourse(c, focus, from) {
       scene = 'course'; cur = c; holdLabs(); clear(); back.hidden = false; gs.classList.remove('allv'); gs.classList.add('crs'); WX = (RB + 36) * EX * 2 + 120; WY = (RB + 70) * 2 + 30; size();
-      tit.innerHTML = '<b>' + esc(c.zh) + '</b><small>' + esc(c.mod + ' · ' + c.code + ' · ' + c.fo) + '</small>';
+      setTit('<b>' + esc(c.zh) + '</b><small>' + esc(c.mod + ' · ' + c.code + ' · ' + c.fo) + '</small>');
       leg.innerHTML = '<span>越靠内越基础</span><span><i class="lgp"></i>先修</span><span><i class="lgr"></i>对照</span><span class="lk">单击概念聚焦 · 双击看详情 · 点分支名看分支 · 点中心走学习路线</span>';
       var B = c.branches, BI = {}, P = {}, deg = {}, pre = {}, nb = {}; B.forEach(function (b, i) { BI[b.id] = i; b.am = (b.a0 + b.a1) / 2; });
       c.nodes.forEach(function (n) { var p = ell(n.ang, R0 + n.rr * (R1 - R0)); P[n.id] = { x: p[0], y: p[1], n: n }; deg[n.id] = 0; pre[n.id] = []; nb[n.id] = []; });
@@ -160,7 +162,7 @@
         CL.forEach(function (q) { q.x -= q.x * .012 / AR; q.y -= q.y * .012 * AR; });
         for (var i = 0; i < N; i++) for (var j = i + 1; j < N; j++) { var a = CL[i], b = CL[j], ox = (a.w + b.w) / 2 + 30 - Math.abs(a.x - b.x), oy = (a.h + b.h) / 2 + 24 - Math.abs((a.y + a.dy) - (b.y + b.dy)); if (ox > 0 && oy > 0) { if (ox < oy * AR) { var s = a.x < b.x ? -1 : 1; a.x += s * ox / 2; b.x -= s * ox / 2; } else { var s2 = (a.y + a.dy) < (b.y + b.dy) ? -1 : 1; a.y += s2 * oy / 2; b.y -= s2 * oy / 2; } } } } }
     /* 总览标题: 全部 = 全部课程; 选了 HP / NP 等 = 这一类的名字 */
-    function allTit() { var g = IDX.groups.filter(function (x) { return x.k === String(R.f).replace(/^g:/, ''); })[0]; var h = g ? '<b>' + esc(g.zh) + '</b><small>' + esc(g.de) + '</small>' : '<b>全部课程</b><small>Alle Kurse</small>'; if (tit.innerHTML === h) return; var had = tit.innerHTML && !CALM; tit.innerHTML = h; /* 总览换筛选时标题淡入, 不是瞬间替换 */ if (had && scene === 'all') tit.firstChild.parentNode.querySelectorAll('b,small').forEach(function (x) { x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: 'ease-out' }); }); }
+    function allTit() { var g = IDX.groups.filter(function (x) { return x.k === String(R.f).replace(/^g:/, ''); })[0]; setTit(g ? '<b>' + esc(g.zh) + '</b><small>' + esc(g.de) + '</small>' : '<b>全部课程</b><small>Alle Kurse</small>'); }
     function drawAll(from, back0) {
       scene = 'all'; cur = null; holdLabs(); clear(); back.hidden = true; gs.classList.add('allv'); gs.classList.remove('crs');
       var act = CS.filter(function (c) { return c.has && c.loaded; }), n = act.length, pend = CS.filter(function (c) { return !c.has && !c.nog; }).length, PR = X.PR = PAIRS();
@@ -210,7 +212,7 @@
       for (var w = 0; w < 4; w++) { sweep(LZ, LA, function (b) { return b.z[1]; }, function (b) { return b.a[1]; }); sweep(LA, LZ, function (b) { return b.a[1]; }, function (b) { return b.z[1]; }); }
       var rows = Math.max(LA.length, LZ.length), H0 = Math.max(21, Math.min(27, Math.floor((gs.getBoundingClientRect().height - 76 - 32 - 270) / rows))), ORD = l.map(function (b, i) { return i; }).sort(function (x, y) { return (LA.indexOf(l[x].a[1]) - LA.indexOf(l[y].a[1])) || (LZ.indexOf(l[x].z[1]) - LZ.indexOf(l[y].z[1])); });
       function col(c, L, side) { return '<ul class="gbl ' + side + ' cx-' + c.code + '" style="margin-top:' + ((rows - L.length) * H0 / 2) + 'px">' + L.map(function (id) { var n = c.NODE[id]; return '<li><button class="gbn" data-n="' + side + ':' + id + '"><b>' + esc(n.zh) + '</b></button></li>'; }).join('') + '</ul>'; }
-      tit.innerHTML = '<b>跨课对读</b><small>' + q[0] + ' ↔ ' + q[1] + ' · ' + l.length + ' 对相通的概念</small>';
+      setTit('<b>跨课对读</b><small>' + q[0] + ' ↔ ' + q[1] + ' · ' + l.length + ' 对相通的概念</small>');
       if (BV) BV.remove(); BV = D.createElement('div'); BV.className = 'gbv'; BV.style.setProperty('--gbh', H0 + 'px'); BV.innerHTML = '<div class="gbhd"><span class="cx-' + q[0] + '"><b>' + esc(CA.zh) + '</b></span><span class="r cx-' + q[1] + '"><b>' + esc(CZ.zh) + '</b></span></div><div class="gbt" style="height:' + (rows * H0 + 6) + 'px">' + col(CA, LA, 'a') + '<svg class="gbs"></svg>' + col(CZ, LZ, 'z') + '</div><div class="gbp"></div>'; gs.appendChild(BV);
       var S = $('.gbs', BV), P = $('.gbp', BV), cur2 = 0, EL2 = [];
       function Y(L, id) { return (rows - L.length) * H0 / 2 + (L.indexOf(id) + .5) * H0; }
