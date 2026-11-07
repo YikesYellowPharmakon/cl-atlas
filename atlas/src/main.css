@@ -1170,3 +1170,6 @@ html.xfo #main { opacity: 0; transition: opacity .11s cubic-bezier(.4, 0, 1, 1);
 
 /* 2026-11-07 图谱圆圈标题闪动: 淡入加在 #cam 上时, 文字走临时图层绘制, 动画结束切回常规绘制, 上万个像素跳变. 淡入放到 SVG 外层, 全程同一种绘制 (graph.js fadeIn) */
 svg.gv.fd { animation: gfade .32s ease both; }
+
+/* 2026-11-07 遮罩还在时笔记不绘制 (core.js reader) */
+#rd.hold { visibility: hidden; }

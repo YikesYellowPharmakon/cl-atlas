@@ -13,6 +13,7 @@
 //     刷新必播; 新打开且距上次 > 2 分钟才播 (localStorage 'atlas-intro-t'); 前进/后退不播; 由 <head> 里的脚本决定 (html[data-intro]).
 //   笔记遮罩: 等笔记加载并停在目标位置 (ready). 进度线按文件大小估的时长走到 90%, 之后极慢地爬, ready 后走满.
 //     进度是估算, 不是真实字节数. 等待时小光点沿路线循环. 0.38 秒内就好则直接淡掉. 最多等 20 秒.
+//     笔记准备好之前保持隐藏 (#rd.hold), 不让它在遮罩底下绘制和光栅化; ready 前才露出, 绘制完再开始收尾 (core.js reader).
 // 规矩: 点击 / 按键 / 滚轮立即结束; 减少动态效果和无头浏览器不播 (测试改 UA, 见 tests/intro.mjs).
 // 接口: AtlasMark.play({ hold, fadeIn, est }) → { ready(), hold(), end() }. 已有动画在播时返回那一个并让它等.
 (function () {
@@ -60,13 +61,14 @@
 
   function run(ov, o) {
     var t0 = performance.now(), cs = getComputedStyle(H), cv = function (n) { return cs.getPropertyValue(n).trim(); }, day = H.getAttribute('data-mode') === 'day';
-    var ok = !o.hold, hold = !!o.hold, exiting = false, done = false, timers = [], iv = 0, est = o.est || 1500;
+    var ok = !o.hold, hold = !!o.hold, exiting = false, done = false, timers = [], iv = 0, ends = [], est = o.est || 1500;
     var after = function (ms, f) { var id = setTimeout(f, ms); timers.push(id); return id; };
     var play = function (el, kf, op) { op.fill = op.fill || 'both'; return el.animate(kf, op); };
     var layer = function (ox, oy) { var s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 32 32'); s.setAttribute('class', 'ly'); if (ox != null) s.style.transformOrigin = R(ox / 32 * 100) + '% ' + R(oy / 32 * 100) + '%'; ov.appendChild(s); return s; };
     var mk = function (par, tag, a) { var e = document.createElementNS(NS, tag); for (var k in a) e.setAttribute(k, a[k]); par.appendChild(e); return e; };
-    ov.innerHTML = ''; var fld = field(day, cv('--ink')); ov.appendChild(fld); play(fld, [{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
-    if (o.fadeIn) play(ov, [{ opacity: 0 }, { opacity: 1 }], { duration: 140, easing: 'ease-out' });
+    // 背景是独立一层: 淡入淡出只动它, 不对整个遮罩做透明度 (那要把所有部件合成一张全屏大图, 大屏上开头和收尾都吃力)
+    ov.innerHTML = ''; ov.style.background = 'none'; var bg = document.createElement('div'); bg.className = 'bgc'; ov.appendChild(bg); if (o.fadeIn) play(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 140, easing: 'ease-out' });
+    var fld = field(day, cv('--ink')); ov.appendChild(fld); play(fld, [{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
     // 星点: 淡入又退去
     var nz = layer(), s = 7, rnd = function () { s = (s * 16807) % 2147483647; return s / 2147483647; };
     for (var i = 0; i < 22; i++) mk(nz, 'circle', { cx: R(-22 + rnd() * 76), cy: R(-8 + rnd() * 48), r: R(.25 + rnd() * .35), class: i % 3 ? 'z' : 'z a', opacity: i % 3 ? .34 : .5 });
@@ -96,17 +98,19 @@
     var S0 = parseFloat(getComputedStyle(parts[0]).width) || 240, cxx = innerWidth / 2, cyy = parseFloat(getComputedStyle(parts[0]).top) + S0 / 2, u = S0 / 32;
     [[-23, -13, 4], [21, -7, 3], [-19, 15, 5], [21, 14, 3]].forEach(function (p, k) { var set = rk(), x0 = Math.round((cxx + p[0] * u) / CW) * CW, y0 = Math.round((cyy + p[1] * u) / CH) * CH, cl = { set: set, t: 140 + k * 150, el: [] };
       for (var j = 0; j < p[2]; j++) { var e = document.createElement('i'); e.style.left = (x0 + j * CW) + 'px'; e.style.top = y0 + 'px'; e.style.color = pal[k]; e.textContent = gly(set); gl.appendChild(e); cl.el.push(e); play(e, [{ opacity: 0 }, { opacity: j ? .75 : 1 }], { duration: 160, delay: cl.t }); } clus.push(cl); });
-    iv = setInterval(function () { var n = performance.now() - t0; clus.forEach(function (cl) { var a = n - cl.t; if (a > 0 && a < 300) cl.el.forEach(function (e) { e.textContent = gly(cl.set); }); else if (a >= 300 && Math.random() < .07) { var e = cl.el[(Math.random() * cl.el.length) | 0]; e.textContent = gly(cl.set); } }); }, 70);
+    // 只在开头解码, 之后不再改文字: 每改一次都要把整份笔记一起提交一帧
+    iv = setInterval(function () { var n = performance.now() - t0; clus.forEach(function (cl) { var a = n - cl.t; if (a > 0 && a < 300) cl.el.forEach(function (e) { e.textContent = gly(cl.set); }); }); if (n > 900) clearInterval(iv); }, 70);
 
-    // 收尾: 进度线从当前位置平滑走满 (剩得多走得久) → 文字淡出 → 星座反序淡出, 遮罩淡开
-    function finish() { if (exiting || done) return; exiting = true; var m = /matrix\(([^,]+)/.exec(getComputedStyle(fill).transform), v = m ? +m[1] : 0, dur = Math.max(160, Math.round((1 - v) * 520)); if (fA) { fA.onfinish = null; fA.cancel(); } play(fill, [{ transform: 'scaleX(' + v + ')' }, { transform: 'scaleX(1)' }], { duration: dur, easing: 'cubic-bezier(.35,0,.25,1)' });
-      after(dur, function () { var fo = { duration: 200, easing: 'ease-out' }; [cap, bar, gl].forEach(function (x) { play(x, [{ opacity: 1 }, { opacity: 0 }], { duration: fo.duration, easing: fo.easing }); }); play(orb, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-out' }); if (pl) play(pl, [{ opacity: 1 }, { opacity: 0 }], { duration: 120 });
-        parts.slice().reverse().forEach(function (p, i) { play(p, [{ opacity: 1 }, { opacity: 0 }], { duration: 170, delay: i * 11, easing: 'ease-in' }); }); play(fld, [{ opacity: 1 }, { opacity: 0 }], { duration: 300 }); play(ov, [{ opacity: 1 }, { opacity: 0 }], { duration: 320, delay: 90, easing: 'ease-in-out' }); after(420, ctl.end); }); }
-    function check() { if (done || exiting || !ok) return; var n = performance.now() - t0; if (hold && n < FAST) { exiting = true; play(ov, [{ opacity: +getComputedStyle(ov).opacity }, { opacity: 0 }], { duration: 170, easing: 'ease-out' }); after(180, ctl.end); return; } var need = (hold ? ROUTE : INTRO) - n; if (need > 0) { after(need, check); return; } finish(); }
+    // 收尾: 一次性交给合成器 (不再用定时器分段, 主线程这时往往正忙): 进度线从当前位置走满 → 文字淡出 → 星座反序淡出, 背景层淡开
+    function finish() { if (exiting || done) return; exiting = true; clearInterval(iv); var m = /matrix\(([^,]+)/.exec(getComputedStyle(fill).transform), v = m ? +m[1] : 0, dur = Math.max(160, Math.round((1 - v) * 520)); if (fA) { fA.onfinish = null; fA.cancel(); } play(fill, [{ transform: 'scaleX(' + v + ')' }, { transform: 'scaleX(1)' }], { duration: dur, easing: 'cubic-bezier(.35,0,.25,1)' });
+      var out = function (el, ms, delay, ez) { play(el, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, delay: dur + delay, easing: ez || 'ease-out' }); };
+      [cap, bar, gl, orb].forEach(function (x) { out(x, 200, 0); }); if (pl) out(pl, 120, 0); parts.slice().reverse().forEach(function (p, i) { out(p, 170, i * 11, 'ease-in'); }); out(fld, 300, 0); out(bg, 320, 90, 'ease-in-out'); after(dur + 430, ctl.end); }
+    function check() { if (done || exiting || !ok) return; var n = performance.now() - t0; if (hold && n < FAST) { exiting = true; clearInterval(iv); [].slice.call(ov.children).forEach(function (x) { play(x, [{ opacity: +getComputedStyle(x).opacity }, { opacity: 0 }], { duration: 170, easing: 'ease-out' }); }); after(180, ctl.end); return; } var need = (hold ? ROUTE : INTRO) - n; if (need > 0) { after(need, check); return; } finish(); }
     var ctl = {
       ready: function () { ok = true; check(); },
+      onend: function (f) { ends.push(f); },
       hold: function () { if (exiting || done) return; hold = true; ok = false; est = Math.max(est, 3000); if (fA) { fA.onfinish = null; fA.cancel(); } barTo(); after(Math.max(0, ROUTE - (performance.now() - t0)), startPulse); },
-      end: function () { if (done) return; done = true; clearInterval(iv); timers.forEach(clearTimeout); ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (k) { removeEventListener(k, ctl.end, true); }); if (ov.id === 'intro') H.removeAttribute('data-intro'); ov.remove(); if (cur === ctl) cur = null; }
+      end: function () { if (done) return; done = true; clearInterval(iv); timers.forEach(clearTimeout); ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (k) { removeEventListener(k, ctl.end, true); }); ends.forEach(function (f) { f(); }); if (ov.id === 'intro') H.removeAttribute('data-intro'); ov.remove(); if (cur === ctl) cur = null; }
     };
     ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (k) { addEventListener(k, ctl.end, { capture: true, passive: true }); });
     if (hold) after(ROUTE, startPulse); after(MAXHOLD, function () { ok = true; check(); }); after(MAXHOLD + 5000, ctl.end);

@@ -193,11 +193,12 @@ __TOUCH__
     /* 加载遮罩: 星座 A 盖住画面, 笔记加载完并停在目标位置后退场 (intro.js) */
     var mk = window.AtlasMark ? AtlasMark.play({ hold: true, fadeIn: true, est: hit[1].z ? 800 + hit[1].z / 1048576 * 150 : 1500 }) : null; RDR.mk = mk;
     /* 2026-11-07: 遮罩的动画先起跑, 下一帧才开始加载笔记 (解析会占住主线程, 先开始加载的话动画第一帧就卡) */
-    var f = D.createElement('iframe'); f.id = 'rd'; f.title = hit[1].t; f.src = href; RDR.f = f; var ins = function () { if (RDR && RDR.f === f) D.body.appendChild(f); }; if (mk) requestAnimationFrame(function () { setTimeout(ins, 0); }); else ins();
-    if (mk) f.addEventListener('load', function () { settle(f, function () { mk.ready(); }); }, { once: true });
+    var f = D.createElement('iframe'); f.id = 'rd'; f.title = hit[1].t; f.src = href; RDR.f = f; var ins = function () { if (RDR && RDR.f === f) D.body.appendChild(f); }; if (mk) { f.className = 'hold'; requestAnimationFrame(function () { setTimeout(ins, 0); }); } else ins();
+    /* 2026-11-07: 笔记准备好之前保持隐藏, 不在遮罩底下绘制; 停到目标位置后才露出, 再等它画完两帧, 然后才开始收尾, 收尾不会和绘制抢 */
+    if (mk) { var reveal = function () { f.classList.remove('hold'); show(); }; mk.onend(reveal); f.addEventListener('load', function () { settle(f, function () { reveal(); var wait = Math.max(0, 280 - (performance.now() - t0)); requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(function () { mk.ready(); }, wait + 80); }); }); }); }, { once: true }); }
     var bar = D.createElement('div'); bar.id = 'rdb'; bar.innerHTML = '<button class="rdx" aria-label="回到笔记目录" title="回到笔记目录 (Esc)"><i class="rdi"></i></button>'; D.body.appendChild(bar); RDR.b = bar; $('.rdx', bar).onclick = leaveReader;
     /* 目录完全淡出 (260ms) 之后笔记才开始淡入, 两层不会叠在一起 */
-    var t0 = performance.now(), shown = false, show = function () { if (shown) return; shown = true; setTimeout(function () { if (RDR && RDR.f === f) { H.classList.add('rdon'); try { f.focus(); } catch (e) {} } }, Math.max(0, 280 - (performance.now() - t0))); }; f.addEventListener('load', show, { once: true }); setTimeout(show, 650); }
+    var t0 = performance.now(), shown = false, show = function () { if (shown) return; shown = true; setTimeout(function () { if (RDR && RDR.f === f) { H.classList.add('rdon'); try { f.focus(); } catch (e) {} } }, Math.max(0, 280 - (performance.now() - t0))); }; if (!mk) { f.addEventListener('load', show, { once: true }); setTimeout(show, 650); } }
   /* 笔记里的滚动位置连续 3 次 (约 240ms) 不变 = 已经停在目标位置; 读不到 (file:// 跨源) 就等 300ms; 最多等 3 秒 */
   function settle(f, cb) { var t0 = performance.now(), last = -1, n = 0; (function poll() { var y; try { y = f.contentWindow.scrollY; f.contentWindow.document.body; } catch (e) { return setTimeout(cb, 300); } if (y === last) n++; else { n = 0; last = y; } if (n >= 3 || performance.now() - t0 > 3000) cb(); else setTimeout(poll, 80); })(); }
   /* 返回键和 Esc: 直接关掉并把地址换回目录, 不靠浏览器后退 (笔记里点过链接后, 后退只会在笔记之间退) */
