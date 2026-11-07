@@ -3,6 +3,8 @@
 //     是否播放由 <head> 里的脚本决定 (html[data-intro]), 这样第一帧就有盖板, 页面不会先闪出来.
 //  2. 打开笔记时的加载遮罩: 笔记加载并滚到目标位置之前盖住画面; A 画完还没好就停在完整的 A 上等 (最多 6 秒);
 //     0.38 秒内就好了则直接淡掉, 不硬播. 字簇用该课的课程色.
+//     2026-11-07 加载感: 大笔记解析时和页面挤同一条主线程, 逐帧动画会被冻住 (IDP 合集实测停 1.6 秒), A 画完后又完全静止, 看着像卡死.
+//     所以进度细线和旋转的点线弧用合成器动画 (transform / opacity, 主线程堵住也继续走); 主线程空闲时再加路线上的光点和字符解码. 进度是估算的, 不是真实字节数.
 // 字幕 = 一句小众格言 (原文衬线斜体 + 等宽出处), 逐字从背景字符解码出来; 每次随机, 不和上一次重复. 主页开场因此多留约半秒.
 // 图形语言取自图谱: 节点 = 实心核心 + 一圈留白 (连线在留白处断开), 主次靠亮度; 跨课节点外有虚线圈 (图谱 .xm);
 //   子概念 = 课程色小点 + 细线 (图谱 .sb2); 背景一段点线弧 (开关圆 .orb0 的点线). 图标 favicon.svg 是同一几何.
@@ -30,7 +32,7 @@
   // ---- 时间线 (ms): 星点铺开 → 点线弧扫过 → 顶点亮 → 连线按路线一条条画, 画到哪个节点哪个亮 → 子概念落下 → 跨课圈 ----
   var LIT = NODES.map(function () { return Infinity; }); LIT[0] = 180;
   var SCHED = EDGES.map(function (e, i) { var t = 210 + i * 85; LIT[e[1]] = Math.min(LIT[e[1]], t + 120); return t; });
-  var LAST = Math.max.apply(null, LIT), END0 = LAST + 240, EXIT = 320, FAST = 380, MAXHOLD = 6000;
+  var LAST = Math.max.apply(null, LIT), END0 = LAST + 240, EXIT = 320, FAST = 380, MAXHOLD = 20000;
   var cur = null;
   // ---- 主页背景字符场的同一套文字 (glass7 v6 字符场): 遮罩上铺一层同样稀疏的暗字, 星座旁冒出几簇字, 一簇一种文字一种颜色, 先解码再停住 ----
   var GL = { braille: '⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵', kana: 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝ', rune: 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ',
@@ -73,12 +75,25 @@
     var say = o.cap || pickSay(), qChars = Array.from(say[0]), qSet = GK[(Math.random() * GK.length) | 0], qStep = Math.min(14, 420 / qChars.length), lastSw = 0;
     var mk = function (tag, a, par) { var e = document.createElementNS(NS, tag); for (var k in a) e.setAttribute(k, a[k]); (par || svg).appendChild(e); return e; };
     var s = 7, rnd = function () { s = (s * 16807) % 2147483647; return s / 2147483647; };   // 星点固定种子, 每次一样
-    var arc = []; for (var k = 0; k < 19; k++) { var an = -.8 + k * .095; arc.push(mk('circle', { cx: R(16 + 17.8 * Math.cos(an)), cy: R(16 + 17.8 * Math.sin(an)), r: .24, class: 'ad' })); }   // 点线弧 = 一串点
+    var arc = [], orb = null, bar = null, barA = null, LATE = 260;
+    if (o.hold) {   // 笔记遮罩: 彗尾点线弧 + 进度细线, 都走合成器; 晚一点才淡入, 很快加载完的笔记看不到它们
+      orb = document.createElementNS(NS, 'svg'); orb.setAttribute('viewBox', '0 0 32 32'); orb.setAttribute('class', 'orb'); ov.insertBefore(orb, svg);
+      for (var k0 = 0; k0 < 22; k0++) { var a0 = k0 * .13, c0 = document.createElementNS(NS, 'circle'); c0.setAttribute('cx', R(16 + 17.8 * Math.cos(a0))); c0.setAttribute('cy', R(16 + 17.8 * Math.sin(a0))); c0.setAttribute('r', .24); c0.setAttribute('class', 'ad'); c0.setAttribute('opacity', R(.08 + .72 * k0 / 21)); orb.appendChild(c0); }
+      bar = document.createElement('div'); bar.className = 'pb'; bar.innerHTML = '<i></i>'; ov.appendChild(bar);
+      if (orb.animate) { orb.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], { duration: 2800, iterations: Infinity });
+        orb.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, delay: LATE, fill: 'both' }); bar.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, delay: LATE, fill: 'both' });
+        barA = bar.firstChild.animate([{ transform: 'scaleX(.02)', offset: 0 }, { transform: 'scaleX(.38)', offset: .05 }, { transform: 'scaleX(.64)', offset: .17 }, { transform: 'scaleX(.82)', offset: .4 }, { transform: 'scaleX(.94)', offset: 1 }], { duration: 18000, fill: 'forwards' }); }
+    } else for (var k = 0; k < 19; k++) { var an = -.8 + k * .095; arc.push(mk('circle', { cx: R(16 + 17.8 * Math.cos(an)), cy: R(16 + 17.8 * Math.sin(an)), r: .24, class: 'ad' })); }   // 点线弧 = 一串点
     var zEl = []; for (var i = 0; i < 22; i++) zEl.push(mk('circle', { cx: R(-22 + rnd() * 76), cy: R(-8 + rnd() * 48), r: R(.25 + rnd() * .35), class: i % 3 ? 'z' : 'z a' }));
     var sEl = SUBS.map(function (q) { var p = NODES[q[0]], g = mk('g', {}); return { l: mk('line', { class: 'sl' }, g), c: mk('circle', { r: q[2], class: 'sb' }, g), q: q, p: p }; });
     var eEl = EDGES.map(function (e) { return mk('line', { 'stroke-width': e[2], class: e[4] ? 'e x' : 'e' }); });
     var xm = mk('circle', { cx: NODES[XM].x, cy: NODES[XM].y, r: NODES[XM].r + 1.5, class: 'xm', pathLength: 12 });
     var nEl = NODES.map(function (n) { return mk('circle', { cx: n.x, cy: n.y, class: n.c === 'a' ? 'n a' : 'n' }); });
+    var pulse = o.hold ? mk('circle', { r: .62, class: 'pl', opacity: 0 }) : null, heldAt = 0, lastG = 0;
+    function waiting(now) {   // 等加载时 (主线程空闲才看得到): 光点沿路线走, 字符继续解码
+      var T1 = 300, tt1 = (now - heldAt) / T1, i = Math.floor(tt1) % EDGES.length, f = tt1 - Math.floor(tt1), e = EDGES[i], a = NODES[e[0]], b = NODES[e[1]], q = cut(a, b, a.r, b.r), g = eio(f);
+      pulse.setAttribute('cx', R(lerp(q[0], q[2], g))); pulse.setAttribute('cy', R(lerp(q[1], q[3], g))); pulse.setAttribute('opacity', R(Math.min(1, (now - heldAt) / 300) * (1 - Math.pow(2 * f - 1, 6))));
+      if (now - lastG > 170) { lastG = now; var cl = clus[(Math.random() * clus.length) | 0]; if (cl) { var el = cl.el[(Math.random() * cl.el.length) | 0]; el.textContent = gly(cl.set); } } }
     var cap = ov.querySelector('.cap'); cap.lastChild.textContent = say[1];
     // 格言逐字解码: 第 i 个字在 Q0 + i·qStep 落定, 之前每 50ms 换一个背景字
     function decode(t) { var Q0 = 240, out = '', sw = Math.floor(t / 50) !== lastSw; if (!sw && t > Q0 + qChars.length * qStep + 60) return; lastSw = Math.floor(t / 50);
@@ -99,10 +114,10 @@
       var xg = eio(sg(tt, LIT[5] - 40, LIT[5] + 260)) * (1 - ex); xm.setAttribute('transform', 'rotate(' + R(-150 * (1 - xg)) + ' ' + R(NODES[XM].x) + ' ' + R(NODES[XM].y) + ')'); xm.setAttribute('opacity', R(.85 * xg));
       decode(tt); cap.style.opacity = R(sg(tt, 200, 320) * (1 - sg(t, END, END + EXIT * .6)));
       if (!clus.length) place();
-      clus.forEach(function (cl) { var a = tt - cl.t0, op = sg(a, 0, 60) * (1 - sg(t, END - 200, END + EXIT * .5)) * (1 - ex);
+      clus.forEach(function (cl) { var a = tt - cl.t0, op = sg(a, 0, 60) * (o.hold ? (1 - sg(t, END + 10, END + EXIT * .5)) * (ok || !heldAt && t < END ? 1 : .8) : 1 - sg(t, END - 200, END + EXIT * .5)) * (1 - ex);
         cl.el.forEach(function (e, j) { if (a > 0 && a < 260 + j * 40 && ((a / 45) | 0) !== e._k) { e._k = (a / 45) | 0; e.textContent = gly(cl.set); } e.style.opacity = R(op * (j ? .75 : 1)); }); });
       fld.style.opacity = R(sg(tt, 0, 240));
-      svg.style.opacity = R(1 - sg(t, END + EXIT * .45, TOTAL));
+      svg.style.opacity = R(1 - sg(t, END + EXIT * .45, TOTAL)); if (orb) { orb.style.visibility = ex > .5 ? 'hidden' : ''; bar.style.visibility = ex > .7 ? 'hidden' : ''; }
       ov.style.opacity = R((o.fadeIn ? sg(t, 0, 140) : 1) * (1 - sg(t, END + 60, TOTAL)) * fade);
     }
     var t = 0, prev = null, raf = 0, done = false, wait = !!o.hold, ok = !o.hold, held = 0, fast = null, guard = 0;
@@ -115,16 +130,18 @@
         if (ov.id === 'intro') H.removeAttribute('data-intro'); ov.remove(); if (cur === ctl) cur = null;
       }
     };
+    function finishBar() { if (!barA) return; var i0 = bar.firstChild, cur0 = getComputedStyle(i0).transform; barA.cancel(); barA = null; i0.animate([{ transform: cur0 === 'none' ? 'scaleX(.02)' : cur0 }, { transform: 'scaleX(1)' }], { duration: 200, easing: 'ease-out', fill: 'forwards' }); }
     function step(now) {
       var dt = prev === null ? 0 : Math.min(64, now - prev); prev = now;
       if (fast !== null) { fast += dt; draw(t, 1 - sg(fast, 0, 200)); if (fast >= 200) return ctl.end(); raf = requestAnimationFrame(step); return; }
+      if (ok && heldAt && barA) finishBar();
       if (wait && ok && t < FAST) fast = 0;                                                   // 很快就好了: 直接淡掉
-      else if (t + dt >= END && !ok) { t = END; held += dt; if (held > MAXHOLD) ok = true; }   // 还没好: 停在完整的 A 上等
-      else t += dt;
+      else if (t + dt >= END && !ok) { t = END; if (!heldAt) heldAt = now; waiting(now); if (now - heldAt > MAXHOLD) ok = true; }   // 还没好: 停在完整的 A 上, 继续有动静
+      else { if (heldAt && pulse) { heldAt = 0; pulse.setAttribute('opacity', 0); } if (t < END && t + dt >= END && barA) finishBar(); t += dt; }
       draw(t, 1); if (t >= TOTAL) return ctl.end(); raf = requestAnimationFrame(step);
     }
     ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (k) { addEventListener(k, ctl.end, { capture: true, passive: true }); });
-    guard = setTimeout(ctl.end, TOTAL + MAXHOLD + 2000);     // 保险: 后台标签页里 rAF 不跑
+    guard = setTimeout(ctl.end, TOTAL + MAXHOLD + 4000);     // 保险: 后台标签页里 rAF 不跑
     draw(0, 1); raf = requestAnimationFrame(step);
     cur = ctl; return ctl;
   }

@@ -132,6 +132,11 @@ __TOUCH__
   function foldList(el, code, anim) { var first = true; $$('.grp', el).forEach(function (g) { var rows = $$('.cr', g), vis = rows.map(function (r) { return inF(BY[code(r)]); }), any = vis.some(Boolean), was = !g.classList.contains('k5off'); g.classList.toggle('k5first', any && first); if (any) first = false;
       /* 组要收起: 里面的行先不动, 跟着组一起收; 组要重新出现: 行先到位, 再展开组; 组留着: 行各自收起或展开 */
       if (any) rows.forEach(function (r, i) { fold(r, vis[i], anim && was); }); fold(g, any, anim); }); }
+  /* 2026-11-07 列表切回全部: 上面要挤进来别的组时 (NP / X 等 → 全部), 组要滑几百像素, 内容上下来回动. 改成正文先淡出, 换好后轻轻淡入上浮; 连点时直接接上 */
+  var CALMS = null;
+  function calmSwap(el, fn) { if (CALMS) { clearTimeout(CALMS.t); var f0 = CALMS.fn; CALMS.a && CALMS.a.cancel(); CALMS = null; if (f0) f0(); } var x = CALMS = { fn: fn, a: el.animate([{ opacity: getComputedStyle(el).opacity }, { opacity: 0 }], { duration: 110, easing: 'ease-in', fill: 'forwards' }) };
+    x.t = setTimeout(function () { x.fn = null; if (CALMS === x) CALMS = null; if (!el.isConnected) return; fn(); x.a.cancel(); el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: 'cubic-bezier(.22,.8,.24,1)' }); }, 110); }
+  function needCalm(el, from) { if (R.f !== 'ALL' || from === 'ALL' || CALM) return false; var g = BY[from] ? BY[from].g : String(from).replace(/^g:/, ''), f = el.querySelector('.grp[data-g]'), k = f ? f.dataset.g : ''; return !!g && (!k || g !== k); }
   /* 笔记页: 所有课程行一直在页面上. 筛选 = 同一个列表收起和展开 (不换页, 没有淡入淡出的幻影); 连续点击时从当前高度接着动 */
   var NOTESF = null;
   function notes(el) { el.innerHTML = IDX.groups.map(function (g) { return { g: g, l: CS.filter(function (c) { return c.g === g.k; }) }; }).filter(function (x) { return x.l.length; }).map(function (x, i) { return '<section class="grp" data-g="' + x.g.k + '">' + shHead(x.g, i === 0, x.l) + x.l.map(function (c) { return '<div class="cr cx-' + c.code + '" style="--vn:c-' + c.code + '" data-nopen="' + c.code + '">' + crHead(c) + '<div class="cb"><div class="nbox"></div></div></div>'; }).join('') + '</section>'; }).join('');
@@ -149,6 +154,7 @@ __TOUCH__
       return true; }
     function applyF(anim) { clearTimeout(openT); spDrop(); var from = prevF; prevF = R.f;
       if (anim && !CALM && BY[from] && BY[R.f] && from !== R.f && swapCourse(from, R.f)) return;
+      if (anim && needCalm(el, from)) { calmSwap(el, function () { foldList(el, function (r) { return r.dataset.nopen; }, false); $$('.cr.open', el).forEach(function (cr) { var cb = $('.cb', cr); cb.style.transition = 'none'; cr.classList.remove('open'); void cb.offsetHeight; cb.style.transition = ''; }); }); return; }
       /* 2026-11-06: 进入课程不再分两段 (先收起其他行, 0.3 秒后才展开笔记列表): 其他行收起和列表展开同一帧开始, 时长、缓动相同, 一次到位.
          目标行本来隐藏时, 先无动画展开, 这样组 / 行的展开高度已经包含列表, 结束时不会跳一下 */
       var tgt = anim && BY[R.f] ? el.querySelector('[data-nopen="' + R.f + '"]') : null;

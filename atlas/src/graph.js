@@ -160,7 +160,7 @@
         CL.forEach(function (q) { q.x -= q.x * .012 / AR; q.y -= q.y * .012 * AR; });
         for (var i = 0; i < N; i++) for (var j = i + 1; j < N; j++) { var a = CL[i], b = CL[j], ox = (a.w + b.w) / 2 + 30 - Math.abs(a.x - b.x), oy = (a.h + b.h) / 2 + 24 - Math.abs((a.y + a.dy) - (b.y + b.dy)); if (ox > 0 && oy > 0) { if (ox < oy * AR) { var s = a.x < b.x ? -1 : 1; a.x += s * ox / 2; b.x -= s * ox / 2; } else { var s2 = (a.y + a.dy) < (b.y + b.dy) ? -1 : 1; a.y += s2 * oy / 2; b.y -= s2 * oy / 2; } } } } }
     /* 总览标题: 全部 = 全部课程; 选了 HP / NP 等 = 这一类的名字 */
-    function allTit() { var g = IDX.groups.filter(function (x) { return x.k === String(R.f).replace(/^g:/, ''); })[0]; tit.innerHTML = g ? '<b>' + esc(g.zh) + '</b><small>' + esc(g.de) + '</small>' : '<b>全部课程</b><small>Alle Kurse</small>'; }
+    function allTit() { var g = IDX.groups.filter(function (x) { return x.k === String(R.f).replace(/^g:/, ''); })[0]; var h = g ? '<b>' + esc(g.zh) + '</b><small>' + esc(g.de) + '</small>' : '<b>全部课程</b><small>Alle Kurse</small>'; if (tit.innerHTML === h) return; var had = tit.innerHTML && !CALM; tit.innerHTML = h; /* 总览换筛选时标题淡入, 不是瞬间替换 */ if (had && scene === 'all') tit.firstChild.parentNode.querySelectorAll('b,small').forEach(function (x) { x.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: 'ease-out' }); }); }
     function drawAll(from, back0) {
       scene = 'all'; cur = null; holdLabs(); clear(); back.hidden = true; gs.classList.add('allv'); gs.classList.remove('crs');
       var act = CS.filter(function (c) { return c.has && c.loaded; }), n = act.length, pend = CS.filter(function (c) { return !c.has && !c.nog; }).length, PR = X.PR = PAIRS();

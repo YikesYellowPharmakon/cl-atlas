@@ -1164,3 +1164,6 @@ html.xfo #main { opacity: 0; transition: opacity .11s cubic-bezier(.4, 0, 1, 1);
 
 /* 2026-11-07 图谱换场景: 标签等放置算完再淡入 (graph.js holdLabs) */
 .gs.lh0 .n .lab { opacity: 0 !important; transition: none !important; }
+
+/* 2026-11-07 总览换筛选: 课程名、缩略图、连线的淡显用过渡, 不瞬间跳变 */
+.gs.allv .thl, .gs.allv .cth, .gs.allv .crb2, .gs.allv .thd { transition: opacity .24s ease; }
