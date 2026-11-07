@@ -189,21 +189,22 @@ __TOUCH__
     history.replaceState({ y: scrollY, open: OPEN }, '', location.hash); history.pushState({ rd: 1 }, '', '#/read/' + hit[0].code + '/' + encodeURIComponent(hit[1].fn) + (href.indexOf('#') > 0 ? '/' + href.split('#')[1] : ''));
     reader(href, hit, a); }
   function reader(href, hit, a) { var c = hit[0], y0 = scrollY; RDR = { y: y0, code: c.code };
-    morph(); H.dataset.course = c.code; if (window.__bgRepal) window.__bgRepal(); H.classList.add('reading');
+    /* 有遮罩时不做配色过渡: 底下的页面马上要被盖住, 过渡只会每帧重算全页样式、重画几十个图层, 和动画开头抢资源 */
+    if (!(window.AtlasMark && AtlasMark.willPlay())) morph(); H.dataset.course = c.code; if (window.__bgRepal) window.__bgRepal(); H.classList.add('reading');
     /* 加载遮罩: 星座 A 盖住画面, 笔记加载完并停在目标位置后退场 (intro.js) */
     var mk = window.AtlasMark ? AtlasMark.play({ hold: true, fadeIn: true, est: hit[1].z ? 800 + hit[1].z / 1048576 * 150 : 1500 }) : null; RDR.mk = mk;
     /* 2026-11-07: 遮罩的动画先起跑, 下一帧才开始加载笔记 (解析会占住主线程, 先开始加载的话动画第一帧就卡) */
-    var f = D.createElement('iframe'); f.id = 'rd'; f.title = hit[1].t; f.src = href; RDR.f = f; var ins = function () { if (RDR && RDR.f === f) D.body.appendChild(f); }; if (mk) { f.className = 'hold'; requestAnimationFrame(function () { setTimeout(ins, 0); }); } else ins();
+    var f = D.createElement('iframe'); f.id = 'rd'; f.title = hit[1].t; f.src = href; RDR.f = f; var ins = function () { if (RDR && RDR.f === f) D.body.appendChild(f); }; if (mk) { f.className = 'hold'; mk.whenLive(ins); H.classList.add('rdqn'); RDR.qt = setTimeout(function () { H.classList.add('rdq'); }, 180); /* 遮罩盖住后隐藏底下的页面, 少几十个图层 */ } else ins();
     /* 2026-11-07: 笔记准备好之前保持隐藏, 不在遮罩底下绘制; 停到目标位置后才露出, 再等它画完两帧, 然后才开始收尾, 收尾不会和绘制抢 */
-    if (mk) { var reveal = function () { f.classList.remove('hold'); show(); }; mk.onend(reveal); f.addEventListener('load', function () { settle(f, function () { reveal(); var wait = Math.max(0, 280 - (performance.now() - t0)); requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(function () { mk.ready(); }, wait + 80); }); }); }); }, { once: true }); }
+    if (mk) { var reveal = function () { f.classList.remove('hold'); show(); }; mk.onend(reveal); f.addEventListener('load', function () { settle(f, function () { reveal(); var wait = Math.max(0, 280 - (performance.now() - t0)); requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(function () { mk.ready(); }, wait + 260); /* 露出后留时间让 GPU 把整页光栅化完, 收尾不和它抢 */ }); }); }); }, { once: true }); }
     var bar = D.createElement('div'); bar.id = 'rdb'; bar.innerHTML = '<button class="rdx" aria-label="回到笔记目录" title="回到笔记目录 (Esc)"><i class="rdi"></i></button>'; D.body.appendChild(bar); RDR.b = bar; $('.rdx', bar).onclick = leaveReader;
     /* 目录完全淡出 (260ms) 之后笔记才开始淡入, 两层不会叠在一起 */
     var t0 = performance.now(), shown = false, show = function () { if (shown) return; shown = true; setTimeout(function () { if (RDR && RDR.f === f) { H.classList.add('rdon'); try { f.focus(); } catch (e) {} } }, Math.max(0, 280 - (performance.now() - t0))); }; if (!mk) { f.addEventListener('load', show, { once: true }); setTimeout(show, 650); } }
-  /* 笔记里的滚动位置连续 3 次 (约 240ms) 不变 = 已经停在目标位置; 读不到 (file:// 跨源) 就等 300ms; 最多等 3 秒 */
-  function settle(f, cb) { var t0 = performance.now(), last = -1, n = 0; (function poll() { var y; try { y = f.contentWindow.scrollY; f.contentWindow.document.body; } catch (e) { return setTimeout(cb, 300); } if (y === last) n++; else { n = 0; last = y; } if (n >= 3 || performance.now() - t0 > 3000) cb(); else setTimeout(poll, 80); })(); }
+  /* 笔记里的滚动位置连续 3 次 (约 240ms) 不变 = 已经停在目标位置; 读不到 (file:// 跨源) 就等 120ms; 最多等 3 秒 */
+  function settle(f, cb) { var t0 = performance.now(), last = -1, n = 0; (function poll() { var y; try { y = f.contentWindow.scrollY; f.contentWindow.document.body; } catch (e) { return setTimeout(cb, 120); } if (y === last) n++; else { n = 0; last = y; } if (n >= 3 || performance.now() - t0 > 3000) cb(); else setTimeout(poll, 80); })(); }
   /* 返回键和 Esc: 直接关掉并把地址换回目录, 不靠浏览器后退 (笔记里点过链接后, 后退只会在笔记之间退) */
   function leaveReader() { if (!RDR) return; closeReader(); history.replaceState({ y: scrollY, open: OPEN }, '', '#/' + R.p + '/' + R.f + (R.node ? '/' + R.node : '')); }
-  function closeReader() { if (!RDR) return; var R0 = RDR; RDR = null; if (R0.mk) R0.mk.end(); var m = null; try { m = localStorage.getItem('lmu-notes-mode'); } catch (e) {} if ((m === 'day') !== (H.dataset.mode === 'day')) { if (m === 'day') H.dataset.mode = 'day'; else delete H.dataset.mode; }
+  function closeReader() { if (!RDR) return; var R0 = RDR; RDR = null; clearTimeout(R0.qt); H.classList.remove('rdq', 'rdqn'); if (R0.mk) R0.mk.end(); var m = null; try { m = localStorage.getItem('lmu-notes-mode'); } catch (e) {} if ((m === 'day') !== (H.dataset.mode === 'day')) { if (m === 'day') H.dataset.mode = 'day'; else delete H.dataset.mode; }
     H.classList.remove('rdon'); morph(); syncRail(); if (window.__bgRepal) window.__bgRepal(); scrollTo(0, R0.y); setTimeout(function () { H.classList.remove('reading'); }, CALM ? 0 : 240); setTimeout(function () { R0.f.remove(); R0.b.remove(); }, 600); }
   addEventListener('popstate', function () { if (RDR && !/^#\/read\//.test(location.hash)) closeReader(); else if (!RDR) { var m = /^#\/read\/(\w+)\/([^/]+)(?:\/(.+))?/.exec(location.hash); if (m && BY[m[1]]) { var n = BY[m[1]].notes.filter(function (x) { return x.fn === decodeURIComponent(m[2]); })[0]; if (n) reader(n.f + (m[3] ? '#' + m[3] : ''), [BY[m[1]], n], null); } } });
   addEventListener('keydown', function (e) { if (RDR && e.key === 'Escape') leaveReader(); });

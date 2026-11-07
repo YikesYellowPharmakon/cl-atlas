@@ -1173,3 +1173,7 @@ svg.gv.fd { animation: gfade .32s ease both; }
 
 /* 2026-11-07 遮罩还在时笔记不绘制 (core.js reader) */
 #rd.hold { visibility: hidden; }
+
+/* 2026-11-07 遮罩期间: 笔记不做自身的淡入 (rdqn); 遮罩盖住后隐藏底下的页面 (rdq), 减少 GPU 负担 */
+html.rdqn #rd { transition: none !important; }
+html.rdq #main, html.rdq #top, html.rdq #rail, html.rdq #toc-pill, html.rdq #bgfield, html.rdq #bg, html.rdq #progress { visibility: hidden; }
