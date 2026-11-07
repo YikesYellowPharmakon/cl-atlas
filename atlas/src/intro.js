@@ -6,7 +6,7 @@
 // 时间线 (ms), 两处相同:
 //   0        遮罩、暗字场
 //   60-740   星点淡入又退去; 连线按路线匀速画出 (每条隔 78 开始, 各画 190), 画到哪个节点哪个亮
-//   150-1266 格言和出处逐字解码 (预先生成 18 层文字由合成器切换); 笔记遮罩至少等它播完;  180 点线弧开始匀速旋转, 进度细线出现
+//   150-1250 格言和出处逐字解密 (见 glitch); 笔记遮罩至少等它播完;  180 点线弧开始匀速旋转, 进度细线出现
 //   收尾     进度线平滑走满 → 文字和进度线淡出 → 星座按路线反序淡出, 遮罩淡开 (约 400)
 // 不同的只有结束时机:
 //   主页开场: 固定 1500 后收尾 (留时间读格言), 进度线匀速走满.
@@ -59,20 +59,26 @@
     c.font = '11px ' + GF; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = ink; c.globalAlpha = day ? .08 : .065; var rx = Math.min(W * .34, 330), ry = Math.min(Hh * .36, 300);
     for (var x = 0; x < W / CW; x++) for (var y = 0; y < Hh / CH; y++) { var px = x * CW + CW / 2, py = y * CH + CH / 2, dx = (px - W / 2) / rx, dy = (py - Hh / 2 + 46) / ry; if (Math.random() > .2 || dx * dx + dy * dy < 1) continue; c.fillText(gly(rk()), px, py); } return cv; }
 
-  // 文字 glitch: 事先生成 18 层「逐步解码」的文字, 由合成器按顺序切换 (不用主线程改文字, 解析笔记时也不会卡).
-  // 每层都是排版相同的一份格言和出处: 没解码的字透明占位, 乱码盖在各字的位置上; 重影 (text-shadow) 和噪声条都不占位, 所以每个字始终不动
-  var GN = 18, GSTEP = 62, GT0 = 150, GEND = GT0 + GN * GSTEP, GSETS = ['kana', 'rune', 'math', 'box', 'cher'];   // 不用盲文: 点阵太细太暗, 一整行几乎看不见
-  function glitch(cap, play) { var q = cap.firstChild, sm = cap.lastChild, esc = function (c) { return c === '&' ? '&amp;' : c === '<' ? '&lt;' : c; }, rs = function () { return GSETS[(Math.random() * GSETS.length) | 0]; };
-    try { var base = cap.getBoundingClientRect(), rg = document.createRange(), any = false;
-      var measure = function (el, lo, hi) { var tn = el.firstChild, cs = Array.from(tn.data), i = 0; return cs.map(function (ch, j) { rg.setStart(tn, i); rg.setEnd(tn, i + ch.length); i += ch.length; var r = rg.getClientRects()[0], o = { c: ch }; if (r && ch.trim()) { any = true; o.l = R(r.left - base.left); o.t = R(r.top - base.top); o.w = R(r.width); o.h = R(r.height); o.d = lo + (j / cs.length * .82 + Math.random() * .18) * (hi - lo); } return o; }); };
-      var Q = measure(q, 0, .9), M = measure(sm, .35, 1); if (!any) return;
-      for (var k = 0; k < GN; k++) { var v = document.createElement('div'), sc = '', fr = Math.max(0, (k - 3) / (GN - 4)), sa = rs(), sb = rs(), amp = Math.round((1 - fr) * 3) * (k % 2 ? 1 : -1); v.className = 'gv';
-        var piece = function (list, small) { var h = '', st = '', sw = function (t) { if (t === st) return; if (st) h += '</' + st + '>'; if (t) h += '<' + t + '>'; st = t; };   // 相邻同类的字合成一段, 标签越少排版舍入越小
-          list.forEach(function (o) { if (o.d == null) { h += esc(o.c); return; } if (o.d < fr) { sw(o.d > fr - .1 ? 'em' : ''); h += esc(o.c); return; } sw('u'); h += esc(o.c); var near = o.d - fr, cl = (near < .05 ? 'k' : near > .3 ? 'f' : '') + (small ? ' s' : ''); sc += '<b' + (cl.trim() ? ' class="' + cl.trim() + '"' : '') + ' style="left:' + o.l + 'px;top:' + o.t + 'px;width:' + o.w + 'px;height:' + o.h + 'px;line-height:' + o.h + 'px">' + esc(gly(Math.random() < .5 ? sa : sb)) + '</b>'; }); sw(''); return h; };
-        var hq = piece(Q), hm = piece(M, 1), bars = ''; if (fr < .8) for (var n = 0; n < 4; n++) bars += '<i style="left:' + R(base.width / 2 + (Math.random() - .5) * Math.min(base.width, 520) - 40) + 'px;top:' + R(Math.random() * base.height) + 'px;width:' + R(18 + Math.random() * 110) + 'px;height:' + (Math.random() < .3 ? 2 : 1) + 'px"></i>';
-        v.innerHTML = '<q' + (amp ? ' style="text-shadow:' + amp + 'px 0 var(--c1),' + (-amp) + 'px 0 color-mix(in srgb,var(--c1) 45%,var(--ink))"' : '') + '>' + hq + '</q><small>' + hm + '</small>' + sc + bars; cap.appendChild(v);
-        play(v, [{ opacity: 0, offset: 0 }, { opacity: 1, offset: .001 }, { opacity: 1, offset: .999 }, { opacity: 0, offset: 1 }], { duration: GSTEP, delay: GT0 + k * GSTEP, easing: 'linear' }); }
-      [q, sm].forEach(function (e) { play(e, [{ opacity: 0 }, { opacity: 1 }], { duration: 1, delay: GEND - 1, easing: 'linear' }); }); } catch (e) {} }
+  // 文字 glitch = 笔记和主页标题的「解密」效果 (touch.js decrypt) 的升级版: 同一套字符, 用文字自己的字体, 从左到右逐字定稿, 没定稿的字随机跳, 空格和标点保留
+  // 升级: 配合长句拉长到约 1.1 秒; 出处也解码; 定稿前沿带一点强调色. 帧全部事先画进一张画布, 由合成器翻页 (解析笔记时也不停, 不用逐帧改文字, 也就不会重新排版)
+  var GCH = Array.from('{}[]<>#*+=01/|§∑∂'), GN = 33, GSTEP = 1000 / 30, GT0 = 150, GEND = Math.round(GT0 + GN * GSTEP);
+  function glitch(cap) { var q = cap.firstChild, sm = cap.lastChild;
+    try { var top0 = cap.getBoundingClientRect().top; cap.style.top = Math.round(top0) + 'px';   /* 对齐像素网格: 落在半像素上时画布和真文字会有亚像素偏差 */
+      var base = cap.getBoundingClientRect(), rg = document.createRange(), csQ = getComputedStyle(q), csM = getComputedStyle(sm), upper = csM.textTransform === 'uppercase', fnt = function (c) { return c.fontStyle + ' ' + c.fontWeight + ' ' + c.fontSize + ' ' + c.fontFamily; }, FQ = fnt(csQ), FM = fnt(csM);
+      var measure = function (el, up) { var tn = el.firstChild, i = 0, out = []; Array.from(tn.data).forEach(function (ch) { rg.setStart(tn, i); rg.setEnd(tn, i + ch.length); i += ch.length; var r = rg.getClientRects()[0]; if (!r || !ch.trim()) return; var pv = out[out.length - 1], l = r.left - base.left, t = r.top - base.top; if (!up && pv && pv.c === 'f' && /[fil]/.test(ch) && pv.t === t) { pv.c += ch; pv.w = l + r.width - pv.l; return; } /* ff fi fl 在字体里是一个连字, 要整个画 */ out.push({ c: up ? ch.toUpperCase() : ch, l: l, t: t, w: r.width, a: /[\p{L}\p{N}]/u.test(ch) }); /* a: 字母数字才解码; 标点符号很窄, 换成随机字符会盖到相邻的字, 像空格一样从头保持原样 */ }); return out; };
+      var Q = measure(q, false), M = measure(sm, upper); if (!Q.length) return;
+      var probe = document.createElement('i'); probe.style.cssText = 'position:absolute;visibility:hidden;color:var(--c1)'; cap.appendChild(probe); var C1 = getComputedStyle(probe).color; cap.removeChild(probe);
+      var PAD = 8, W = Math.ceil(base.width), Hh = Math.ceil(base.height) + PAD * 2, d = Math.min(3, devicePixelRatio || 1), holder = document.createElement('div'), clip = document.createElement('div'), cv = document.createElement('canvas'), c = cv.getContext('2d');
+      holder.className = 'gv'; clip.className = 'gw'; clip.style.cssText = 'top:' + (-PAD) + 'px;width:' + W + 'px;height:' + Hh + 'px'; clip.appendChild(cv); holder.appendChild(clip); cap.appendChild(holder);   // 先接入页面再画: 画布的字才继承页面的字体设置 (平滑方式等), 和真文字一致
+      cv.width = W * d; cv.height = Hh * d * GN; cv.style.cssText = 'width:' + W + 'px;height:' + (Hh * GN) + 'px'; c.scale(d, d); c.textBaseline = 'alphabetic';
+      // 基线直接从真文字量: 行尾放一个零高的行内块, 它的底边就是基线 (自己用字体度量算会差不到 1 像素, 切换时字会跳)
+      var baseline = function (el, list) { var p = document.createElement('span'); p.style.cssText = 'display:inline-block;width:0;height:0'; el.appendChild(p); var y = p.getBoundingClientRect().bottom - base.top; el.removeChild(p); return y - list[list.length - 1].t; }, aQ = baseline(q, Q), aM = M.length ? baseline(sm, M) : 0;
+      var snap = function (y) { return Math.round(y * d) / d; }; /* 网页把文字基线对齐到设备像素, 画布也要, 否则行高带小数的文字 (出处) 切换时会跳半个像素 */
+      var line = function (list, font, asc, ink, lo, k) { c.font = font; var n = Math.floor(Math.max(0, Math.min(1, (k / (GN - 1) - lo) / (1 - lo))) * list.length); list.forEach(function (o, i) { var y = snap(o.t + asc); c.fillStyle = o.a && (i >= n ? i - n < 3 : n - i <= 2) && n < list.length ? C1 : ink; if (i < n || !o.a) { c.textAlign = 'left'; c.fillText(o.c, o.l, y); } else { c.textAlign = 'center'; c.fillText(GCH[(Math.random() * GCH.length) | 0], o.l + o.w / 2, y); } }); };
+      for (var k = 0; k < GN; k++) { c.save(); c.translate(0, k * Hh + PAD); c.font = FQ; c.fillStyle = csQ.color; c.textAlign = 'left'; var a0 = Q[0], z0 = Q[Q.length - 1]; c.fillText('“', a0.l - c.measureText('“').width, snap(a0.t + aQ)); c.fillText('”', z0.l + z0.w, snap(z0.t + aQ)); line(Q, FQ, aQ, csQ.color, 0, k); line(M, FM, aM, csM.color, .45, k); c.restore(); }
+      cv.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(' + (-Hh * (GN - 1)) + 'px)' }], { duration: GEND - GT0, delay: GT0, easing: 'steps(' + (GN - 1) + ',end)', fill: 'both' });
+      // 不换成真文字: 最后一帧一直留到遮罩退场. 换的话, 透明的真文字层可能还没光栅化, 切换时会空几帧 (整行闪一下); 这里没有互换, 也就没有闪和字形变化
+      q.style.visibility = sm.style.visibility = 'hidden'; } catch (e) {} }
 
   function run(ov, o) {
     var t0 = performance.now(), cs = getComputedStyle(H), cv = function (n) { return cs.getPropertyValue(n).trim(); }, day = H.getAttribute('data-mode') === 'day';
@@ -108,13 +114,14 @@
       pl.animate(TOUR.map(function (m, j) { var n = NODES[m]; return { transform: 'translate(' + R(n.x / 32 * S0) + 'px,' + R(n.y / 32 * S0) + 'px)', offset: d[j] / tot }; }), { duration: 3600, iterations: Infinity, easing: 'linear' }); plW = wrap(pl); plW.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, fill: 'both' }); }
     // 文字和进度线
     var say = pickSay(), cap = document.createElement('div'); cap.className = 'cap'; cap.innerHTML = '<q></q><small></small>'; cap.firstChild.textContent = say[0]; cap.lastChild.textContent = say[1]; ov.appendChild(cap);
-    glitch(cap, play); play(cap, [{ opacity: 0 }, { opacity: 1 }], { duration: 110, delay: GT0 - 20, easing: 'linear' });
+    glitch(cap); play(cap, [{ opacity: 0 }, { opacity: 1 }], { duration: 110, delay: GT0 - 20, easing: 'linear' });
     var bar = document.createElement('div'); bar.className = 'pb'; bar.innerHTML = '<i></i>'; ov.appendChild(bar); var fill = bar.firstChild, fA = null; play(bar, [{ opacity: 0 }, { opacity: 1 }], { duration: 360, delay: 180 });
     // 进度线是一条等待期间不会结束的动画: 分段接力时, 前一段若在主线程忙的时候走完 (本地解析大笔记时常碰上), 合成器会连整个画面一起停住, 直到主线程空闲 (SL 实测停 3 秒)
     function barTo() { var lead = hold ? est : INTRO, tot = lead + 30000; fA = play(fill, [{ transform: 'scaleX(.03)', easing: hold ? 'cubic-bezier(.25,.5,.5,1)' : 'linear' }, { transform: 'scaleX(' + (hold ? .9 : 1) + ')', offset: lead / tot, easing: 'linear' }, { transform: 'scaleX(' + (hold ? .99 : 1) + ')' }], { duration: tot, easing: 'linear' }); }
     barTo();
     // 字符簇: 星座四周, 对齐背景的 14×20 网格; 解码在主线程, 堵住时只是停一下
-    var pal = hold ? [cv('--accent'), cv('--accent'), cv('--accent'), cv('--accent')] : [cv('--k-add'), cv('--k-math'), cv('--k-ok'), cv('--k-warn2')], gl = document.createElement('div'), clus = []; gl.className = 'gly'; ov.appendChild(gl);
+    var pale = function (n) { return 'color-mix(in srgb,var(--k-' + n + ') 50%,var(--accent))'; }, pal = H.getAttribute('data-course') === 'ALL' ? [pale('add'), pale('math'), pale('ok'), pale('warn2')] : [cv('--accent'), cv('--accent'), cv('--accent'), cv('--accent')],   /* 主页: 淡彩, 和课程代码同一路; 笔记和课程页: 该课的颜色 */
+      gl = document.createElement('div'), clus = []; gl.className = 'gly'; ov.appendChild(gl);
     var S0 = parseFloat(getComputedStyle(parts[0]).width) || 240, cxx = innerWidth / 2, cyy = parseFloat(getComputedStyle(parts[0]).top) + S0 / 2, u = S0 / 32;
     [[-23, -13, 4], [21, -7, 3], [-19, 15, 5], [21, 14, 3]].forEach(function (p, k) { var set = rk(), x0 = Math.round((cxx + p[0] * u) / CW) * CW, y0 = Math.round((cyy + p[1] * u) / CH) * CH, cl = { set: set, t: 140 + k * 150, el: [] };
       for (var j = 0; j < p[2]; j++) { var e = document.createElement('i'); e.style.left = (x0 + j * CW) + 'px'; e.style.top = y0 + 'px'; e.style.color = pal[k]; e.textContent = gly(set); gl.appendChild(e); cl.el.push(e); play(e, [{ opacity: 0 }, { opacity: j ? .75 : 1 }], { duration: 160, delay: cl.t }); } clus.push(cl); });
@@ -131,7 +138,7 @@
       onend: function (f) { ends.push(f); },
       // 动画确实上了合成器才回调: 笔记 (尤其本地, 读文件几乎没有延迟) 要等这之后才开始加载, 否则主线程一堵, 动画根本起不来
       whenLive: function (f) { var fired = false, go = function () { if (fired) return; fired = true; f(); }; Promise.all([orbA.ready, fA.ready]).then(function () { requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(go, 0); }); }); }, go); setTimeout(go, 350); },
-      hold: function () { if (exiting || done) return; hold = true; ok = false; est = Math.max(est, 3000); if (fA) fA.cancel(); barTo(); after(Math.max(0, ROUTE - (performance.now() - t0)), startPulse); },
+      hold: function (e) { if (exiting || done) return; hold = true; ok = false; est = e || Math.max(est, 3000); if (fA) fA.cancel(); barTo(); after(Math.max(0, ROUTE - (performance.now() - t0)), startPulse); },
       end: function () { if (done) return; done = true; clearInterval(iv); timers.forEach(clearTimeout); ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (k) { removeEventListener(k, ctl.end, true); }); ends.forEach(function (f) { f(); }); if (ov.id === 'intro') H.removeAttribute('data-intro'); ov.remove(); if (cur === ctl) cur = null; }
     };
     ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (k) { addEventListener(k, ctl.end, { capture: true, passive: true }); });
@@ -144,7 +151,7 @@
     willPlay: function () { return !OFF; },
     play: function (o) {
       o = o || {};
-      if (cur) { if (o.hold) cur.hold(); return cur; }
+      if (cur) { if (o.hold) cur.hold(o.est); return cur; }
       if (OFF) return null;
       var ov = document.createElement('div'); ov.className = 'amk amk-rd'; ov.setAttribute('aria-hidden', 'true');
       document.body.appendChild(ov); return run(ov, o);

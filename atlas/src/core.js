@@ -7,7 +7,7 @@
   var CALM = matchMedia('(prefers-reduced-motion: reduce)').matches, M = $('#main'), CLEAN = [];
   var PG = [['notes', '笔记', 'Notizen'], ['graph', '图谱', 'Wissensnetz'], ['terms', '术语', 'Begriffe']], CAT = [['lec', '课件笔记', 'Folien'], ['ex', '练习单', 'Übungen'], ['lit', '文献合集', 'Literatur']];
   var R = { p: 'notes', f: 'ALL', node: '' }, OPEN = {};
-  var BOOT = /^#\/read\//.test(location.hash) ? location.hash : ''; if (BOOT) history.replaceState(null, '', '#/notes/ALL');
+  var BOOT = /^#\/read\//.test(location.hash) ? location.hash : ''; var BOOTC = BOOT ? BOOT.split('/')[2] : '';   /* 刷新时在笔记内: 打开笔记之前也保持这门课的配色 */ if (BOOT) history.replaceState(null, '', '#/notes/ALL');
   (function () { var m = /#\/(\w+)(?:\/([\w:]+))?(?:\/(\w+))?/.exec(location.hash); if (m && PG.some(function (x) { return x[0] === m[1]; })) { R.p = m[1]; R.f = m[2] || 'ALL'; R.node = m[3] || ''; } if (history.state && history.state.open) OPEN = history.state.open; })();
   function inF(c) { return R.f === 'ALL' || R.f === c.code || R.f === 'g:' + c.g; }
 
@@ -78,7 +78,7 @@ __TOUCH__
   function ind(n, t) { var b = t.querySelector('b') || t, sm = t.querySelector('small'), bar = t.closest('.hb1') || t.parentNode, rb = b.getBoundingClientRect(), rs = sm && sm.getBoundingClientRect(), r0 = bar.getBoundingClientRect(), R = rs && rs.width ? Math.max(rb.right, rs.right) : rb.right; n.style.width = (R - rb.left) + 'px'; n.style.transform = 'translateX(' + (rb.left - r0.left) + 'px)'; }
   function indNow() { var on = $('.si.on'); if (on) ind($('.ind:not(.gh)'), on); }
   function syncTop() { H.dataset.flt = R.f || 'ALL'; $$('.si[data-p]').forEach(function (t) { var on = t.dataset.p === R.p; t.classList.toggle('on', on); t.setAttribute('aria-current', on ? 'page' : 'false'); }); indNow(); $('.ind.gh').classList.remove('v');
-    $('#q').placeholder = 'Suche'; syncRail(); history.replaceState(history.state, '', '#/' + R.p + '/' + R.f + (R.node ? '/' + R.node : '')); }
+    $('#q').placeholder = 'Suche'; syncRail(); /* 笔记打开时地址是笔记自己的 (#/read/...), 不能写回目录: 字体就绪等异步调用会赶上这里, 之后刷新就回了主页 */ if (!RDR) history.replaceState(history.state, '', '#/' + R.p + '/' + R.f + (R.node ? '/' + R.node : '')); }
 
   /* 课程索引: 三页都在同一个位置 */
   /* 课程筛选: 永远一行, 不弹窗.
@@ -104,7 +104,7 @@ __TOUCH__
     /* 旧的一层立即换掉, 只让新的一层轻轻滑入: 任何时刻只有一层, 不会叠字 */
     if (lv) lv.replaceWith(nv); else box.appendChild(nv); if (lv && dir && !CALM) { nv.classList.add(dir > 0 ? 'inr' : 'inl'); RAILT = setTimeout(function () { nv.classList.remove('inr', 'inl'); }, 220); }
     var sc = nv.querySelector('.rls'), on = sc && sc.querySelector('.on'); if (on && sc.scrollWidth > sc.clientWidth) sc.scrollLeft = Math.max(0, on.offsetLeft - sc.offsetLeft - sc.clientWidth / 2); }
-  function syncRail() { H.dataset.course = BY[R.f] ? R.f : 'ALL'; var c = BY[R.f], g = c ? c.g : R.f.indexOf('g:') === 0 ? R.f.slice(2) : ''; var d = g !== RAILG ? (g ? 1 : -1) : 0; RAILG = g; paintRail(d); }
+  function syncRail() { H.dataset.course = RDR ? RDR.code : BY[BOOTC] ? BOOTC : BY[R.f] ? R.f : 'ALL'; var c = BY[R.f], g = c ? c.g : R.f.indexOf('g:') === 0 ? R.f.slice(2) : ''; var d = g !== RAILG ? (g ? 1 : -1) : 0; RAILG = g; paintRail(d); }
 
   /* 检索: 从页头下方展开一行. 笔记页查课程和笔记; 图谱查节点; 术语就地筛选 */
   function search() { var inp = $('#q'), lst = $('#res'), box = $('.slq'), sel = 0, res = [];
@@ -215,5 +215,5 @@ __TOUCH__
   if (R.p !== 'graph' && history.state && history.state.y) setTimeout(function () { scrollTo(0, history.state.y); }, 80);
   addEventListener('pagehide', function () { history.replaceState({ y: scrollY, open: OPEN }, '', location.hash); });
   if (D.fonts && D.fonts.ready) D.fonts.ready.then(syncTop);
-  if (BOOT) { history.pushState({ rd: 1 }, '', BOOT); dispatchEvent(new PopStateEvent('popstate')); }
+  if (BOOT) { history.pushState({ rd: 1 }, '', BOOT); dispatchEvent(new PopStateEvent('popstate')); BOOTC = ''; }
 })();
