@@ -4,4 +4,4 @@ Notes for the Computational Linguistics programme at LMU Munich, with a knowledg
 
 **https://yikesyellowpharmakon.github.io/lmu-cl-notes/**
 
-The notes are written in Chinese next to the original slide text. Each course has its own folder; `atlas/` holds the source of the homepage.
+Each course has its own folder; `atlas/` holds the source of the homepage.
