@@ -1,12 +1,12 @@
 // 星座 A 动画 (图标 B2「不对称星座 A」+ 开场「路线」), 主页开场和打开笔记时的遮罩是同一套, 2026-11-07 重写:
 //
 // 为什么不用逐帧 JS: 笔记在内嵌框里解析时和页面挤同一条主线程 (IDP 合集实测停 1.6 秒), 逐帧动画开头就卡住, 之后又突然跳到下一段.
-// 所以所有动作都交给合成器 (每个部件一个独立图层, 只动 transform / opacity), 主线程堵住也照常走. 只有字符解码在主线程, 堵住时停一下不影响观感.
+// 所以所有动作都交给合成器 (每个部件一个 div 图层, 只动 transform / opacity, 不动 <svg> 根元素), 主线程堵住也照常走. 只有字符解码在主线程, 堵住时停一下不影响观感.
 //
 // 时间线 (ms), 两处相同:
 //   0        遮罩、暗字场
 //   60-740   星点淡入又退去; 连线按路线匀速画出 (每条隔 78 开始, 各画 190), 画到哪个节点哪个亮
-//   150-830  格言逐字解码 (预先生成 11 层文字由合成器切换);  180 点线弧开始匀速旋转, 进度细线出现
+//   150-1266 格言和出处逐字解码 (预先生成 18 层文字由合成器切换); 笔记遮罩至少等它播完;  180 点线弧开始匀速旋转, 进度细线出现
 //   收尾     进度线平滑走满 → 文字和进度线淡出 → 星座按路线反序淡出, 遮罩淡开 (约 400)
 // 不同的只有结束时机:
 //   主页开场: 固定 1500 后收尾 (留时间读格言), 进度线匀速走满.
@@ -59,27 +59,31 @@
     c.font = '11px ' + GF; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = ink; c.globalAlpha = day ? .08 : .065; var rx = Math.min(W * .34, 330), ry = Math.min(Hh * .36, 300);
     for (var x = 0; x < W / CW; x++) for (var y = 0; y < Hh / CH; y++) { var px = x * CW + CW / 2, py = y * CH + CH / 2, dx = (px - W / 2) / rx, dy = (py - Hh / 2 + 46) / ry; if (Math.random() > .2 || dx * dx + dy * dy < 1) continue; c.fillText(gly(rk()), px, py); } return cv; }
 
-  // 文字 glitch: 事先生成几层「逐步解码」的文字, 由合成器按顺序切换 (不用主线程改文字, 解析笔记时也不会卡).
-  // 每层都是一份排版相同的 <q>, 没解码的字透明占位, 乱码盖在各字的位置上, 所以解码前后每个字都不会移动
-  var GN = 11, GSTEP = 62, GT0 = 150, GSETS = ['kana', 'rune', 'math', 'box', 'cher'];   // 不用盲文: 点阵太细太暗, 一整行几乎看不见
-  function glitch(cap, text, play) { var q = cap.firstChild, esc = function (c) { return c === '&' ? '&amp;' : c === '<' ? '&lt;' : c; }, rs = function () { return GSETS[(Math.random() * GSETS.length) | 0]; };
-    try { var tn = q.firstChild, base = cap.getBoundingClientRect(), rg = document.createRange(), cs = Array.from(text), i = 0, any = false;
-      var pos = cs.map(function (ch, j) { rg.setStart(tn, i); rg.setEnd(tn, i + ch.length); i += ch.length; var r = rg.getClientRects()[0]; if (!r || !ch.trim()) return null; any = true; return { l: R(r.left - base.left), t: R(r.top - base.top), w: R(r.width), h: R(r.height), d: j / cs.length * .82 + Math.random() * .18 }; });
-      if (!any) return;
-      for (var k = 0; k < GN; k++) { var v = document.createElement('div'), h = '', sc = '', fr = k / (GN - 1), sa = rs(), sb = rs(); v.className = 'gv';
-        var st = '', sw = function (t) { if (t === st) return; if (st) h += '</' + st + '>'; if (t) h += '<' + t + '>'; st = t; };   // 相邻同类的字合成一段, 标签越少排版舍入越小
-        cs.forEach(function (ch, j) { var p = pos[j]; if (!p) { h += esc(ch); return; } if (p.d < fr) { sw(p.d > fr - .14 ? 'em' : ''); h += esc(ch); return; } sw('u'); h += esc(ch); sc += '<b' + (p.d - fr > .3 ? ' class="f"' : '') + ' style="left:' + p.l + 'px;top:' + p.t + 'px;width:' + p.w + 'px;height:' + p.h + 'px;line-height:' + p.h + 'px">' + esc(gly(Math.random() < .5 ? sa : sb)) + '</b>'; }); sw('');
-        v.innerHTML = '<q>' + h + '</q>' + sc; cap.appendChild(v);
+  // 文字 glitch: 事先生成 18 层「逐步解码」的文字, 由合成器按顺序切换 (不用主线程改文字, 解析笔记时也不会卡).
+  // 每层都是排版相同的一份格言和出处: 没解码的字透明占位, 乱码盖在各字的位置上; 重影 (text-shadow) 和噪声条都不占位, 所以每个字始终不动
+  var GN = 18, GSTEP = 62, GT0 = 150, GEND = GT0 + GN * GSTEP, GSETS = ['kana', 'rune', 'math', 'box', 'cher'];   // 不用盲文: 点阵太细太暗, 一整行几乎看不见
+  function glitch(cap, play) { var q = cap.firstChild, sm = cap.lastChild, esc = function (c) { return c === '&' ? '&amp;' : c === '<' ? '&lt;' : c; }, rs = function () { return GSETS[(Math.random() * GSETS.length) | 0]; };
+    try { var base = cap.getBoundingClientRect(), rg = document.createRange(), any = false;
+      var measure = function (el, lo, hi) { var tn = el.firstChild, cs = Array.from(tn.data), i = 0; return cs.map(function (ch, j) { rg.setStart(tn, i); rg.setEnd(tn, i + ch.length); i += ch.length; var r = rg.getClientRects()[0], o = { c: ch }; if (r && ch.trim()) { any = true; o.l = R(r.left - base.left); o.t = R(r.top - base.top); o.w = R(r.width); o.h = R(r.height); o.d = lo + (j / cs.length * .82 + Math.random() * .18) * (hi - lo); } return o; }); };
+      var Q = measure(q, 0, .9), M = measure(sm, .35, 1); if (!any) return;
+      for (var k = 0; k < GN; k++) { var v = document.createElement('div'), sc = '', fr = Math.max(0, (k - 3) / (GN - 4)), sa = rs(), sb = rs(), amp = Math.round((1 - fr) * 3) * (k % 2 ? 1 : -1); v.className = 'gv';
+        var piece = function (list, small) { var h = '', st = '', sw = function (t) { if (t === st) return; if (st) h += '</' + st + '>'; if (t) h += '<' + t + '>'; st = t; };   // 相邻同类的字合成一段, 标签越少排版舍入越小
+          list.forEach(function (o) { if (o.d == null) { h += esc(o.c); return; } if (o.d < fr) { sw(o.d > fr - .1 ? 'em' : ''); h += esc(o.c); return; } sw('u'); h += esc(o.c); var near = o.d - fr, cl = (near < .05 ? 'k' : near > .3 ? 'f' : '') + (small ? ' s' : ''); sc += '<b' + (cl.trim() ? ' class="' + cl.trim() + '"' : '') + ' style="left:' + o.l + 'px;top:' + o.t + 'px;width:' + o.w + 'px;height:' + o.h + 'px;line-height:' + o.h + 'px">' + esc(gly(Math.random() < .5 ? sa : sb)) + '</b>'; }); sw(''); return h; };
+        var hq = piece(Q), hm = piece(M, 1), bars = ''; if (fr < .8) for (var n = 0; n < 4; n++) bars += '<i style="left:' + R(base.width / 2 + (Math.random() - .5) * Math.min(base.width, 520) - 40) + 'px;top:' + R(Math.random() * base.height) + 'px;width:' + R(18 + Math.random() * 110) + 'px;height:' + (Math.random() < .3 ? 2 : 1) + 'px"></i>';
+        v.innerHTML = '<q' + (amp ? ' style="text-shadow:' + amp + 'px 0 var(--c1),' + (-amp) + 'px 0 color-mix(in srgb,var(--c1) 45%,var(--ink))"' : '') + '>' + hq + '</q><small>' + hm + '</small>' + sc + bars; cap.appendChild(v);
         play(v, [{ opacity: 0, offset: 0 }, { opacity: 1, offset: .001 }, { opacity: 1, offset: .999 }, { opacity: 0, offset: 1 }], { duration: GSTEP, delay: GT0 + k * GSTEP, easing: 'linear' }); }
-      play(q, [{ opacity: 0 }, { opacity: 1 }], { duration: 1, delay: GT0 + GN * GSTEP - 1, easing: 'linear' }); } catch (e) {} }
+      [q, sm].forEach(function (e) { play(e, [{ opacity: 0 }, { opacity: 1 }], { duration: 1, delay: GEND - 1, easing: 'linear' }); }); } catch (e) {} }
 
   function run(ov, o) {
     var t0 = performance.now(), cs = getComputedStyle(H), cv = function (n) { return cs.getPropertyValue(n).trim(); }, day = H.getAttribute('data-mode') === 'day';
     var ok = !o.hold, hold = !!o.hold, exiting = false, done = false, timers = [], iv = 0, ends = [], est = o.est || 1500;
     var after = function (ms, f) { var id = setTimeout(f, ms); timers.push(id); return id; };
     var play = function (el, kf, op) { op.fill = op.fill || 'both'; return el.animate(kf, op); };
-    var layer = function (ox, oy) { var s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 32 32'); s.setAttribute('class', 'ly'); if (ox != null) s.style.transformOrigin = R(ox / 32 * 100) + '% ' + R(oy / 32 * 100) + '%'; ov.appendChild(s); return s; };
-    var mk = function (par, tag, a) { var e = document.createElementNS(NS, tag); for (var k in a) e.setAttribute(k, a[k]); par.appendChild(e); return e; };
+    // 每个部件 = 一个 div (动画放这里) 包一张静态 svg. 动画绝不能放在 <svg> 根元素上: Chrome 不会把它放上合成器, 解析笔记时整个星座和圆环都会停住 (追踪里还显示正常, 只有真实像素测得出, 见 tests/lab.mjs 的结论)
+    var layer = function (ox, oy) { var d = document.createElement('div'), s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 32 32'); d.className = 'ly'; d.appendChild(s); d.svg = s; if (ox != null) d.style.transformOrigin = R(ox / 32 * 100) + '% ' + R(oy / 32 * 100) + '%'; ov.appendChild(d); return d; };
+    // 循环动画和淡入淡出分在两层
+    var wrap = function (el) { var w = document.createElement('div'); w.className = 'wr'; el.parentNode.insertBefore(w, el); w.appendChild(el); return w; };
+    var mk = function (par, tag, a) { var e = document.createElementNS(NS, tag); for (var k in a) e.setAttribute(k, a[k]); (par.svg || par).appendChild(e); return e; };
     // 背景是独立一层: 淡入淡出只动它, 不对整个遮罩做透明度 (那要把所有部件合成一张全屏大图, 大屏上开头和收尾都吃力)
     ov.innerHTML = ''; ov.style.background = 'none'; var bg = document.createElement('div'); bg.className = 'bgc'; ov.appendChild(bg); if (o.fadeIn) play(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 140, easing: 'ease-out' });
     var fld = field(day, cv('--ink')); ov.appendChild(fld); play(fld, [{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
@@ -89,8 +93,8 @@
     play(nz, [{ opacity: 0, offset: 0 }, { opacity: 1, offset: .32 }, { opacity: 1, offset: .62 }, { opacity: 0, offset: 1 }], { duration: ROUTE });
     // 点线弧: 匀速旋转 (旋转和淡入分开两个动画)
     var orb = layer(16, 16); for (var k0 = 0; k0 < 22; k0++) { var a0 = k0 * .13; mk(orb, 'circle', { cx: R(16 + 17.8 * Math.cos(a0)), cy: R(16 + 17.8 * Math.sin(a0)), r: .24, class: 'ad', opacity: R(.08 + .72 * k0 / 21) }); }
-    var orbA = orb.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], { duration: 3200, iterations: Infinity });
-    orb.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 180, fill: 'both' });
+    var orbA = orb.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], { duration: 3200, iterations: Infinity }), orbW = wrap(orb);
+    orbW.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 180, fill: 'both' });
     // 连线, 节点 (子概念跟着父节点), 跨课虚线圈
     var parts = [];
     EDGES.forEach(function (e, i) { var a = NODES[e[0]], b = NODES[e[1]], q = cut(a, b, a.r, b.r), ly = layer(q[0], q[1]); mk(ly, 'line', { x1: R(q[0]), y1: R(q[1]), x2: R(q[2]), y2: R(q[3]), 'stroke-width': e[2], class: e[4] ? 'e x' : 'e', opacity: e[3] });
@@ -99,12 +103,12 @@
       mk(ly, 'circle', { cx: n.x, cy: n.y, r: n.r, class: n.c === 'a' ? 'n a' : 'n', opacity: n.k }); play(ly, [{ opacity: 0, transform: 'scale(.4)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 280, delay: LIT[i], easing: 'cubic-bezier(.3,1.3,.6,1)' }); parts.push(ly); });
     var xl = layer(NODES[XM].x, NODES[XM].y); mk(xl, 'circle', { cx: NODES[XM].x, cy: NODES[XM].y, r: NODES[XM].r + 1.5, class: 'xm', pathLength: 12 }); play(xl, [{ opacity: 0, transform: 'rotate(-90deg) scale(.7)' }, { opacity: .85, transform: 'rotate(0deg) scale(1)' }], { duration: 340, delay: LIT[5] - 40, easing: EASE }); parts.push(xl);
     // 等待时的小光点: 沿路线循环
-    var pl = null;
+    var pl = null, plW = null;
     function startPulse() { if (pl || exiting || done) return; pl = layer(); pl.style.transformOrigin = '0 0'; mk(pl, 'circle', { cx: 0, cy: 0, r: .6, class: 'pl' }); var d = [0], tot = 0; for (var j = 1; j < TOUR.length; j++) { var p = NODES[TOUR[j - 1]], q = NODES[TOUR[j]]; tot += Math.hypot(p.x - q.x, p.y - q.y); d.push(tot); }
-      pl.animate(TOUR.map(function (m, j) { var n = NODES[m]; return { transform: 'translate(' + R(n.x / 32 * 100) + '%,' + R(n.y / 32 * 100) + '%)', offset: d[j] / tot }; }), { duration: 3600, iterations: Infinity, easing: 'linear' }); pl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, fill: 'both' }); }
+      pl.animate(TOUR.map(function (m, j) { var n = NODES[m]; return { transform: 'translate(' + R(n.x / 32 * S0) + 'px,' + R(n.y / 32 * S0) + 'px)', offset: d[j] / tot }; }), { duration: 3600, iterations: Infinity, easing: 'linear' }); plW = wrap(pl); plW.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, fill: 'both' }); }
     // 文字和进度线
     var say = pickSay(), cap = document.createElement('div'); cap.className = 'cap'; cap.innerHTML = '<q></q><small></small>'; cap.firstChild.textContent = say[0]; cap.lastChild.textContent = say[1]; ov.appendChild(cap);
-    glitch(cap, say[0], play); play(cap, [{ opacity: 0 }, { opacity: 1 }], { duration: 110, delay: GT0 - 20, easing: 'linear' });
+    glitch(cap, play); play(cap, [{ opacity: 0 }, { opacity: 1 }], { duration: 110, delay: GT0 - 20, easing: 'linear' });
     var bar = document.createElement('div'); bar.className = 'pb'; bar.innerHTML = '<i></i>'; ov.appendChild(bar); var fill = bar.firstChild, fA = null; play(bar, [{ opacity: 0 }, { opacity: 1 }], { duration: 360, delay: 180 });
     // 进度线是一条等待期间不会结束的动画: 分段接力时, 前一段若在主线程忙的时候走完 (本地解析大笔记时常碰上), 合成器会连整个画面一起停住, 直到主线程空闲 (SL 实测停 3 秒)
     function barTo() { var lead = hold ? est : INTRO, tot = lead + 30000; fA = play(fill, [{ transform: 'scaleX(.03)', easing: hold ? 'cubic-bezier(.25,.5,.5,1)' : 'linear' }, { transform: 'scaleX(' + (hold ? .9 : 1) + ')', offset: lead / tot, easing: 'linear' }, { transform: 'scaleX(' + (hold ? .99 : 1) + ')' }], { duration: tot, easing: 'linear' }); }
@@ -120,8 +124,8 @@
     // 收尾: 一次性交给合成器 (不再用定时器分段, 主线程这时往往正忙): 进度线从当前位置走满 → 文字淡出 → 星座反序淡出, 背景层淡开
     function finish() { if (exiting || done) return; exiting = true; clearInterval(iv); var m = /matrix\(([^,]+)/.exec(getComputedStyle(fill).transform), v = m ? +m[1] : 0, dur = Math.max(160, Math.round((1 - v) * 520)); if (fA) fA.cancel(); play(fill, [{ transform: 'scaleX(' + v + ')' }, { transform: 'scaleX(1)' }], { duration: dur, easing: 'cubic-bezier(.35,0,.25,1)' });
       var out = function (el, ms, delay, ez) { play(el, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, delay: dur + delay, easing: ez || 'ease-out' }); };
-      [cap, bar, gl, orb].forEach(function (x) { out(x, 200, 0); }); if (pl) out(pl, 120, 0); parts.slice().reverse().forEach(function (p, i) { out(p, 170, i * 11, 'ease-in'); }); out(fld, 300, 0); out(bg, 320, 90, 'ease-in-out'); after(dur + 430, ctl.end); }
-    function check() { if (done || exiting || !ok) return; var n = performance.now() - t0; if (hold && n < FAST) { exiting = true; clearInterval(iv); [].slice.call(ov.children).forEach(function (x) { play(x, [{ opacity: +getComputedStyle(x).opacity }, { opacity: 0 }], { duration: 170, easing: 'ease-out' }); }); after(180, ctl.end); return; } var need = (hold ? ROUTE : INTRO) - n; if (need > 0) { after(need, check); return; } finish(); }
+      [cap, bar, gl, orbW].forEach(function (x) { out(x, 200, 0); }); if (plW) out(plW, 120, 0); parts.slice().reverse().forEach(function (p, i) { out(p, 170, i * 11, 'ease-in'); }); out(fld, 300, 0); out(bg, 320, 90, 'ease-in-out'); after(dur + 430, ctl.end); }
+    function check() { if (done || exiting || !ok) return; var n = performance.now() - t0; if (hold && n < FAST) { exiting = true; clearInterval(iv); [].slice.call(ov.children).forEach(function (x) { play(x, [{ opacity: +getComputedStyle(x).opacity }, { opacity: 0 }], { duration: 170, easing: 'ease-out' }); }); after(180, ctl.end); return; } var need = (hold ? Math.max(ROUTE, GEND) : INTRO) - n; if (need > 0) { after(need, check); return; } finish(); }
     var ctl = {
       ready: function () { ok = true; check(); },
       onend: function (f) { ends.push(f); },
