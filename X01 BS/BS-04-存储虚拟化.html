@@ -1476,7 +1476,6 @@ free(b); free(a);</pre></li>
   z = malloc(<span class="tk-k">sizeof</span>(<span class="tk-k">int</span>));
 }</pre>
   <p>Wo werden folgende Speicherobjekte abgelegt? Mögliche Bereiche: Statische Daten, Code, Stack, <span class="nb">Heap</span></p>
-  <details class="answer"><summary>答案 (先自己做再看)</summary>
   <div class="tablewrap"><table>
     <tr><th>Adresse</th><th>Ort</th></tr>
     <tr><td>x</td><td class="wide">Statische Daten (oder Code)</td></tr>
@@ -1485,7 +1484,6 @@ free(b); free(a);</pre></li>
     <tr><td>z</td><td>Stack</td></tr>
     <tr><td>*z</td><td>Heap</td></tr>
   </table></div>
-  </details>
 </div>
 <div class="zh">
   <p>问: 这些对象分别放在哪个区域 (静态数据、代码、栈、堆)? 答案: 全局变量 x 在静态数据区 (幻灯片写「或代码」, 因为有的系统把它们放在同一段); 函数 main 的机器码在代码区; 局部变量 y 在栈上; 指针变量 z 本身也是局部变量, 在栈上; z 指向的那个 int (<code>*z</code>) 是 malloc 分配的, <span class="nb">在堆上.</span></p>

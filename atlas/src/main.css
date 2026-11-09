@@ -1187,4 +1187,7 @@ html.lite .sh::before { -webkit-mask: none; mask: none; height: 1px; opacity: .4
 html.lite #top::before { -webkit-mask: none; mask: none; height: 110px; background: linear-gradient(var(--bg-a) 62%, transparent); }
 html.lite .key { box-shadow: 0 0 0 1px color-mix(in srgb, var(--dv, var(--k-ans2)) 28%, transparent); }
 html.lite .key::before, html.lite .key::after { box-shadow: none !important; }
-
+/* 2026-11-08 悬停时浮出的概念名只是说明, 不拦截点击 (曾经挡住弧线, 点弧跳进概念) */
+.gv .bn .bnl { pointer-events: none; }
+/* 2026-11-08 盘很密时弧线难免从课名后面经过: 课名描一圈底色, 文字始终可读 */
+.gs .gv .thl text { paint-order: stroke; stroke: var(--bg-b); stroke-width: 4px; stroke-linejoin: round; }

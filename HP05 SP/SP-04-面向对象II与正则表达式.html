@@ -2011,13 +2011,12 @@ annesAcc2 = Account(<span class="tk-n">2</span>, anne)</pre>
   <span class="slide">Slide 57–58</span>
   <p>What can you match with the following regular <span class="nb">expressions?</span></p>
   <ol><li><code>[ts]h\w*</code></li><li><code>[^trs][a-z]+</code></li><li><code>&lt;.*/?&gt;</code></li><li><code>\d+-year-old</code></li></ol>
-  <details class="answer"><summary>Example solutions (Slide 58)</summary>
-<pre data-lang="text">1 [ts]h\w*        # Example matches: the, she, show
+  <p><b>Example solutions</b></p>
+  <pre data-lang="text">1 [ts]h\w*        # Example matches: the, she, show
 2 [^trs][a-z]+    # Example match: blue
 3 &lt;.*/?&gt;          # Example matches: &lt;img/&gt;, &lt;a&gt;
 4 \d+-year-old    # Examples matches: 1-year-old, 100-year-old</pre>
   <p>More reading: <a href="https://docs.python.org/3/howto/regex.html">https://docs.python.org/3/howto/regex.html</a></p>
-  </details>
 </div>
 <div class="zh">
   <p>逐个读: (1) t 或 s, 接 h, 再接任意个单词字符: the、she、show. (2) 一个<b>不是</b> t、r、s 的字符, 再接至少一个小写字母: blue 可以. 但这只限制第一个字符: 在 the 里它会从 h 开始匹配到 he, 而且空格也算「不是 t、r、s」, 实测 <code class="lc">re.findall(r'[^trs][a-z]+', 'blue the')</code> 是 <code class="lc">['blue', ' the']</code>. (3) <code>&lt;</code>, 任意字符, 可选的 <code>/</code>, <code>&gt;</code>, 像 HTML 标签. (4) 一个或多个数字接 <span class="nb">-year-old.</span></p>
@@ -2041,11 +2040,10 @@ annesAcc2 = Account(<span class="tk-n">2</span>, anne)</pre>
 <div class="card orig">
   <span class="slide">Slide 60–61</span>
   <p>Come up with a regular expression that matches the entire string of <i>afoot</i>, <i>foody</i>, <i>fool</i>, but does NOT match <i>forest</i>, <i>afluent</i>, <i>pool</i>, <i>foos</i>. Use as few characters as <span class="nb">possible.</span></p>
-  <details class="answer"><summary>Some solutions (Slide 61)</summary>
-<pre data-lang="text">/a?foo[tdl]y?/      12 characters
+  <p><b>Some solutions</b></p>
+  <pre data-lang="text">/a?foo[tdl]y?/      12 characters
 /a?foo(t|l|dy)/     13
 /a?foo([tl]|dy)/    14</pre>
-  </details>
 </div>
 <div class="zh">
   <p>要求<b>整个</b>字符串匹配. 三个要匹配的词共同点是 foo, 前面可能有 a, 后面是 t、d 或 l, 最后可能有 y. 第一个解最短 (不算斜杠 12 个字符), 但它也会接受题目没列出的 footy、fooly; 后两个更精确, 只接受 t、l 或 dy. 三个解都实测过: 用 <code>re.fullmatch</code> 只匹配 afoot、foody、<span class="nb">fool.</span></p>

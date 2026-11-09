@@ -2110,12 +2110,11 @@ cfd = nltk.ConditionalFreqDist(
         for target in ["american", "citizen"]
         if w.lower().startswith(target))</pre>
   <p>?? How many conditions would we expect <span class="nb">here?</span></p>
-  <details class="answer"><summary>Answer (Slide 73)</summary>
-<pre data-lang="python repl"><span class="tk-p">&gt;&gt;&gt; </span><span class="tk-b">print</span>(cfd.conditions())
+  <p><b>Answer</b></p>
+  <pre data-lang="python repl"><span class="tk-p">&gt;&gt;&gt; </span><span class="tk-b">print</span>(cfd.conditions())
 ['Citizens', 'citizens', 'American', 'citizen', 'citizenship',
 'Americanism', 'Americans', 'citizenry', 'Americanâ', 'Americansâ']</pre>
   <p>... more than 2 (in this case they are actually 10), because we do not use the tokens in target as conditions, but rather check for lower-cased words that start with these <span class="nb">tokens</span></p>
-  </details>
 </div>
 <div class="zh">
   <p>课堂问题: 这个 cfd 有几个条件? 关键看每对的第一个元素: 这里是 <code>w</code>, 即文本里<b>原样</b>的词, 而不是 <code>target</code>. 所以每个小写后以 american 或 citizen 开头的不同词形都是一个条件, 大小写不同也算两个, 共 10 个 (实测一致). <code>Americanâ</code> 这种是语料文件里的编码残留 (原文的弯引号<span class="nb">被错读了).</span></p>
