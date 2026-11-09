@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIT1806 合集 · ZoomNotes</title>
+<style>
+  /* 同一门课沿用同目录已有笔记的整段 <style>；新课只改下面的颜色 token。 */
+  :root {
+    --bg: #131e12;
+    --ink: #e4ede3;
+    --muted: #9eb59b;
+    --line: #324b30;
+    --card: #1c2b1a;
+    --code: #0f180e;
+    --accent: #8be481;
+    --chip: #263e23;
+    --zh: #192b17;
+    --add: #192318;
+    --add-line: #8bb686;
+    --warn: #2a1a1c;
+    --warn-line: #ff7b72;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16.5px/1.6 "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif;
+  }
+  header { position: static; background: transparent; border: 0; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 18px 22px 72px; }
+  header .wrap { padding-top: 18px; padding-bottom: 8px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 6px; font-weight: 650; }
+  h2 { font-size: 22px; margin: 44px 0 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+  h3 { font-size: 17px; margin: 24px 0 6px; }
+  h1 .de-title, h2 .de-title, h3 .de-title {
+    display: block; margin-top: 2px; color: var(--muted);
+    font-weight: 500; font-size: 0.92em; line-height: 1.35;
+  }
+  h1 .de-title { font-size: 0.62em; }
+  p { margin: 8px 0; }
+  .lede { color: var(--muted); margin: 0; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+  nav a {
+    color: var(--accent); text-decoration: none; background: var(--chip);
+    border-radius: 999px; padding: 3px 10px;
+    font: 13px/1.4 "ZH Latin", "PingFang SC", sans-serif;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 16px; margin: 12px 0;
+  }
+  .card p, .card li { margin: 4px 0; }
+  .de { position: relative; padding-top: 26px; }
+  .folie {
+    position: absolute; top: 7px; left: 16px;
+    font: 11.5px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); letter-spacing: .02em;
+  }
+  .de .def {
+    border-left: 3px solid var(--accent); padding: 4px 10px; margin: 6px 0;
+    background: var(--chip); border-radius: 0 8px 8px 0;
+  }
+  .zh {
+    background: var(--zh); border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .zh p { margin: 0 0 8px; }
+  .zh p:last-child, .zh ul:last-child, .zh ol:last-child { margin-bottom: 0; }
+  .add {
+    background: var(--add); border-left: 3px dashed var(--add-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .add::before { content: "补充（幻灯片之外）"; display: block; font-size: 12px; color: var(--add-line); font-weight: 600; margin-bottom: 4px; }
+  .add p { margin: 0 0 8px; }
+  .add p:last-child { margin-bottom: 0; }
+  .warn {
+    background: var(--warn); border-left: 3px solid var(--warn-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .vocab { font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14px; color: var(--muted); margin: 6px 0 2px; }
+  .vocab b { color: var(--ink); font-weight: 600; }
+  ul, ol { margin: 8px 0; padding-left: 1.3em; }
+  li { margin: 4px 0; }
+  ul ul { margin: 2px 0; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; margin: 12px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { font: 12px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); font-weight: 600; background: var(--chip); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  pre {
+    background: var(--code); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; overflow: auto; margin: 12px 0;
+    font: 13.5px/1.5 "SF Mono", ui-monospace, Menlo, monospace;
+  }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--chip); padding: 1px 5px; border-radius: 5px;
+  }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .src { color: var(--muted); font-size: 14px; }
+  blockquote { margin: 8px 0; padding: 4px 14px; border-left: 3px solid var(--line); font-style: italic; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 6px; }
+  .diagram { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .diagram > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14.5px; }
+  .diagram h4 { margin: 0 0 6px; font-size: 15px; }
+  @media (max-width: 560px) { .diagram { grid-template-columns: 1fr; } }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cols pre { margin: 0; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  /* ===== 前端细节优化 2026-10-16：只调排版与交互，不改内容和颜色 token ===== */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
+  p, li, a, code { overflow-wrap: break-word; }
+  [id] { scroll-margin-top: 16px; }
+  :focus-visible { outline: 2px solid var(--accent, var(--link)); outline-offset: 2px; border-radius: 4px; }
+  pre, .tablewrap { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  pre { tab-size: 4; }
+  .tablewrap { overflow-x: auto; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  @media print { pre, table, details, figure { break-inside: avoid; } h2, h3 { break-after: avoid; } }
+  ::selection { background: color-mix(in srgb, var(--accent, var(--link)) 35%, transparent); }
+  nav a { transition: background-color .15s ease, color .15s ease; }
+  nav a:hover { background: color-mix(in srgb, var(--accent, var(--link)) 22%, var(--chip, var(--paper))); }
+  details summary:hover { color: var(--accent, var(--link)); }
+  @media print { .card, .zh, .add, .warn, .de, .later, .vocab { break-inside: avoid; } }
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .wrap, header .wrap, main { padding-left: 16px; padding-right: 16px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    .card { padding-left: 12px; padding-right: 12px; }
+    .folie, .slide { left: 12px; }
+    .zh, .add, .warn { padding: 9px 12px; }
+    pre { padding: 10px 12px; font-size: 13px; }
+  }
+  /* ===== 排版统一层 v9（所有笔记共用；只管字体、尺寸、间距、对齐，不改颜色 token） ===== */
+  :root { --measure: 760px; --gutter: 24px; --serif: "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif; --sans: "ZH Latin", "PingFang SC", "Hiragino Sans GB", "Songti SC", sans-serif; --mono: "SF Mono", ui-monospace, Menlo, monospace; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { font: 16.5px/1.65 var(--serif); font-kerning: normal; }
+  /* 换行：中文按标点避头尾（strict），不用 balance / pretty（它们会在宽屏和手机上把中文行拆成一长一短、在词中间断开） */
+  body { line-break: strict; word-break: normal; overflow-wrap: break-word; font-feature-settings: "halt" 1; }
+  /* 中文讲解用英文标点（, . : ; ! ? ( )，由 scripts/zh_punct.py 转换）；剩下的「」、《》用 halt 压成半宽，不留大空白 */
+  pre, code, kbd, .katex { font-feature-settings: normal; }
+  /* 页首说明和副标题按「 · 」分段，只在段与段之间换行，不在一个段落中间断开 */
+  .seg, h1 .seg, h2 .seg, h3 .seg, .lede .seg { display: inline-block; margin: 0; font-size: inherit; font-weight: inherit; color: inherit; letter-spacing: inherit; }
+  p, li, td, th, dd, figcaption, summary, .lede { text-wrap: wrap; }
+  h1, h2, h3, h4 { text-wrap: wrap; word-break: keep-all; overflow-wrap: anywhere; }
+  /* 行内代码整体不拆行（bark() 不会断成 bark( / )）；只有页首、出处说明里的长文件名允许在放不下时断开 */
+  code { white-space: nowrap; }
+  .lede code, .src code, h1 code, h2 code, h3 code { white-space: normal; overflow-wrap: anywhere; }
+  td:first-child, th:first-child { min-width: 5em; }
+  /* 单元格内容不能断开的表（莫尔斯码之类）给 table 加 class="nowrap"，放不下就横向滚动（注释里不要写带尖括号的标签，wrap_tables.py 曾把它当成真表格） */
+  table.nowrap td, table.nowrap th { white-space: nowrap; text-wrap: nowrap; }
+  /* 代码块里的 code 跟随 pre 保留换行（上面的 nowrap 只给行内代码；漏了这条，多行代码会挤成一行） */
+  pre code { white-space: inherit; overflow-wrap: normal; word-break: normal; }
+  /* 长的行内代码（apply_typography.py 标 .lc，超过 24 个字符）在手机上放不下，允许在空格处换行，必要时任意处断开 */
+  code.lc { white-space: normal; overflow-wrap: anywhere; }
+  /* 版心：页首和正文同一列，左右对齐、整体居中 */
+  header .wrap, main.wrap, main { box-sizing: border-box; max-width: var(--measure); margin-left: auto; margin-right: auto; padding-left: var(--gutter); padding-right: var(--gutter); }
+  header .wrap { padding-top: 40px; padding-bottom: 8px; }
+  main.wrap, main { padding-top: 8px; padding-bottom: 96px; }
+  /* 标题层级 */
+  h1 { font-size: 28px; line-height: 1.3; font-weight: 650; margin: 0 0 4px; }
+  h1 .de-title, h1 > span { display: block; margin-top: 6px; font-size: 15px; line-height: 1.45; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  h2 { font-size: 22px; line-height: 1.35; font-weight: 650; margin: 56px 0 10px; padding-top: 16px; }
+  h2 .de-title { display: block; margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--muted); }
+  h3 { font-size: 17.5px; line-height: 1.45; font-weight: 650; margin: 32px 0 8px; }
+  h3 .de-title { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  h4 { font-size: 16px; margin: 24px 0 8px; }
+  /* 页首说明与导航 */
+  .lede { margin: 12px 0 0; font: 15.5px/1.65 var(--serif); color: var(--muted); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px 6px; margin: 18px 0 0; }
+  nav a { font: 12.5px/1.5 var(--sans); padding: 3px 11px; border-radius: 999px; text-decoration: none; }
+  /* 正文段落 */
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 1.4em; margin: 8px 0; }
+  li { margin: 4px 0; }
+  /* 原文卡片与各类框：统一宽度、圆角、内边距 */
+  .card { box-sizing: border-box; width: 100%; border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .card.de, .card.orig { padding-top: 30px; }
+  .folie, .slide { top: 9px; left: 18px; font: 11.5px/1.3 var(--sans); letter-spacing: .03em; }
+  .zh, .add, .warn, details.answer, .later { box-sizing: border-box; font: 15px/1.75 var(--sans); padding: 12px 16px; margin: 10px 0 6px; }
+  .zh p, .add p, .warn p, details.answer p { margin: 0 0 10px; }
+  .zh p:last-child, .add p:last-child, .warn p:last-child { margin-bottom: 0; }
+  .src { font: 14px/1.7 var(--sans); }
+  /* 居中元素：公式行、图、表格统一处理 */
+  p[style*="text-align:center"], p[style*="text-align: center"], .math-block { margin: 14px auto; text-align: center; font-size: 1.05em; }
+  figure, .src-fig { margin: 14px auto; text-align: center; }
+  /* 图注左对齐: 居中的两行图注第二行会孤零零缩在中间 */
+  figure figcaption, .src-fig figcaption { text-align: left; }
+  /* 图注按标点分句 (span.cs)，每行都在一个标点后结束，不在半句中间换行 */
+  figcaption .cs { display: inline-block; max-width: 100%; }
+  figure img, .src-fig img { display: block; margin: 0 auto; }
+  figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .tablewrap { width: 100%; overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; font: 14.5px/1.6 var(--sans); }
+  .card table, .tablewrap table { margin: 0; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 11px; }
+  td.num, th.num { text-align: right; }
+  /* 代码 */
+  pre { font: 13.5px/1.55 var(--mono); padding: 12px 16px; border-radius: 10px; margin: 12px 0; overflow-x: auto; tab-size: 4; }
+  code { font-family: var(--mono); font-size: .86em; }
+  pre code { font-size: inherit; }
+  .cols { gap: 12px; }
+  .cols > *, .pair > *, .card > *, .zh > *, details.answer > * { min-width: 0; }
+  img, video { max-width: 100%; height: auto; }
+  .katex svg { max-width: none; }
+  /* 折叠框 */
+  details > summary { font: 600 15px/1.5 var(--sans); }
+  /* 窄屏 */
+  @media (max-width: 600px) {
+    :root { --gutter: 16px; }
+    body { font-size: 16px; line-height: 1.65; }
+    header .wrap { padding-top: 24px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; margin-top: 44px; }
+    h3 { font-size: 17px; }
+    .card { padding-left: 13px; padding-right: 13px; }
+    .folie, .slide { left: 13px; }
+    .zh, .add, .warn, details.answer { padding: 10px 13px; font-size: 15px; line-height: 1.75; }
+    nav a { font-size: 12px; padding: 2px 9px; }
+    .cols { grid-template-columns: 1fr; }
+    /* 手机上表格列太窄时中文会一字一行（「需求分析」竖着排）：给单元格最小宽度，放不下就在 .tablewrap 里横向滚动 */
+    th, td { min-width: 4.5em; }
+    td.wide, th.wide { min-width: 9em; }
+  }
+  /* ===== /排版统一层 ===== */
+</style>
+<style id="oc-structure">
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) { list-style-position: inside; padding-left: 0; }
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) :is(ul, ol) { padding-left: 1.4em; }
+</style>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  .katex { font-size: 1.08em; }
+  .math-block { overflow-x: auto; overflow-y: hidden; margin: 10px 0; }
+  .math-block .katex-display { margin: 0.4em 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>线性代数 · ZoomNotes 讲义合集<br><span class="de-title">ZoomNotes for Linear Algebra</span></h1>
+    <nav>
+      <a href="#preface">前言</a>
+      <a href="#materials">教材、ZoomNotes 与视频讲座</a>
+      <a href="#factorizations">三种重要分解: LU、QR、SVD</a>
+      <a href="#part1">第 1 部分: 线性代数的基本思想</a>
+      <a href="#part2">第 2 部分: 求解线性方程 Ax = b: A 是 n × n 方阵</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<div class="zh">
+  <p><b>读法说明. </b>带边框的卡片是讲义原文 (英语), 左上角标出 PDF 页码 (Page N). 淡色底的框是中文讲解, 虚线框是讲义之外的补充, 红框标出原文错误.</p>
+</div>
+
+<h2 id="preface" data-nav="前言">前言<br><span class="de-title">Preface</span></h2>
+
+<div class="card de">
+  <span class="folie">Page 4</span>
+  <p>The title “ZoomNotes” indicates that these pages were created in 2020 and 2021. But they are not limited to online lectures. I hope these notes will help instructors and students to see linear algebra in an organized way, from vectors to matrices to subspaces to bases. “Linear independence” is a crucial idea for this subject, so it comes early—for vectors of integers.</p>
+  <p>I hope that faculty who are planning a linear algebra course and students who are reading for themselves will see these notes.</p>
+</div>
+<div class="zh">
+  <p>ZoomNotes 写于 2020–2021 年, 名字虽然让人想到网课, 但用途不限于线上讲座. 它同时面向备课的教师和自学者, 希望按「向量 → 矩阵 → 子空间 → 基」这条主线呈现线性代数, 让读者先看到整门课的结构.</p>
+  <p><b>Linear independence 线性无关</b>被提前讲, 是因为它用来判断一组向量有没有冗余. 这个概念接着会通向基、维数和秩. 讲义先用整数向量举例, 是为了把计算负担降下来, 把注意力放在概念本身.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 4</span>
+  <p>A happy part of linear algebra is the wonderful variety of matrices—diagonal, triangular, symmetric, orthogonal, and many more. The organizing principles have become matrix factorizations like \(A=LU\) (lower triangular times upper triangular). The idea of elimination—to simplify the equations \(Ax=b\) by introducing zeros in the matrix—appears early as it must. Please don’t spend forever on those computations. Linear algebra has so many more good ideas.</p>
+</div>
+<div class="zh">
+  <p>线性代数会反复遇到对角矩阵、三角矩阵、对称矩阵和正交矩阵. 它们各自的零元素位置或对称性, 会让计算和解释都变得更简单. <b>Matrix factorization 矩阵分解</b>正是组织这些特殊矩阵的一条主线, 例如把 \(A\) 写成下三角矩阵与上三角矩阵的乘积 \(A=LU\).</p>
+  <p><b>Elimination 消元</b>通过有目的地制造零, 把方程组 \(Ax=b\) 化成更容易处理的形式. 它需要较早出现, 但手算消元不是整门课的终点. 更重要的是理解零的位置为什么出现, 以及分解怎样暴露矩阵的结构; 具体步骤已在 <a href="MIT1806-02-矩阵消元.html">MIT1806 02</a> 展开.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 4</span>
+  <p>The reader may know my video lectures on OpenCourseWare : Math 18.06 is on ocw.mit.edu and on Youtube/mitocw. I am so grateful that those have been helpful. Now I have realized that lecture notes can help in a different way. You will quickly gain a picture of the whole course—the structure of the subject, the key topics in a natural order, the connecting ideas that make linear algebra so beautiful. This structure is the basis of two textbooks from Wellesley-Cambridge Press :</p>
+  <p><b>Introduction to Linear Algebra</b> &nbsp;&nbsp;&nbsp; <b>Linear Algebra for Everyone</b></p>
+  <p>I don’t try to teach every topic in those books. I do try to reach eigenvalues and singular values ! A basis of eigenvectors for square matrices—and of singular vectors for all matrices—takes you to the heart of a matrix in a way that elimination cannot do.</p>
+</div>
+<div class="zh">
+  <p>与按章节细讲的教材相比, 这份讲义更重视整门课的地图: 主题按自然顺序排列, 重点是看见它们怎样互相连接. 它不追求覆盖两本教材的每个主题, 但会走到<b>eigenvalue 特征值</b>和<b>singular value 奇异值</b>.</p>
+  <p>对方阵, 一组特征向量基能把矩阵的作用写成各方向上的独立缩放. 对任意矩阵, 奇异向量则分别给出输入空间和输出空间的合适基. 消元主要回答怎样求解和化简, 这两类向量进一步回答矩阵在结构上「做了什么」. 后续推导分别见 <a href="MIT1806-22-特征值与特征向量.html">MIT1806 22</a> 和 <a href="MIT1806-31-奇异值分解.html">MIT1806 31</a>.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 4</span>
+  <p>The last chapters of these notes extend to a third book and a second math course 18.065 with videos on OpenCourseWare :</p>
+  <p><b>Linear Algebra and Learning from Data (Wellesley-Cambridge Press 2019)</b></p>
+  <p>This is “Deep Learning” and it is not entirely linear. It creates a learning function \(F(x,v)\) from training data \(v\) (like images of handwritten numbers) and matrix weights \(x\). The piecewise linear “ReLU function” plays a mysterious but crucial part in \(F\). Then \(F(x,v_{\text{new}})\) can come close to new data that the system has never seen.</p>
+  <p>The learning function \(F(x,v)\) grows out of linear algebra and optimization and statistics and high performance computing. Our aim is to understand (in part) why it succeeds.</p>
+  <p>Above all, I hope these ZoomNotes help you to teach linear algebra and learn linear algebra. This subject is used in so many valuable ways. And it rests on ideas that everyone can understand.</p>
+  <p>Thank you. &nbsp;&nbsp;&nbsp; Gilbert Strang</p>
+</div>
+<div class="zh">
+  <p>讲义最后几章会把线性代数延伸到数据学习和深度学习. 这里的学习函数记作 \(F(x,v)\): 按原文的记号, \(v\) 是训练数据, \(x\) 是矩阵形式的权重, 不要按其他教材的习惯把 \(x\) 自动理解成输入.</p>
+  <p>模型虽然大量使用矩阵乘法, 却不是纯线性的. <b>ReLU function ReLU 函数</b>是分段线性函数, 它在不同区间的切换给模型带来非线性. 训练完成后, \(F(x,v_{\text{new}})\) 要处理的不再是训练样本, 而是没见过的新数据. 作者把理解这种成功作为后段目标, 并强调它同时依靠线性代数、优化、统计和高性能计算.</p>
+</div>
+
+<h2 id="materials" data-nav="配套资料">教材、ZoomNotes 与视频讲座<br><span class="de-title">Textbooks, ZoomNotes, and Video Lectures</span></h2>
+
+<div class="card de">
+  <span class="folie">Page 5</span>
+  <p><b>Introduction to Linear Algebra, 5th Ed. (2016)</b> &nbsp;&nbsp; math.mit.edu/linearalgebra<br>
+  <b>Linear Algebra and Learning from Data (2019)</b> &nbsp;&nbsp; math.mit.edu/learningfromdata<br>
+  <b>Linear Algebra for Everyone (2020)</b> &nbsp;&nbsp; math.mit.edu/everyone<br>
+  <b>Differential Equations and Linear Algebra (2014)</b> &nbsp;&nbsp; math.mit.edu/dela<br>
+  <b>ZoomNotes for Linear Algebra (2021)</b></p>
+  <p><b>Video Lectures</b> &nbsp;&nbsp; <b>OpenCourseWare</b> &nbsp;&nbsp; ocw.mit.edu/courses &nbsp;&nbsp; youtube/mitocw<br>
+  Math 18.06 and 18.06SC &nbsp;&nbsp; Linear Algebra at MIT<br>
+  (added to 18.06) &nbsp;&nbsp; A 2020 Vision of Linear Algebra<br>
+  Math 18.065 &nbsp;&nbsp; Linear Algebra and Learning from Data<br>
+  Math 18.085 and 18.086 &nbsp;&nbsp; Computational Science and Engineering<br>
+  Strang and Moler &nbsp;&nbsp; Differential Equations and Linear Algebra</p>
+  <p>Interview with Lex Fridman &nbsp;&nbsp; https://www.youtube.com/watch?v=lEZPfmGCEk0</p>
+  <p><b>Wellesley - Cambridge Press</b> &nbsp;&nbsp;&nbsp; <b>Gilbert Strang’s page :</b> math.mit.edu/∼gs<br>
+  Box 812060 Wellesley MA 02482 USA &nbsp;&nbsp;&nbsp; Outside US/Canada : www.cambridge.org<br>
+  www.wellesleycambridge.com &nbsp;&nbsp;&nbsp; Select books, India : www.wellesleypublishers.com<br>
+  Orders : math.mit.edu/weborder.php</p>
+</div>
+<div class="zh">
+  <p>这一页集中列出配套教材、讲座系列和出版方联系方式. 阅读本讲义时, 可以先按前言区分三条主线: 线性代数基础、从数据学习, 以及微分方程与计算科学.</p>
+</div>
+
+<h2 id="factorizations" data-nav="三种分解">三种重要分解: LU、QR、SVD<br><span class="de-title">Three Great Factorizations : LU, QR, SVD</span></h2>
+
+<h3>正交矩阵<br><span class="de-title">Orthogonal matrix</span></h3>
+<div class="card de">
+  <span class="folie">Page 6</span>
+  <p>\(Q^TQ=I\)<br>
+  Square \(QQ^T=I\)</p>
+  <div class="math-block">\[
+  Q=\begin{bmatrix}q_1&amp;q_2&amp;\cdots&amp;q_n\end{bmatrix}
+  \]</div>
+  <p>Orthogonal basis</p>
+</div>
+<div class="zh">
+  <p><b>Orthogonal matrix 正交矩阵</b>的列向量 \(q_1,\ldots,q_n\) 两两正交且长度都为 1. 把这些列做内积, 结果就是 \(Q^TQ=I\): 对角线上是各列自身的内积 1, 其他位置是不同列的内积 0.</p>
+  <p>如果 \(Q\) 还是方阵, \(Q^T\) 同时是它的逆矩阵, 所以也有 \(QQ^T=I\). 「Orthogonal basis」强调这些列可以作为一组正交归一基; 在这组基下, 求坐标只需与相应的 \(q_i\) 做内积.</p>
+</div>
+
+<h3>三角矩阵<br><span class="de-title">Triangular matrix</span></h3>
+<div class="card de">
+  <span class="folie">Page 6</span>
+  <p>\(R_{ij}=0\) for \(i&gt;j\)<br>
+  \(R_{jj}\ne0\) on diagonal</p>
+  <div class="math-block">\[
+  R=\begin{bmatrix}
+  r_{11}&amp;r_{12}&amp;\cdot&amp;r_{1n}\\
+  &amp;r_{22}&amp;\cdot&amp;r_{2n}\\
+  &amp;&amp;\cdot&amp;\cdot\\
+  &amp;&amp;&amp;r_{nn}
+  \end{bmatrix}
+  \]</div>
+  <p>Triangular basis</p>
+</div>
+<div class="zh">
+  <p>这里的 \(R\) 是<b>upper triangular matrix 上三角矩阵</b>: 当行号大于列号, 即元素位于主对角线下方时, \(R_{ij}=0\). 上方和对角线上的元素可以非零, 点号表示沿同一方向继续排列.</p>
+  <p>原文还要求每个对角元 \(R_{jj}\ne0\), 因此这个方阵可逆, \(n\) 列构成一组基. 对角元只要有一个为 0, 行列式就是 0, 这条「Triangular basis」也就不再成立.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 6</span>
+  <ol>
+    <li>\(A=LU=(\text{lower triangular})(\text{upper triangular})\) : Elimination</li>
+    <li>\(A=QR=(\text{orthogonal})(\text{upper triangular})\) : Gram-Schmidt</li>
+    <li>\(A=U\Sigma V^T=(\text{orthogonal})(\text{diagonal})(\text{orthogonal})\) : Singular values<br>
+    Chapters 2, 4, 7</li>
+  </ol>
+</div>
+<div class="zh">
+  <p>三种分解都把 \(A\) 拆成结构更简单的因子, 但目的不同. <b>LU 分解</b>记录消元: \(L\) 保存消元所用的倍数, \(U\) 是化简后的上三角矩阵. <b>QR 分解</b>来自 Gram–Schmidt 正交化: \(Q\) 给出正交归一方向, \(R\) 保存原向量在这些方向上的坐标和剩余分量.</p>
+  <p><b>SVD 奇异值分解</b>写成 \(U\Sigma V^T\). 两个正交因子分别管理输出与输入方向, 对角矩阵 \(\Sigma\) 里的奇异值给出各方向的缩放. 因而前两种分解与求解、正交化紧密相连, SVD 则直接展示矩阵最重要的一组输入–输出方向.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 6</span>
+<figure class="src-fig"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABE0AAAIYCAIAAAAXboUIAAAACXBIWXMAAA7EAAAOxAGVKw4bAAB20klEQVR4nOzdd5zVZN6wcXqTKiBFpIjUAUERVEQQpIh0LFgpwgpiQVGw70dAEQuKuoouKouruKIurhQBRZoiiICLCiidpYMgvU/e30OeJ282bU7JSb2+f+xnnbmTc5/DTJJrkpOTSwEAAACAaMnl9wQAAAAAwGV0DgAAAICooXMAAAAARA2dAwAAACBq6BwAAAAAUUPnAAAAAIgaOgcAAABA1NA5AAAAAKKGzgEAAAAQNXQOAAAAgKihcwAAAABEDZ0DAAAAIGroHAAAAABRQ+cAAAAAiBo6BwAAAEDU0DkAAAAAoobOAQAAABA1dE5M/fHHH35PAQAAIOM45oktOieONmzYUKVKlWeffdbviQAAAGSQHO3IMY8c+fg9EfiAzokd+VWvXLlyrjNIHQAAEFUjR45UD3hInXiic+JFPZOTS4fUAQAA0SNHOPoDnsqVK5M6cUPnxIg5ckgdAAAQPYbIIXXiic6JC7vIIXUAAECUWEYOqRNDdE4smCOnXLlypA4AAIgYc+QYjnlInfigc6LPHDm1atXavn37qFGjSB0AABAZ5siRr8gxjxz5kDoxROdEnF3kqN8ldQAAQDRYRo76LVInnuicKHOOHBWpAwAAws4hclSkTgzROZGVSOSoSB0AABBeOUaOitSJGzonmhKPHBWpAwAAwijByFGROrFC50RQspGjInUAAEC4pHD0QurEB50TNalFjorUAQAAYZHycQupExN0TqSkEzkqUgcAAARfmkcspE4c0DnRkX7kqEgdAAAQZK4cq5A6kUfnRIRbkaMidQAAQDC5eJRC6kQbnRMF7kaOitQBAABB4/rxCakTYXRO6GUiclSkDgAACI4MHZmQOlFF54Rb5iJHReoAAIAgyOgxCakTSXROiG3cuDGjkaMidQAAgL88OBohdaKHzgkrc+TUrl3b9chRkToAAMAvnh2HyHGUHE2ROpFB54SSl5GjInUAAID3PD4CIXWihM4JH+8jR0XqAAAALz333HPeH3tYps769esz/bhwHZ0TMn5FjorUAQAA3vAlclSkTjTQOWHib+SofNzoAACAmPD9eIPUiQA6JzSCEDkq3zc9AAAgwgJypEHqhB2dEw7BiRxVQDZAAAAgYgJ1jEHqhBqdEwJBixxVoDZDAAAgAgJ4dEHqhBedE3TBjBxVADdGAAAgpAJ7XEHqhBSdE2hBjhxVYDdJAAAgRAJ+REHqhBGdE1zBjxxVwDdMAAAg4EJxLEHqhA6dE1BhiRxVKDZPAAAggEJ0FEHqhAudE0ThihxViDZSAAAgIJ5//vlwHT+QOiFC5wROGCNHReoAAIDEhS5yVKROWNA5wRLeyFGROgAAIBEhjRwVqRMKdE6AhD1yVKQOAABwFurIUZE6wUfnBEU0IkdF6gAAADsRiBwVqRNwdE4gWEbOjh07/J5X6sypM2rUKL8nBQAAfBaZyFHJ0RqpE1h0jv8kcqpWrRqlyFGROgAAQC9ikaMidQKLzvFZVCNHReoAAABVJCNHReoEE53jp2hHjorUAQAAEY4cFakTQHSOb+IQOSpSBwCAOIt85KhInaChc/wRn8hRkToAAMRTTCJHReoECp3jg7hFjorUAQAgbl544YX4RI6K1AkOOsdr8YwclfkvOqQOAABRFcPIUZlT57zzziN1vEfneCrOkaMidQAAiIPYRo6K1AkCOsc7RI6K1AEAINpiHjkqUsd3dI5HiBw9UgcAgKgicjSkjr/oHC8QOWakDgAA0UPkGJA6PqJzMo7IsUPqAAAQJUSOJVLHL3ROZhE5zkgdAACigchxQOr4gs7JICInEaQOAABhR+TkiNTxHp2TKURO4kgdAADCi8hJEKnjMTonI8yRU6dOHSLHAakDAEAYvfjii0RO4uRoUI4JSR1v0DnuI3JSQ+oAABAuRE4KSB3P0DkuI3LSQeoAABAWRE7KSB1v0Dlu2rRpE5GTJlIHAIDgI3LSROp4gM5xDZHjFlIHAIAgI3JcQepkGp3jDiLHXaQOAADBROS4iNTJKDrHBUROJpA6AAAEjTlyRo4c6fekwo3UyRw6J11ETuaQOgAABAeRkyGkTobQOWkhcjKN1AEAIAiInIwidTKBzkkdkeMNUgcAAH8ROR4gdVxH56SIyPESqQMAgF+IHM+QOu6ic1JB5HjvhRdeIHUAAPDY6NGjiRwvWabOunXr/J5XKNE5SSNy/ELqAADgJSLHF6SOW+ic5BA5/iJ1AADwBpHjI1LHFXROEoicICB1AADINCLHd6RO+uicRBE5wUHqAACQOUROQJA6aaJzEkLkBA2pAwBAJhA5gULqpIPOyZll5OzcudPvecUdqQMAgLuInACSY05SJzV0Tg6InCAjdQAAcAuRE1ikTmroHCdETvCROgAApI/ICThSJwV0ji0iJyxIHQAA0kHkhAKpkyw6xxqREy7m1Hnuuef8nhQAACHw0ksvETlhQeokhc6xIJFTrVo1IidcSB0AAJJF5IQOqZM4OseIyAkvUgcAgMQROSFF6iSIzvkvRE7YkToAACSCyAk1UicRdM7/R+REA6kDAIAzIicCSJ0c0Tn/i8iJElIHAAA7RE5kkDrO6Jz/QeRED6kDAIAZkRMxpI4DOofIiSxSBwAAPSInkkgdO3HvHCIn2kgdAABURE6EkTqWYt05RE4ckDoAABA5kUfqmMW3c4ic+HjxxRdJHQBAbL388stEThyQOgYx7RwiJ25IHQBAPBE5sULq6MWxc8yRU7duXSIn8kgdAEDcEDkxJMe0cmSr/0evVKlSPFMndp1D5MQZqQMAiA8iJ7ZIHVW8OofIAakDAIgDIifmSB0lVp1D5EBF6gAAoo3IgULqxKdziBzokToAgKgicqCJeerEonOIHJiROgCA6CFyYBDn1Il+5xA5sEPqAACihMiBpdimTsQ7Z/PmzUQOHJA6AIBoIHLgIJ6pE+XOIXKQCFIHABB2RA5yFMPUiWznEDlIHKkDAAgvIgcJilvqRLNziBwki9QBAIQRkYOkxCp1Itg5RA5SQ+oAAMKFyEEK4pM6UescIgfpIHUAAGFB5CBlMUmdSHUOkYP0kToAgOAjcpCmOKROdDqHyIFbSB0AQJAROXBF5FMnIp1D5MBdpA4AIJiIHLgo2qkThc4hcpAJpA4AIGiIHLguwqkT+s6xjJxdu3b5PS9EwejRo0kdAEBAEDnIEDlyjmTqhLtziBxkGqkDAAgCIgcZFcnUCXHnEDnwBqkDAPDXmDFjiBxkWvRSJ6ydQ+TAS6QOAMAvRA48Y5k6a9eu9XteKQpl5xA58B6pAwDwHpEDj0UpdcLXOUQO/ELqAAC8ROTAF5FJnZB1DpEDf5E6AABvEDnwUTRSJ0ydQ+QgCMyp8/zzz/s9KQBApBA58F0EUic0nUPkIDhIHQBA5hA5CIiwp044Okci5/zzzydyEBykDgAgE4gcBEqoUycEnUPkIJhIHQCAu4gcBFB4UyfonUPkIMhIHQCAW8yR88wzz/g9KeB/hDR1At05RA6Cj9QBAKSPyEHAhTF1gts5RA7CgtQBAKTjlVdeIXIQfKFLnYB2DpGDcCF1AACpIXIQIuFKnSB2DpGDMCJ1AADJInIQOiFKncB1jjlysrKyiByEAqkDAEgckYOQkiNzOT4PfuoEq3OIHIQdqQMASASRg1ALReoEqHOIHEQDqQMAcEbkIAKCnzpB6RwiB1FC6gAA7BA5iIyAp04gOofIQfSQOgAAMyIHERPk1PG/c4gcRNVLL71E6gAANEQOIimwqeNz5xA5iDZSBwCgInIQYcFMHT87h8hBHJA6AIBXX32VyEG0BTB1fOscIgfxQeoAQJwROYiJoKWOP51D5CBuSB0AiCciB7FiTp1zzz3Xr9TxoXOIHMQTqQMAcUPkIIaCkzped85//vMfIgexReoAQHwQOZpbbrmliqOOHTv6PUe4KSCp42nnEDkAqQMAcUDk6C1fvnzs2LH169fPZaNRo0Z+zxEuC0LqeNc5RA6gInUAINqIHEuHDx8uX748nRMfvqeOR51D5AB6pA4ARBWR46BXr150Tqz4mzpedA6RA5iROgAQPUSOs2HDhtE5ceNj6mS8c8yRU69ePSIHUEgdIH4eeOCBRYsW+T0LZAqRk6PRo0fTOTEkR/5y/O996mS2c4gcwBmpA8SK7ARz587dp0+fzZs3+z0XuIzIScSYMWPonHjyJXUy2DlEDpAIUgeID203X6BAgYEDB27bts3vGcEdr732GpGTCDonzrxPnUx1DpEDJI7UAWLCsI8vWLDg3Xffzc4x7IicxNE5Medx6mSkc4gcIFmkDhAHhh28qkCBAv3791+5cqXfs0MqiJyk0DnwMnXc7xwiB0gNqQNEnmXnaDp27Dh//ny/54gkEDnJonOgeJg6LncOkQOkg9QBos25c1SNGzf+61//evDgQb8nixwEP3IOHz68bNmymTNnTp069ZtvvtmwYUM6a9u5c+e33347bdq0GTNmLF68eP/+/SmsJAKdc+TIkZUrV86aNUteWPk/p0+fdh4vA2SYvGjTp0///vvvZfFMzEoOtufOnSv/0AsWLPjjjz8y8RDu8iZ13OwcIgdIH6kDRFginaMqXrz4nXfeuXz5cr+nDGtBjhyJZJne5ZdfnidPHsMkzznnnH79+q1YsSLxtcmh54MPPmg4wNMO80aMGLF169bE15Zg5+zdu/epnBw7dkwb/9lnnzkPlsawnM+7777rvKD+RvDz58+/6aabChUqZHhJH3vsMcs/TGzcuPHuu+8uXbq0fnyBAgV69Oixfv16h1dp1KhRzrPSFs/Ozv773/9+ySWX6B8id+7cHTt2/OWXXxL/d/GFB6njWucQOYBbXn75ZcMOgNQBoiHxztEf/7399tuc3gmUIEfO+++/X7ZsWW1iVapUMXxEo3ocPGTIkBMnTjiv6ujRo4MGDcqbN69+2dq1a9evXz9//vzaVwoWLDh48ODDhw8nMr0EO0cOIK+55hpDURjoz1q8+eabtWrVchgsvWE5nyeffPK8885zWFAmLMMOHTp0++23OwyTR9+0aZO2WskPaRV5ZezGFytWzOEi1dtuu+3ss892eLivvvpKOdNRTZs2tRsjj/75558n8o/io0ynjjudQ+QA7iJ1gEhKoXNURYsWvfXWW+XgJseLZJBpgY0c+dno37+/fmLqMbpy5nSHtI1h2t26dTt58qTd2rZv396gQQP9+Jo1a/773/9Wv7t169ZWrVoZvpvIvTSSum5t586ddevWtfulMF+d9dZbb9kNtusc9XUbOnSo3YIy4W3btl144YV2AzTSk+opJkm+jh075ji+ZMmScvxsN6sjR4507drVblnZFHz33XeGM0Vmkjo//vhjjv8o/spo6rjQOUQOkAmkDhA9KXeOpkKFCvfff//8+fOzs7P9fjZxFNjIEb169dJP7LbbbtN/t3379uYfpyeffNJyVfv27atdu7Z+ZN68eX/99Vf9mP3798tPo35MmTJlcrwiLtn357z++ut2vwuW70IpX7685WCHzhEHDhwwd6BqyJAh1atXz3XmerPrr79e/tPhFMqIESMOHjx4+eWXq/956aWXDhw4sEOHDnbj5Z/MYVaLFy+2W/Cpp54qUqRIrjN/AWnZsmWzZs3sRl555ZXO/yJBkLnUSbdziBwgc0gdIGLS7xxN1apV77vvvq+//trhT/JwV5Ajx/zeTsM7QJ599lnzT1G+fPl27txpXpv5TEKnTp3Mw0aNGmUYVqVKlb179zrMM9nO+eqrr+x+BSw7p0WLFpaDnTtHyIG13QPlOnN3kM2bN2uD77rrLsthZ599tjoByS310jKV+SdHVbBgQYfr/eQJOkxJ9OzZ8/fff1cHf/zxx3bDVq1a5fzcgyBDqZNW5xA5gXXgwIG5c+dOnz59y5YtCS7iyn1U4Dpz6rzwwgt+Two5W7JkSTXARP+uBreUKlXqtttumzRpknbEg0z4y1/+YnjlgxM569atM7wVxJwN8hNi+fMzbtw4w8iPPvrIPEyO1M2Pu3LlSvPIW2+91WGqyXbODz/8YPeTb9k5Xbp0sRycY+eY38WkkcgxvEFOWs7wtiU9+U3fuHGjfvypU6fOOeccy8Fz5sxxmJXdQ4h77rnHMNjuRNPYsWOdn3tAZCJ1Uu8cIscbf/3rXxO/E4jYsGGDbGK0XWnu3LkffPBBh/WneR8VqSnn6WnUK0Rlq5Tg+Kefflo/Scsx2pXH0UbqhNGCBQsc9k9AJuTLl+/KK68cOXLk/PnzM3Tv2tgKcuSITp06GaZ3//33G8b89NNPlj82jz32mH6Y/OTob2OgsXzTfHZ2doECBcyDly5dajfVZDvHbtq5bDrnxhtvtBycY+dcfPHFlguWL19+x44d5vHqxWxmRYsWtbzR2dVXX2053jlCLF9e0aRJE/OJXLuzTM7HgYHieuqk2DmbN28mcrzx8MMPW0aIRn+sP2nSpMKFC5vH/Otf/zKv2ZX7qEycOPGss85ymJ4oUaJE9+7dv/32Wxm/Z8+eZs2ame90aSCbmz59+miP8vPPP3fs2LFYsWL6MfK4vXv3dvv1DihSJ3ToHPhLDo+aNm0qe5ApU6YkddtfmAU8ciQqzD8Ab731lmGYNInle1deeukl/bBx48ZZ/kTpr9rSszxEcTilk2znyAGA3Q+5Zef06NHDcnCOnSMTsFzQ7nLxSy+91HL8kCFDLMfbBdgTTzzhMCu7O7ZNmzbNPFiS1XKw8xm2oLFMnTVr1qS2thQ7xzwJ+UF3uGsE0jRs2DDLn91cus75+9//bjfmpptuMqzQxfuo7Nu3r3Xr1nYPnS9fPvMPxo8//liuXDm7RfSFoyeNpL3lUfbf8hRSf0FDiNQJFzoH/ipZsmSHDh1GjBgxc+ZM2Xj6/QsRYgGPHDFgwADzD4DlDYVHjx5tGCaH0YYrrOzeQnb06FHLR2/cuLF5sGS23UdVhq5z7K4cueqqqyzHP/7445bje/fubTl+4MCBDrOy6xz9m3808vtuObhLly7Ozz1Q5KDRcK7sggsuSDkxUr9ujdTx0smTJ0uVKuXwG/j11187XCp62WWX6dfm+n1UDh8+bHcCVzrH8lzQP/7xD7vZ2t3+RfTt21cG5M+f37BdjglSJ0ToHHivSJEibdu2HTVq1LJly7j9tCuCHzmnTp0qXry4+Ydh9uzZ5sHZ2dlDhw6V/bI6RvbyX3zxhX7A+vXrLX+05GjbbgKGv4pqPvnkE8vxkekcu7/w2nVOv379LMffcccdDrNKqnNGjhxpObhNmzbOzz04LCMn8beam6V1HwJSx0sOv4Fbt261vJpW07VrV/2qMnEflU8//dTu0eVb5vGyta1Zs6bl+KZNm9q9CD179syV030Yo43UCYuffvrpasAkxwt9U1C5cuW+fft+9tlnvCfHXcGPHLF8+XLLn4q5c+faLbJnzx6pIFlQ/bAXvQkTJliurUyZMnZrs7xddS770xSR6Zy2bdtajrfrnDvvvNNyvOH23wZJdY75sE0lLer83APC3TM5qnTvK03qeMbuVoly4Kv+sslPw/Dhwy0vAH3xxRe19WTuPip2H+bVrVs3y/F2t1kUdqdrJLTku4sXL07yxYsUUgcIL3fvK/3EE0/I0arfzymaQhE54o033rD88TCcqEmQ4WNGNdLSdouYb4GgatmypeX4yHROu3btLMfbdY7da+v85hlXOkcOIJ2fexBkInIUVz4nlNTxht2p4fr16+c6c+cN7fIw2Trrb9AhPyjaH/kyeh8Vu88hzp8/v+XdTu02drlsdifqWy1r1aqV4isYIaQOEFLpd47sYR955JHgf8Z5qIUlcsQDDzxg+XPy/vvvp7C2zp07W66tZs2adovYdU6VKlUsx9M5BnSOkrHIUVzpHIXU8cTVNnckFIULFza8KX/NmjVDhw7t2rXrkCFDdu/erX09o/dROXjwoN0lGZbni+zu4ZjLJmYGDx4s39LfbzrOSB0gjFLunBIlSgwYMGDhwoXZ2dl+P4mIC1HkKPbvbk9tX3nFFVdYri0rK8tukY4dO1ouUqpUKcvxdI4BnZO5yFHc6hyF1Mk8h84xf1aUnUzfR8VugytJYxipXhRXpEgRuye1ZMkS/fjTp0+r90VYt25dgk828kgdIHSS7ZzcuXO3bt36008/PXHihN9zj4VwRY5i/7GY5vusJsJwI1ZNw4YN7Ra59tprLRcpWrSo5Xg6xyDmnZPRyFFc7ByF1Mkwh85ZsGBBImvw4D4q8+bNs5uk4V5tjzzyiHxRfiftbjB977336sfLr3Qu043jQOoA4ZJ455QvX/7hhx+W7bbfU46R119/3fCvEPDIETfffLPlz48cgKWwNrt3Al900UV2i9i9Hb9SpUqW4+kcgzh3TqYjR3G3cxRSJ5PsOqdAgQLmW6ZY8uA+KtnZ2eqtAswGDx6sH3beeeflyZNn27Zt6tVoZmXLltV/1m+vXr1y2Vz/FnOkDhAiiXROkyZNJk2axAkcj4UxcsQ999xj94OUwuUP3bt3t1yV+aIMjd3HyNSvX99yPJ1jENvO8SByFNc7RyF1MsaucxzuwmzgwX1UhPyGWy6i75a5c+fKV9q2bSv/f8WKFZbjc+k+7vfIkSPFihWTLtq5c2eir1eckDpAWDh0Tt68eeUo84cffvB7jnEU0sgRTz/9tN1P1EsvvZTs2h566CHLVcnPrd0il19+ueUidp9NSecYxLNzvIkcJROdo5A6mWHXOT179kxwDR7cR0X8+uuvlovk0n088x133CH/+cEHH6j/edFFF1mOl62VOkC9F7baRbBE6gChYNk5Z5111n333cde0i/hjRzx5Zdf2u1zHW4eYGfKlCmWq5JDUrtF7N7S8+yzz1qOT7ZzVq9ebfcE6RyDsHSOZ5GjZKhzlDOpI79g+udA6qTJrnPuv//+BNfgwX1UVJdeeqnlUuoH6Rw9erR48eJFixbVboT9yiuvWI4vVKjQ/v37lf/Lrffeey/RFyuWSB0g+AydI4UjR0X6u2LCY6GOHHHo0KG8efNa7kPFrFmzklrb3r178+TJY15PhQoV7BaxvC+rmDdvnuX4ZDtn3bp1ds9u37595vF0jlmgOsfLyFEy1zkKqeM2u85J/N6RHtxHRWX3sWX58uWT3bl6cqZ3797aePmifMtykXfffXfPnj3yXWmeAwcOJPhMY4vUAQJO6xzZpj322GOyo/R7RrEW9shR2R1wC9nvnzp1ynnx06dP6/+za9eulrtvuxualypVyjy+cuXKhtVqku0cOUKwe3aWfyCgc8yC0zkeR46S0c5RSB1X2XWOHNomuAYP7qOi+v333/Pnz2+54CuvvNKhQwf5P19//bV+Ebs7Y1511VVjx46V/3PDDTck+DRjjtQBgkw6Rw4Z7733XrtPLYNnohE5Yvr06ZY7UNWjjz7qsOyyZcvkwGz16tXaV+bMmWO5Hsv3xx4/ftxy8IgRI+weMdnOOXnyZO7cuS0X2bRpk2HwwYMH7c4v0Tm+8z5ylEx3jkLquMeuc+x+A808uI+Kplu3bpYLys903rx5JZMMfxmaPHmy5fhcZ94+JP/72WefJfg0QeoAgTV48OBffvnF71kgOpGjnLmFqfN9/EaPHm254MyZM4sXLy4Hafq7m4rmzZubV/L999+b17BmzRrzyHLlytl9yJ6QyVhO0uFPrnLMYLnId999Z3gdrr/+ersXYcCAAc4vY8OGDZN69dq0aWM5/pFHHrEc37dvX8vxzp90ZHe1i/zbmQfb3ZSiWbNmzs/dA75EjuJB5yikjkvS7xwP7qOikSyxXFBl/vPSiRMnSpcubTe+ZMmSx48fT/BpQiF1AMBelCJHJRFi+b4aTceOHRcsWKBdw7Z8+XI57M6dO7ccRhtqQfz222/m0wiWn+vw/vvvmx/rww8/dJiqvNSWM6xdu7bdInZvFR4yZIg2RiLH4RbbolevXs6vYa1atSwXHD58uOV4yxoU9913n+V46RnL8Z07d7abkvx72T2dyZMnm8fLwZXlYIc/Z3vDr8hRvOkchdRxQ/qd48F9VDTSLWeffbbd7+eqVavMi9x777124/v165fgc4SG1AEAs+hFjkr99G1nhQoVqlSpUuHChbWv2H0qnfnqsksuucQ8zHztVo73gB04cKDl3IoVK2b3FqB3333XchFJuxEjRixevPif//ynemW+PME6depYDm7Tpo3zxEqWLGm5oN0RiN0DXX/99ZbjmzZtajm+SZMmdlPaunWr5SJCfozN4+XFtxzscBsJD/gYOYpnnaOQOmlLv3M8uI+K3t133225rOW2UixdutRyvJgzZ06CzxF6pA4A6JlvkxONyFHO3E7guuuus9uNWho5cqTDCgcNGmQY/8orr+gHfPDBB4YBXbp0cb744tSpU3anTcSiRYssl5J12kWFXoECBaZNm2Z3HwLJmKNHj9pNzOGj/ORAyHwvh99++83uBFq5cuXMD7Rp0ya79y1Lm9ld5jdx4kS7WZlr6sCBA3YX+Im1a9c6/Ltkjr+Ro3jZOYpN6vBezASl3zlK5u+jord48WLLCdv99Uix+WSJihUrJvJwsETqAIDKHDmJ37A0FORw3PnaLU3x4sWdry5Tvfjii4b3h/Tp02fWrFkzZsy4//77DQfuQ4cONbzPR2/79u1Tp05t0qSJw6yqVKny3nvvrVu3znxMsmrVKoeL24V8V72/kV3n5DrzdnyZuSEqpEDGjRtXpkwZh5V36tRp/vz56odh/P7775MnT7b7K7Dqyiuv/Oqrr9TbXu/du/eTTz6pVq2aw3h5Wf71r3/JmrVZ/fLLL6NGjbK7CYFq4MCBy5cvV87cquGLL75wfm0lFD/++OMdO3Yk8fOUNt8jR/G4cxRSJw2tWrWy/NlN/H5rSubvo2Kg3kJAT721tN142aSaH27w4MGJP0GYkToAEPnI0UiH2L2lXsihc//+/bdt25bg2uSAu1u3bs5v/mnbtu2SJUuc12P3t1pLW7ZsMa/ht99+s/tUcZmhtohD56gefPBB/WrtPlrQ7M0335TxvXr1SnB83759FfvbrNmNV5UoUSKRReRfUwb/+OOPCT6E/Csk+O+eviBEjuJ95yikTqqaNWtm+VOb7DFrRu+jYmB+u6HD++3Ejh07zJ93tmzZsqSeIMxIHQBxFp/I0Uh4DB8+XAKgSZMmDRo0aNGiRb9+/caPH2/52Zo5ki565513ZA0tW7a8+OKLpaNkhXfcccfYsWM3btzo+uTtnDp16uOPP77lllvkSTVq1KhDhw7Dhg1buXKlZxNAggISOYovnaOQOimxuyWA8/W1Zhm9j4rBpk2bDIt/+umnzosYPpm0Zs2aST072CF1AMRTDCMH8FFwIkfxq3OUM6lTt25dUidxdlemOn8EmKXM3UfFTP8JPCVLljx27Jjz+EmTJukf0e5+jkgBqQMgbogcwEuBihzFx85RSJ1kONwJpFGjRim8TT8T91GxNH78eG0N/fv3z3G8hJD+3o5r1qxJ9hHhgNQBEB9EDuCloEWO4m/nKKROArZv3/7xxx/XqFHDrnNEhw4dZs6cmew1si7eR8XBgQMHtFv1L1y4MJFFBgwYoI5v3LhxCo8IZ6QOgDggcgAvBTByFN87RyF1ctKoUSOHwjE4dOhQUit36z4qzm655ZZcjp9GaqDdkNpwigluIXUARBuRA3gpmJGjBKFzFFLHb5m+j8rXX3+dlZWV1Of8SFzJItu3b0//0WGJ1AEQVUQO4KXARo4SkM5RSB3Ac6QOgOghcgAvBTlylOB0jkLqAJ4jdQBEydixY4kcwDMBjxwlUJ2jkDqA50gdANFA5ABeCn7kKEHrHIXUATxH6gAIOyIH8FIoIkcJYOcopA7gOVIHQHgROYCXwhI5SjA7RyF1AM+ROgDCiMgBvBSiyFEC2zli586dpA7gpTFjxhgOF1588UW/JwUAtogcwEvhihwlyJ2jkDqA50gdAGFB5ABeCl3kKAHvHIXUATxH6gAIPiIH8FIYI0cJfucopA7gOVIHQJAROYCXQho5Sig6RyF1AM+ROgCCicgBvGSOHPnPUESOEpbOUaxSp1q1aqQOkDmkDoCgefPNN4kcwDOhjhwlRJ2jkDqA50gdAMFB5ABeCnvkKOHqHIXUATxH6gAIAiIH8FIEIkcJXecopA7gOVIHgL+IHMBL0YgcJYydo5A6gOdIHQB+IXIAL0UmcpSQdo5yJnXq1KlD6gCeIXUAeI/IAbwUpchRwts5CqkDeI7UAeAlIgfwUsQiRwl15yikDuA5UgeAN4gcwEvRixwl7J2jkDqA50gdAJlG5KTs4MGDS5cunXHGqlWrTp8+rf/uzz//vHXr1jQfQo59Z8+ePW3atMWLFx85ciTNtamOHj0qs5XVTpkyZebMmYsWLdq3b58raz58+PCyZctknVOnTv3mm282bNiQ5gp3794t65G1LViwIP21BUQkI0eJQOcopA7gOVIHQOYQOan56quvWrVqlT9/fv1LV7Zs2UGDBqmH45IlBQsWlA24fqlXX331KUeTJk1SR544ceIvf/mL4YirQIECnTt3/vbbb1Obsyw4ePDgCy+8MG/evLlMateuLf/0+/fvT2HN0nuvvfba5ZdfnidPHsNqzznnnH79+q1YsSKpFf7xxx/PPfdcvXr1DGu74IIL5FWSh0thkgER1chRotE5CqkDeI7UAZAJRE4KTp06JQfu+hctd+7cpUuX1v5TKqJWrVrqEb/h9ZTMMB+761133XUybM2aNc7D7rzzzmPHjiU+Z8knw71zixQpYrlmyZIvvvgiqRfk/fffl8DT1lClSpWsrCzDauUlGjJkiMRbIiscP3782WefrS3bokWL22677fzzz9e+UrFixenTpyc1yYCIcOQokekcJU6pwylpA05J+4XUAeCut956y7BVIXIS0bdvX/2L9vDDDx86dEi+/vvvv7/22mvSCYbvmtfw0UcfWTZGrjOds3btWsNKLMnRv/q4zvbu3XvttddqS11zzTVz586VXbly5lju8ccflwIxrFm+8re//S2Rl0IOivr3769fVjt/9dlnn5nX3K1bt5MnTzqsUEKoV69e+pnIa6V+SxbUPxGJyffeey+RSQZHtCNHiVLnKDFIHU5J63FKOghIHQBuIXJS8+mnn+pfNDlwNwzYvXt38+bNtQF333235XrMZzxU7du3V0+81KxZU44opk2bJjtfw8Gxw6Mb7Nu3r0GDBtr4q666Kjs72zBG1m9es+zrFy5cmOOroW8Scdttt+m/K8/FvOYnn3zSbm2nTp3q2rWrfvCdd96pHyBHDsWLF9cPmDFjRo6TDIjIR44Ssc5Rops6nJI24JR0cJA6ANJH5KTm9OnTtWvX1r9ukiLmYUeOHLnkkkvUAVIClqvq0aOHwzFA9+7djx49qg0+cOCAPlf0ZH/qMGFZj35w69atzWOOHz+eL18+85obN27s/Gq89NJLhkXWr1+vH/Dss8+aVyuPJUePliuUBNKPlGMt8yUz9957r35MuXLlJCyd5xkEcYgcJXqdo0Q0dTglreGUdAC98sorhped1AGQOCInZQsXLjS8dLfeeqvlSDniP+uss3L93x83zQYMGGC392/YsKH5D53Lly+3HFymTBm7K96//fZb8/j333/fPLJy5cqWK3c4nFu3bl3BggX1gxs1amQYM2nSJMvVjhs3zrzCOXPmGA4qrr76avOwqVOnGtY2aNAgu0kGREwiR4lk5yiRSx1OSetxSjqYSB0AqSFy0jFy5EjzXs/u74bq2Yx27dpZfve+++4zr0r1/fffWy7SrFkzy/FvvPGG5fh77rnHPLhIkSLbtm0zjLS7wETaw+6l6NSpk2Hw/fffbxjz008/Wa72scceM6/QPIfnnnvOPGzNmjWGYcWKFTtw4IDdPH0Xn8hRoto5YseOHdFIHU5J63FKOshIHQDJInLSdNddd1nuqUeMGGH+I+OxY8cqVKhwxRVXWK5q0KBBlqtq0aKF3aM///zzlovY7c31l0jomQ9sLrroIsuRn3zyieWaly5dah4sP12GYfKalC9f3jxSji4MI2fMmGEeZnmN/aFDh8wj33nnHbsXzV/SMxdccIF+qhGOHCXCnaNEJXU4Ja3hlHTwkToAEkfkpM+uc3KduVjD/Fc52SY3aNDAclV2nWN3UCHmz59v9+iWh859+vSxHGy4f5KQ/bvlyAkTJljOxPII5/PPPzePHD16tGGYHFps3LjRMMzy8pCVK1daPrr5fkiGi00CIm6Ro0S7c5RIpA6npDWckg4FUgdAIogcV4waNcpyr6cqV66c4Q46J06csPvwiRQ6RzrK7qEnTpxoHr906VLz1Rz58+c3XJqh2HfO22+/bV7tqVOnDFeYq2bPnm0enJ2dPXToUG0aFSpUMJ+lkVepcOHC5hXaJYH6V2a9qlWr2r1ofolh5CiR7xwl/KnDKWkVp6RDhNQB4IzIccvixYstd6Z6AwcOTOSj8FLoHGHZA7nsL3yYOnWq/u6mRYoU0T7cQrNr1y45VLNc7Ztvvmlep93lJ3PnzrWb9p49e6SCZEHLG8kuWrTIcoV2V62XKFHCPDhQfw+NZ+QocegcxSZ1Nm3a5Pe8EsIpaRWnpMOF1AFgh8hxl93fDfXkKOjnn392Xk9qnVOlShXLpTp27Gi3yKFDhyZPniy7iQ8++MBwGCM7a6myQoUK2T0Ry8554403LAcn+5EVGvMuTNWmTZsOVizfcrxmzZrUHt11sY0cJSado4Q5dTglrXBKOpxIHQBmf/3rXw1bBiInTXPmzLHZUf8X2ZF9+umnDutJrXPsrkKX+krqWchxQp8+fdR9t+zxS5Ysablay8554IEHLAdbvj04EY899lgiL6mzBQsWpPbo7opz5Cjx6RwltKnDKWmFU9KhReoA0CNyMuSpp56y3KmZjR071m4lqR0kNG7c2HKpmjVrJjj5bdu29e/fX/vrZKdOneQrdn8MtTxI6N27t+XglH+67O7bNGrUqK8SFoRbs8Y8cpRYdY4S2tThlDSnpMOL1AGgInIy6vHHH7fbsRrIrtlyDakdJFx++eWWS8nxdI5zPnr06LBhw4oUKaIukidPntGjR6vfSqpzunTpYjn4pptuSuCVs2D3ORzh+qxwIkeJW+co4UwdTklzSjrUSB0ARI4H3n33XcOnL1gqXLiw5WFPagcJl156qeVSF154ofNsZ86cWbVqVW18/vz59TciSqpzbr75ZsvB559/fmKvnFHPnj0tV/jMM8+ktkLvETmq2HWOEs7U4ZS05WBOSYcFqQPEGZHjmaVLl8rBveUOTq9fv37mZVM7SLC75OSqq66yW+TEiRN33323YbzhI8iTOkiw/EwL1bp16xJ97XQMnw+u6d69ewpr8x6Ro4lj5yhnUqd27dr6n4Dgpw6npM1ifko6XEgdIJ6IHI8dOHDg9ttvt9zHaYoVK3bq1CnDgqkdJNSsWdNyqT59+liOP3bsWJs2bQyDzbcwTeogQX6i7J6p+VMlEjFixAjLtZUuXdr8kR5BQ+ToxbRzlHCmDqekDeJ8SjqMSB0gboicTDt69KjlIew//vEPu+vDVeb39KZ2kFCmTBnLpew275Z/ZzSfdUnqIOHLL7+0e5pZWVlOL5+Nzz//3G6F8+bNS2GFniFyDOLbOUo4U4dT0gbxPCUdXqQOEB9EjgeWLFlSuHDhP/74w/ytzZs3X3bZZXZ7T/MHM6RwkCC7+9y5c1sutXDhQvP4Tz75xDyyRo0a5pFJHSQcOnQob968ds901qxZObyIJlu2bLFbW4LHCdKfyT5o+ogcs1h3jhLO1OGUtF4MT0mHHakDxAGR441Vq1bJa/vaa69Zflc6xO6A4ZtvvjEMTuEg4ddff7Vc5Oyzzz558qR5vOVfTuvXr28emdRBgmjXrp3leNGgQQPzEZHB6dOnDV+RWVmuLU+ePNKWzmtbsWJFmTJlPD6YJHIsxb1zlMCnDqekFU5JRw6pA0QbkeMZ9cxDxYoV7T5GLzs7u0WLFuadnRz8GEamcJAghyKWi/Tt29c8ePPmzZaD8+fP//vvvxsG293r1e5mS9OnT7ccr3r00UcdXsNly5adf/75q1ev1n/R4VPa69Sp43C65sCBA3JUKa+5wyO6jsixQ+f8jyCnDqekFU5JR5E5dbR7VAAINdmMG367iZzMkcMD9UV2OJSfO3eu4V/E8o6pdgcJcsRs97nY/fr1s1xk+fLl5sHz5s2z2/PecMMNcryhDtu+fbvsiO1Gvvrqq5YzkZyzSyOV3S5m5syZxYsXz8rKMpyA2rlzZ9GiRe3Wdu211x4/fty8tsOHD7dq1UoOnHI85+MiIscBnfO/Aps6nJJWcUo6el5++WXDiy9f8XtSANJi/hPGsGHD/J5UlMnuT32d5dhaDtktx+zevdvwj2JZnnYHCbnOfDK4eT978OBBy+tK7D5G3PnDAGvUqNG7d++uXbs6fJK4ePDBB9VnvXjxYsP6v//+e9mDOywrE1uwYIH2RCTG+vbtK69bvnz5vvvuO/OE7S5xV8mxh+FAS15/9dDioYcesnwFMoHIcUbn/H/BTB1OSatifko6eqQ8DR+LVLBgwS+++MLveQFIy6xZswoXLmzYxVj+XQxu0W7EKq+8ZepIEuj/RUqXLr13717zMIfOEW3btjVcWmJ5i6Czzjpr48aNlvPctWuXw/r1ZJ/euXNny2/J+mX3LZOpWbOmOb0eeeSRHFcuHVWpUiX9T6ndn5LlSMD5HFGuMweKHTp0aN++fZUqVdSvNGrU6NixYwn9y6WNyMkRnfNfApg6nJJWxfmUdPRYRs6MGTP8nhcAF8yfP18ORvW/4KRORkm3aC+17J7kaEF2Vdp35WC9efPm+n+Ojz76yHI9dgcJcuB+zjnn5DoTSE899dSXX365YMGCXr16mUfmyZNnypQpDlO1qxdNiRIl/vnPf8rIcePGOQyTHzDL4xDZucgPm/NDGIwcOdJhwmvXri1fvnzia5ODRvNfmTOEyEkEnWMUtNThlLQmnqeko4czOUDkkTpe0s4kaMqWLXvXXXe9/vrrf/7znw2Hwg6XBztc9LFy5cpKlSo57DFFkSJFPvvsM+epbtmypWLFinZrkAfaunWrOvL48eN2f9wsXry4wx2D5BjA4bMoDOv58MMPc3x516xZU6dOnURWeOmllxI5QUPnWNi+fXugUodT0pq4nZKOHiIHiAlSxzNZWVmy33/vvfdkZ3fllVfa7c7q1q07Z84ch/U4X9wuu/gbb7zR7tZEsqNcu3ZtIrOVY/FrrrnGsBe44YYbFi1aZBgpB2OdOnXSj8yXL9+tt966fv36HB9l1qxZDRs2tHsp5BH79++/bdu2RCYsjhw5IsVYokQJuxWWKVNmzJgxnv14myPn/PPPJ3Is0TnWApU6nJLWxOqUdPRIuBI5QHyQOt64++67p06dqv3n1q1b33333TvuuKNp06YNGjRo2bLlfffdJ3v2HD8dLpE38W7ZsuX555/v0aOHrLxx48YdO3YcMWLEqlWrkp3zxo0bJ0+ePHHiRPkh0R/SmMkjyoGHjJw3b97u3buTepQlS5YMHz68W7duTZo0kZeiRYsW/fr1Gz9+/L59+5KdsHLmwnU5gLn33nvbtGkjB04XX3xx69at77//fnkilhe6ZwiRkxQ6x1ZwUodT0noxOSUdPUQOEEOkToik9iF78BKRkyw6x0lAUodT0mbRPiUdPUQOEFukTljQOQFH5KSAzsmBOXWqVq3qcepwStpOJE9JRw+RA8QcqRMKdE6QETmpoXNyFoTUcQWbMHiPyAGgkDphwEFCYBE5KaNzEhKN1GETBo8ROQA0pE7AcZAQTEROOuicREUgddiEwUtEDgADUifIOEgIICInTXROEsKeOmzC4BmJHMOtyYkcAAqpE2B29zLt3r2731OLKSInfXROckKdOnQOvEHkAHBA6gRT3759LQ8SOnTo4PfU4ojIcQWdkzRJnVq1aoUxdegceIDIAZAjUieA2rVrZ3mQcNFFF/k9tdghctxC56QipKnDKWlkGpEDIEGWqXPixAm/5xVTO3bsKFq0qOVBQt68eVevXu33BGOEyHERnZOiMKYOp6SRUUQOgKSQOkEg/wqjRo0qU6aM5RGCqmLFiq+99trs2bN/+uknv+cbcUSOu+ic1IUudTgljcyRyOnZsyeRAyAppI7vmjdvXiVh7du393u+UUbkuI7OSUuIUodT0sgcIgdAykgdQCFyMoPOSVfwU4dT0sgoIgdAmkgdxByRkyF0jgsCnjqckkbmmCOnQIECRA6AZEnqFClShNRBDBE5mUPnuCPgqQNkApEDwEWkDmKIyMkoOsc1pA5ihcgB4DpSB7FC5GQaneMmUgcxQeQAyBBSBzFB5HiAznEZqYPIk8i5/fbbiRwAGULqIPKIHG/QOe7btm0bqYOoInIAeIDUQYQROZ6hczKC1EEkETkAPEPqIJKIHC/ROZlimTobN270e15AiogcAB4jdRAxRI7H6JwMInUQGUQOAF+QOogMIsd7dE5mkTqIACIHgI9IHUQAkeMLOifjSB2EmkTObbfdRuQA8BGpg1AjcvxC53iB1EFIETkAAoLUQUgROT6iczxC6iB0iBwAgWJOne7du5M6CDIix190jndIncjYv3//Aw88cOWVVzZv3nzu3Ll+TycjiBwAAUTqIESIHN/ROZ4idaKhffv22r9gy5Yt/Z6O+4gcAIFF6iAUiJwgoHO8JqlTs2ZNUsfSwYMHZ8yY8fjjj998883t2rVr2rRp69atb7/99pdffnnDhg1+z+5/jRs3Tv/PV6pUKb9n5DIiB0DAkTqRFKVrJYicgKBzfEDqmMkv/6BBg4oWLaq+IPnz5y9UqJD+JcqdO/eAAQOOHTvm7zy3bNlSvHjxXP9t9+7d/s7KRRI5t956K5EDIOBIneiJzLUSRE5w0Dn+IHX0PvroI308tG7d+uDBg0eOHGnVqpWhKDp16pSdne3jVDt27JjL5JtvvvFxSi4icgCECKmTiFBcKKFE6FoJIidQ6BzfkDqqV1991ZANixYtUr8l22VzVEyfPt2vqX7wwQfm+Yh33nnHrym5iMgBEDqkjoOwXCihROhaCXkiRE6g0Dl+InWmTJki21nDpm3v3r3qd3v06GGOiqefftqXqe7cubN06dKWnTNkyBBfpuQiy8jxMSkBIEHz5s0jdcxCdKGEEpVrJYicAKJzfBbn1Dl69GjlypXNmzb5ujqgQ4cO5u9OmjTJl9necMMNlpGj7iR8mZJbiBwAoUbqGIToQgklKtdKEDnBROf4L7ap8+abb1pu2g4fPqwOmDJliuFbbdu2PX36tPdTnTx5suVUVfLP5/2U3ELkAIgAUkcTogsllKhcK2EZOZs3b/Z7XqBzgiGeqdOmTRvLTduBAwe0MbLruv766y+55JKuXbu+8847vkSO7B7Kly9v0zj/I1++fCdPnvR+YumTyLnlllv0z4XIARBSpI4StgsllEhcK0HkBBmdExQxTJ1ixYpZbtr++OMPv6f2X3r16mW3Fdb8+uuvfk8zaUQOgIghdUJ0oYQSiWsliJyAo3MCJFapc+TIEbtNm3Z6PQhmzpypzipv3rwPPfSQ3Zw///xzv2eaHCIHQCTFPHXCcqGEEolrJYic4KNzgiU+qbNr1y67TduePXv8nt3/OnjwoHYBwKOPPrp06VK7Ob/wwgt+TzYJRA6ACItz6oTlQgkl/NdKEDmhQOcEztatW+OQOvv27bPbrgWnc+666y51SrVr1z527Jhkj92c+/bt6/dkE0XkAIi8eKZOWC6UUMJ/rQSRExZ0ThAFOXV27tz57bffTps2bcaMGYsXL96/f39q6/njjz/stmsB6RzZTarzyZ0798KFC9UvVqxY0XLOzZo183e2CSJyAMREDFMnFBdKKOG/VoLICRE6J6DMqVOlShUfU2ft2rUPPvig/CabN0P16tUbMWKETDjHlRw7duyp//Pwww/bbdeGDBmiDfPrT1BHjhzRtmKDBg3Svt6yZUvLOZctW9aXeSaFyAEQK5apc/z4cb/nlSmhuFBCCfm1EkROuNA5wRWQ1Dl69Kgc6OfNm1c/E9k21a9fP3/+/NpXChYsOHjwYO2OLpYczuHYkb7y7JnqSdSpE6hWrZr+SQ0YMMBuqkG7KsBAIufmm2/WT5jIARB5YUkdV66VCP6FEkrIr5UgckKHzgk031Nn+/btDRo00E9A5vPvf/9bm16rVq0M3125cqXd2sLSOd9//32ePHnUCcyePVv/rTFjxthN9bvvvvN+qgkicgDEVpBTJ/1rJUJ0oYQS8msliJwwonOCzsfU2bdvX+3atfUPnTdvXsPNT/bv31+hQgX9mDJlyqxYscJyhbJfefv/vPrqq3ab45dfflkblvL7f1Imk8zKylJn8qc//cnw3S+++MJu2n/72988nmqCiBwAMRfA1HHrWomw/AFRFd5rJYickKJzQsCv1Onatathc2P54cSjRo0yDJPp5bhhCuzp9SeffFKdxrnnnmuurPXr19tN+5FHHvFlws6IHABQApY6Ll4rEaLOCe+1EkROeNE54eB96nz00Ufmzc1rr71mHikbX/PIW2+91Xn9wewc2c3ky5dPncbUqVPNA06fPl2wYEHLaXfr1s37CTsjcgBAE5DUcfdaiVBcKKGE+VoJIifU6JzQ8DJ1jhw5UrZsWfPmZv78+ebB2dnZcvRsHrx06VKHhwhg50gVXHzxxeocbrnlFrth2pbaoG7dul7ONkfydG666Sb9DIkcADEXhNTJ3LUSAdyxakJ6rQSRE3Z0Tph4ljrjxo2z3NzY/W5bvofS+ZROADfH2k5FGs9hDrJTtJy2VISkhZcTdkDkAIAlf1Mno9dKBHDHqgrptRJETgTQOSEjqVOjRg39b10mUqdevXqWm5ujR49ajm/cuLF5sBxYyzbX7iGCtjlevXq1tpGdNGmSw8hHH33Ububr1q3zbMIOiBwAcOBX6mT6Womg7VhVIb1WgsiJBjonfDKdOnanjyUD7BYxvGNS88knn9gtEqjNsexOmjZtqj56165dnQdPmDDBbuZBaAlz5OTPnz8IEwOA4JDUKVy4sH5T6UHqZPpaiUDtWDVhvFaCyIkMOieUMpo6dsfxZcqUsVukffv2losMHDjQbpFAbY61926WLFly+/btzoMXLVpkN/OXX37ZmwnbIXIAIEHep06mr5UI1I5VFcZrJYicKKFzwipzqdO/f3/LDU3lypXtFunUqZPlIi1btrRbJDib4w0bNmgXMIwfPz7H8fv27bObubx0mZ+vLSIHAJLiZep4cK1EcHasqjBeK0HkRAydE2IZSp3OnTtbbmhq1qxpt4hd58h87BYJzub46quvVh+3bdu2CS5ieYG1aNGiRSZn6oTIAYAUeJY6HlwrEZwdqyp010oQOdFD54RbJlLniiuusNzQZGVl2S3SsWNHy0VKlSplt0hANsdvv/229rh169ZtnhjDG1g15cuX92zmehI5PXr00M+EyAGABHmTOh5cKxGQHasqdNdKEDmRROeEnuupY/iQZk3Dhg3tFrn22mstFylatKjdIkHYHMtLV7x4cbtppMb7z18jcgAgTR6kjgfXSgRhx6oJ17USRE5U0TlR4G7qyAbFckNz0UUX2S0iWzHLRSpVqmS3SBA2x3anodKxZMkSbyavInIAwBWZTh0PrpUIwo5VFa5rJYicCKNzIsLF1LG7t+PFF19st8hVV11luUj9+vXtFvF9czxx4kT14WTDumLFit3JeP/99+0mL9/yYPIqIgcAXJTR1PHgWgnfd6yqcF0rQeREG50THW6lzkMPPWS5lalXr57dIpdffrnlIl26dLFbxN/N8a5du0qXLq0+nOUHUTtbvXq13eSfeOKJTEzYjMgBANeZU6dbt26upI4H10oEpHNCdK0EkRN5dE6kuJI6U6ZMsdzKVK9e3W4Ruz9TPfvss3aL+Ls5vvHGG9XHatasWXZ2drKLnzx5UqLCcvI33HBDJiZsQOQAQIZkKHU8uFYiCJ0TomsliJw4oHOiRn5vzamzYcOGxNewd+/ePHnymLcyFSpUsFvE8jObhewt7BbxcXP82WefqQ9UqFCh3377LbWV1K5d23LyF154obuzNZPI0TpNReQAgIsykToeXCvhe+eE6FoJIicm6JwISj91unbtat7K5MuXz+7UR6lSpczjK1eufPr0abuH8GtzvG/fvvLly6sP9MILL6S8HtnnWU5e2imFE0SJI3IAwAOup44H10r43jlhuVaCyIkPOiea0kydOXPmWG5odu7caR4s233LwSNGjHB4CL82x71791YfpXHjxtIMKa/n0UcftZt/+h/VaofIAQDPuJs6Hlwr4W/nhOVaCSInVuicyEozdZo3b27e0Hz//ffmkWvWrDGPLFeunGxwHdbv8Ilgu3fvTuH5JmLmzJnqQ0ge/PLLL+ms6u9//7vd/OVR3JqwHpEDAB5zN3Uyfa2Ej50TlmsliJy4oXOiLJ3U+e233woWLGjY0Fhebmv5xsEPP/zQef07d+602xzLtFN4sjnatm1bxYoV1YdwPteUiCVLltjN/9VXX3VlwnpEDgD4wsXUyfS1Ej52TiiulSByYojOibh0UmfMmDGGrcwll1xiHtauXTvDsJ49e+a48l9++cVuW+b67SNl4/jKK6+UK1dOXb8Uwscff3zw4MF01ilbRrv533TTTW7NXEXkAICPXEydjF4r4cuFEkpIrpUgcuKJzom+dFJn0KBBhg2NBIN+wAcffGAY0KVLl0S2/i+++KLdtmzUqFGpPVPNyZMn77777osvvlieadGiRS0fJV++fNWqVZMxMpNE1vnss8+2aNGiTp06VatWtfvMZk3p0qVl5bVr165fv/4NN9xw5MiRlJ+LRI6sQb9yIgcAPOZW6mT0WgnvL5RQQnKtBJETW3ROLKSTOpIBkgT6Zfv06TNr1qwZM2bcf//9hlujDB06VBrDblXZ2dk7duxYtmzZsGHDChQoYLctk3UOHz58xYoVe/bscbhjm4PvvvvObuVmWVlZOa7wwIEDia/QbNWqVSk8C4XIAYDAcCt1MnethJcXSijhuVaCyIkzOicu0kkd2XTK1tzyRjGatm3b5rgZdbh02M7atWtTeLK7du2qVauW5FnRokXLli173nnn1axZs379+rVr165WrVrFihVLly4t35IBJUqUkF1OjiuUQmvZsmXu3LllEdnPyVLnnHNOpUqVqlevXqdOnXr16snK5f/Io8jWUx5Ovlu8ePGCBQtKzl1zzTWpXaxM5ABAoLiVOhm6ViKjF0oo4bxWgsiJOTonRsy/7UndgW3btm3vvPNOv3795IhfNmENGzaUbdMdd9wxduzYzN1JObYsI2fatGl+zwsAYm3u3LmupI5b10p4dqGEEsJrJYgc0DnxkmbqwBtEDgAEllup48q1Ep5dKKGE7VoJ8wGPTJLIiRs6J3ZInYAjcgAg4NxKHYVrJTKDyIGKzokjUiewJHKuv/56IgcAAs7F1IG7iBxo6JyYInUCiMgBgBAhdQKIyIEenRNfpE6gEDkAEDrm1OnatSup4xciBwZ0TqyROgFB5ABASJE6AUHkwIzOiTtSx3dEDgCEGqnjOyIHlugckDp+InIAIAJIHR8RObBD5+B/kDq+OHnyJJEDANFA6viCyIEDOgf/i9TxGJEDABFD6niMyIEzOgf/33/+8x/D9qJy5cqkTiYQOQAQSaSOZ4gc5IjOwX8hdTxA5ABAhJE6HiBykAg6B0akTkYROQAQeaRORhE5SBCdAwukToYQOQAQE6ROhhA5SBydA2ukjuskcq677joiBwBigtRxHZGDpNA5sEXquIjIAYAYInVcROQgWXQOnJA6riByACC2SB1XSOTUqFGDyEFS6BzkgNRJE5EDADFH6qSJyEFq6BzkjNRJmWXkTJ061e95AQA8NWfOHFInNUQOUkbnICGkTgqIHACAhtRJAZGDdNA5SJSkTvXq1UmdBJ04cYLIAQDokTpJIXKQJjoHSSB1EkTkAAAsmVOnS5cupI4ZkYP00TlIDqmTIyIHAOCA1MkRkQNX0DlIGqnjgMgBAOSI1HFA5MAtdA5SQepYInIAAAkidSwROXARnYMUkToGRA4AICmkjgGRA3fROUgdqaMhcgAAKSB1NEQOXEfnIC2kjnImcrp3707kAABSQOooRA4yg85BumKeOkQOACBNMU8dIgcZQufABbFNHSIHAOCK2KYOkYPMoXPgDsvUWb9+vd/zyiAiBwDgohimDpGDjKJz4BpJnfPPPz8mqUPkAABcF6vUIXKQaXQO3BST1JFdDpEDAMiEmKQOkQMP0DlwWeRTh8gBAGRU5FOHyIE36By4L8KpQ+QAADwQ4dQhcuAZOgcZEcnUIXIAAJ6JZOoQOfASnYNMiVjqWEbOlClT/J4XACCyvv766yilDpEDj9E5yKDIpA6RAwDwhTl1OnfuHMbUsYycTZs2+T0vRBmdg8yKQOoQOQAAH0UgdYgc+ILOQcaFOnVkR9KtWzciBwDgo1CnDpEDv9A58EJIU4fIAQAEREhTh8iBj+gceCR0qUPkAAACJXSpQ+TAX3QOvLN58+awpA6RAwAIoBClDpED39E58FQoUofIAQAEVihSh8hBENA58FrAU4fIAQAEXMBTh8hBQNA58EFgU0d2El27diVyAAABF9jUIXIQHHQO/BHA1CFyAAAhEsDUIXIQKHQOfBOo1CFyAAChE6jUIXIQNHQO/BSQ1CFyAAAhFZDUIXIQQHQOfOZ76hA5AIBQ8z11iBwEE50D/5lT57zzzvMmdYgcAEAE+Jg6RA4Ci85BIPiSOrID6NKlC5EDAIgAX1KHyEGQ0TkICkkd2Th6ljpEDgAgYjxOHSIHAUfnIEA8Sx0iBwAQSZ6lDpGD4KNzECwepA6RAwCIMHPqdOrUyd3UIXIQCnQOAiejqWMZOZ9//rkrKwcAIAhmz56dudQhchAWdA6CKEOpQ+QAAGIiQ6lD5CBE6BwElOupIxv3zp07EzkAgJhwPXWIHIQLnYPgcjF1iBwAQAy5mDpEDkKHzkGguZI6RA4AILZcSR0iB2FE5yDo0kwdIgcAEHNppg6Rg5CicxACKacOkQMAgJJG6hA5CC86B+GQQuoQOQAAaFJIHSIHoUbnIDRkw5p46hA5AAAYJJU6RA7Cjs5BmCSYOrLJlg03kQMAgEGCqUPkIALoHIRMjqlD5AAA4CDH1CFyEA10DsLHIXWIHAAAcuSQOkQOIoPOQShZps7q1auJHAAAEmGZOuvXrydyEBl0DsLKnDpSNUQOAAAJMqdOwYIFiRxEBp2DEDOnDpEDAEDizKlD5CAy6ByEm2XqEDkAACTIMnWIHEQAnYPQM6QOkQMAQFIMqUPkIBroHESBbI6rVq1K5AAAkJqvvvpKTR0iB5FB5yAitmzZUr9+fSIHAIDUzJ49Oysri8hBZNA5iI5Tp075PQUAAEKMPSmihM4BAAAAEDV0DgAAAICooXMAAAAARA2dAwAAACBq6BwAAAAAUUPnAAAAAIgaOgcAAABA1NA5AAAAAKKGzgEAAAAQNXQOAAAAgKihcwAAAABEDZ0DAAAAIGroHAAAAABRQ+cAAAAAiBo6BwAAAEDU0DkAAAAAoobOAQAAABA1dA4AAACAqKFzAAAAAEQNnQMAAAAgaugcAAAAAFFD5wAAAACIGjoHAAAAQNTQOQAAAACihs4BAAAAEDV0DgAAAICooXMAAAAARA2dAwAAACBq6BwAAAAAUUPnAAAAAIgaOgcAAABA1NA5AAAAAKKGzgEAAAAQNXQOAAAAgKihcwAAAABEDZ0DAAAAIGroHAAAAABRQ+cAAAAAiBo6BwAAAEDU0DkAAAAAoobOAQAAABA1dA4AAACAqKFzAAAAAEQNnQMAAAAgaugcAAAAAFFD5wAAAACIGjoHAAAgvk6ePLl69erZs2dPmDBh1KhRL7zwwttvv71gwYIjR474PTUgLXSOR44dO3bRRRdVrFjx/PPPr1OnTv369Rs2bChfufDCC7OysmrUqFH5jB9++MGw4MKFC+XrlSpVuuCCC+rVqyeLyPjq1avLV2Qlp06d8uXpJOvo0aN7TA4ePJja2m699dYKFSqckxN5tRs0aNCuXbtevXqNHTv2999/d/dJeUOmbX7pTp8+nciyzz///Lnnnlu1alX1R05+eOSnTv5P3bp15edQviUvjt2yw4cPlxewSpUqtWrVuvAM+SmVn7rbbrvNvScHAC6QHaVs6M477zzZUcou0rCHrV27drVq1WSDdtVVV/k90xSlsyNwkJ2dPXfu3P79+5cuXTrXGblz5y5WrFiu/5MvX75u3brNmzfPlWfhvXRet3HjxsleUg7AZN8nP0Xys6TtQ2WXKvtQ+Ynq2bOnecGbb75ZDlFk7yk/eHIQIgvKblR+PmX8O++84/ZTRA7oHI8cP3789ttvb926dfPmzc8+++xcOnLs2LRp01atWnXp0mXz5s2GBVesWNG+ffvLLrtM2/QUKFCgZs2aV1xxxV133eXLc0nBzJkz27RpI1tM/ROXXEltbY899pi8kvKiyXZEv0LJP9mNySvZsmXLZs2ayfborLPO0m+vO3fuvGrVKnefWqb16dNHtqe5/tvatWsTWfa9995r27btlVdeWbRoUf3i8rMkP1HyLzJs2DC7Zd966y35WS1Tpoy2lBxAyKrGjBnj3pMDABf8+9//7tixo2yyGjdunD9/fv3mTnaXsuGS/YLsNYYOHer3TFOUzo7AjhSOHK9re89nnnlG9o8nT55UzuTB7NmzZTeqPVbv3r0PHTrk0rPxTjqv22effXbttdfK4YTkjX5xOQaTepGDDdmHvvTSS+YFH330UVlKfvC0RcqVKycHJLK2OXPmuPwMkRM6xwfyu5HCr5xsYvLmzSvHnXv37s30DDPkL3/5i/6Jp9w5Gtma6Fe4evVq8xgJRf0LXrhw4QULFqT5uB47ePBg1apV09m9yd5dv/h9992X4ILLli3LkyfPOeec8+OPPyY/cQDw1OHDh/V/UJNjXL9n5Jr0dwQayZjbb79dXUnBggWffvrp48ePW44cNWqU9nBXX3213bAgS/91W7hwYWqHLg8//LCMl5c3+VnDNXSO12QzIYfa2i/Mueeem+CCX375pStt4KOVK1e62zmXX365trby5cvbDcvOzm7QoIE2smLFiidOnEjzoT12ww03pLOZ/uijj/SLN2/ePJGljh07lpWVJXW9ePHilGYNAJ6aNWuWflvXr18/v2fkpjR3BKrt27fXrVtXXUORIkXmz5/vMFj2nq1atdIe8ZFHHkl17n5K83WTUNEv/vbbbye4YNOmTVP+Z4Jb6ByvyTYltWP9xx57LKlfsABav369i51j+LvdTTfd5DD4rrvu0j+07AvTeWjvaX97S20z/euvv+oXL1GiRCJLPfjggzL4z3/+c0pTBgCvGU7yf/DBB37PyE1p7gjEpk2bqlevri5eoECBRC6jWrFihfaIssiWLVtSmbqv0nzdWrZsmcLiR44cyZ8/f+J/y0aG0DleGz58eGz/MLBx40YXO8fwd7u33nrLYXCPHj30g9977710Htp7vXr1SmcznZ2drX+rktiwYYPzIgsWLMidO3ejRo3Uy7UBIPj0J/nF1q1b/Z6Rm9LcERw9ejQrK0tb/OGHH05wwXLlymlLvfbaa8lP3GfpvG7Hjx8vVKiQtmysrsGJBjrHa+n8YaBSpUqZnl5Guds5jzzyiH5tv/76q8Pg2rVr6wcvWrQonYf2Xpq7N3HZZZfp1zB58mSHwQcPHqxWrZps3EN32wYAsXXo0CH9Sf7q1av7PSOXpbkjGDhwoLZs+fLlE7/laaNGjbQFO3funPzEfZbO65bmNTjcYM13dI6n0nxzTvq39JXt2ty5cz/66KOJEycuWLBg//79ya5h9erVsvi//vWvbdu25Th4+fLl77//voxXzx642zn6A3eHN+eoc9Y/ruRiCuco5Ih/ypQpEyZMmDp16sqVK5NdXEp11qxZ8mosXLgwOzvbefC+ffvkUeSxZs+erb6VKP3OGTBggH4Nzlej9evXT8a88soryT4KAPhl5syZ+q1c3759XX+I8O4IDFdAjB8/PvFl9Tdeu/jiixNfUBPe123EiBH6ZZO9BmfdunWJPxYygc7x1DfffOPXHwamTZvWokWLvHnzFi1aVP5XncBZZ501ZMgQw5vylyxZkpWVVe6/SSrIr6v+/YgFCxZ8/vnn7R5OIqpevXqGXY6hN9LpHMPf7ZzfnKP/I5aQSEv8gXbu3Pnwww/LK5AnTx79pwo0adJENriGwdISFSpU0L9u8qxlo/zqq6+WKFFCW7Zhw4aSfJYPd+zYsfvuu09eW22wVJmkafqd89Zbb+nX4PA3OflRkQHyb53j7gQAgsNwkl8Oi91acwR2BJdeeqm2oEwvqc/eueCCC7Rlq1atmviCEXjdrr766hSWjcY1ONFA53jqmWee0f/CJN4t6h8G1q9fn8KDSsaov+R169b9+eeflTN/7ejUqZM2jfbt2xuOaA8fPlyjRg3DVEuWLCmbD62RVP/4xz/Mj/j5558XKFBAHSDrkZ3NmDFj5BdeNk/6ZdPpHMPf7RzenPP1119rw2RTO3bs2MQf5dtvv1U/QGbUqFGyAVXONIC2DS1UqJD5TZxvv/22fmJdunRR3wFpeHuM/FuYdzPysrdu3VobM3jw4A8//FBeJXnEWrVqpbyZVi1evFi/hsqVK1sO27NnT/ny5YsXL27+KCcACDLD1bn/+c9/XFltBHYEs2fP1i+Y+EcLiFOnTmk7dFGvXr0EF4zA6yaHT/prcBLvFvUaHJl8guOROXSOpwyfnJPgCU357c2fP/95552X2oM+8cQT6sN16NBB+6LhFs/mm9Lccsst+gGSN7KpOnny5OrVq/W/9o0aNTIsKLuWIkWKaAO0M9Tbt2833MM+nc5Rb0uvsXxzzo4dO4YPH67NNisry/wHJAe7du3SPtF16dKl2tf1d6i84IILDEutWbNGPzEpK9krrFq1Skryjjvu0H9r6tSphmVl36N9t0ePHtrX9Z9goEqhc44cOSKT0a9Ectc87Prrr88Vwvs0AIg5w0l+tz45Jxo7gq5du+oX/O677xJ/BQzPpX379oksFY3XzfDJOYm/d0C9Bufdd99NcDwyh87xjkSC/m8S3vxh4PTp00WLFtUe9JNPPlG/vnfvXv1vr/k65j/96U/6AY8++qj2rWuvvVb7eu7cuQ2XvekDqWXLlvpvTZ8+Xb/OdDpHfwpeNoUDdXr16iVFp33Ms+z5ZLv86aefJnsV1gsvvKA9RP369bXF7733Xv2zMNxkc9u2bfrvyoZeeyPTkiVL9N+S/tQvKJty/bky/WcayEM3adJEv2xqt90z3IzB/Lc0yV35evfu3VNYOQD4aMaMGfrtW58+fVxZbQR2BLKP1h8GJHsx1cSJE/UPmuBH6ETgdRPPPvusfkFvrsGBu+gc73z33Xf6X5hk/zCQ1LsGNQcPHtQ/qNSL5dfNh7b9+/fXD1AveFMZTvXs2LFD/3D6E9yPP/64fp1u3Yfg0KFD+i1a9erVu+tcffXV+m36zTffvH379hQeRf30GI22tR08eLD+6z/99JN+KXk19N+97rrrtG8Z/lIlr7B+QfVfWSX1aPjY6fTfnyNuuukm/Upefvll/Xdlf1OyZMly5crt3r07hZUDgI8MJ/ndOikdgR2B/uLtXP99riMRhk+fmz59eiJLReB1E23bttUvmNQ1OHYXh8NjdI53DCdPk/3DQI4feGLnnnvuUR8xX758X375pfrFAwcO6CfTsWNHw1IOndOzZ0/9t/QT++c//6n/1ptvvqlfp1udY/i7nfnNOUePHtV/LliFChVSCINff/21dOnS6hquuuoq7esPPPCA/tH1Z+QVx820vFD6b8nLqF+wfv362rckNgyTcaVznnvuOYcJqBdVmi8GAIDg05/kF269wzACO4KXXnpJv9To0aOTegX0NyEoVqyYISHsROB1S/MaHMMM4Rc6xzvXXHON/jfNyz8MfPPNN+PHj1+9erVy5ld3woQJhkuY9G/dUTl0jsMmY9iwYfpvTZw4Ub9Otzpn6NCh+vVYvjnHcAtv8xNMxJ49ez744IPJkyer96Fes2ZN37595Z9D/+g//PCDfhGHzbTD0z99+rT+zTM1atQwzMSVzjHcvOHCCy/UvvX666/LV/r165fCagHAXwcPHtSf5M/xnmArV6587rnnEryYOew7goceeki/1Lx58xJZSiUdol82qVt1h/11M9y8x5trcOA6Oscjp06d0t9UMfGbCrj4hwHZpstGp1q1aiVKlHjjjTf0v8BudY7hBPfHH3+sX6dbnaO/1tbhk3P0H4xdoECBpG6jabBp06bevXvLllReqJtvvln/LFzZTO/atUv/rbp16xom4ErnGB4lX7586l/mZPdTpEgR+cFI/GPjACA4vvjiC/3GTTbXzuPbtWtXqFChw4cPJ/UoId0R6K9uyPXfl5rnyHCZmfrX0mSF9HV7/vnn9Ut5dg0O3EXneGTZsmX6Xxjnz3vRU8vB8vbNSfn+++/VjzSuXr36unXrDh06pJ+PW50jmx79tz788EP9Ol3pHMPf7RxeSYlJbZh0TmqfBnP06NEnn3xSvRXm8OHDFdNlx65spuU11H+rZs2ahmm40jlCslC/nuXLl0uBX3bZZblz5/7mm29SWycA+Mtwkn/ChAkOg3/66SfnfYdZqHcEhg+JTvxPfr///rv+za5JvWKqUL9u+o/fyGVz5YiZPAUpulq1aiUyGB6gczwydepU/S+M/OYnspRsI8qWLVu4cGHJknQe/ZlnnpEDWXncUqVKbdq0STnzVn79fNzqHMNShk8OdqVzDH+3s/vknM2bNztv+BKxZs2arKwsdQ2DBw9Wv5iJzbRhqXPPPdcwE7c6x3Dx5Pjx49XPdJKjhNRWCAC+M9xQy+5zJFU33nijjJk5c2aCKw/7jkACQ79Ugm+wUXQfSiHKlCmza9euBBdUhf11U/80rJJ0Ua++y9Ho0aNl/J///OdEBsMDdI5H5s+fr/81+9vf/pbIUuox6EMPPZTOQ48cOVJ7XFmh+sUMdc6LL76o/9bTTz+tX6crnTNkyBD9Suz+xDJhwgT9sM6dOyf7QDt37pTNpbp4iRIltNT8f+3de1xVVdoH8AOikuKkaeANDa80hTbTCKlTiFmTRpaik/JHkhpOFmViWl7mY1maGuVHy8rrEF4CNO9pomSaRpiGeOEm5Q0nhotcVBTE8z4v633XPK4jm33OQc5h8/v+4af22mvtdfbR59nP2bc7EaZv3rzJfzZr3Lix8pNbbdU5yvvCBw4cSNvy8/PTn/kAAJyKcpK/c+fOGitv2LDBVHUorPO0hgESgfK8NfFbp5SZmbl+/fqdO3cq1y0fP37c3d1ddHFxcdm0aZOebUkG2G9BQUE6/1JJxcXFVBA2b96cPr6e9aEOoM6pI/SXXpxREbTPqgu7d+9u2rSpl5dXQUGBzdvNycnht/3t2rVLLL9DdY7yUq3Ro0fzMWulzunTp48cQePmnPDwcL4tiq28tby8vMYkN3HiRNk9ICBALr8TYdps8Q5Zyj28tbbqnNjYWNOt6K9HamqqbaMBADic8mY2ipbVrXnhwgXx8krlnQcaDJAIbty44enpKXvJn1npMEC8bID2SYsWLby9veVTnqmpZ8+essvSpUt17i7JAPuNf4Qan2xBrl27NnjwYFp57ty5esaHuoE6p+7wB7G//vrr2itTQUJFTqNGjfjrrmygnNaQp4a2bNnCl1u+4VipE/hD7pXnSmdlZcmmmzdv+vj4yKaWLVvyGz2XLVvGO/7973+39uOUlJTovDln0KBBfFuLFy+WTVTkdOzYkUKY9rYorsnuHh4e4iU8RUVFgYGBfOTk5GTei1bjrfzFRMpjMUNDQ3lHyj28dd68ebLp6tWrXbt25a1paWn6dpgqIyPDdKv58+fbNhQAgDNQTvJX95yrkydPdu7cWayj/wWOxkgEy5cvl72o6hA/840YMYLy9Y8//miuOkYPDg729/enJF5QUDBgwACxsqur60cffaRzKwbbb8o7Dy9duqSxcllZ2d/+9jdajf6056FHUOtQ59Sd9PR0+aRjd3d35fVYUm5u7owZM5o0aULrbNu2zc6NxsTEmG5F8YvC3L333ssX+vr6FhcXb9y4UXZUihkejEaOHMmblLMByhblVaqHDh3ij6Inffr0sfbjKLc5VXdzjuX8lyxZIps+++wzWrJmzRrtbXXp0oWP0LZtW0oDrVu35j+MiXESEhLkq0iVWMwLyFOnTvGmYcOG8c1VVFTw38+8vLzEmLT8+eefN91K55vaLFEO499C//79EZEBoF7j91GYbvecq8zMzClTpshLG4KCgvQPboxEQJGfJ26qDPPy8lxcXA4cOCDX+f77701V92rKHys7dOhg8y+txthvL774ouyl8VxpGlDcIfbkk09a+xA/uNNQ59QpChnipDmhw00KKLTkzJkzOTk5FG6+/PLL8ePHiyeTPPTQQ0ePHrV/i+fPn2/WrJnyj7xfv360RSU3uLq6bt68WfSi0NC7d2/e+umnn4qmsrIy5acRy3uNwsLClHhEEZZyjPJ2HVPVKZ29e/dqfwSKbhRfRo0aFRIS0rFjR+WD0EIqaWJjY5VeVJi5ubnJNeU57m+//ZYKyMDAwBofvxYREaHMlr4aqpGUWos88sgj8v6W+Ph43kQTvnbtmmhasWIFb+rWrZtyXyOVvvwi4/vuu4/+PlDspr8Mzz33HO9L6Yd25tWrV7U/wm3RbMUg9DdQ50ucAACcyty5c0NDQymzKBcsUSIbPXp0aBXKGlTSKAnLZPFiN22GSQS0Ff7iB/EOPVnGUCv/RDQBqoXsuWbeGPuNJsafIhsQEEAHG8eOHaMq8cSJE9u2bYuKihLPWqAjnH/+85/l5eU27zG4Q1Dn1LWSkpLFixdbRl7J398/JiZG55M99Ni6dat8LTGFNgoW4hD/yJEj8iS+t7c3rSbWP3z4cPfu3ZVZUc3w1ltvnT17lr8aWaB/3mPHjuVbvHHjxsyZM0XBJlD0odQir6+lI2wqUV599dVVq1bVeKhN5R9tvUmTJjQIVYmenp7t27f38vJq1aoVlXC0dUpst31UQ2pqKq/lHn30UXGIP2LECD2/uJSWlg4fPlz0pc9CWVNe6vDKK6+Iu63oT1pO36lYPnHiRJqnsn9oj2VkZFBUVd6PZqp6nRn/Oc1cFan5e51NVb8PUUiVlxd36dKFSrv3339/586dtv0locmLofS/DQAAwKnIB3lZi0KoPHTWw2CJgDb07LPPysu/Kbf26NGjU6dO/IJw2kphYSHvtXv3bqpP9G/FYPvtp59+ouKZ/3LKtWjRgj4Rv4AfnArqHMeorKykMmPjxo2LFi2aPHlyZGTkvHnz4uPjrXqBl37l5eUnT548d+6cspz+nWdmZqanp1NlUusbLSgoiIuLow9IFU5RUZG56lEk69evp5hVZ9dKUUWXlpZGpd3bb79NZdXs2bOtehW0ueoyQgqdlnVRfn5+SkoK/Vl7k/2vH3/8cdmyZZ988klSUpJYkpiYuG/fPrEb7URfN/19o+rR/qEAABoCgyWCS5cuUemycOHCadOmvfzyy5MmTYqKiqJ8LQ7cleuZ6SDh7rvvtu25r0bab3R4tmfPntWrV1PRFRERMWvWLNpEcnJyLf4qDXcC6hwAAACABq2srEyeo3jiiSdWrly5dOnSsLAw8XTpI0eOOHqCALZAnQMAAADQoFVWVt72uizT7d48AVBfoM4BAAAAaOjatGljWeS4ubnVylORABwCdQ4AAABAQxcSEmJZ56xdu9bR8wKwHeocAAAAgIbu2LFj/EUUrq6u/BXbAPUR6hwAAAAA+N8XTrz55ptPPfXU66+/fuLECUdPB8BeqHMAAAAAAMBoUOcAAAAAAIDRoM4BAAAAAACjQZ0DAAAAAABGgzoHAAAAAACMBnUOAAAAAAAYDeocAAAAAAAwGtQ5AAAAAABgNKhzAAAAAADAaFDnAAAAAACA0aDOAQAAAAAAo0Gd0yBkZ2dPr3L69GlHz8UBioqK8m916dIlR0/qvxr4twMAAPWdM+fZmzdvxsTEvPbaa9HR0fTfjp4O1CnUOcZHh9EeHh6mKs2bN8/KynL0jOra/PnzfXx8TMwDDzzg6En9H3w7AABQ3zlznp04caKcVXh4uKOnA3UKdY7xTZs2jYeeKVOmOHpGteO1117Tv/KFCxfc3NycMP4a9dsBAACdkpKS1q1b5+hZqKydlXPm2StXrri6uvI8W1pa6uhJQd1BnWN8U6dO5f/CIyMjHT2jWhAbG9uoUSOrurRv397Z4q/ZoN8OAADoVFFR8eCDD7733nuOnsgtbJuVE+bZy5cvu7i48DxbUlLi6ElB3UGdY3wZGRnNmjUT/7zpP9LT0x09I3vl5OR4enpaW+d06tTJ2eKv2YjfDgAA6DdjxgyK/85W59g2K+fMs+PGjZOzGjt2rKOnA3UKdU6DQEfPU6ZMiYyMNMBh9PXr1wMCAihaWVvndO7c2Qnjr9lY3w4AAOi3adMmkZWcqs6xeVbOmWcrKyuXL18+YcIE+pP+29HTgTqFOgfqEypyhg4dKmKoYeocAABogBITE++66y5nq3PsmRXyLDgb1Dlwe+np6bGxsVu2bLl48aJVHY8ePbpu3bqvv/46Ly+vdqd0+fLlIUOGyBhaK3VObm7u5s2b169fT9PWM0hpaem+fftoz9BnPHDgQHFxscbK5eXl+/fvj4mJ2bp1K23IXPV0S1pi1bRrZRAAANAvPz9/165dX375ZXx8fEZGxp3YxDfffOPu7i6zkv6KoqCggPrS3JKSkmr9Kck2z0qolTyblpa2bdu26Ojo7du3nzp1Sntl5FnQhjrHyI4dO+bv7+91q7Vr14rWw4cPUxhSWqm8yc7OHjhwoAxVTZs2XbBgAR/20KFDf/7zn5WOFJVSUlJouezYuHHjSZMmVVRU8L7PPfec0vGdd94RTcHBwUoTj7CUaf74xz+abiXXfOaZZ2rcG0r8LSwsHDt2LBVLcqGfn19iYmJ13Xfs2BEYGEjre3h4yF7Nmzd/8803KURarr9nz56OHTvSOk2aNKF96ObmRpMcOnRo37599Xw7OgcBAIBadObMmWHDhokg36FDBwryIjtQjlPW3LlzZ/fu3ZUYfuXKFWqiA3TLpmvXromOdAxN2U25OZ42JNekI+wJEyZQ8OfdH3vssRs3bsyYMUOebCH3338/VTvKxGzLs3pmVePesyfPUoExbdo02pCrq2uLFi1kF0qUdNRx2y41psjIyMhOnTrxz/vQQw9ZOwjUa6hzDK6yspJCHg9bK1askK0UkSkW89aVK1e2bNmS/qnzwES++uorPixVL7wWIrNnz6YCgEoRKgb4MxxHjhxJoZn3nTlzJu/InzCmPGSZ/lc2jRo1KiAgQKQcKeD/vfTSSzXuCh5/27Vr5+vr27Nnz/Hjx1PUk8spwMXGxiodqYwZM2YMtdKnO3HiBC25dOkSxUHZa/DgwcqPalTDUMSkJtpLpaWltLs2bNhAG6UlvXr10vnt6BwEAABqxZEjR+6++24RjePj42lJcXHxX/7yF7Fk+vTpSqjPy8ujjMlj+OXLl0XTf/7zH/luNEHWOXv37qW0RQmIt1JNJTNacnIyrfbdd9/xFSgBhYWFURJ8/PHHvb295XJaYlkG2JBndc5Km8159uDBg23atKHWDz74QOyoHTt20KGI6OLu7k57Q+miM0X+8ssvyieyYRCov1DnGN+SJUv4P3J+JE1CQ0N5K5U3FGXon3p6ejr/0ejhhx9Whp0zZw7vSLXNwoULRdPWrVt506JFi3hHJXbz+Ltz587bxl9JPIFATtWq/cDjrxhc3I9Ifw4fPlwup5xx7tw53lEmjKefflouPHXqFB9NOQ/z1FNPieXLli2TC7OzsykjdunSha+p8e3oHwQAAOyUn5/v6ekpom5gYKBcnpCQIEP0xx9/rPR67LHHeAyXdQ7x9/fnTbLOEXbt2sVbLa8Qo5qKv46Gkmz37t0vXLhATWVlZf369ZNNdFx+9epV3tfmPFvjrLTZlmepJrznnntEE5WacvnIkSNll27duinb0p8i5eAmizoHedbwUOcY3+rVq3ncUeqcl156ibe+/fbbsonfDOPi4qJcnUXhnnccOnQob3300UdlU5s2bXjoT05Ori7+7t+/XyP+mmuvzunRowdvSktL49vlz52k6Mx/k9uwYYNYXlhYyLuMGzdOdqF8I8+G9erVi9aUTStXrqQ8yjdd3bdj1SAAAGAnivwyFE+fPl0uv379urxI4a677vrtt994r8GDB/MYzpNdUFAQb7K2ziF/+MMf+Dq8BkhMTORNyuXlNufZWqxz9OfZhQsXyuV+fn7ypFlERATvImo8waoUyZ92zesc5NmGAHWO8f3rX//ikUKpcyZMmMBbxXVZgnKq5/fff+cdFy1axFvj4uJ467x583jr5s2bZdPPP//Mm3j8/eGHH3jTnatzLJ8D07ZtW9naqlUreVtRaWkpn5K8QE5ZPnz4cDlUTk4Ob+rWrdsvv/wimqhq6t27N99udd+OVYMAAIA9cnNzGzduLEPu559/zlu9vLxk08yZM3nT008/zWM1r3Mef/xx3mRDnSMvojNV3YrDmyhJyXevESUp2Jxna7HO0Z9naXp8o/LpR5MnT+bLjx8/LoeyKkXyWfE6B3m2IUCdY3w21zkvvPACb1J+xFLqHHmiQ6DChre+/PLLssk565z+/fvzTfPHwrz66qtioZubW0JCglhYUlLC1w8ODpbrl5eX80v+TFWPZFiwYIE4fc+zoLn6b8eqQQAAwB6rVq3i8Va5gYSOgGWTcpqizuocy7RFB+J8BP5bpHPWOdXl2YyMjNatW4uFAwYMkOu/8cYbfH1+OsuqFFldnYM82xCgzjE+m+sccfO9dPr0ad5Ru85RTpoPGjRINjlnncOfK0C++eYb3koTW716tXiPZ0VFRXR0tK+vL1+f37pjueuEoKAg8cBKTuPb0T8IAADYQ7mEe/v27bz1/vvv5628YnFgnaNcMnfw4EHZ5Jx1jkaezc/PX7t27aZNm8RJnqysrHHjxvEzbIQ+FB9Nf4qsrs6xahCop1DnGJ9D6hwah7f6+fnJJuesc0aMGME3vWbNGssRbt68SYHYx8eHcs/SpUv5+kqd8/vvv1MwtYye3t7eyqsYNL4d/YMAAIA95BuoBXnqXlB+2OJXNziwzgkJCeEjfP3117LJOescPXn27NmzYWFhrq6utGNHjx7N11fqHP0pUqPOQZ41PNQ5xueQOocCBG/l17k6Z52jJAx+Q5GQnJz88MMPU1PXrl2zs7MpmfH1lTqH/Prrr0pqFGgapaWlcjXtb0fnIAAAYA/+3B2iPMVYeQGDOLcvOLDOGTVqVHVpyznrHO08W1ZWNmvWLPEs6Xfffddscd+OUueYdadIjTpH/yBQT6HOMT6H1Dmpqam81fmvWwsODuab5vc7kvfff1+8Pa1Vq1Znz541V125y9e3rHPMVc8qUJ7lIERFRcl1tL8dnYMAAIA9lPtR9+7dy1vvu+8+3pqXlyebHFjnDBs2jI/g/NetaeTZrKwsWl8snzx5slhYY51j1pcitescnYNAPYU6x/gcUucokTQ8PFw2HT16lDc5SZ0TGBgoW6mY4e82nTt3rmyigkcs1K5zUlJS5H+vXbtWeTbokCFDZKvGt6N/EAAAsMfixYt5gOXXgJlvfVBYu3bteJNyz0ld1jnK+PIxZWY78uwdrXOqy7O5ubny4jH6yHIfatc5+lOkRp2DPGt4qHOMzyF1zvr163nrxo0bZZPyhs033nhDNtVY5/Tt21e2urq6WrUfeKTz9fVVWnv06CFb5cOjzVXPneS3QlIOEMu165xevXrx893Z2dn8tHi/fv1kk8a3o38QAACwByW46kIxcXd3l01hYWG8ib/LkpSUlMgm7Tpn9+7dvHXOnDmWs9Kuc3jaevDBB3mTzXlWz6w02JZnJ06cKJcHBATI5dp1jv4UqVHnIM8aHuoc41PeRLl8+XLeGh4ezlv5eWTlPH5WVhbvqNQ5dLzOW3l4atGiRXFxsWzKy8vjHcePHy+blKJr6tSpymcZNGgQX0H+GnTs2LEa9wOPdB07duRNZWVl8rXT9B/87sPo6Gi+xSlTpojlW7Zs4csHDx7MB/Tz83vnnXf4Eoqe8k1zVEDK5Rrfjv5BAADATvzMzPz58+Vy5S0CytE2P0YnOTk5YnlmZiblPt5EiYZ3PHjwIG+dMWOGWE6p9urVq+K/eZ3j4+MjX6BJKKuKq6mF2bNn88FtzrN6ZqXBtjzLLwv08PD497//TQuLior4+R+SnJzMB9SfIvl7Qtu3b2/bIFBPoc4xPuXJYIsXL+atSjHD44jyM1VqairvqNQ5Xl5eshC6du0aBTjZZHniu127drK1Q4cOhYWFlZWVc+bM4VGbREREKB3lq2yE/fv3m6tepay8Cvq2ePylDfFXDcTFxckmJVvExMSYbjVgwICAgIB7772XL/T19aWsI09b9e3bt3HjxmJ6kjwvv2fPHj3fjv5BAADATnSAK9+mEhISIpd/9913MkT/4x//UHp98cUXPIZTPjJXVQX8lTsCZTrekXJQo0aNZGtQUBAtvHjxYv/+/eUZBl7nmG69/OzTTz+Vy++55x7+Y6JgW57VMysNtuXZLl268Cm1bds2ODi4devWnp6efPmaNWsSEhJEFWS2JkXyfN2qVSu+PvKs4aHOMT6lkgkNDZVNFRUVyovGKHSKprKysq5du/Im5YyNUufQOC1btqQYumHDhieeeEIuHzhwoOWPQFFRUbxv06ZNKaJ5eHh8+OGHfDkFVv7zFfntt98oSMkVmjdv/sADD/Tp00e5HuC2ZPwVb7Z+/vnnr1+/bq56bH/Pnj1F07hx45Qtnj9/nr9zWujXr19OTo54/Jrk6uoqnx7z5JNP0hJKmZ999pl4GwBFZ7HaiBEjdH47+gcBAAD77dixQ1yoTMf64rb+8vLyAQMGiMA7ZMgQ+l+ly+XLl/ndO6aqw3TqPmrUKNlR2L17t9J30qRJfAVfX19Ko/Hx8XIFXufQQT+NTOn1q6++ovwrL6WjCW/bts3ys9icZ2uclQbb8izVWqZb0Wwp8W3fvl1Z/sgjj4gBzbpTJJWvyiCZmZmyFXnW8FDnGFlqairVACYLtPDnn38+fPiw8qxMU9XZ5Lfeeuvs2bOWv0VRMB07dqwcXKlzKAguWLCAX8Ts4uIyZsyY6s50R0ZG8l+V/vSnPx0/fly5bthUdc1xWloa75iSkiI/FOUSqhOKior07A2Kv97e3t9++21paSl9ENo65Yy//vWv4tICalIKOWnr1q3yVc0U8VesWCFi9JEjR2RMp+60muwSEhLSt29fSnI0QyrMKL7T5qgQCg8Pl5cuaH87OgcBAIBaROGXDqZFyqMEIa5NoAi8cOFC/nwajpKXj4+PjOF0jP7uu+/Sysr9Oc2aNaP0yjtWVlbOmjVLnkTq2rXrpk2b+ArK/TlZWVn+/v58TEo9luWTZFuerXFWGmzLs7Ty8OHD5d4LDQ399ddfRdMrr7wiPgL9Scv57U96UuTUqVOpSFM+Ly2hWk7/IFCvoc4BG932OQRUcsTFxX300UcUy86cOaM9AgXWZcuWffHFF0lJSdZu/eLFixSv+ZNtahQdHc1D5Pnz52NiYqKioj7//PNDhw5RZNfoW15efvLkyXPnzinLKyoqMjMz09PTlfy3Z88eESILCwspQ9C+WrNmDW1R/2xraxAAALDW6dOn161b9/HHH69YsSIxMVH80q/h+vXrmzdvpigdGxurXJ9WI4rzlF8otitnOczVPIfg8OHDlDdpWwkJCTVOzOY8qzErDfbk2dzcXErrV65cUZbn5+enpKTQn8py5FnQA3UO2Ej7eWsAAABgD+3nrQFAjVDngI1Q5wAAANw5qHMA7IQ6B2yEOgcAAODOQZ0DYCfUOWAj5VkusbGxjp4RAACAcXh4eMgka/naTQCoEeocsNHUqVN5nbNkyRJHzwgAAMAgrly5wpNs69atHT0jgPoHdQ5YraCgIDo6uk2bNjwEd+jQYfv27adPn3b07AAAAOq3n376KTQ0VHkgckRERFJSkuUTyQCgOqhzwGrp6ekfViMuLs7RswMAAKjfVq1aVV2evXDhgqNnB1BvoM4BAAAAAACjQZ0DAAAAAABGgzoHAAAAAACMBnUOAAAAAAAYDeocAAAAAAAwGtQ5AAAAAABgNKhzAAAAAADAaFDnAAAAAACA0aDOAQAAAAAAo0GdAwAAAAAARoM6BwAAAAAAjAZ1DgAAAAAAGA3qHAAAAAAAMBrUOQAAAAAAYDSocwAAAAAAwGhQ5wAAAAAAgNGgzgEAAAAAAKNBnQMAAAAAAEaDOgcAAAAAAIwGdQ4AAAAAABgN6hwAAAAAADAa1DkAAAAAAGA0qHMAAAAAAMBoUOcAAAAAAIDR/A/+WFhBGQ3cvQAAAABJRU5ErkJggg==" alt="矩阵 A 从行空间到列空间的映射及三种分解的输入输出基"><figcaption>原图 (Page 6): 矩阵把行空间送到列空间, 下方列出 LU、QR、SVD 的输入基与输出基.</figcaption></figure>
+</div>
+<div class="zh">
+  <p><b>读图:</b> 左框是 \(A\) 的<b>row space 行空间</b>, 右框是<b>column space 列空间</b>, 箭头表示 \(x\mapsto Ax\). 行空间提供输入方向, 列空间接收输出; 矩阵把前者映到后者.</p>
+  <p>图下方按 LU、QR、SVD 的顺序读: 输入基依次来自 \(U,R,V\), 输出基依次来自 \(L,Q,U\). 也就是说, 三种分解都在选择更适合矩阵两侧空间的基. 这张图把「求出因子」进一步提升为「用合适的基重新描述同一个变换」.</p>
+</div>
+
+<h2 id="part1" data-nav="基本思想">第 1 部分: 线性代数的基本思想<br><span class="de-title">Part 1 : Basic Ideas of Linear Algebra</span></h2>
+
+<h3>1.1 向量的线性组合<br><span class="de-title">1.1 Linear Combinations of Vectors</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 8</span>
+  <p>A 3-dimensional vector \(v=\begin{bmatrix}v_1\\v_2\\v_3\end{bmatrix}\) has 3 components \(v_1,v_2,v_3\) as in \(v=\begin{bmatrix}2\\4\\1\end{bmatrix}\).</p>
+  <p>\(v\) gives a point in 3-dimensional space \(\mathbb{R}^3\). Think of an arrow from \((0,0,0)\) to \((2,4,1)\).</p>
+</div>
+<div class="zh">
+  <p>三维向量按次序装着三个分量. 它既可以表示 \(\mathbb{R}^3\) 中的一个点, 也可以想象成从原点指向这个点的箭头. 两种看法的坐标完全相同, 但箭头更方便表现加法、缩放和方向.</p>
+  <p>这里的 \(v_1,v_2,v_3\) 是向量 \(v\) 的分量, 不是三个不同的向量. 竖着写成列向量, 后面才能直接用「矩阵乘列向量」的记号.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 8</span>
+  <p>We add vectors \(v+w\). We multiply them by numbers like \(c=4\) and \(d=0\) (called <b>scalars</b>)</p>
+  <p>\[
+  \begin{bmatrix}3\\4\\5\end{bmatrix}+\begin{bmatrix}2\\0\\-2\end{bmatrix}=\begin{bmatrix}5\\4\\3\end{bmatrix}
+  \qquad
+  4\begin{bmatrix}3\\4\\5\end{bmatrix}=\begin{bmatrix}12\\16\\20\end{bmatrix}
+  \qquad
+  0\begin{bmatrix}2\\0\\-2\end{bmatrix}=\begin{bmatrix}0\\0\\0\end{bmatrix}=\text{zero vector}
+  \]</p>
+</div>
+<div class="zh">
+  <p>向量加法逐分量进行, 数乘则把同一个数乘到每个分量上. 这里的数称为<b>scalar 标量</b>, 用来和向量区分.</p>
+  <p>数乘的几何作用是沿原方向伸缩; 负标量还会反转方向. 任何向量乘以 0 都得到零向量. 零向量的三个分量全为 0, 它对应原点, 也没有可指定的方向.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 8</span>
+  <p><b>Linear combinations</b> &nbsp; \(2v-3w\) &nbsp; <b>and</b> &nbsp; \(cv+dw\) &nbsp; <b>and</b> &nbsp; \(w-2z+u\)</p>
+  <p>\[
+  2\begin{bmatrix}3\\4\\5\end{bmatrix}-3\begin{bmatrix}1\\2\\3\end{bmatrix}=\begin{bmatrix}3\\2\\1\end{bmatrix}
+  \qquad
+  1\begin{bmatrix}1\\2\\3\end{bmatrix}-2\begin{bmatrix}4\\5\\6\end{bmatrix}+1\begin{bmatrix}7\\8\\9\end{bmatrix}=\begin{bmatrix}0\\0\\0\end{bmatrix}
+  \]</p>
+</div>
+<div class="zh">
+  <p><b>Linear combination 线性组合</b>就是先把若干向量各自乘以标量, 再把结果相加. \(2v-3w\) 的系数是 2 和 \(-3\); \(w-2z+u\) 则组合了三个向量.</p>
+  <p>计算仍然逐分量进行. 第二个例子的三个向量最后合成零向量, 而且系数 \(1,-2,1\) 不全为 0. 这种非平凡关系说明三个向量中有冗余, 也为后面的线性相关做准备.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 8</span>
+  <p><b>Allow every \(c,d\) or all \(c,d,e\)</b> &nbsp; All combinations of \(v\) and \(w\) usually (!) fill a <b>plane</b> in \(\mathbb{R}^3\)</p>
+  <p>All \(c\begin{bmatrix}3\\4\\5\end{bmatrix}+d\begin{bmatrix}1\\2\\3\end{bmatrix}\) fill a <b>plane</b> &nbsp;&nbsp; All \(c\begin{bmatrix}1\\2\\3\end{bmatrix}+d\begin{bmatrix}3\\4\\5\end{bmatrix}+e\begin{bmatrix}1\\0\\0\end{bmatrix}\) fill <b>3D space \(\mathbb{R}^3\)</b></p>
+</div>
+<div class="zh">
+  <p>让系数取遍所有实数, 得到的不再只是几个向量, 而是它们全部线性组合构成的集合. 两个不共线的向量通常张成过原点的一张平面; 三个彼此提供新方向的向量可以张成整个 \(\mathbb{R}^3\).</p>
+  <p>「过原点」来自系数全取 0. 还要注意, 张成平面或空间不要求系数只能取正数; 正负系数分别走到相反方向, 合起来才是完整的平面或空间.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 8</span>
+  <p>Sometimes a combination gives the zero vector. Then the vectors are <b>dependent</b>.</p>
+  <p>All \(c\begin{bmatrix}3\\4\\5\end{bmatrix}+d\begin{bmatrix}6\\8\\10\end{bmatrix}\) only fill a <b>line</b>. They are all multiples of \(\begin{bmatrix}3\\4\\5\end{bmatrix}\). This includes \(\begin{bmatrix}-3\\-4\\-5\end{bmatrix}\).</p>
+</div>
+<div class="zh">
+  <p>第二个向量是第一个向量的 2 倍, 所以 \(2v-w=0\) 给出了非平凡的零组合. 两个向量没有提供两个独立方向, 所有组合都只能落在同一条直线上.</p>
+  <p><b>Dependent 线性相关</b>在这里表现为一个向量能由另一个向量得到. 系数 \(c,d\) 仍可任意取, 但改变两个系数并没有带来新的方向.</p>
+</div>
+<div class="warn">
+  <p><b>幻灯片小错:</b> 「a combination gives the zero vector」少了「系数不全为 0」的条件. 任何一组向量在系数全为 0 时都得到零向量, 这不能说明相关; 正确判据是存在不全为 0 的系数使线性组合为 0.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 8</span>
+  <p>All \(c\begin{bmatrix}1\\2\\3\end{bmatrix}+d\begin{bmatrix}4\\5\\6\end{bmatrix}+e\begin{bmatrix}7\\8\\9\end{bmatrix}\) only fill a <b>plane and not 3D space</b>. \(\begin{bmatrix}7\\8\\9\end{bmatrix}\) is \(2\begin{bmatrix}4\\5\\6\end{bmatrix}-\begin{bmatrix}1\\2\\3\end{bmatrix}\). That third vector is nothing new.</p>
+</div>
+<div class="zh">
+  <p>第三个向量已经落在前两个向量张成的平面里, 因为它等于 \(2\) 倍第二个向量减去第一个向量. 加上它以后, 可选的组合变多了, 能到达的位置却没有增加.</p>
+  <p>因此「向量个数」不等于「独立方向的个数」. 这里有三个向量, 但只有前两个提供不同方向, 所以仍只张成平面.</p>
+</div>
+
+<h3>1.2 点积、长度与夹角<br><span class="de-title">1.2 Dot Products \(v\cdot w\) and Lengths \(\|v\|\) and Angles \(\theta\)</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 9</span>
+  <p>Dot product \(v\cdot w=\begin{bmatrix}3\\4\\5\end{bmatrix}\cdot\begin{bmatrix}2\\0\\1\end{bmatrix}=\begin{matrix}3\times2\\4\times0\\5\times1\end{matrix}=11\) &nbsp; add</p>
+  <p>\(\boxed{v\cdot w=w\cdot v}\) &nbsp;&nbsp; \(\begin{bmatrix}a\\b\end{bmatrix}\cdot\begin{bmatrix}c\\d\end{bmatrix}=ac+bd\)</p>
+</div>
+<div class="zh">
+  <p><b>Dot product 点积</b>把对应分量相乘, 再把所有乘积加起来, 结果是一个标量而不是向量. 例子的三个乘积是 \(6,0,5\), 合计 \(11\).</p>
+  <p>二维公式 \(ac+bd\) 展示了同一规则. 乘法交换律使每一对乘积不区分先后, 所以 \(v\cdot w=w\cdot v\). 点积把两个向量的方向关系压缩成一个数, 后面会用它计算长度和夹角.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 9</span>
+  <p>Length squared of \(v=\begin{bmatrix}3\\4\end{bmatrix}\) is \(\|v\|^2=3^2+4^2=9+16\). This is Pythagoras \(c^2=a^2+b^2\)</p>
+  <p>Length squared of \(v\) is \(\|v\|^2=v\cdot v=\begin{bmatrix}3\\4\\5\end{bmatrix}\cdot\begin{bmatrix}3\\4\\5\end{bmatrix}=9+16+25\) (Pythagoras in 3D)</p>
+</div>
+<div class="zh">
+  <p>向量与自身做点积, 得到各分量的平方和, 也就是<b>length 长度</b>的平方. 二维时这就是勾股定理: 两个分量是直角边, 向量长度是斜边.</p>
+  <p>三维把同样的平方和扩展为三项. 长度本身要再开平方, 即 \(\|v\|=\sqrt{v\cdot v}\). 因为平方和不会为负, 这个定义总能给出非负长度; 只有零向量的长度为 0.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 9</span>
+  <p>Length squared of \(v+w\) is \((v+w)\cdot(v+w)=v\cdot v+v\cdot w+w\cdot v+w\cdot w\)</p>
+  <p>\(\boxed{\|v+w\|^2=\|v\|^2+\|w\|^2+2v\cdot w}\) &nbsp;&nbsp; \(\boxed{\|v+w\|\leq\|v\|+\|w\|}\)</p>
+</div>
+<div class="zh">
+  <p>展开 \((v+w)\cdot(v+w)\) 会得到四项. 点积满足交换律, 两个交叉项 \(v\cdot w\) 与 \(w\cdot v\) 相同, 所以合并成 \(2v\cdot w\).</p>
+  <p>第二条是<b>triangle inequality 三角不等式</b>: 沿两边绕行的总长度不短于直接走第三边. 对向量而言, 先走 \(v\) 再走 \(w\) 的终点由 \(v+w\) 给出, 因此它的长度不超过两段长度之和.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 9</span>
+  <p>\(v=\begin{bmatrix}3\\4\\5\end{bmatrix}\quad w=\begin{bmatrix}1\\0\\-1\end{bmatrix}\quad v+w=\begin{bmatrix}4\\4\\4\end{bmatrix}\)</p>
+  <p>Length squared of \(v+w\) is \(48\) is \(50+2+2v\cdot w\) &nbsp; \(4^2+4^2+4^2\)</p>
+</div>
+<div class="zh">
+  <p>这个例子把刚才的恒等式代入具体向量. \(v+w=(4,4,4)\), 所以长度平方直接算得 \(48\). 另一方面, \(\|v\|^2=50\), \(\|w\|^2=2\), 交叉项负责补上两种算法之间的差别.</p>
+  <p>这里 \(v\cdot w=-2\), 因此 \(50+2+2(-2)=48\). 交叉项为负说明两个方向在一定程度上相互抵消; 不能只用两个长度平方相加.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 9</span>
+<figure class="src-fig"><img src="data:image/png;base64,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" alt="向量 v、w 与 v-w 组成的三角形"><figcaption>原图 (Page 9): 三条有向边分别为 v、w、v-w, 展示向量差与第三边的关系.</figcaption></figure>
+  <p>Triangle has edges \(v,w,v-w\)</p>
+  <p>\(\|v-w\|^2=\|v\|^2+\|w\|^2-2v\cdot w\)</p>
+</div>
+<div class="zh">
+  <p><b>读图:</b> 从共同起点画出 \(v\) 和 \(w\), 连接两个终点的有向边是 \(v-w\). 方向关系可以写成 \(w+(v-w)=v\), 所以这条边与 \(w\) 首尾相接后到达 \(v\) 的终点.</p>
+  <p>把 \(v-w\) 与自身做点积, 展开后交叉项带负号, 就得到图中的公式. 它正是余弦定理的向量形式; 若两向量垂直, 点积为 0, 公式退化为勾股定理.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 9</span>
+  <p><b>The dot product \(v\cdot w\) reveals the angle \(\theta\) between \(v\) and \(w\)</b> &nbsp;&nbsp; \(\boxed{v\cdot w=\|v\|\|w\|\cos\theta}\)</p>
+  <p>\(|\cos\theta|\leq1\) is one way to see the <b>Schwarz inequality</b> &nbsp;&nbsp; \(\boxed{|v\cdot w|\leq\|v\|\|w\|}\)</p>
+</div>
+<div class="zh">
+  <p>点积不仅由分量决定, 也等于两个长度与夹角余弦的乘积. 因此在非零向量的情况下, 可以反过来用 \(\cos\theta=(v\cdot w)/(\|v\|\|w\|)\) 求夹角.</p>
+  <p>余弦的绝对值不超过 1, 立即得到<b>Schwarz inequality 施瓦茨不等式</b>: 点积的绝对值不会超过两个长度的乘积. 等号对应 \(|\cos\theta|=1\), 即两向量同向或反向.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 9</span>
+  <p>The angle between \(v=\begin{bmatrix}2\\2\\-1\end{bmatrix}\) and \(w=\begin{bmatrix}-1\\2\\2\end{bmatrix}\) is \(\theta=90^\circ\) because \(\boxed{v\cdot w=0:\ \text{Perpendicular}}\)</p>
+</div>
+<div class="zh">
+  <p>两个向量的点积为 \(-2+4-2=0\), 所以夹角为 \(90^\circ\), 它们互相垂直. 长度因子非零时, \(v\cdot w=\|v\|\|w\|\cos\theta\) 为 0 只可能来自 \(\cos\theta=0\).</p>
+  <p>零向量也满足与任何向量的点积为 0, 但零向量没有夹角. 说「点积为 0 所以垂直」时, 默认讨论的是两个非零向量.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 9</span>
+  <p>The angle between \(v=\begin{bmatrix}1\\0\end{bmatrix}\) and \(w=\begin{bmatrix}1\\1\end{bmatrix}\) is \(\theta=45^\circ\) because \(v\cdot w=1\) and \(\|v\|\|w\|=\sqrt{2}\).</p>
+</div>
+<div class="zh">
+  <p>这里 \(v\) 沿水平轴, \(w\) 沿斜向 \(45^\circ\) 的方向. 代数上, 点积是 1, 两个长度的乘积是 \(\sqrt{2}\), 所以 \(\cos\theta=1/\sqrt{2}\), 对应 \(\theta=45^\circ\).</p>
+  <p>这个例子把几何直观和点积公式对上了. 实际计算时不必先画图, 只要算出点积和两个长度, 就能确定夹角.</p>
+</div>
+
+<h3>1.3 矩阵乘向量<br><span class="de-title">1.3 Matrices Multiplying Vectors</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 10</span>
+  <p>There is a <b>row way</b> to multiply \(Ax\) and also a <b>column way</b> to compute the vector \(Ax\)</p>
+  <p><b>Row way = Dot product of vector \(x\) with each row of \(A\)</b></p>
+  <p>\[
+  Ax=\begin{bmatrix}2&amp;5\\3&amp;7\end{bmatrix}\begin{bmatrix}v_1\\v_2\end{bmatrix}
+  =\begin{bmatrix}2v_1+5v_2\\3v_1+7v_2\end{bmatrix}
+  \qquad
+  \begin{bmatrix}2&amp;5\\3&amp;7\end{bmatrix}\begin{bmatrix}1\\1\end{bmatrix}=\begin{bmatrix}7\\10\end{bmatrix}
+  \]</p>
+</div>
+<div class="zh">
+  <p><b>Row way 按行看法</b>把 \(A\) 的每一行分别与 \(x\) 做点积, 每个点积给出输出的一个分量. 第一行算出 \(2v_1+5v_2\), 第二行算出 \(3v_1+7v_2\).</p>
+  <p>当代入 \(x=(1,1)\) 时, 两个分量分别是 7 和 10. 按行看法适合逐个数计算, 也直接对应方程组里的一条条方程.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 10</span>
+  <p><b>Column way = \(Ax\) is a combination of the columns of \(A\)</b></p>
+  <p>\[
+  Ax=\begin{bmatrix}2&amp;5\\3&amp;7\end{bmatrix}\begin{bmatrix}v_1\\v_2\end{bmatrix}
+  =v_1\begin{bmatrix}\text{column}\\1\end{bmatrix}+v_2\begin{bmatrix}\text{column}\\2\end{bmatrix}
+  \qquad
+  \begin{bmatrix}2&amp;5\\3&amp;7\end{bmatrix}\begin{bmatrix}1\\1\end{bmatrix}
+  =\begin{bmatrix}2\\3\end{bmatrix}+\begin{bmatrix}5\\7\end{bmatrix}
+  =\begin{bmatrix}7\\10\end{bmatrix}
+  \]</p>
+</div>
+<div class="zh">
+  <p><b>Column way 按列看法</b>把 \(x\) 的分量看成各列的系数: 第一列乘 \(v_1\), 第二列乘 \(v_2\), 再相加. 所以 \(Ax\) 是 \(A\) 的列向量的线性组合.</p>
+  <p>代入 \(x=(1,1)\) 就是把两列原样相加, 仍得到 \((7,10)\). 两种看法只是组织乘加运算的顺序不同, 结果完全一致.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 10</span>
+  <p>Which way to choose? Dot products with <b>rows</b> or combination of <b>columns</b>?</p>
+  <ul>
+    <li>For computing with numbers, I use the <b>row way</b>: dot products</li>
+    <li>For understanding with vectors, I use the <b>column way</b>: combine columns</li>
+    <li>Same result \(Ax\) from the same multiply-adds. Just in a different order</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>手算数值时, 按行做点积最直接. 理解矩阵作用时, 按列看更有解释力: 它说明输出由哪些列方向组合而成, 以及每个输入分量控制哪一个方向.</p>
+  <p>这不是两种不同乘法, 而是同一个 \(Ax\) 的两种读法. 后面讲列空间、秩和矩阵分解时, 按列看法会成为主线.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 10</span>
+  <p>\(\boxed{C(A)=\text{Column space of }A=\text{all combinations of the columns}=\text{all outputs }Ax}\)</p>
+</div>
+<div class="zh">
+  <p><b>Column space 列空间</b>记作 \(C(A)\), 是 \(A\) 的所有列向量的全部线性组合. 因为 \(Ax\) 正好就是以 \(x\) 的分量为系数的列组合, 所以列空间也等于让 \(x\) 任意变化时所有可能输出的集合.</p>
+  <p>这个等价关系把「矩阵能输出什么」转换成「它的列能张成什么」. 判断某个 \(b\) 是否可能等于 \(Ax\), 也就是判断 \(b\) 是否属于 \(C(A)\).</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 10</span>
+  <p>The <b>identity matrix</b> has \(Ix=x\) for every \(x\) &nbsp;&nbsp; \(\begin{bmatrix}1&amp;0&amp;0\\0&amp;1&amp;0\\0&amp;0&amp;1\end{bmatrix}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}=\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}\)</p>
+  <p>The column space of the 3 by 3 identity matrix \(I\) is the whole space \(\mathbb{R}^3\).</p>
+</div>
+<div class="zh">
+  <p><b>Identity matrix 单位矩阵</b>不改变任何向量, 即 \(Ix=x\). 它的三列分别指向三个坐标轴, 系数 \(x_1,x_2,x_3\) 可以任意选择, 因而能组合出 \(\mathbb{R}^3\) 的每个向量.</p>
+  <p>从输出角度看, 任意 \(b\in\mathbb{R}^3\) 都可直接取 \(x=b\), 使 \(Ix=b\). 所以它的列空间是整个三维空间.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 10</span>
+<figure class="src-fig"><img src="data:image/png;base64,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" alt="一个非零向量张成直线, 两个不共线向量张成平面"><figcaption>原图 (Page 10): 左图画出 u 的全部倍数, 右图画出 u、v 的全部线性组合.</figcaption></figure>
+  <p>If all columns are multiples of column 1 (not zero), the column space \(C(A)\) is a <b>line</b>.</p>
+</div>
+<div class="zh">
+  <p>如果每一列都只是同一个非零列的倍数, 那么无论怎样组合, 结果仍在这条列向量所在的直线上. 增加更多共线的列不会扩大列空间.</p>
+  <p><b>读图:</b> 左图的 \(cu\) 让系数取遍实数, 得到整条直线, 其中也包括反向的 \(-u/2\). 右图的两个不共线向量则提供两个方向, \(cu+dv\) 张成过原点的平面.</p>
+</div>
+
+<h3>1.4 矩阵的列空间与行空间<br><span class="de-title">1.4 Column Space and Row Space of \(A\)</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 11</span>
+  <p><b>The column space of \(A\) contains all linear combinations of the columns of \(A\)</b></p>
+  <p>All the vectors \(Ax\) (for all \(x\)) fill the column space \(C(A)\): line or plane or ...</p>
+</div>
+<div class="zh">
+  <p>列空间是列向量的所有线性组合, 也是所有 \(Ax\) 的集合. 它可能只是一条线、一张平面, 也可能是更高维的空间, 取决于各列实际提供了多少独立方向.</p>
+  <p>这里再次强调 \(Ax\) 与列组合的等价. 它把矩阵乘法、方程是否有解和空间维数连在了一起.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 11</span>
+  <p>If \(v\) is in \(C(A)\) so is every \(cv\). [Reason: \(v=Ax\) gives \(cv=A(cx)\)]</p>
+  <p>If \(v_1\) and \(v_2\) are in \(C(A)\) so is \(v_1+v_2\) [\(v_1=Ax_1\) and \(v_2=Ax_2\) give \(v_1+v_2=A(x_1+x_2)\)]</p>
+</div>
+<div class="zh">
+  <p>列空间对数乘和加法封闭. 若 \(v=Ax\), 那么 \(cv=A(cx)\), 所以任意倍数仍是某个输出. 若两个向量分别等于 \(Ax_1\) 和 \(Ax_2\), 它们的和就是 \(A(x_1+x_2)\).</p>
+  <p>这两条性质说明 \(C(A)\) 不只是任意的一组点, 而是一个<b>subspace 子空间</b>. 证明中没有依赖矩阵的具体数值, 只使用了矩阵乘法的线性.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 11</span>
+  <p>The column spaces of \(\begin{bmatrix}1&amp;0\\0&amp;1\end{bmatrix}\) and \(\begin{bmatrix}1&amp;3\\2&amp;4\end{bmatrix}\) and \(\begin{bmatrix}1&amp;3&amp;5\\2&amp;4&amp;6\end{bmatrix}\) are the whole \(\mathbb{R}^2\)</p>
+</div>
+<div class="zh">
+  <p>这三个矩阵虽然列数不同, 列空间却都是整个 \(\mathbb{R}^2\). 关键是每个矩阵都有两列指向两个独立方向, 足以组合出平面中的任意向量.</p>
+  <p>第三个矩阵有三列, 但列空间不会因此变成三维: 所有列都位于 \(\mathbb{R}^2\), 多余的一列只能提供冗余. 列空间的维数由独立方向数决定, 不直接等于列数.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 11</span>
+  <p>The column spaces of \(\begin{bmatrix}1\\1\end{bmatrix}\) and \(\begin{bmatrix}1&amp;2\\1&amp;2\end{bmatrix}\) are lines inside 2-dimensional space</p>
+  <p>The column space of \(Z=\begin{bmatrix}0&amp;0\\0&amp;0\end{bmatrix}\) has \(C(Z)=\text{only one point}\begin{bmatrix}0\\0\end{bmatrix}\).</p>
+</div>
+<div class="zh">
+  <p>单列矩阵的所有输出都是这一列的倍数, 因而形成一条直线. 第二矩阵虽然有两列, 第二列是第一列的 2 倍, 仍只张成同一条直线.</p>
+  <p>零矩阵只有零列, 任何输入都被映成零向量, 所以列空间只有原点一个点. 直线、平面和单个点都包含原点, 这与「所有线性组合」的定义一致.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 11</span>
+  <p>The <b>row space</b> of \(A\) contains all combinations of the rows of \(A\)</p>
+  <p>To stay with column vectors, <b>transpose \(A\)</b> to make its rows into columns of \(A^T\)</p>
+  <p>Then the row space of \(A\) is the column space of \(A^T\) (\(A\) transpose)</p>
+</div>
+<div class="zh">
+  <p><b>Row space 行空间</b>由 \(A\) 的所有行的线性组合构成. 为了继续统一使用列向量记号, 把 \(A\) 转置: 原来的行就变成 \(A^T\) 的列.</p>
+  <p>因此 \(A\) 的行空间等于 \(A^T\) 的列空间. 这不是说行空间和列空间总在同一个环境里: 若 \(A\) 是 \(m\times n\), 行空间位于 \(\mathbb{R}^n\), 列空间位于 \(\mathbb{R}^m\).</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 11</span>
+  <p>The column space of \(A=\begin{bmatrix}1&amp;2&amp;3\\3&amp;6&amp;9\end{bmatrix}\) is an infinite line in the direction of \(\begin{bmatrix}1\\3\end{bmatrix}\)</p>
+  <p>The row and column spaces of \(A=\begin{bmatrix}1&amp;2&amp;3\\1&amp;3&amp;4\\1&amp;4&amp;5\end{bmatrix}\) are infinite planes. <b>Not all of \(\mathbb{R}^3\)</b></p>
+  <p>The row and column spaces of \(A=\begin{bmatrix}1&amp;2&amp;3\\0&amp;4&amp;5\\0&amp;0&amp;6\end{bmatrix}\) are the whole \(\mathbb{R}^3\).</p>
+</div>
+<div class="zh">
+  <p>第一个矩阵的三列全是 \((1,3)\) 的倍数, 所以列空间是一条无限延伸的直线. 第二个矩阵的行、列都只有两个独立方向, 两个空间分别是平面, 但都不是整个 \(\mathbb{R}^3\).</p>
+  <p>第三个上三角矩阵的对角元全不为 0, 三行和三列都各自提供三个独立方向, 所以行空间和列空间都占满 \(\mathbb{R}^3\). 三个例子还提前显示: 行空间与列空间可以位于不同空间, 但维数会相同.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 11</span>
+  <p>\(A=\begin{bmatrix}1&amp;2&amp;5&amp;1\\3&amp;4&amp;6&amp;7\end{bmatrix}\) &nbsp; has column space \(=\mathbb{R}^2\)<br>has row space \(=2\text{D plane in }\mathbb{R}^4\)</p>
+</div>
+<div class="zh">
+  <p>这个 \(2\times4\) 矩阵的两行提供两个独立方向, 所以行空间是 \(\mathbb{R}^4\) 中的二维平面. 四列都只有两个分量, 而且合起来能张成整个 \(\mathbb{R}^2\), 所以列空间是 \(\mathbb{R}^2\).</p>
+  <p>这里最直观地看出: 行空间与列空间的维数都是 2, 但所在空间不同. 比较秩时比较的是维数, 不是把两个集合直接说成相等.</p>
+</div>
+
+<h3>1.5 相关列与无关列<br><span class="de-title">1.5 Dependent and Independent Columns</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 12</span>
+  <p>The columns of \(A\) are “<b>dependent</b>” if one column is a combination of the other columns</p>
+  <p>Another way to describe dependence: \(Ax=0\) for some vector \(x\) (other than \(x=0\))</p>
+</div>
+<div class="zh">
+  <p>如果某一列能写成其他列的线性组合, 这些列就是<b>dependent 线性相关</b>的. 把这一列移到等式另一边, 就得到系数不全为 0 的列组合等于零向量.</p>
+  <p>用矩阵写法, 列组合是 \(Ax\), 所以等价判据是存在 \(x\ne0\) 使 \(Ax=0\). 这个非零 \(x\) 记录了各列之间的冗余关系, 也说明零空间不只有零向量.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 12</span>
+  <p>\(A_1=\begin{bmatrix}1&amp;2\\2&amp;4\\1&amp;2\end{bmatrix}\) and \(A_2=\begin{bmatrix}1&amp;4&amp;0\\2&amp;5&amp;0\\3&amp;6&amp;0\end{bmatrix}\) and \(A_3=\begin{bmatrix}a&amp;b&amp;c\\d&amp;e&amp;f\end{bmatrix}\) have <b>dependent columns</b></p>
+</div>
+<div class="zh">
+  <p>\(A_1\) 的第二列是第一列的 2 倍, 所以两列相关. \(A_2\) 有一列全为 0, 零列本身就能用非零系数参与一个零组合, 因而三列相关.</p>
+  <p>\(A_3\) 的三个列向量都在二维空间中. 平面里最多选出两个独立方向, 三个向量必然有冗余, 不需要知道 \(a,b,\ldots,f\) 的具体值.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 12</span>
+  <p>Reasons: Column 2 of \(A_1=2\) (Column 1) &nbsp;&nbsp; \(A_2\) times \(x=\begin{bmatrix}0\\0\\1\end{bmatrix}\) gives \(\begin{bmatrix}0\\0\\0\end{bmatrix}\)</p>
+  <p>\(A_3\) has 3 columns in 2-dimensional space. Three vectors in a plane: <b>Dependent!</b></p>
+</div>
+<div class="zh">
+  <p>这里分别用两种判据说明相关性. 对 \(A_1\), 直接指出一列是另一列的倍数. 对 \(A_2\), 取 \(x=(0,0,1)\), 乘法只选中第三列; 第三列为零, 所以非零 \(x\) 也能给出 \(A_2x=0\).</p>
+  <p>对 \(A_3\) 则用维数判断. 这三个判据说的是同一件事: 列方向中存在可以删去而不缩小列空间的冗余.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 12</span>
+  <p>The columns of \(A\) are “<b>independent</b>” if no column is a combination of the other columns</p>
+  <p>Another way to say it: \(Ax=0\) <b>only when \(x=0\)</b></p>
+</div>
+<div class="zh">
+  <p><b>Independent 线性无关</b>表示没有任何一列能由其余列组合出来. 换句话说, 要让列组合等于零, 只能把所有系数都取 0.</p>
+  <p>所以 \(Ax=0\) 只有平凡解 \(x=0\). 每一列都在提供不能由其他列替代的新方向, 这也是「基」所要求的无关性.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 12</span>
+  <p>\(A_4=\begin{bmatrix}1&amp;4\\2&amp;5\\3&amp;9\end{bmatrix}\) and \(A_5=\begin{bmatrix}1&amp;1&amp;1\\0&amp;1&amp;1\\0&amp;0&amp;1\end{bmatrix}\) and \(A_6=I\) have <b>independent columns</b></p>
+</div>
+<div class="zh">
+  <p>\(A_4\) 的两列不成倍数关系, 因而无关. \(A_5\) 是上三角矩阵, 对角元全为 1; 从最后一列往前看, 每列都包含之前各列没有的新分量, 所以三列无关.</p>
+  <p>单位矩阵 \(I\) 的列沿不同坐标轴, 自然也是无关的. 无关列的个数可以小于、等于矩阵的行数, 但不能超过所在空间的维数.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 12</span>
+  <p>What about the <b>rows</b> of \(A_1\) to \(A_6\)? \(A_1,A_2,A_4\) have dependent rows. Possibly also \(A_3\).</p>
+  <p><b>For any square matrix: Columns are independent if and only if rows are independent.</b></p>
+</div>
+<div class="zh">
+  <p>列相关并不自动意味着每个矩阵的行也相关, 但对<b>方阵</b>有一个重要等价: 列无关当且仅当行无关. 方阵的列若充满整个空间, 行也会充满; 若列有冗余, 行也一定有冗余.</p>
+  <p>对非方阵不能直接套这个等价. 例如 \(A_4\) 的三行位于二维空间, 必然相关, 但它的两列仍无关. \(A_3\) 只有两行, 是否相关还要看具体数值, 所以原文只说「可能」.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 12</span>
+  <p>A key idea is coming</p>
+  <p>\(\boxed{\text{Number of independent rows}=\text{Number of independent columns}}\)</p>
+</div>
+<div class="zh">
+  <p>下一节会把「最大无关行数」和「最大无关列数」正式联系起来. 两者分别给出行空间和列空间的维数, 而最终它们相等, 这个共同数值就是矩阵的秩.</p>
+  <p>前面的 \(2\times4\) 例子已经展示了这一点: 行空间和列空间不在同一个 \(\mathbb{R}^n\) 中, 却可以具有相同维数.</p>
+</div>
+
+<h3>1.6 矩阵与矩阵相乘<br><span class="de-title">1.6 Matrix-Matrix Multiplication \(AB\)</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 13</span>
+  <p>There are <b>4 ways to multiply matrices</b>. The first way is usually best for hand computation. The other three ways produce whole vectors instead of just one number at a time.</p>
+  <p><b>1. (Row \(i\) of \(A\)) \(\cdot\) (Column \(j\) of \(B\))</b> produces one number: row \(i\), column \(j\) of \(AB\)</p>
+  <p>\(\begin{bmatrix}1&amp;2\\3&amp;4\end{bmatrix}\begin{bmatrix}5&amp;7\\6&amp;8\end{bmatrix}=\begin{bmatrix}17&amp;\cdot\\\cdot&amp;\cdot\end{bmatrix}\) because \(\begin{bmatrix}1&amp;2\end{bmatrix}\begin{bmatrix}5\\6\end{bmatrix}=17\) &nbsp; <b>Dot product</b></p>
+</div>
+<div class="zh">
+  <p>第一种是逐元素算法: \(AB\) 的第 \(i\) 行第 \(j\) 列, 等于 \(A\) 的第 \(i\) 行与 \(B\) 的第 \(j\) 列的点积. 例子中 \(1\cdot5+2\cdot6=17\), 所以乘积左上角是 17.</p>
+  <p>这种<b>inner product 内积</b>看法适合手算单个元素. 要得到完整矩阵, 就对所有行列组合重复同一操作.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 13</span>
+  <p><b>2. (Matrix \(A\)) (Column \(j\) of \(B\))</b> produces column \(j\) of \(AB\): <b>Combine columns of \(A\)</b></p>
+  <p>\(\begin{bmatrix}1&amp;2\\3&amp;4\end{bmatrix}\begin{bmatrix}5&amp;7\\6&amp;8\end{bmatrix}=\begin{bmatrix}17&amp;\cdot\\39&amp;\cdot\end{bmatrix}\) because \(5\begin{bmatrix}1\\3\end{bmatrix}+6\begin{bmatrix}2\\4\end{bmatrix}=\begin{bmatrix}17\\39\end{bmatrix}\)</p>
+  <p>This is the best way for understanding: <b>Linear combinations.</b> “Good level”</p>
+</div>
+<div class="zh">
+  <p>第二种一次算出 \(AB\) 的整列: 用 \(A\) 乘 \(B\) 的第 \(j\) 列. 按列看法, 这就是以该列的分量为系数, 组合 \(A\) 的各列.</p>
+  <p>例子中 \(B\) 的第一列是 \((5,6)\), 所以输出第一列是 \(5\) 倍 \(A\) 的第一列加 \(6\) 倍第二列, 得到 \((17,39)\). 这种看法直接揭示 \(AB\) 的每一列都在 \(A\) 的列空间里.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 13</span>
+  <p><b>3. (Row \(i\) of \(A\)) (Matrix \(B\))</b> produces row \(i\) of \(AB\): <b>Combine rows of \(B\)</b></p>
+  <p>\(\begin{bmatrix}1&amp;2\\3&amp;4\end{bmatrix}\begin{bmatrix}5&amp;7\\6&amp;8\end{bmatrix}=\begin{bmatrix}17&amp;23\\\cdot&amp;\cdot\end{bmatrix}\) because \(1\begin{bmatrix}5&amp;7\end{bmatrix}+2\begin{bmatrix}6&amp;8\end{bmatrix}=\begin{bmatrix}17&amp;23\end{bmatrix}\)</p>
+</div>
+<div class="zh">
+  <p>第三种与第二种对偶: 用 \(A\) 的一行乘整个 \(B\), 得到 \(AB\) 的一整行. 这一行是 \(B\) 各行的线性组合, 系数来自 \(A\) 所选的行.</p>
+  <p>例子用 \(1\) 倍 \(B\) 的第一行加 \(2\) 倍第二行, 得到 \((17,23)\). 因而 \(AB\) 的每一行都在 \(B\) 的行空间里.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 13</span>
+  <p><b>4. (Column \(k\) of \(A\)) (Row \(k\) of \(B\))</b> produces a simple matrix: <b>Add these simple matrices!</b></p>
+  <p>\(\begin{bmatrix}1\\3\end{bmatrix}\begin{bmatrix}5&amp;7\end{bmatrix}=\begin{bmatrix}5&amp;7\\15&amp;21\end{bmatrix}\) and \(\begin{bmatrix}2\\4\end{bmatrix}\begin{bmatrix}6&amp;8\end{bmatrix}=\begin{bmatrix}12&amp;16\\24&amp;32\end{bmatrix}\) &nbsp; <b>NOW ADD</b> &nbsp; \(\begin{bmatrix}17&amp;23\\39&amp;53\end{bmatrix}=AB\)</p>
+</div>
+<div class="zh">
+  <p>第四种把 \(AB\) 拆成若干「列乘行」的和. 一列乘一行得到一个简单的秩一矩阵, 称为<b>outer product 外积</b>; 对所有 \(k\) 求和就是完整乘积.</p>
+  <p>例子把两个外积逐元素相加, 得到 \(AB=\begin{bmatrix}17&amp;23\\39&amp;53\end{bmatrix}\). 这种看法后面会解释为什么 \(CR\) 能写成秩一矩阵之和, 也通向奇异值分解.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 13</span>
+  <p>Dot products in 1 are “<b>inner products</b>”. Column-row products in 4 are “<b>outer products</b>”.</p>
+  <p>All four ways use the <b>same \(mnp\) multiplications</b> if \(A\) is \(m\) by \(n\) and \(B\) is \(n\) by \(p\).</p>
+  <p>If \(A\) and \(B\) are square \(n\) by \(n\) matrices then \(AB\) uses \(n^3\) <b>multiply-adds</b> in 1, 2, 3, 4.</p>
+</div>
+<div class="zh">
+  <p>内积一次产出一个数, 外积一次产出一个矩阵; 四种算法只是按不同粒度组织同一批乘法. 若 \(A\) 是 \(m\times n\), \(B\) 是 \(n\times p\), 每个输出元素需要 \(n\) 次乘法, 共 \(mp\) 个输出, 所以总数是 \(mnp\).</p>
+  <p>方阵情形 \(m=n=p\), 乘法次数为 \(n^3\). 选择算法会改变理解和数据访问方式, 但在这种基本计数下不会改变乘法总数.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 13</span>
+  <p><b>Associative Law</b> &nbsp;&nbsp; \(A\) times \(BC=AB\) times \(C\) &nbsp;&nbsp; <b>Most important rule!</b></p>
+</div>
+<div class="zh">
+  <p><b>Associative law 结合律</b>写成 \(A(BC)=(AB)C\). 括号的位置可以改变, 矩阵的先后顺序不能改变. 矩阵乘法一般不满足交换律, 所以不能把 \(ABC\) 任意改成 \(BAC\).</p>
+  <p>结合律让我们能按计算成本或结构选择先算哪一对乘积, 而不改变最终结果.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 13</span>
+  <p><b>Block multiplication</b><br>Block sizes must fit</p>
+  <p>\(\begin{bmatrix}A&amp;B\\C&amp;D\end{bmatrix}\begin{bmatrix}E\\F\end{bmatrix}=\begin{bmatrix}AE+BF\\CE+DF\end{bmatrix}\)</p>
+</div>
+<div class="zh">
+  <p><b>Block multiplication 分块乘法</b>把每个块当作一个元素来使用普通矩阵乘法规则. 第一行输出为 \(AE+BF\), 第二行为 \(CE+DF\).</p>
+  <p>前提是块尺寸必须配合: \(A\) 的列数要等于 \(E\) 的行数, \(B\) 的列数要等于 \(F\) 的行数, 而且两块结果的尺寸相同才能相加. 分块只是组织计算, 不改变乘法本身.</p>
+</div>
+
+<h3>1.7 把 \(A\) 分解为 \(CR\): 列秩等于行秩<br><span class="de-title">1.7 Factoring \(A\) into \(CR\) : Column rank \(=r=\) Row rank</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 14</span>
+  <p><b>Step 1</b> &nbsp; \(C\) contains the <b>first \(r\) independent columns of \(A\)</b> (delete dependent columns of \(A\))</p>
+  <ol>
+    <li>If column 1 of \(A\) is not zero, put it into \(C\)</li>
+    <li>If column 2 of \(A\) is not a multiple of column 1 of \(A\), put it into \(C\)</li>
+    <li>If column 3 of \(A\) is not a combination of columns 1 and 2 of \(A\), put it into \(C\)</li>
+    <li>[\(n\).] If column \(n\) of \(A\) is not a combination of the first \(n-1\) columns, put it into \(C\)</li>
+  </ol>
+</div>
+<div class="zh">
+  <p>构造 \(C\) 时从左到右扫描 \(A\) 的列. 当前列若不能由前面保留的列组合出来, 就把它收进 \(C\); 若能, 则它对列空间没有新增贡献, 可以删去.</p>
+  <p>最终 \(C\) 保留 \(r\) 个无关列, 而且它们仍张成原来的整个列空间. 「first \(r\) independent columns」指按这个顺序最早得到的一组无关列, 不是任意挑 \(r\) 列.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 14</span>
+  <p><b>Step 2</b> &nbsp; Column \(j\) of \(CR\) expresses column \(j\) of \(A\) as a combination of the columns of \(C\)</p>
+</div>
+<div class="zh">
+  <p>保留在 \(C\) 中的列直接在 \(R\) 里放一个标准单位列, 就能由 \(CR\) 原样取回. 被删去的列则把「它怎样由 \(C\) 的列组合出来」的系数写进 \(R\) 的对应列.</p>
+  <p>因此 \(R\) 的每一列都是一份配方, \(C\) 提供原料, 二者相乘逐列重建 \(A\). 这给出 \(A=CR\), 而不是只重建其中几列.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 14</span>
+  <p>Example &nbsp; \(A=\begin{bmatrix}1&amp;2&amp;4\\1&amp;3&amp;5\end{bmatrix}\) &nbsp;&nbsp; Columns 1 and 2 of \(A\) go directly into \(C\)<br>Column 3 = 2 (Column 1) + 1 (Column 2) &nbsp;&nbsp; Not in \(C\)</p>
+</div>
+<div class="zh">
+  <p>例子的前两列不成倍数, 所以都进入 \(C\). 第三列等于 \(2\) 倍第一列加第二列, 已经落在前两列张成的空间里, 不再进入 \(C\).</p>
+  <p>因此 \(C\) 有两列. 第三列的系数 \(2,1\) 接下来会成为 \(R\) 的第三列, 保证分解后仍能恢复原来的第三列.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 14</span>
+  <p>\[A=\begin{bmatrix}1&amp;2&amp;4\\1&amp;3&amp;5\end{bmatrix}
+  =\begin{bmatrix}1&amp;2\\1&amp;3\end{bmatrix}
+  \begin{bmatrix}1&amp;0&amp;2\\0&amp;1&amp;1\end{bmatrix}=CR\]</p>
+  <p>2 columns in \(C\)<br>2 rows in \(R\)</p>
+  <p>These matrices \(A,C,R\) all have <b>column rank 2</b> (2 independent columns)</p>
+  <p>By the theorem \(A,C,R\) also have <b>row rank 2</b> (2 independent rows)</p>
+</div>
+<div class="zh">
+  <p><b>读公式:</b> \(C\) 保存前两列. \(R\) 的前两列是 \((1,0)\) 与 \((0,1)\), 分别取出 \(C\) 的第一、第二列; 第三列 \((2,1)\) 则按刚才的关系重建第三列.</p>
+  <p>\(A,C,R\) 的列秩都为 2. 对 \(R\) 来说, 前两列已经明显无关; 对 \(C\) 和 \(A\), 两列也提供了全部独立方向. 原文接着使用「列秩等于行秩」, 得出三者的行秩同样是 2.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 14</span>
+  <p><b>First great theorem</b> &nbsp;&nbsp; \(\boxed{\text{Every matrix has column rank = row rank}}\)</p>
+  <p>Dimension \(r\) of the column space = Dimension \(r\) of the row space = <b>Rank of matrix \(A\)</b></p>
+  <p>\(A=(m\text{ by }n)=CR=(m\text{ by }r)(r\text{ by }n)\)</p>
+</div>
+<div class="zh">
+  <p><b>Rank 秩</b>同时是列空间和行空间的维数. 虽然这两个空间可以位于不同的 \(\mathbb{R}^m\) 与 \(\mathbb{R}^n\), 它们的维数始终相同, 都记为 \(r\).</p>
+  <p>尺寸关系为 \((m\times n)=(m\times r)(r\times n)\). 中间维度 \(r\) 把 \(C\) 与 \(R\) 接起来, 也说明只需 \(r\) 个无关列和 \(r\) 个无关行就能描述整个矩阵.</p>
+</div>
+
+<h3>1.8 秩一矩阵: 一列乘一行<br><span class="de-title">1.8 Rank one matrices &nbsp; \(A=(1\text{ column})\text{ times }(1\text{ row})\)</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 15</span>
+  <p><b>Rank one Example</b> &nbsp;&nbsp; \(A=\begin{bmatrix}2&amp;4&amp;6\\3&amp;6&amp;9\end{bmatrix}=\begin{bmatrix}2\\3\end{bmatrix}\begin{bmatrix}1&amp;2&amp;3\end{bmatrix}=CR\)</p>
+</div>
+<div class="zh">
+  <p>这个矩阵可以写成一列 \((2,3)\) 乘一行 \((1,2,3)\). 乘积的每一列都是 \((2,3)\) 的倍数, 所以列空间只有一条直线, 秩为 1.</p>
+  <p>同时, 每一行都是 \((1,2,3)\) 的倍数, 行空间也只有一条直线. 一个外积因此同时展示了列秩和行秩为什么是 1.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 15</span>
+  <p><b>Suppose all columns of \(A\) are multiples of one column.<br>Then all rows of \(A\) are multiples of one row. Rank = 1.</b></p>
+  <p>Row space is a line &nbsp;&nbsp;&nbsp; Column space is a line</p>
+</div>
+<div class="zh">
+  <p>若所有列都是同一个非零列 \(c\) 的倍数, 可把第 \(j\) 列写成 \(r_jc\). 于是 \(A=c\begin{bmatrix}r_1&amp;\cdots&amp;r_n\end{bmatrix}\), 这就自动说明所有行也是同一行的倍数.</p>
+  <p>所以「列只张成一条线」和「行只张成一条线」在外积结构下同时成立. 行空间与列空间都是一维, 秩为 1.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 15</span>
+  <p>If all columns of \(A\) are multiples of column 1, it goes into \(C\).</p>
+  <p>If all rows of \(A\) are multiples of row 1, that row (divided by \(a_{11}\)) goes into \(R\).</p>
+  <p><b>Every rank 1 matrix factors into one column times one row.<br>Every rank \(r\) matrix is the sum of \(r\) rank one matrices.</b><br>This comes from <i>column times row multiplication</i> of \(C\) times \(R\).</p>
+</div>
+<div class="zh">
+  <p>秩一矩阵只需一个基本列进入 \(C\), 再用一行记录所有列的倍数. 若首行首列元素 \(a_{11}\) 非零, 可以把第一列作为 \(C\), 把第一行除以 \(a_{11}\) 作为 \(R\), 使第一个交叉位置恢复为 \(a_{11}\).</p>
+  <p>更一般地, \(A=CR\) 可按「列乘行」展开成 \(r\) 个外积之和. 每个外积都是秩一矩阵, 所以秩一矩阵构成所有矩阵的基本积木.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 15</span>
+  <p>\(*\) If \(A\) starts with a row or column of zeros, look at row 2 or column 2<br>\(**\) Rank 1 matrices are the <b>building blocks of all matrices</b></p>
+  <p>\[A=\begin{bmatrix}0&amp;0&amp;0\\1&amp;3&amp;4\\2&amp;6&amp;8\end{bmatrix}
+  =\begin{bmatrix}0\\1\\2\end{bmatrix}\begin{bmatrix}1&amp;3&amp;4\end{bmatrix}\]</p>
+</div>
+<div class="zh">
+  <p>若第一行或第一列全为 0, 就不能靠 \(a_{11}\) 做归一化. 改选一个非零行或非零列即可; 例子使用非零的第二行和第二列构造外积.</p>
+  <p>这里 \((0,1,2)\begin{bmatrix}1&amp;3&amp;4\end{bmatrix}\) 的第一行自然为 0, 后两行成 2 倍关系. 零行不妨碍秩为 1, 因为真正决定结构的是唯一一个非零方向.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 15</span>
+  <p>All the key factorizations of linear algebra add <b>columns times rows</b></p>
+  <p>\(\boxed{A=CR\qquad A=LU\qquad A=QR\qquad S=Q\Lambda Q^T\qquad A=U\Sigma V^T}\)</p>
+  <p>Those 5 factorizations are described in <b>Parts 1+3, 2, 4, 6, 7</b> of these ZoomNotes</p>
+</div>
+<div class="zh">
+  <p>这五种分解都能用「列乘行再求和」来读. 对 \(CR\), 每一项对应一个独立列方向; 对 \(LU\) 与 \(QR\), 外积之和分别连接消元和正交化; 对 \(S=Q\Lambda Q^T\) 与 \(A=U\Sigma V^T\), 每一项还带有一个特征值或奇异值.</p>
+  <p>这样看, 矩阵分解不是五套互不相干的公式, 而是在不同基下把同一个矩阵拆成简单作用之和. 后续 Part 3、2、4、6、7 会分别展开这些结构.</p>
+</div>
+
+<h2 id="part2" data-nav="解方程">第 2 部分: 求解线性方程 Ax = b: A 是 n × n 方阵<br><span class="de-title">Part 2 : Solving Linear Equations Ax = b : A is n by n</span></h2>
+
+<div class="card de">
+  <span class="folie">Page 16</span>
+  <ul>
+    <li>2.1 Inverse Matrices \(A^{-1}\) and Solutions \(x=A^{-1}b\)</li>
+    <li>2.2 Triangular Matrix and Back Substitution for \(Ux=c\)</li>
+    <li>2.3 Elimination : Square Matrix \(A\) to Triangular \(U\)</li>
+    <li>2.4 Row Exchanges for Nonzero Pivots : Permutation \(P\)</li>
+    <li>2.5 Elimination with No Row Exchanges : Why is \(A=LU\) ?</li>
+    <li>2.6 Transposes / Symmetric Matrices / Dot Products</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>这一部分围绕方阵方程 \(Ax=b\), 从逆矩阵和回代走到消元、换行与 \(A=LU\), 最后补齐转置和对称分解. 重点是主元为什么不能为 0, 以及消元怎样同时给出解和 LU 分解.</p>
+</div>
+
+<h3>2.1 逆矩阵与解 \(x=A^{-1}b\)<br><span class="de-title">2.1 Inverse Matrices \(A^{-1}\) and Solutions \(x=A^{-1}b\)</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 17</span>
+  <p>The inverse of a square matrix \(A\) has \(A^{-1}A=I\) and \(AA^{-1}=I\)</p>
+</div>
+<div class="zh">
+  <p>方阵 \(A\) 的<b>inverse matrix 逆矩阵</b>记作 \(A^{-1}\). 它从左边或右边乘 \(A\), 都得到单位矩阵 \(I\). 所以逆矩阵会撤销 \(A\) 的作用: 先算 \(Ax\), 再乘 \(A^{-1}\), 就回到 \(x\).</p>
+  <p>这里同时写出左逆和右逆. 对方阵而言, 只要存在一侧逆矩阵, 另一侧也会成立; 但「矩阵可逆」仍以这个双侧等式为标准定义.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 17</span>
+  <p>2 by 2 &nbsp; \(A^{-1}=\begin{bmatrix}2&amp;1\\5&amp;4\end{bmatrix}^{-1}=\frac{1}{3}\begin{bmatrix}4&amp;-1\\-3&amp;2\end{bmatrix}\) &nbsp;&nbsp; \(\begin{bmatrix}a&amp;b\\c&amp;d\end{bmatrix}^{-1}=\frac{1}{ad-bc}\begin{bmatrix}d&amp;-b\\-c&amp;a\end{bmatrix}\)</p>
+</div>
+<div class="zh">
+  <p>二阶逆矩阵公式分两步: 先交换主对角线上的 \(a,d\), 再把另外两个元素 \(b,c\) 变号; 最后整体除以<b>determinant 行列式</b> \(ad-bc\).</p>
+  <p>这个例子的行列式是 \(2\cdot4-1\cdot5=3\), 所以前面的因子 \(1/3\) 正确. 但按通用公式, 左下角应是 \(-c=-5\), 不是原图印的 \(-3\).</p>
+</div>
+<div class="warn">
+  <p><b>幻灯片错误:</b> 数值例子的逆矩阵左下角印成 \(-3\), 应为 \(-5\). 正确结果是 \(\frac13\begin{bmatrix}4&amp;-1\\-5&amp;2\end{bmatrix}\); 用它左乘或右乘 \(A\) 都得到 \(I\), 而原图矩阵不满足逆矩阵定义.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 17</span>
+  <p>\(A\) has no inverse if \(ad-bc=0\) &nbsp; \(A=\begin{bmatrix}1&amp;2\\4&amp;8\end{bmatrix}\) has no inverse matrix<br>has dependent rows<br>has dependent columns</p>
+</div>
+<div class="zh">
+  <p>分母 \(ad-bc\) 为 0 时, 二阶公式失效, 矩阵也确实不可逆. 例子的第二行是第一行的 4 倍, 第二列也是第一列的 2 倍, 所以行和列都线性相关.</p>
+  <p>几何上, 两行相关意味着两个方程并不提供两个独立限制; 两列相关意味着所有输出都落在一条直线上. 不可能让每个 \(b\) 都成为 \(Ax\), 因而没有能把所有输出逐一送回去的逆矩阵.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 17</span>
+  <ol>
+    <li>Invertible \(\Leftrightarrow\) Rows are independent \(\Leftrightarrow\) Columns are independent</li>
+    <li>No zeros on the main diagonal \(\Leftrightarrow\) Triangular matrix is invertible</li>
+  </ol>
+</div>
+<div class="zh">
+  <p>方阵可逆, 等价于行向量线性无关, 也等价于列向量线性无关. 这与 Part 1 的「行秩等于列秩」相接: 对 \(n\times n\) 矩阵, 两种秩都必须达到 \(n\).</p>
+  <p>若矩阵还是三角矩阵, 判断可以更直接: 主对角线全不为 0 就可逆, 只要出现一个 0 就不可逆. 这些对角元就是消元和回代所依赖的主元.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 17</span>
+  <p>3. If \(BA=I\) and \(AC=I\) then \(B=B(AC)=(BA)C=C\)</p>
+</div>
+<div class="zh">
+  <p>这条推导说明方阵的左逆和右逆必然相同. 假设 \(B\) 是左逆, \(C\) 是右逆, 在 \(B(AC)\) 中先用 \(AC=I\), 得到 \(B\); 在 \((BA)C\) 中先用 \(BA=I\), 得到 \(C\).</p>
+  <p>矩阵乘法的结合律允许这样改变括号, 因此 \(B=C\). 这个共同矩阵就是唯一的 \(A^{-1}\), 不需要分别寻找两个不同的逆.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 17</span>
+  <p>4. Invertible \(\Leftrightarrow\) The only solution to \(Ax=b\) is \(x=A^{-1}b\)</p>
+  <p>5. Invertible \(\Leftrightarrow\) determinant is not zero \(\Leftrightarrow\) \(A^{-1}=[\text{cofactor matrix}]^T/\det A\)</p>
+</div>
+<div class="zh">
+  <p>可逆时, 在 \(Ax=b\) 两边左乘 \(A^{-1}\), 立即得到唯一解 \(x=A^{-1}b\). 反过来, 若每个 \(b\) 都对应唯一解, 矩阵的列既张成整个空间又没有冗余, 所以 \(A\) 可逆.</p>
+  <p>另一个等价判据是 \(\det A\ne0\). 二阶公式是更一般的<b>cofactor matrix 余子式矩阵</b>方法的特例: 先取余子式矩阵的转置, 再除以行列式, 就得到逆矩阵.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 17</span>
+  <p>6. Inverse of \(AB=B^{-1}\) times \(A^{-1}\) (need both inverses) &nbsp; \(\boxed{ABB^{-1}A^{-1}=I}\)</p>
+</div>
+<div class="zh">
+  <p>乘积的逆要反转顺序: \((AB)^{-1}=B^{-1}A^{-1}\). 检查右边时, 中间的 \(BB^{-1}\) 先合成 \(I\), 剩下的 \(AA^{-1}\) 再合成 \(I\).</p>
+  <p>顺序反过来通常不行, 因为矩阵乘法不交换. 直观上, \(AB\) 是先做 \(B\) 再做 \(A\); 撤销时必须先撤销后做的 \(A\), 再撤销 \(B\).</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 17</span>
+  <p>7. Computing \(A^{-1}\) is <i>not efficient</i> for \(Ax=b\). &nbsp; Use 2.3 : <i>elimination</i>.</p>
+</div>
+<div class="zh">
+  <p>公式 \(x=A^{-1}b\) 很适合表达解, 却不是推荐的计算方法. 若目标只是求一个具体右端项 \(b\) 对应的 \(x\), 直接对增广矩阵消元再做回代更省事.</p>
+  <p>计算完整 \(A^{-1}\) 相当于同时处理 \(n\) 个标准右端项, 做了很多当前问题不需要的工作. 后面 2.2 和 2.3 给出的正是实际求解路线.</p>
+</div>
+
+<h3>2.2 三角矩阵与 \(Ux=c\) 的回代<br><span class="de-title">2.2 Triangular Matrix and Back Substitution for \(Ux=c\)</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 18</span>
+  <p>Solve \(Ux=\begin{bmatrix}2&amp;3&amp;4\\0&amp;5&amp;6\\0&amp;0&amp;7\end{bmatrix}\begin{bmatrix}x_1\\x_2\\x_3\end{bmatrix}=\begin{bmatrix}19\\17\\14\end{bmatrix}=c\) without finding \(U^{-1}\)</p>
+  <p>Upper triangular \(U\) / Pivots \(2,5,7\) are not zero / Go from bottom to top</p>
+</div>
+<div class="zh">
+  <p>这里不求 \(U^{-1}\), 而是直接利用上三角结构. 最后一行只含 \(x_3\), 倒数第二行只含 \(x_2,x_3\), 第一行才同时含三个未知数.</p>
+  <p>因此计算顺序是从底向上. 主元 \(2,5,7\) 全不为 0, 每一步都能通过除以主元确定一个未知数, 最终得到唯一解.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 18</span>
+  <p><b>Back substitution</b> &nbsp; The last equation \(7x_3=14\) gives \(x_3=2\)<br>
+  <b>Work upwards</b> &nbsp; The next equation \(5x_2+6(2)=17\) gives \(x_2=1\)<br>
+  <b>Upwards again</b> &nbsp; The first equation \(2x_1+3(1)+4(2)=19\) gives \(x_1=4\)<br>
+  <b>Conclusion</b> &nbsp; The only solution to this example is \(x=(4,1,2)\)</p>
+</div>
+<div class="zh">
+  <p><b>Back substitution 回代</b>把已经求出的值逐行代回上面的方程:</p>
+  <ol>
+    <li>最后一行直接给出 \(x_3=14/7=2\).</li>
+    <li>代入第二行, \(5x_2+12=17\), 所以 \(x_2=1\).</li>
+    <li>再把 \(x_2=1,x_3=2\) 代入第一行, \(2x_1+3+8=19\), 所以 \(x_1=4\).</li>
+  </ol>
+  <p>每一步都只剩一个未知量, 因此 \((4,1,2)\) 是唯一解, 不需要构造完整的逆矩阵.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 18</span>
+  <p><b>Special note</b> &nbsp; To solve for \(x_3,x_2,x_1\) we divided by the pivots \(7,5,2\)</p>
+  <p>A zero pivot in \(U\) produces dependent rows, dependent columns, <b>no \(U^{-1}\)</b></p>
+</div>
+<div class="zh">
+  <p>回代三次分别除以 \(7,5,2\), 所以主元非零不是计算上的小细节, 而是唯一解存在的条件. 若某个主元为 0, 对应方程无法再通过除法确定变量.</p>
+  <p>对上三角矩阵, 零主元也使行列式为 0, 行和列都会出现相关性. 此时 \(U^{-1}\) 不存在; 方程可能无解, 也可能有无穷多解, 要看右端项是否相容.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 18</span>
+  <p>Inverse of this difference matrix = sum matrix</p>
+  <p>\[\begin{bmatrix}1&amp;-1&amp;0&amp;0\\0&amp;1&amp;-1&amp;0\\0&amp;0&amp;1&amp;-1\\0&amp;0&amp;0&amp;1\end{bmatrix}^{-1}=\begin{bmatrix}1&amp;1&amp;1&amp;1\\0&amp;1&amp;1&amp;1\\0&amp;0&amp;1&amp;1\\0&amp;0&amp;0&amp;1\end{bmatrix}\]</p>
+</div>
+<div class="zh">
+  <p>左边的<b>difference matrix 差分矩阵</b>从当前分量减去前一个分量, 右边则做反向的累加. 例如差分输出依次是 \(x_1,x_2-x_1,x_3-x_2,x_4-x_3\); 把这些输出逐步累加, 就恢复 \(x_1,x_2,x_3,x_4\).</p>
+  <p>所以「差分」和「求和」互为逆运算. 右边第 \(j\) 列全由前 \(j\) 个输出累加而成, 这正好解释了它为什么也是上三角矩阵.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 18</span>
+  <p>Calculus : Inverse of derivative is integral &nbsp; \(\int_0^x\frac{df}{dx}\,dx=f(x)-f(0)\)</p>
+</div>
+<div class="zh">
+  <p>微积分里有同样的反向关系: 对导数从 \(0\) 积到 \(x\), 得到函数值的净变化 \(f(x)-f(0)\). 这就是微积分基本定理.</p>
+  <p>差分矩阵对应离散差分, 求和矩阵对应离散累加; 求导和积分则是连续版本. 两种情形都说明, 逆运算恢复的是原量, 但积分只恢复到相差初始值 \(f(0)\) 的形式.</p>
+</div>
+
+<h3>2.3 消元: 从方阵 \(A\) 到三角矩阵 \(U\)<br><span class="de-title">2.3 Elimination : Square Matrix \(A\) to Triangular \(U\)</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 19</span>
+  <p>\[A=\begin{bmatrix}2&amp;3&amp;4\\4&amp;11&amp;14\\2&amp;8&amp;17\end{bmatrix}\to\begin{bmatrix}2&amp;3&amp;4\\0&amp;5&amp;6\\2&amp;8&amp;17\end{bmatrix}\to\begin{bmatrix}2&amp;3&amp;4\\0&amp;5&amp;6\\0&amp;5&amp;13\end{bmatrix}\to\begin{bmatrix}2&amp;3&amp;4\\0&amp;5&amp;6\\0&amp;0&amp;7\end{bmatrix}=U\]</p>
+</div>
+<div class="zh">
+  <p><b>Elimination 消元</b>用一行倍数去减另一行, 在主对角线下方逐步制造 0. 这张图的三步依次处理第二行第一列、第三行第一列、第三行第二列.</p>
+  <p>前两步都固定第一主元行, 把第一列下方的两个元素消掉. 第三步改用新的第二主元行, 消掉它下面的 5. 最终 \(U\) 的主对角线下方全为 0.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 19</span>
+  <p><b>One elimination step subtracts \(\ell_{ij}\) times row \(j\) from row \(i\) (\(i&gt;j\))</b></p>
+  <p>Each step produces a zero below the diagonal of \(U\) : \(\ell_{21}=2,\ell_{31}=\ell_{32}=1\)</p>
+</div>
+<div class="zh">
+  <p>记号 \(\ell_{ij}\) 表示「从第 \(i\) 行减去第 \(j\) 行的多少倍」, 且只对 \(i&gt;j\) 的下三角位置使用. 倍数要选成恰好抵消目标元素.</p>
+  <p>本例第二行第一列是 4, 主元是 2, 所以 \(\ell_{21}=4/2=2\). 第三行第一列同样是 2, 得 \(\ell_{31}=1\); 第二步后第三行第二列是 5, 除以第二主元 5, 得 \(\ell_{32}=1\).</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 19</span>
+  <p>To invert elimination, add \(\ell_{ij}\) times row \(j\) back to row \(i\)</p>
+  <p>\[\begin{bmatrix}1&amp;0&amp;0\\-\ell&amp;1&amp;0\\0&amp;0&amp;1\end{bmatrix}^{-1}=\begin{bmatrix}1&amp;0&amp;0\\\ell&amp;1&amp;0\\0&amp;0&amp;1\end{bmatrix}\]</p>
+</div>
+<div class="zh">
+  <p>单个消元矩阵的主对角线都是 1, 只在一个下三角位置放 \(-\ell\), 表示「减去 \(\ell\) 倍主元行」. 要撤销这一步, 就把同样的倍数加回去.</p>
+  <p>因此逆矩阵只需把 \(-\ell\) 改成 \(\ell\). 这也说明消元本身是可逆操作: 它没有丢失信息, 只是把信息重新分配到 \(L\) 和 \(U\) 中.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 19</span>
+  <p>\(\boxed{A=LU=(\text{Lower triangular }L)\text{ times }(\text{Upper triangular }U)}\)</p>
+  <p>This \(A\) needs 3 elimination steps to a beautiful result</p>
+</div>
+<div class="zh">
+  <p>把 \(A\) 消成 \(U\) 后, 再逐步撤销消元, 就得到 \(A=LU\). \(U\) 保存消元后的上三角结果, <b>lower triangular matrix 下三角矩阵</b> \(L\) 则保存反向恢复所需的倍数.</p>
+  <p>这个例子经过三次消元, 因而 \(L\) 的对角线下方有三个非平凡倍数. 分解把「怎样化简矩阵」和「怎样恢复原矩阵」同时记录下来.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 19</span>
+  <p>\[A=\begin{bmatrix}2&amp;3&amp;4\\4&amp;11&amp;14\\2&amp;8&amp;17\end{bmatrix}=\begin{bmatrix}1&amp;0&amp;0\\2&amp;1&amp;0\\1&amp;1&amp;1\end{bmatrix}\begin{bmatrix}2&amp;3&amp;4\\0&amp;5&amp;6\\0&amp;0&amp;7\end{bmatrix}=L\text{ times }U\]</p>
+  <p>Elimination produced no zeros on the diagonal and created 3 zeros in \(U\)</p>
+</div>
+<div class="zh">
+  <p><b>读公式:</b> \(L\) 的对角线是 1, 下三角位置依次填入 \(\ell_{21}=2,\ell_{31}=1,\ell_{32}=1\). \(U\) 就是前面三步消元的终点.</p>
+  <p>例如 \(LU\) 的第二行等于 \(2\) 倍 \(U\) 的第一行加第二行, 恢复为 \((4,11,14)\). 第三行则把三行按 \(1,1,1\) 组合, 恢复为 \((2,8,17)\). 三个主元 \(2,5,7\) 都非零, 所以分解和求解都能继续.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 19</span>
+  <p><b>For \(Ax=b\) &nbsp; Add extra column \(b\) &nbsp; Elimination and back substitution</b></p>
+  <p>\[[A\;b]=\begin{bmatrix}2&amp;3&amp;4&amp;19\\4&amp;11&amp;14&amp;55\\2&amp;8&amp;17&amp;50\end{bmatrix}\to[U\;c]=\begin{bmatrix}2&amp;3&amp;4&amp;19\\0&amp;5&amp;6&amp;17\\0&amp;0&amp;7&amp;14\end{bmatrix}\xrightarrow[\text{in 2.2}]{\text{backsub}}x=\begin{bmatrix}4\\1\\2\end{bmatrix}\]</p>
+</div>
+<div class="zh">
+  <p>实际解方程时, 把 \(b\) 作为额外一列附在 \(A\) 右边, 形成<b>augmented matrix 增广矩阵</b> \([A\;b]\). 对每一行做消元时, 右端项也必须同步做同样的运算.</p>
+  <p>本例先算 \(55-2\cdot19=17\), 再算 \(50-19=31\), 最后算 \(31-17=14\), 所以 \(b=(19,55,50)\) 变成 \(c=(19,17,14)\). 接着用 2.2 的回代得到 \(x=(4,1,2)\).</p>
+</div>
+
+<h3>2.4 为非零主元换行: 置换矩阵 \(P\)<br><span class="de-title">2.4 Row Exchanges for Nonzero Pivots : Permutation \(P\)</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 20</span>
+  <p>If a diagonal pivot is zero or small : Look below it for a better pivot<br><i>Exchange rows</i></p>
+  <p>\[A=\begin{bmatrix}0&amp;2\\3&amp;4\end{bmatrix}\text{ goes to }PA=\begin{bmatrix}0&amp;1\\1&amp;0\end{bmatrix}\begin{bmatrix}0&amp;2\\3&amp;4\end{bmatrix}=\begin{bmatrix}3&amp;4\\0&amp;2\end{bmatrix}\qquad\begin{matrix}\text{Nonzero pivots}\\3\text{ and }2\end{matrix}\]</p>
+</div>
+<div class="zh">
+  <p>若当前对角位置是 0, 或数值很小、不适合当主元, 就向下方寻找更合适的行并交换. 例子原矩阵左上角为 0, 无法直接除以它消元.</p>
+  <p>左乘 \(P=\begin{bmatrix}0&amp;1\\1&amp;0\end{bmatrix}\) 会交换两行, 得到主元 3 和 2. 换行只改变方程的排列顺序, 不改变方程组的解.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 20</span>
+  <p>\(\boxed{\text{Permutation matrix }P=\text{Rows of }I\text{ in any order}}\)</p>
+  <p>There are \(n!\) row orders and \(n!\) permutations of size \(n\) (this includes \(P=I\))</p>
+</div>
+<div class="zh">
+  <p><b>Permutation matrix 置换矩阵</b>由单位矩阵的行重新排列而成. 每行每列恰有一个 1, 其余都是 0; 左乘 \(P\) 时, 输出的第 \(i\) 行就是原矩阵的某一整行.</p>
+  <p>第一行有 \(n\) 个来源可选, 第二行剩 \(n-1\) 个, 依此类推, 所以共有 \(n!\) 种. 单位矩阵对应「不换行」, 也包含在这 \(n!\) 个置换中.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 20</span>
+  <p>The inverse of \(P\) is the transpose of \(P\) &nbsp; \(\begin{bmatrix}0&amp;1&amp;0\\0&amp;0&amp;1\\1&amp;0&amp;0\end{bmatrix}\begin{bmatrix}0&amp;0&amp;1\\1&amp;0&amp;0\\0&amp;1&amp;0\end{bmatrix}=I\)<br>Exchange rows with columns</p>
+</div>
+<div class="zh">
+  <p>置换矩阵满足 \(P^{-1}=P^T\). 因为 \(P\) 的列是一组标准正交基, \(P^TP\) 的第 \(i,j\) 项就是第 \(i\) 列与第 \(j\) 列的点积: 同列为 1, 不同列为 0.</p>
+  <p>例子中的第二个矩阵正是第一个矩阵的转置, 所以乘积为 \(I\). 从操作上看, 转置给出反向置换, 把刚才重排的行放回原来的位置.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 20</span>
+  <p>Can you find all six 3 by 3 permutations ? Is every \(P_1P_2=P_2P_1\) ?</p>
+</div>
+<div class="zh">
+  <p>三阶置换共有 \(3!=6\) 个: 恒等、三种只交换两行的对换, 以及两个三行循环移位. 它们的行分别可排成 \((1,2,3),(1,3,2),(2,1,3),(2,3,1),(3,1,2),(3,2,1)\).</p>
+  <p>置换乘法一般<b>不交换</b>. 例如 \(P_1\) 交换第 1、2 行, \(P_2\) 交换第 2、3 行; \(P_1P_2\) 与 \(P_2P_1\) 分别产生方向相反的三行循环, 所以不相等. 只有特定的一对置换才可能交换.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 20</span>
+  <p>If \(A\) is invertible then some \(PA\) has no zero pivots and \(\boxed{PA=LU}\)</p>
+</div>
+<div class="zh">
+  <p>没有换行的 \(A=LU\) 只适用于消元途中不需要换主元的情形. 更一般地, 可先把所有必要换行汇总到 \(P\) 中, 再对 \(PA\) 做普通消元, 得到 \(PA=LU\).</p>
+  <p>只要 \(A\) 可逆, 就能通过适当换行保证每一步都有非零主元. 因此换行不是分解失败的例外处理, 而是完整 LU 方法的一部分.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 20</span>
+  <p>Reverse the order by \(P\) &nbsp; \(\begin{bmatrix}0&amp;0&amp;0&amp;1\\0&amp;0&amp;1&amp;0\\0&amp;1&amp;0&amp;0\\1&amp;0&amp;0&amp;0\end{bmatrix}\)</p>
+  <p>Circular shift by \(P\) &nbsp; \(\begin{bmatrix}0&amp;0&amp;0&amp;1\\1&amp;0&amp;0&amp;0\\0&amp;1&amp;0&amp;0\\0&amp;0&amp;1&amp;0\end{bmatrix}\)</p>
+</div>
+<div class="zh">
+  <p>第一个 \(P\) 把四行顺序完全反转, 单位矩阵的第 4、3、2、1 行依次成为它的四行. 第二个则做循环移位: 原第 4 行移到最上, 其余三行依次下移.</p>
+  <p>这两个例子都保持「每行每列恰有一个 1」. 直接看 1 的位置就能读出置换怎样移动各行, 不必把矩阵乘法逐项算一遍.</p>
+</div>
+
+<h3>2.5 不换行的消元: 为什么 \(A=LU\)<br><span class="de-title">2.5 Elimination with No Row Exchanges : Why is \(A=LU\) ?</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 21</span>
+  <p>Reason : Each step removes a column of \(L\) times a row of \(U\)</p>
+  <p>\[\text{Remove }\begin{bmatrix}1\;(\text{row 1})\\\ell_{21}\;(\text{row 1})\\\ell_{31}\;(\text{row 1})\\\ell_{41}\;(\text{row 1})\end{bmatrix}\text{ from }A\text{ to leave }A_2=\begin{bmatrix}0&amp;0&amp;0&amp;0\\0&amp;\times&amp;\times&amp;\times\\0&amp;\times&amp;\times&amp;\times\\0&amp;\times&amp;\times&amp;\times\end{bmatrix}\]</p>
+</div>
+<div class="zh">
+  <p>这一节用「列乘行」重新解释消元. 第一步从 \(A\) 中减去一个秩一矩阵, 使第一行和第一列都变成 0, 剩下的 \(A_2\) 只在右下角保留待处理部分.</p>
+  <p>被减去的矩阵由一列和一行相乘得到. 列的第一个系数是 1, 其余是 \(\ell_{21},\ell_{31},\ell_{41}\); 行就是第一条主元行.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 21</span>
+  <p><b>We removed a rank-one matrix : column times row.</b> It was the column \(\ell_1=(1,\ell_{21},\ell_{31},\ell_{41})\) times row 1 of \(A\)—the first pivot row \(u_1\).</p>
+  <p>We face a similar problem for \(A_2\). We take a similar step to \(A_3\) :</p>
+</div>
+<div class="zh">
+  <p>令 \(u_1\) 为 \(A\) 的第一条主元行, 则 \(\ell_1u_1\) 的第一行正好是 \(u_1\). 第 \(i\) 行则是 \(\ell_{i1}u_1\), 恰好等于消元时从第 \(i\) 行减去的部分.</p>
+  <p>所以一次消去整列, 可以压缩成一次外积相减. 得到 \(A_2\) 后, 对右下角剩余矩阵重复同样过程, 就会得到 \(A_3\).</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 21</span>
+  <p>\[\text{Remove }\begin{bmatrix}0\;(\text{row 2 of }A_2)\\1\;(\text{row 2 of }A_2)\\\ell_{32}\;(\text{row 2 of }A_2)\\\ell_{42}\;(\text{row 2 of }A_2)\end{bmatrix}\text{ from }A_2\text{ to leave }A_3=\begin{bmatrix}0&amp;0&amp;0&amp;0\\0&amp;0&amp;0&amp;0\\0&amp;0&amp;\times&amp;\times\\0&amp;0&amp;\times&amp;\times\end{bmatrix}\]</p>
+</div>
+<div class="zh">
+  <p>第二步使用 \(A_2\) 的第二行作为新的主元行. 对应列向量是 \((0,1,\ell_{32},\ell_{42})\): 第一个 0 表示不再影响已经处理完的第一行, 对角位置的 1 负责消去当前主元行.</p>
+  <p>减去这个外积后, 前两行和前两列都成为 0. 非零的 \(\times\) 区域继续缩小, 这就是消元一步步向右下角推进的外积版本.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 21</span>
+  <p>Row 2 of \(A_2\) was the second pivot row = second row \(u_2\) of \(U\). We removed a column \(\ell_2=(0,1,\ell_{32},\ell_{42})\) times \(u_2\). Continuing this way, every step removes a column \(\ell_j\) times a pivot row \(u_j\) of \(U\). Now put those pieces back :</p>
+  <p>\[\boxed{A=\ell_1u_1+\ell_2u_2+\cdots+\ell_nu_n=\begin{bmatrix}\ell_1&amp;\cdots&amp;\ell_n\end{bmatrix}\begin{bmatrix}u_1\\\vdots\\u_n\end{bmatrix}=LU}\]</p>
+</div>
+<div class="zh">
+  <p>第 \(j\) 步减去的是 \(\ell_j u_j\), 其中 \(u_j\) 会成为 \(U\) 的第 \(j\) 行. 消元把所有外积依次减掉, 最后留下零矩阵; 所以把这些外积全部加回去, 就重新得到 \(A\).</p>
+  <p>再把各 \(\ell_j\) 并排为 \(L\) 的列, 把各 \(u_j\) 上下叠成 \(U\) 的行. 按 Part 1 的列乘行规则, \(LU\) 正好等于这些外积之和, 因而 \(A=LU\).</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 21</span>
+  <p>That last step was column-row multiplication (see 1.6) of \(L\) times \(U\).</p>
+  <p>Column \(k\) of \(L\) and row \(k\) of \(U\) begin with \(k-1\) zeros. Then \(L\) is lower triangular and \(U\) is upper triangular.</p>
+</div>
+<div class="zh">
+  <p>第 \(k\) 列 \(\ell_k\) 的前 \(k-1\) 个分量为 0, 对角元为 1, 非零倍数只可能出现在下方, 所以 \(L\) 是下三角矩阵. 第 \(k\) 行 \(u_k\) 的前 \(k-1\) 个分量也为 0, 主元及其右侧元素保留, 所以 \(U\) 是上三角矩阵.</p>
+  <p>这些 0 来自已经完成的消元步骤, 不是额外假设. 外积解释因此同时给出了 \(A=LU\) 和这两个因子的三角形状.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 21</span>
+  <p>Here are the separate elimination matrices—inverted and in reverse order to bring back the original \(A\) :</p>
+  <p>\[\boxed{L_{32}L_{31}L_{21}A=U\qquad\text{and}\qquad A=L_{21}^{-1}L_{31}^{-1}L_{32}^{-1}U=LU}\]</p>
+</div>
+<div class="zh">
+  <p>单个 \(L_{ij}\) 表示一次消元. 实际先从第一列的 \(L_{21},L_{31}\) 开始, 再处理第二列的 \(L_{32}\); 左乘到 \(A\) 上时, 后做的矩阵写在更左边, 所以是 \(L_{32}L_{31}L_{21}A=U\).</p>
+  <p>解出 \(A\) 时, 要按相反顺序撤销, 并把每个矩阵换成逆矩阵, 得到 \(A=L_{21}^{-1}L_{31}^{-1}L_{32}^{-1}U\). 前三个因子的乘积就是 \(L\), 它把各步倍数按正确位置收拢起来.</p>
+</div>
+
+<h3>2.6 转置、对称矩阵与点积<br><span class="de-title">2.6 Transposes / Symmetric Matrices / Dot Products</span></h3>
+
+<div class="card de">
+  <span class="folie">Page 22</span>
+  <p>Transpose of \(A=\begin{bmatrix}1&amp;2&amp;3\\0&amp;0&amp;4\end{bmatrix}\) is \(A^T=\begin{bmatrix}1&amp;0\\2&amp;0\\3&amp;4\end{bmatrix}\) &nbsp;&nbsp; \(\boxed{(A^T)_{ij}=A_{ji}}\)</p>
+</div>
+<div class="zh">
+  <p><b>Transpose 转置</b>把矩阵的行与列互换. 原 \(A\) 是 \(2\times3\), 转置后就是 \(3\times2\); 原来的第一行变成第一列, 第二行变成第二列.</p>
+  <p>元素级规则是 \((A^T)_{ij}=A_{ji}\): 转置后第 \(i\) 行第 \(j\) 列的元素, 来自原矩阵第 \(j\) 行第 \(i\) 列. 主对角线元素的位置不变.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 22</span>
+  <p>Rules for the sum and product</p>
+  <ul>
+    <li>Transpose of \(A+B\) is \(A^T+B^T\)</li>
+    <li>Transpose of \(AB\) is \(B^TA^T\)</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>和的转置可以逐项转置, 即 \((A+B)^T=A^T+B^T\). 乘积的转置则必须交换顺序: \((AB)^T=B^TA^T\).</p>
+  <p>要记好后一条, 可以看元素: \((AB)_{ij}=\sum_kA_{ik}B_{kj}\). 转置并改写下标后, 变成 \(\sum_kB^T_{jk}A^T_{ki}\), 这正是 \(B^TA^T\) 的第 \(j,i\) 项.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 22</span>
+  <p><b>A symmetric matrix has \(S^T=S\)</b> &nbsp; This means that every \(s_{ij}=s_{ji}\)</p>
+  <p>The matrices \(A^TA\) and \(AA^T\) are symmetric / usually different</p>
+</div>
+<div class="zh">
+  <p><b>Symmetric matrix 对称矩阵</b>满足 \(S^T=S\), 也就是主对角线两侧镜像位置的元素相等. 对称矩阵必须是方阵, 否则转置后的尺寸都不同.</p>
+  <p>任意矩阵 \(A\) 都能生成两个对称矩阵: \((A^TA)^T=A^TA\), \((AA^T)^T=AA^T\). 前者作用于 \(A\) 的列, 尺寸由列数决定; 后者作用于行, 尺寸由行数决定, 所以二者通常不同.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 22</span>
+  <p>\(\begin{bmatrix}2&amp;3\end{bmatrix}\begin{bmatrix}2\\3\end{bmatrix}=\begin{bmatrix}13\end{bmatrix}\) &nbsp;&nbsp; \(\begin{bmatrix}2\\3\end{bmatrix}\begin{bmatrix}2&amp;3\end{bmatrix}=\begin{bmatrix}4&amp;6\\6&amp;9\end{bmatrix}\) &nbsp;&nbsp; \(\begin{matrix}4+9=13\\6=6\end{matrix}\)</p>
+</div>
+<div class="zh">
+  <p>同一对向量交换乘法顺序, 会得到不同尺寸的对象. 「行乘列」是内积, 只给一个数 \(2^2+3^2=13\); 「列乘行」是外积, 给出 \(2\times2\) 矩阵.</p>
+  <p>外积矩阵的两个对角元之和 \(4+9\) 等于内积 13, 两个非对角元也都等于 6, 因而矩阵对称. 这个例子把内积、外积和对称性放在了一次计算里.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 22</span>
+  <p>\(S=LU\) is improved to symmetric \(S=LDL^T\) (pivots in \(U\) go into \(D\))</p>
+</div>
+<div class="zh">
+  <p>若 \(S\) 是对称矩阵, 且消元不需要换行, 普通 \(S=LU\) 可以进一步写成对称形式 \(S=LDL^T\). 做法是把 \(U\) 每一行的主元提出来, 收进对角矩阵 \(D\).</p>
+  <p>提主元后, 剩下的上三角因子恰好是 \(L^T\), 因而 \(U=DL^T\), 代回即得 \(S=LDL^T\). 这个形式只保存一个三角因子 \(L\) 和一组主元 \(D\), 直接利用了对称性.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 22</span>
+  <p>\[S=\begin{bmatrix}2&amp;4\\4&amp;11\end{bmatrix}=\begin{bmatrix}1&amp;0\\2&amp;1\end{bmatrix}\begin{bmatrix}2&amp;4\\0&amp;3\end{bmatrix}=\begin{bmatrix}1&amp;0\\2&amp;1\end{bmatrix}\begin{bmatrix}2&amp;0\\0&amp;3\end{bmatrix}\begin{bmatrix}1&amp;2\\0&amp;1\end{bmatrix}=LDU^T\]</p>
+</div>
+<div class="zh">
+  <p>数值例子先给 \(S=LU\), 其中 \(L=\begin{bmatrix}1&amp;0\\2&amp;1\end{bmatrix}\), \(U=\begin{bmatrix}2&amp;4\\0&amp;3\end{bmatrix}\). 再从 \(U\) 的两行分别提出主元 2 和 3.</p>
+  <p>提出的主元组成 \(D=\operatorname{diag}(2,3)\), 剩余矩阵 \(\begin{bmatrix}1&amp;2\\0&amp;1\end{bmatrix}\) 正是 \(L^T\). 所以数值矩阵链完全正确, 末尾缩写应当写成 \(LDL^T\).</p>
+</div>
+<div class="warn">
+  <p><b>幻灯片错误:</b> 公式末尾印成 \(LDU^T\), 应为 \(LDL^T\). 这里 \(U=DL^T\), 第三个因子已经明确是 \(L^T\); 若按原图的 \(LDU^T\) 理解, 既不等于前面的矩阵乘积, 也不再是本行开头的对称分解.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Page 22</span>
+  <p><b>Dot product</b> &nbsp; Work = Movements \(\cdot\) Forces \(=x^Tf\)<br>
+  <b>Inner product</b> &nbsp; Heat = Voltage drops \(\cdot\) Currents \(=e^Ty\)<br>
+  \(x\cdot y=x^Ty\) &nbsp; Income = Quantities \(\cdot\) Prices \(=q^Tp\)</p>
+</div>
+<div class="zh">
+  <p>点积写成矩阵形式就是 \(x\cdot y=x^Ty\): 左边是行向量, 右边是列向量, 对应分量相乘后求和. 它把一组成对数量汇总成一个标量.</p>
+  <p>三个应用都是同一结构: 各段位移乘相应力再求和得到功; 各支路电压降乘电流再求和得到热功率; 各类商品数量乘价格再求和得到收入. 关键是两个向量的分量必须按同一对象或同一段过程一一对应.</p>
+</div>
+
+</main>
+<script data-goatcounter="https://yikesyellowpharmakon.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

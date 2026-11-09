@@ -278,3 +278,92 @@ S perk | konvert | 成分树转依存树 | Zusammenhang zwischen Konstituenz und
 S perk | auxpp | 功能词的差别 | must, to, when | 成分树里是中心, UD 里是 aux、case、mark.
 S synfunk | ebenen | 句法与音系、语义的相互作用 | Interaktionen von Syntax mit Phonologie, Semantik | 停顿和语调能改变结构: Santa Barbara Miller; Du musst gehen ! / ?
 S subj | satz | 从句作成分 | Subjektsatz, Objektsatz | 主语、宾语可以由从句实现, 从句的动词依附主句动词.
+
+# EICL 07 · 隐马尔可夫模型 (英语课件, D 用课件语言)
+S postag | infdef | 非形式定义 | Part-of-speech tagging, informal definition | 在上下文中消除词的句法范畴歧义.
+
+D argmax | max gives the largest value of f(x); argmax gives that value of x for which f(x) is largest.
+X argmax | max 回答「最大值是多少」, argmax 回答「在哪里取到」. 词性标注要的是 argmax: 找最好的序列, 序列的概率本身不重要. 乘一个正因子只拉伸曲线, 最高点的位置不变, 所以贝叶斯公式的分母可以直接去掉. 例: −(x−2)²+5 的 max 是 5, argmax 是 2.
+S argmax | posfak | 正因子不影响 argmax | Positive factor c does not affect argmax | 分母 P(w) 因此可以去掉.
+
+D jointp | The joint probability P(AB) is the probability that A and B occur together.
+X jointp | 把事件看成集合时, 同时发生就是取交集, 所以也写 P(A∩B). 在 NLP 里 P(X₁X₂) 通常读成序列: 先 X₁ 后 X₂. 韦恩图上它就是两圆相交的面积.
+
+D condp | The conditional probability is the updated probability of an event given some knowledge: P(A|B) = P(AB)/P(B).
+X condp | 已知 B 发生, 样本空间缩小成 B, A 能发生的部分只剩交集, 所以用交集除以 B. P(A|B) 和 P(B|A) 分母不同, 一般不相等. 要求 P(B) 不为 0.
+
+D chainr | P(X₁…Xₙ) = P(X₁) · P(X₂|X₁) · … · P(Xₙ|X₁…Xₙ₋₁).
+X chainr | 反复使用条件概率的定义, 把长序列的概率拆成「已知前面所有项时下一项的概率」的乘积. 这一步没有任何近似. 词性标注用它展开 P(t₀,ₙ), 紧接着才用马尔可夫假设把长条件截短.
+
+D bayes | P(B|A) = P(A|B)P(B) / P(A).
+X bayes | 想要 P(B|A) 却只有 P(A|B) 时, 用它把条件翻过来. 分母可以展开成 P(A|B)P(B) + P(A|¬B)P(¬B). 词性标注里想求 P(标签|词), 翻转之后变成 P(词|标签)P(标签), 分母 P(词) 对所有候选相同, 可以去掉.
+S bayes | totalp | 分母展开 |  | 按 B 发生和不发生两种情况相加.
+
+D indep | Two events A and B are independent iff P(AB) = P(A)P(B).
+X indep | 直观含义: 知道 A 发生, 对 B 的判断不变, 于是 P(A|B) = P(A). 检验方法: 用相对频率估计 P(A)、P(B)、P(AB), 再比较乘积和联合概率. P(AB) 远大于乘积是正相关 (champagne 和 sparkling), 远小于是负相关. 判断用 ≈, 因为估计值带抽样波动.
+S indep | test | 检验独立性 | Testing for independence | 比较 P(AB) 和 P(A)P(B).
+
+D brownset | Early work on part-of-speech tagging was done on the Brown corpus; its tag set distinguishes e.g. NN, NNS, NNP, VB, VBD, VBG, VBN, VBZ.
+X brownset | 这些标签不是典型的句法范畴: 名词分单复数和专名 (NN、NNS、NNP), 动词按屈折形式分 VB、VBD、VBG、VBN、VBZ, is 和 to 有专属标签 BEZ、TO. 形态信息对预测相邻词很有用, 所以分得这么细. 例: Peter/NNP arrived/VBD in/IN London/NNP.
+
+D infoq | Two main sources of information: the context of the ambiguous word and a word’s bias for the different parts of speech.
+X infoq | 上下文: 邻居的词性, AT 和 VBZ 中间多半是 NN 而不是 JJ. 词的偏好: put 多半是 VBD. 只用偏好, 给每个词选最常见的标签, 英语就能做对 90%, 因为大多数词的标签分布极不均匀. 难句 The representative put chairs on the table 有两种词性分析, 要靠两种信息一起解决.
+S infoq | ctx | 上下文 | context | 歧义词左右的词.
+S infoq | wb | 词性偏好 | bias | 词自身对各词性的偏好.
+
+D superv | Labeled training set: each word is annotated by a linguist; train a statistical model on it and apply the model to new text.
+X superv | 三步: 语言学家人工标注训练集, 在训练集上学出一组参数, 再把模型用到新文本上. 参数就是一堆数字, 反映训练集的特点. HMM 的「学习」只是计数和相除. 标注文本写成 word/TAG, 如 Confidence/NN in/IN the/AT pound/NN.
+
+D mle | ml = maximum likelihood = relative frequency.
+X mle | 用训练集里的相对频率当概率的估计值, 记作带帽的 P̂ml. 例: C(JJ NN) = 4, C(JJ) = 7, 所以 P̂(NN|JJ) = 4/7. 弱点是训练集里没出现过的组合概率就是 0, 如课件文本里没有 at, 于是 P̂(at|IN) = 0.
+
+D ctxparam | The conditional probabilities P(t^k|t^j) are the context parameters of the model.
+X ctxparam | 这是第一种信息的形式化. 估计: P̂(t^k|t^j) = C(t^j t^k) / C(t^j), 数 t^j 后面跟 t^k 的次数, 除以 t^j 的次数. 这是很贫乏的上下文模型, 因为有两个假设: 有限视野 (马尔可夫假设) 只记得前一个标签; 时间不变性 (平稳) 假设概率在句首句尾都一样.
+S ctxparam | horizon | 有限视野 | Limited horizon, Markov assumption | 记忆只限于前一个标签.
+S ctxparam | tinv | 时间不变性 | Time invariance, stationary | 概率不随位置变化.
+
+D markovo | In an nth order Markov model, the tag at time t depends on the n previous tags.
+X markovo | 阶数就是往回看几个标签. 0 阶完全不看前面的标签, 1 阶看紧邻的一个 (本讲所用), 2 阶看两个. 阶数越高上下文越丰富, 要估计的参数也越多. 同样的说法也适用于发射词的马尔可夫模型.
+S markovo | o0 | 0 阶 | Order 0 | 不依赖前面的标签.
+S markovo | o1 | 1 阶 | Order 1 | 依赖紧邻的前一个标签.
+S markovo | o2 | 2 阶 | Order 2 | 依赖前两个标签.
+
+D biasparam | We need to estimate P(t_i|w_i), actually P(w_i|t_i): P̂(w^l|t^j) = C(w^l : t^j) / C(t^j).
+X biasparam | 第二种信息的形式化. 直觉上想要 P(标签|词), 模型里却用 P(词|标签), 因为模型设想标签生成词. 估计时数这个词被标成该标签的次数, 除以该标签的总次数, 分母是标签不是词. 例: C(VB) = 4, take 标成 VB 一次, P̂(take|VB) = 1/4.
+
+D hmmmod | The tags generate the words (not vice versa); the words are conditioned on the tags.
+X hmmmod | 图里上排是标签链, s 边 (sequence) 是转移 P(t_i|t_{i−1}), e 边 (emission) 是发射 P(w_i|t_i). 句子的来历被设想成: 标签先一个接一个产生, 每个标签再吐出一个词. 我们只看得见词, 标签是「隐」的, 所以要推断. t⁰ 是句首的虚拟标签.
+S hmmmod | trans | 转移 | sequence | 标签到下一个标签的 s 边.
+S hmmmod | emit | 发射 | emission | 标签到词的 e 边.
+
+D posformal | Given a sentence, find the most probable sequence of tags: argmax over t₁,ₙ of Σᵢ [log P(wᵢ|tᵢ) + log P(tᵢ|tᵢ₋₁)].
+X posformal | 从 argmax P(t₁,ₙ|w₁,ₙ) 出发: 加虚拟起始标签, 用贝叶斯翻转, 去掉对所有候选相同的分母. 再假设给定标签时词相互独立且只依赖自己的标签, 用链式法则和马尔可夫假设展开标签序列, 得到每个位置一个「发射 × 转移」. 最后取对数, 乘法变加法, 算起来更方便. 公式 (11) 是考点.
+S posformal | start | 虚拟起始标签 | dummy “start” tag | 让第一个词也有前一个标签.
+S posformal | logsp | 对数空间 | computation in log space | 乘积变成求和.
+S posformal | simplif | 化简 argmax | Simplifying the argmax | 从条件概率一路化到发射和转移的乘积.
+
+D greedy | At position i, choose the tag that maximizes P(tᵢ|tᵢ₋₁)P(wᵢ|tᵢ).
+X greedy | 从左到右走, 每步选让「转移 × 发射」最大的标签, 选完不再回头. 问题在于早期的错误改不了: A representative put costs 20% more 里, put 其实是名词, 证据要到后面才出现, 贪心却已经把它当动词. 所以必须比较整条序列.
+
+D brute | There are |T|^n different tag sequences.
+X brute | 每个位置 |T| 种选择, n 个位置就是 |T|^n 种. 40 个标签、20 个词已经有约 1.1 × 10³² 条序列, 不可能逐条算. 这就是形式定义不能直接计算的原因.
+
+D dynpro | Optimal substructure and overlapping subsolutions: the subproblem is the best path that gets me to tag t at position j.
+X dynpro | 两个性质. 最优子结构: 最优路径的每段前缀也是最优的. 重叠子解: 到达「位置 j、标签 t」的最优前缀会被下一列所有节点用到, 穷举要重算, 动态规划只算一次. 马尔可夫假设保证下一步只需要当前标签, 所以这样拆是成立的.
+S dynpro | optsub | 最优子结构 | Optimal substructure | 最优解包含子问题的最优解.
+S dynpro | overlap | 重叠子解 | Overlapping subsolutions | 同一子解被反复用到.
+
+D lattice | lattice = path probability matrix.
+X lattice | 把所有序列压缩到一张图: 一列一个词, 一列里的节点是这个词的候选标签, 一条从左到右的路径就是一个标签序列. 发射概率为 0 的标签可以不考虑. 例: Janet/NNP will/MD back/VB the/DT bill/NN 是图中的最优路径.
+
+D vtrbbptr | vtrb_j(t) is the probability of the most probable path from 0 to j that tags w_j with t; bptr_j(t) is the tag of w_{j−1} on that path.
+X vtrbbptr | vtrb 是某列某标签的值, 由上一列的 vtrb × 转移 × 发射取最大得到; bptr 记下哪个前驱胜出. 起点 vtrb₀(start) = 1. 第一列只有 start 一个前驱. 课件例子: vtrb₂(other) = 0.0192, bptr₂(other) = NN.
+S vtrbbptr | vtrbdef | Viterbi 概率 | vtrb | 到某位置某标签的最优路径概率.
+S vtrbbptr | bptrdef | 回溯指针 | bptr | 最优路径上的前一个标签.
+
+D viterbi | Viterbi algorithm: find the most probable tag sequence.
+X viterbi | 三步: 初始化第一列; 递推, 每个节点在所有前驱里取 vtrb × 转移 × 发射的最大值并记下 bptr; 终止, 从最后一列的最大值开始顺 bptr 倒着读出序列. 例: move is 得 move/NN is/other, 概率 0.0192. 同样的思路也用于选择子词元切分.
+S viterbi | init | 初始化 | initialization | 第一列 = 起始概率 × 发射.
+S viterbi | recur | 递推 | recursion | 取前驱最大值, 记回溯指针.
+S viterbi | term | 终止 | termination | 取最后一列最大值并回溯.
+S viterbi | readout | 读出路径 | Read out path | 顺 bptr 倒着读.

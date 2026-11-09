@@ -179,3 +179,15 @@ X EIP:cutjoin ~ DBS:natjoin | join 命令按共同的键合并文件, 就是自�
 X EIP:difftool ~ SP:commit | git diff 用的就是 diff 的统一格式.
 X EIP:assocarr ~ SP:dict | 关联数组相当于 Python 字典.
 X EIP:debugging ~ EIPS:fehlertypen | 语法错误和逻辑错误的区分相同.
+
+# EICL 07 · 隐马尔可夫模型 (2026-11-08)
+X EICL:hmmmod ~ SMIS:hmm | 同一模型; EICL 用 1 阶入门, SMIS 讲一般形式.
+X EICL:viterbi ~ SMIS:viterbi | 同一算法; EICL 手算小例子, SMIS 讲更完整的形式.
+X EICL:viterbi ~ DPNLP2:viterbi | 同一种动态规划, 词性序列换成子词元切分.
+X EICL:condp ~ SMIS:cond | 同一概念.
+X EICL:chainr ~ SMIS:chain | 同一概念.
+X EICL:bayes ~ SMIS:bayes | 同一定理.
+X EICL:indep ~ SMIS:indep | 同一概念; EICL 用于检验词的共现.
+X EICL:mle ~ SMIS:mlest | 同一方法: 用相对频率估计概率.
+X EICL:markovo ~ SMIS:markov | 阶数即马尔可夫模型的 k.
+X EICL:superv ~ IML:sup | 词性标注是监督学习的一个实例.

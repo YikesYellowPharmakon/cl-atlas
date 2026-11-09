@@ -305,6 +305,134 @@ KA Regens | das | Ein Wort ist das Regens | Folie 33
 KA Dependent | der | das andere Wort ist der Dependent | Folie 33
 
 # ---- 名称依据 (cover.py 溯源检查): 笔记里没有逐字出现的名称, 人工审过才写在这里 ----
-ZH 学科标准译名 | 否定辖域; 量词辖域; 挂接歧义; 空转移; 聚合关系; 描写性; 规定性; 多词单位; 错误率; 词结构树; 递归复合; STTS 标签集
-ZH 描述性小标题, 不是术语 | 从句作成分; 切分方法; 十个词类; 可否屈折; 命名方式; 多种说法; 梅里丘克三条件; 相同判定标准; 符类符例比; 规则格式; 词的判定标准; 词类划分标准; 语境消歧
+ZH 学科标准译名 | 否定辖域; 量词辖域; 挂接歧义; 空转移; 聚合关系; 描写性; 规定性; 多词单位; 错误率; 词结构树; 递归复合; STTS 标签集; 对数空间; 虚拟起始标签
+ZH 描述性小标题, 不是术语 | 从句作成分; 切分方法; 十个词类; 可否屈折; 命名方式; 多种说法; 梅里丘克三条件; 相同判定标准; 符类符例比; 规则格式; 词的判定标准; 词类划分标准; 语境消歧; 两种信息来源; 分母展开; 检验独立性; 概率基础; 正因子不影响 argmax; 读出路径
 DE 学科标准叫法 | Asterisk *; Attributtypen; Direkte Rekursion; Externe Distribution; Freie & gebundene Morpheme; Indirekte Rekursion; Klassenerhaltende Derivation; Klassifikationskriterien; Kopftabelle; Kriterien für „Wort“; Mehrwortausdrücke; Mel’čuks Definition; Negationsskopus; Paraphrasen; Phrasentypen; Quantorenskopus; Rekursive Komposition; Schema X → (W) Y (Z); Strikte vs. großzügige Interpretation; Strukturelle Ambiguität; Strukturelle Position; Verschmelzung; Wortart-Ambiguität; Wortstrukturbaum; ε
+
+# ===== EICL 07 · 隐马尔可夫模型 (Schütze, 12hmm.pdf; 英语课件) 2026-11-08 =====
+B wkeit | 概率基础 | Basics | 词性标注要用到的最少量概率论: 条件概率、链式法则、贝叶斯定理、独立性.
+B hmmb | 概率词性标注 | Probabilistic POS tagging | 从标注语料估计两组参数, 把词性标注写成求最可能标签序列.
+B vitb | Viterbi 算法 | Viterbi | 用动态规划在指数多的序列里找最可能的一条.
+
+N argmax | wkeit | max 与 argmax | max, argmax | 07:argmax | max 给出最大的值, argmax 给出取到最大值的自变量. | 词性标注要的是 argmax ;; 乘正因子不改变 argmax | argmax 给出 x = 2, max 给出 5
+N jointp | wkeit | 联合概率 | Joint probability | 07:joint | A 和 B 同时发生的概率. | 写作 P(AB) 或 P(A∩B) ;; NLP 里常指先后发生的序列
+N condp | wkeit | 条件概率 | Conditional probability | 07:joint | 得知某些信息之后, 对事件概率的更新. | P(A|B) = P(AB)/P(B) ;; 面积上是交集除以 B
+N chainr | wkeit | 链式法则 | Chain rule | 07:chain | 把序列的概率拆成一串条件概率的乘积. | 不做任何假设, 永远成立 ;; NLP 里主要用于序列
+N bayes | wkeit | 贝叶斯定理 | Bayes’ theorem | 07:bayes | 把条件翻过来, 由 P(A|B) 求 P(B|A). | 分母可按 B 和非 B 展开 ;; 标注时用来翻转词和标签
+N indep | wkeit | 独立性 | Independence | 07:indep | 联合概率等于各自概率的乘积. | 知道 A 不改变对 B 的判断 ;; 检验: 比较 P(AB) 和 P(A)P(B) ;; 远大于是正相关, 远小于是负相关 | champagne, sparkling
+
+N brownset | hmmb | Brown 语料库与标签集 | Brown part-of-speech tags | 07:brown | 早期词性标注研究用的语料库, 它的标签集按形态细分. | 名词分 NN、NNS、NNP ;; 动词按屈折形式分五类 ;; is 和 to 有专属标签 | VBD, NNS, AT
+N infoq | hmmb | 两种信息来源 | Two main sources of information | 07:infosources | 标注靠邻居的词性和词自身对词性的偏好. | 只选最常见标签就有 90% 正确率 ;; 两种信息各对应一组参数 | The representative put chairs on the table
+N superv | hmmb | 监督学习 | Supervised learning | 07:supervised | 在人工标注的训练集上学参数, 再用到新文本上. | 参数就是从训练集学到的数字 ;; 对 HMM 来说学习就是计数
+N mle | hmmb | 最大似然估计 | Maximum likelihood estimate | 07:context | 这里就是用训练集里的相对频率估计概率. | 没见过的组合概率为 0 | C(JJ NN) / C(JJ)
+N ctxparam | hmmb | 上下文参数 | Context parameters | 07:context | 前一个标签已知时下一个标签的概率 P(t^k|t^j). | 估计: C(t^j t^k) / C(t^j) ;; 有限视野和时间不变性两个假设 | P(NN|JJ)
+N markovo | hmmb | 马尔可夫模型的阶数 | nth order Markov model | 07:context | n 阶模型里当前标签依赖前 n 个标签. | 0 阶不看前面的标签 ;; 本讲用 1 阶
+N biasparam | hmmb | 词性偏好参数 | Word bias | 07:bias | 标签已知时词的概率 P(w^l|t^j). | 估计: C(w^l : t^j) / C(t^j) ;; 分母是标签的次数 | P(book|NN)
+N hmmmod | hmmb | 隐马尔可夫模型 | Hidden Markov Model | 07:generate | 标签按转移一个接一个产生, 每个标签发射出一个词. | 标签看不见, 词看得见 ;; 方向是标签生成词, 所以用 P(w|t)
+N posformal | hmmb | 词性标注的形式定义 | Part-of-speech tagging: Problem statement | 07:problem | 给定句子, 选条件概率最大的标签序列. | 贝叶斯翻转后去掉分母 ;; 再用词的假设和马尔可夫假设 ;; 取对数变成求和
+N greedy | hmmb | 贪心标注 | Greedy tagging | 07:greedy | 从左到右每步选当前最好的标签, 选完不再回头. | 早期选错后面改不了 | A representative put costs 20% more
+
+N brute | vitb | 穷举法 | Brute force | 07:bruteforce | 逐条计算所有标签序列, 共 |T|^n 条. | 40 个标签 20 个词约 10^32 条
+N dynpro | vitb | 动态规划 | Dynamic programming | 07:dp | 把问题拆成子问题, 重叠的子解只算一次. | 最优子结构 ;; 重叠子解
+N lattice | vitb | 网格 | Lattice | 07:lattice | 一列一个词、一列内每个节点一个候选标签的图. | 一条路径就是一个标签序列 ;; 也叫路径概率矩阵
+N vtrbbptr | vitb | vtrb 与 bptr | vtrb and bptr | 07:example | vtrb 是到某位置某标签的最优路径概率, bptr 记下它的前一个标签. | 起点 vtrb0(start) = 1 ;; 读结果时倒着顺 bptr 走
+N viterbi | vitb | Viterbi 算法 | Viterbi | 07:lattice | 逐列求每个标签的最优路径, 最后回溯出最可能的序列. | 初始化、递推、终止三步 ;; 每列每个节点只留一个最优前驱 | move/NN is/other
+
+E argmax > posformal | 形式定义就是一个 argmax.
+E jointp > condp | 条件概率由联合概率定义.
+E condp > chainr | 反复用条件概率的定义得到链式法则.
+E condp > bayes | 贝叶斯定理由条件概率定义推出.
+E jointp > indep | 独立性比较联合概率和乘积.
+E chainr > posformal | 对标签序列用链式法则.
+E bayes > posformal | 化简第一步翻转词和标签.
+E indep > posformal | 化简时假设词在给定标签时条件独立.
+E postag > infoq | 标注任务先要问能用什么信息.
+E postag > brownset | 标注需要一套标签集.
+E brownset > superv | 训练集按标签集人工标注.
+E superv > mle | 训练集用来估计参数.
+E infoq > ctxparam | 上下文信息写成转移概率.
+E infoq > biasparam | 词的偏好写成发射概率.
+E mle > ctxparam | 上下文参数用相对频率估计.
+E mle > biasparam | 偏好参数用相对频率估计.
+E markovo > ctxparam | 阶数决定上下文参数往回看几个标签.
+E ctxparam > hmmmod | 上下文参数是模型的转移.
+E biasparam > hmmmod | 偏好参数是模型的发射.
+E hmmmod > posformal | 模型结构给出化简后的乘积.
+E hmmmod > greedy | 贪心标注直接用模型的两组参数.
+E greedy ~ viterbi | 局部决定对比比较整条序列.
+E posformal > brute | 直接求 argmax 就要遍历全部序列.
+E brute > dynpro | 序列太多才需要动态规划.
+E dynpro > lattice | 网格是存放子解的结构.
+E lattice > vtrbbptr | 两个量定义在网格的节点上.
+E vtrbbptr > viterbi | 算法逐列计算这两个量.
+E dynpro > viterbi | Viterbi 是动态规划的一个实例.
+
+T joint probability |  |  | 联合概率 | wkeit | The probability that A and B occur together. | A 和 B 同时发生的概率. |  | 07:joint
+T conditional probability |  |  | 条件概率 | wkeit | The updated probability of an event given some knowledge. | 得知某些信息后更新的概率. | joint probability | 07:joint
+T chain rule |  |  | 链式法则 | wkeit | Factorizes a sequence probability into a product of conditional probabilities. | 把序列概率拆成条件概率的乘积. |  | 07:chain
+T Bayes’ theorem |  |  | 贝叶斯定理 | wkeit | Computes P(B|A) from P(A|B), P(B) and P(A). | 由 P(A|B) 求 P(B|A). |  | 07:bayes
+T independence |  |  | 独立性 | wkeit | A and B are independent iff P(AB) = P(A)P(B). | 联合概率等于各自概率的乘积. |  | 07:indep
+T relative frequency |  |  | 相对频率 | wkeit | A count divided by the total count, the simplest probability estimate. | 次数除以总数, 最简单的概率估计. |  | 07:indep
+T Brown corpus |  |  | 布朗语料库 | hmmb | The corpus on which early part-of-speech tagging work was done. | 早期词性标注研究用的语料库. |  | 07:brown
+T tag set |  |  | 标签集 | hmmb | The set of part-of-speech tags used by a tagger. | 标注器所用的全部词性标签. |  | 07:brown
+T supervised learning |  |  | 监督学习 | hmmb | Learning parameters from a training set labeled by hand. | 在人工标注的训练集上学习参数. |  | 07:supervised
+T maximum likelihood estimate |  |  | 最大似然估计 | hmmb | Here: estimating a probability by relative frequency. | 这里指用相对频率估计概率. | relative frequency | 07:context | MLE
+T context parameters |  |  | 上下文参数 | hmmb | The conditional probabilities P(t^k|t^j). | 给定前一标签时下一标签的条件概率. | word bias | 07:context
+T word bias |  |  | 词性偏好 | hmmb | A word’s preference for certain tags, modeled as P(w|t). | 词对各词性的偏好, 用 P(w|t) 建模. | context parameters | 07:bias
+T Markov assumption |  |  | 马尔可夫假设 | hmmb | The memory is limited to a fixed number of preceding tags. | 记忆只限于前面固定个数的标签. |  | 07:context | limited horizon
+T time invariance |  |  | 时间不变性 | hmmb | The conditional probabilities do not change along the sentence. | 条件概率在句子各处都相同. |  | 07:context | stationary
+T order |  |  | 阶数 | hmmb | The number of previous tags a Markov model depends on. | 马尔可夫模型依赖前面几个标签. |  | 07:context
+T Hidden Markov Model |  |  | 隐马尔可夫模型 | hmmb | Hidden tags generate a sequence of observed words. | 隐藏的标签生成看得见的词序列. |  | 07:generate | HMM
+T emission |  |  | 发射 | hmmb | A tag generating a word, with probability P(w|t). | 标签以 P(w|t) 生成一个词. | transition | 07:generate
+T greedy tagging |  |  | 贪心标注 | hmmb | Choosing the locally most probable tag word by word. | 逐词选择局部最可能的标签. | Viterbi | 07:greedy
+T dynamic programming |  |  | 动态规划 | vitb | Solving overlapping subproblems once and reusing their solutions. | 重叠的子问题只解一次并重复使用. |  | 07:dp
+T optimal substructure |  |  | 最优子结构 | vitb | An optimal solution contains optimal solutions to subproblems. | 最优解里包含子问题的最优解. |  | 07:dp
+T overlapping subsolutions |  |  | 重叠子解 | vitb | The same subsolutions are needed again and again. | 同样的子解被反复需要. |  | 07:dp
+T lattice |  |  | 网格 | vitb | A graph with one column of candidate tags per word. | 每个词一列候选标签的图. |  | 07:lattice | path probability matrix
+T backpointer |  |  | 回溯指针 | vitb | Stores the previous tag on the best path to a node. | 记下到达节点的最优路径上的前一个标签. |  | 07:lattice | bptr
+T Viterbi |  |  | Viterbi | vitb | Dynamic programming algorithm for the most probable tag sequence. | 求最可能标签序列的动态规划算法. | greedy tagging | 07:lattice | Viterbi-Algorithmus
+
+M joint probability | jointp
+M conditional probability | condp
+M chain rule | chainr
+M Bayes’ theorem | bayes
+M independence | indep
+M relative frequency | mle
+M Brown corpus | brownset
+M tag set | brownset
+M supervised learning | superv
+M maximum likelihood estimate | mle
+M context parameters | ctxparam
+M word bias | biasparam
+M Markov assumption | ctxparam
+M time invariance | ctxparam
+M order | markovo
+M Hidden Markov Model | hmmmod
+M emission | hmmmod
+M greedy tagging | greedy
+M dynamic programming | dynpro
+M optimal substructure | dynpro
+M overlapping subsolutions | dynpro
+M lattice | lattice
+M backpointer | vtrbbptr
+M Viterbi | viterbi
+
+KP 07 | Part-of-speech tagging, informal definition | postag.infdef
+KP 07 | Part-of-speech tagging, formal definition | posformal
+KP 07 | Brown part-of-speech tags | brownset
+KP 07 | Parameter estimation: Context | ctxparam
+KP 07 | Parameter estimation: Word bias | biasparam
+KP 07 | Order of a Markov model | markovo
+KP 07 | Viterbi | viterbi
+
+SKIP EICL 07: 分节标题, 内容归入其下各概念 | Basics; Viterbi; Probabilistic POS tagging; POS setup; POS tagging
+SKIP EICL 07: 记号 | ∑ and ∏; Notation; Notation (2)
+SKIP EICL 07: 动机, 归入 Viterbi 算法 (子词元切分) | Relevance in the age of generative AI
+SKIP EICL 07: 例题数据, 归入 Viterbi 算法 | Example: P(VB|MD), P(the|DT)
+SKIP EICL 07: 归入 词性标注的形式定义 | Simplifying the argmax (1)–(3)
+SKIP EICL 07: 结构性回顾 | Learning goals
+DROP EICL 07: 归入 词性偏好参数 / 上下文参数 | bias; context
+DROP EICL 07: 归入 隐马尔可夫模型 (s 边) | sequence
+DROP EICL 07: 并入其他术语 | part-of-speech tagging; path probability matrix; limited horizon; stationary
+DROP EICL 07: 归入 Viterbi 算法 (动机) | subtoken
+DROP EICL 07: 归入 Viterbi 算法 (三步) | initialization; recursion; termination
