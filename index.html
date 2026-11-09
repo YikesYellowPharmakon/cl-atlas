@@ -2576,13 +2576,15 @@ window.IDX={"courses": [{"code": "EIP", "mod": "HP1", "g": "HP", "zh": "计算�
   function openNote(href, hit, a) { if (RDR) return; var mdl = $('#mdl'); if (mdl) { mdl.remove(); D.body.classList.remove('on'); }
     history.replaceState({ y: scrollY, open: OPEN }, '', location.hash); history.pushState({ rd: 1 }, '', '#/read/' + hit[0].code + '/' + encodeURIComponent(hit[1].fn) + (href.indexOf('#') > 0 ? '/' + href.split('#')[1] : ''));
     reader(href, hit, a); }
+  /* 2026-11-09 Cmd+←/→ 连贯: 笔记的 INDEX 和胶囊目录跳转时替换当前历史, 不多记一步 (笔记显示在 iframe 里, 同页锚点算在同一个后退栈上). 只在阅读层生效, 笔记文件不改; 正文交叉引用和笔记间跳转不动; 读不到 iframe (file://) 时保持原样 */
+  function noHist(f) { try { var d = f.contentDocument, w = f.contentWindow; if (!d) return; d.addEventListener('click', function (e) { if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; var a = e.target.closest && e.target.closest('nav a[href^="#"], #toc-pill .panel a[href^="#"]'); if (!a || a.target === '_blank') return; e.preventDefault(); w.location.replace(a.href); /* 必须用完整地址: 相对地址会按主页解析, 把笔记换成主页 */ }); } catch (e) {} }
   function reader(href, hit, a) { var c = hit[0], y0 = scrollY; RDR = { y: y0, code: c.code };
     /* 有遮罩时不做配色过渡: 底下的页面马上要被盖住, 过渡只会每帧重算全页样式、重画几十个图层, 和动画开头抢资源 */
     if (!(window.AtlasMark && AtlasMark.willPlay())) morph(); H.dataset.course = c.code; if (window.__bgRepal) window.__bgRepal(); H.classList.add('reading');
     /* 加载遮罩: 星座 A 盖住画面, 笔记加载完并停在目标位置后退场 (intro.js) */
     var mk = window.AtlasMark ? AtlasMark.play({ hold: true, fadeIn: true, est: hit[1].z ? 800 + hit[1].z / 1048576 * 150 : 1500 }) : null; RDR.mk = mk;
     /* 2026-11-07: 遮罩的动画先起跑, 下一帧才开始加载笔记 (解析会占住主线程, 先开始加载的话动画第一帧就卡) */
-    var f = D.createElement('iframe'); f.id = 'rd'; f.title = hit[1].t; f.src = href; RDR.f = f; var ins = function () { if (RDR && RDR.f === f) D.body.appendChild(f); }; if (mk) { f.className = 'hold'; mk.whenLive(ins); H.classList.add('rdqn'); RDR.qt = setTimeout(function () { H.classList.add('rdq'); }, 180); /* 遮罩盖住后隐藏底下的页面, 少几十个图层 */ } else ins();
+    var f = D.createElement('iframe'); f.id = 'rd'; f.title = hit[1].t; f.src = href; RDR.f = f; f.addEventListener('load', function () { noHist(f); }); var ins = function () { if (RDR && RDR.f === f) D.body.appendChild(f); }; if (mk) { f.className = 'hold'; mk.whenLive(ins); H.classList.add('rdqn'); RDR.qt = setTimeout(function () { H.classList.add('rdq'); }, 180); /* 遮罩盖住后隐藏底下的页面, 少几十个图层 */ } else ins();
     /* 2026-11-07: 笔记准备好之前保持隐藏, 不在遮罩底下绘制; 停到目标位置后才露出, 再等它画完两帧, 然后才开始收尾, 收尾不会和绘制抢 */
     if (mk) { var reveal = function () { f.classList.remove('hold'); show(); }; mk.onend(reveal); f.addEventListener('load', function () { settle(f, function () { reveal(); var wait = Math.max(0, 280 - (performance.now() - t0)); requestAnimationFrame(function () { requestAnimationFrame(function () { setTimeout(function () { mk.ready(); }, wait + 260); /* 露出后留时间让 GPU 把整页光栅化完, 收尾不和它抢 */ }); }); }); }, { once: true }); }
     var bar = D.createElement('div'); bar.id = 'rdb'; bar.innerHTML = '<button class="rdx" aria-label="回到笔记目录" title="回到笔记目录 (Esc)"><i class="rdi"></i></button>'; D.body.appendChild(bar); RDR.b = bar; $('.rdx', bar).onclick = leaveReader;
