@@ -1139,6 +1139,7 @@
       <a href="#a2">Aufgabe 02 · 词与形态</a>
       <a href="#a3">Aufgabe 03 · 词类与依存</a>
       <a href="#a4">Aufgabe 04 · 成分与短语结构</a>
+      <a href="#a5">Aufgabe 05 · 词性标注与 Viterbi</a>
     </nav>
   </div>
 </header>
@@ -2069,6 +2070,119 @@
   <p><b>易错</b>: ① 把 tall 当成 was 的上级: 题目规定 head(VP) = head(V), 所以 VP → V Adj 的中心是 was, tall 挂在 was 下面. ② 边名写成 nsubj、ccomp 这类关系名: 题目要的是从属词的词类. ③ Buster、Chatterer 选 N: 它们是专有名词, 用 PropN; <span class="nb">tree 才是 N.</span></p>
 </details>
 <div class="add"><p>「Achtung」那句说的是 UD 的不同: Stanford 分析器按 UD 会让系动词句 the tree was tall 以形容词 tall 为中心, was 用 cop 挂在 tall 下面, tree 是 tall 的 nsubj; thought 下面的从句 (ccomp) 也就挂 tall 而不是 was. 边名也不是词类, 而是 nsubj、ccomp、det、cop 这类关系. 这和 Folie 51–53 的对比是同一回事: 成分树 + 中心语表让功能词 (这里是系动词) 当中心, <span class="nb">UD 让实词当中心.</span></p></div>
+</article>
+
+</section>
+
+
+<!-- ======================= AUFGABE 05 ======================= -->
+
+<section class="part" id="a5">
+<h2>Aufgabe 05<br><span class="de-title">POS-Tagging, Viterbi-Algorithmus, Markow-Annahmen</span><small><span class="rl">Frage 1 和 Frage 2 对应 <a href="EICL-07-隐马尔可夫模型.html#brown">EICL 07 · Brown 语料库与标签集</a>、<a href="EICL-07-隐马尔可夫模型.html#infosources">标注可用的信息</a>;</span><span class="rl">Frage 6 对应 <a href="EICL-07-隐马尔可夫模型.html#dp">EICL 07 · 动态规划</a>;</span><span class="rl">Frage 7 对应 <a href="EICL-07-隐马尔可夫模型.html#context">EICL 07 · 上下文参数</a>;</span><span class="rl">源文件 Aufgabe 10 (Seite 1 von 3) _ moodle.lmu.de.html 至 (Seite 3 von 3);</span><span class="rl">原标题为 Aufgabe 10.</span></small></h2>
+
+<div class="zh"><p>这张练习单考第 7 讲 (隐马尔可夫模型): 用 Brown 标签给句子标词性, 靠形态和位置给没见过的词定词性, 估算 Viterbi 的运行时间, 以及在不同阶数的马尔可夫假设下用相对频率<span class="nb">估计概率.</span></p></div>
+
+<article id="a5-1">
+<h3>Frage 1 · 用 Brown 标签标注两个句子<br><span class="de-title">POS tagging mit Brown-Tags</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 05 · Frage 1 · 5 Punkte</span>
+  <p>Das Part of Speech Tagging (POS tagging) ist sehr wichtig für viele computerlinguistische <span class="nb">Anwendungen.</span></p>
+  <p>Benutzen Sie für folgende Aufgabe die Brown POS Tags und wählen Sie die jeweils passenden Tags für alle Wörter des <span class="nb">Satzes aus:</span></p>
+  <p><i>I like to take long walks by the seashore . It helps me relax .</i></p>
+  <p>Auswahl: AT, BEZ, IN, JJ, JJR, MD, NN, NNP, NNS, PERIOD, PN, RB, RBR, TO, VB, VBD, VBG, VBN, VBZ, <span class="nb">WDT</span></p>
+</div>
+<div class="zh"><p>词性标注对很多计算语言学应用都很重要. 用 Brown 标签给句子里的每个词选合<span class="nb">适的标签.</span></p>
+<p>标签含义见 <a href="EICL-07-隐马尔可夫模型.html#brown">EICL 07 Folie 26</a>. 先看词在句子里的功能, 再按形态细分: 名词看单复数, 动词看屈折形式. 标点也是一个词, <span class="nb">要单独标.</span></p></div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<div class="tablewrap"><table>
+<tr><th>词</th><th>标签</th><th>依据</th></tr>
+<tr><td>I</td><td>PN</td><td>人称代词</td></tr>
+<tr><td>like</td><td>VB</td><td class="wide">动词原形: 主语是 I, 没有第三人称单数的 -s</td></tr>
+<tr><td>to</td><td>TO</td><td class="wide">to 有专属标签, 这里是不定式标记</td></tr>
+<tr><td>take</td><td>VB</td><td>不定式, 动词原形</td></tr>
+<tr><td>long</td><td>JJ</td><td>修饰 walks 的形容词</td></tr>
+<tr><td>walks</td><td>NNS</td><td>复数名词, 不是动词</td></tr>
+<tr><td>by</td><td>IN</td><td>介词</td></tr>
+<tr><td>the</td><td>AT</td><td>冠词</td></tr>
+<tr><td>seashore</td><td>NN</td><td>单数名词</td></tr>
+<tr><td>.</td><td>PERIOD</td><td>句末标点</td></tr>
+<tr><td>It</td><td>PN</td><td>人称代词</td></tr>
+<tr><td>helps</td><td>VBZ</td><td>第三人称单数现在时</td></tr>
+<tr><td>me</td><td>PN</td><td>人称代词, 宾格也是 PN</td></tr>
+<tr><td>relax</td><td>VB</td><td class="wide">help 后面的不带 to 不定式, 动词原形</td></tr>
+<tr><td>.</td><td>PERIOD</td><td>句末标点</td></tr>
+</table></div>
+<p><b>易错</b>: walks 和 helps 都以 -s 结尾, 但 long walks 里前面是形容词, 后面接介词短语, 所以是名词复数 NNS; It helps me 里 helps 是谓语, 所以是 VBZ. 这正是词性标注要解决的歧义: 同一种词尾, <span class="nb">要靠上下文区分.</span></p>
+</details>
+<div class="add"><p>这份标签表是课上的简化版. 原始 Brown 标签集更细: I 是 PPSS, It 是 PPS, me 是 PPO, the 是 AT. 现在常用的 Penn Treebank 标签集里, like 是 VBP (非第三人称单数现在时), 这份表里没有这个标签, <span class="nb">所以只能选 VB.</span></p></div>
+</article>
+
+<article id="a5-2">
+<h3>Frage 2 · 给虚构词定词性<br><span class="de-title">Unbekannte Wörter taggen</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 05 · Frage 2 · 2 Punkte</span>
+  <p>Wählen Sie jeweils den wahrscheinlichsten Part of Speech für die Wörter in folgendem fiktiven Satz aus. Benutzen Sie die Brown-Corpus-Tags, wie sie in der Vorlesung definiert <span class="nb">wurden.</span></p>
+  <p>Überlegen Sie sich auch, welche Merkmale der unbekannten Wörter es sind, die ein Tagging möglich <span class="nb">machen.</span></p>
+  <p>"Das Ützlipütz prümft den pliemen <span class="nb">Wenzipil."</span></p>
+  <p>Auswahl: AT, BEZ, IN, JJ, JJR, MD, NN, NNP, NNS, PERIOD, PN, RB, RBR, TO, VB, VBD, VBG, VBN, VBZ, <span class="nb">WDT</span></p>
+</div>
+<div class="zh"><p>为虚构句子里的每个词选最可能的词性, 用课上定义的 Brown 标签. 还要想一想: 是未知词的哪些特征让标注<span class="nb">成为可能.</span></p>
+<p>实词都是编的, 词典帮不上忙, 能用的只有功能词 Das、den 和实词的形态、位置. 按 <a href="EICL-07-隐马尔可夫模型.html#infosources">EICL 07</a> 的两类信息来想: 相邻标签的搭配, <span class="nb">和词本身的形式.</span></p></div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<div class="tablewrap"><table>
+<tr><th>词</th><th>标签</th><th>靠什么判断</th></tr>
+<tr><td>Das</td><td>AT</td><td>已知的冠词, 后面紧跟大写词</td></tr>
+<tr><td>Ützlipütz</td><td>NN</td><td class="wide">大写, 在冠词后面; 没有复数词尾, Das 也说明是中性单数</td></tr>
+<tr><td>prümft</td><td>VBZ</td><td class="wide">词尾 -t 配第三人称单数主语, 在陈述句第二位</td></tr>
+<tr><td>den</td><td>AT</td><td>已知的冠词</td></tr>
+<tr><td>pliemen</td><td>JJ</td><td class="wide">小写, 夹在冠词和大写词之间, 词尾 -en 是形容词的屈折</td></tr>
+<tr><td>Wenzipil</td><td>NN</td><td class="wide">大写, 在 den + 形容词后面, 单数</td></tr>
+<tr><td>.</td><td>PERIOD</td><td>句末标点</td></tr>
+</table></div>
+<p>起作用的特征有四类: 大写 (德语名词), 词尾 (-t、-en), 词在句中的位置 (动词第二位、形容词夹在冠词和名词之间), 相邻的功能词 (Das、<span class="nb">den 预告后面有名词).</span></p>
+<p><b>易错</b>: 大写词不一定是专有名词 NNP. 德语普通名词都大写, 而且专有名词前一般不带冠词, <span class="nb">所以这里选 NN.</span></p>
+</details>
+</article>
+
+<article id="a5-6">
+<h3>Frage 6 · 标签数变成 5 倍, 运行时间变成几倍<br><span class="de-title">Laufzeit des Viterbi-Algorithmus</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 05 · Frage 6 · 1 Punkt</span>
+  <p>Betrachten Sie wieder den Viterbi-Algorithmus, wie er in der Vorlesung beschrieben wurde. Angenommen, ein Satz der Länge 10 wird getaggt und dann die Anzahl der Tags verfünffacht. Um welchen Faktor erhöht sich dann die Laufzeit des Algorithmus <span class="nb">ungefähr?</span></p>
+  <p>Auswahl: 1, 5, 10, 25, 50, 100, <span class="nb">500</span></p>
+</div>
+<div class="zh"><p>看课上讲的 Viterbi 算法. 假设给一个长度为 10 的句子标注, 然后把标签数变成 5 倍. 算法的运行时间大约变成原来<span class="nb">的多少倍?</span></p>
+<p>数一下算法做了多少次比较: 句子有多少个位置, 每个位置有多少个标签要填, 填一个标签时要看前一列的多<span class="nb">少个格子.</span></p></div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<p>因子是 <b>25</b>. 句长 <span class="mt"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>,</span><!--/mt--> 标签数 <span class="mt"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">∣</span></span></span></span>:</span><!--/mt--> 每个位置要填 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">∣</span></span></span></span> 个格子, 每个格子要比较前一列的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">∣</span></span></span></span> 个格子, 所以运行时间是 <span class="mt"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord"><span class="mord">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>.</span><!--/mt--> 标签数变成 5 倍, 运行时间变成 <span class="nb"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">5</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">25</span></span></span></span> 倍.</span></p>
+<p><b>易错</b>: 句长 10 只是干扰信息, 它不变, 不影响倍数. 选 5 是忘了平方; 按穷举的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord"><span class="mord">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span> 算, 倍数是 <span class="mt"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">5</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span></span></span></span></span></span></span></span>,</span><!--/mt--> <span class="nb">选项里也没有.</span></p>
+</details>
+</article>
+
+<article id="a5-7">
+<h3>Frage 7 · 四种马尔可夫假设下的概率估计<br><span class="de-title">Markow-Annahmen 0. bis 3. Ordnung</span></h3>
+<div class="card de">
+  <span class="folie">Aufgabe 05 · Frage 7 · 2 Punkte</span>
+  <p>Schätzen Sie die Wahrscheinlichkeit P(books|reads the old) aufgrund des untenstehenden Textes unter vier verschiedenen <span class="nb">Markow-Annahmen.</span></p>
+  <p>Falls nötig, runden Sie die Zahlen auf die dritte Nachkommastelle. (Falls Sie Ihre Moodle-Einstellungen auf Englisch gestellt haben, benutzen Sie als Dezimaltrennzeichen bitte den Dezimalpunkt. Falls Sie Ihre Moodle-Einstellungen auf Deutsch gestellt haben, benutzen Sie hierfür bitte das <span class="nb">Komma.)</span></p>
+  <p>Wichtig: betrachten Sie &lt;s&gt; als ein Wort. Die Wahrscheinlichkeiten sollten also so geschätzt werden, als ob &lt;s&gt; ein normales Wort <span class="nb">wäre.</span></p>
+  <p>&lt;s&gt;<br>old books and new books sit on the shelves , the old man in between .<br>he reads the old books , but does he truly understand old books ?<br>&lt;s&gt;</p>
+  <p>Markow-Annahme 0. Ordnung: ___<br>Markow-Annahme 1. Ordnung: ___<br>Markow-Annahme 2. Ordnung: ___<br>Markow-Annahme 3. Ordnung: ___</p>
+</div>
+<div class="zh"><p>根据下面的文本, 在四种马尔可夫假设下估计概率 P(books|reads the old). 必要时四舍五入到小数点后第三位. 注意: 把 &lt;s&gt; <span class="nb">当成一个普通的词.</span></p>
+<p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 阶假设只保留最近的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 个词作条件, 然后用相对频率估计: 这 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 个词后面接 books 的次数, 除以这 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 个词出现的次数. 0 阶没有条件, <span class="nb">分母是全文的词数.</span></p></div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<p>全文 32 个词: 两个 &lt;s&gt;、标点各算一个词. <span class="nb">books 出现 4 次.</span></p>
+<div class="tablewrap"><table>
+<tr><th>阶数</th><th>要估计的概率</th><th>计数</th><th>结果</th></tr>
+<tr><td>0</td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">(</span><span class="mord text"><span class="mord">books</span></span><span class="mclose">)</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">4/32</span></span></span></span></td><td>0.125</td></tr>
+<tr><td>1</td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">(</span><span class="mord text"><span class="mord">books</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">old</span></span><span class="mclose">)</span></span></span></span></td><td class="wide"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mopen">(</span><span class="mord text"><span class="mord">old books</span></span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mopen">(</span><span class="mord text"><span class="mord">old</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3/4</span></span></span></span></td><td>0.75</td></tr>
+<tr><td>2</td><td class="wide"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">(</span><span class="mord text"><span class="mord">books</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">the old</span></span><span class="mclose">)</span></span></span></span></td><td class="wide"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mopen">(</span><span class="mord text"><span class="mord">the old books</span></span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mopen">(</span><span class="mord text"><span class="mord">the old</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/2</span></span></span></span></td><td>0.5</td></tr>
+<tr><td>3</td><td class="wide"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">P</span><span class="mopen">(</span><span class="mord text"><span class="mord">books</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">reads the old</span></span><span class="mclose">)</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1/1</span></span></span></span></td><td>1</td></tr>
+</table></div>
+<p>old 出现 4 次, 其中 the old man 那一次后面不是 books. the old 出现 2 次, 一次接 man, 一次接 books. reads the old 只出现 1 次, <span class="nb">后面就是 books.</span></p>
+<p><b>易错</b>: 0 阶的分母要把两个 &lt;s&gt; 和所有标点都算上, 少算 &lt;s&gt; 就会得到 4/30. 阶数越高, 条件越具体, 但计数越少: 3 阶的 1.0 只建立在一次观察上, <span class="nb">这就是数据稀疏.</span></p>
+</details>
 </article>
 
 </section>

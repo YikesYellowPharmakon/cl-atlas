@@ -43,7 +43,7 @@ for folder, path in SR.course_dirs():
         import contextlib, io
         with contextlib.redirect_stdout(io.StringIO()): CA.run(code)   # 先按当前笔记刷新锚点 (只读)
         data, rep = K.compile_course(code)
-        data['newf'] = [n['t'] for n in notes if n['k'] == 'lec' and n['fn'] not in data['used'] and not NONK_FILE.search(n['t']) and not re.search(r'组织|欢迎|Organisation', n['t'])]  # 组织类、研讨课类讲次本来不进图谱
+        data['newf'] = [n['t'] for n in notes if n['k'] == 'lec' and n['fn'] not in data['used'] and not NONK_FILE.search(n['t']) and not re.search(r'组织|欢迎|Organisation|^DPNLP II 00 ', n['t'])]  # 组织类、研讨课类讲次本来不进图谱; DPNLP II 00 用户定了不做
         data.pop('used'); REPORT[code] = rep; hub = data['hub']
         if data['newf']: print('新讲次未进图谱', code, data['newf'])
         if rep['errs']: sys.exit(f'{code} 校验失败: {rep["errs"]}')
