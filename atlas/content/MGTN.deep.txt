@@ -138,13 +138,14 @@ S komp | assoz | 结合律 | Assoziativität | h ∘ (g ∘ f) = (h ∘ g) ∘ f
 S komp | nichtkomm | 不可交换 |  | g ∘ f 和 f ∘ g 一般不同.
 
 D injsur | f ist injektiv, wenn aus f(x) = f(y) folgt x = y; surjektiv, wenn das Bild der ganze Wertebereich ist; bijektiv, wenn beides gilt.
-X injsur | 单射 (Injektivität) 看会不会撞车, 满射 (Surjektivität) 看目标集有没有元素被落下, 双射 (Bijektivität) 两者同时成立, 这时可以按箭头倒回去得到唯一的逆映射. 同一条公式换定义域或目标集, 性质就变: x ↦ x² 在 ℝ → ℝ 上两者都不是, 目标集缩到 ℝ₀⁺ 就是满射, 定义域也去掉负数就是双射, 逆映射是 √x. 有限集两边元素个数相同时, 三者一起成立或一起失败.
+X injsur | 单射 (Injektivität) 看会不会撞车, 满射 (Surjektivität) 看目标集有没有元素被落下, 双射 (Bijektivität) 两者同时成立, 这时可以按箭头倒回去得到唯一的逆映射. 同一条公式换定义域或目标集, 性质就变: x ↦ x² 在 ℝ → ℝ 上两者都不是, 目标集缩到 ℝ₀⁺ 就是满射, 定义域也去掉负数就是双射, 逆映射是 √x. 有限集两边元素个数相同时, 三者一起成立或一起失败. 复合时单射总能保持; 满射和双射只在 f 的值域等于 g 的定义域时才保持, 否则 g 的定义域里多出的部分会让 D 的元素取不到. 关系的角度: 单射 ⇔ 左唯一 (linkseindeutig), 满射 ⇔ 右全 (rechtstotal).
 S injsur | inj | 单射 | Injektivität | 不同输入不共享输出.
 S injsur | sur | 满射 | Surjektivität | 像等于整个目标集.
 S injsur | bij | 双射 | Bijektivität | 单射且满射, 有逆映射.
+S injsur | kompinh | 复合的保持性 |  | f、g 单射则 g ∘ f 单射; 满射和双射的保持还需要 f 的值域等于 g 的定义域.
 
-D umkehr | Eine Umkehrfunktion existiert nur für bijektive Abbildungen und ordnet jedem Funktionswert seine eindeutige Eingabe zu.
-X umkehr | 反函数 (Umkehrfunktion) 要求每个函数值恰好来自一个 x. x² 在 ℝ 上没有反函数, 但原像 f⁻¹({4}) = {−2, 2} 照样能算. 区间上的连续严格单调函数在它的像上是双射 (严格单调保证不撞车), 所以可以反解, 例如 exp 的反函数是 ln.
+D umkehr | f: A → B ist genau dann bijektiv, wenn es h: B → A gibt mit h(f(a)) = a für alle a und f(h(b)) = b für alle b; h ist eindeutig und heißt Umkehrfunktion f⁻¹.
+X umkehr | 反函数 (Umkehrfunktion) 要求每个函数值恰好来自一个 x. 反函数唯一, 而且 (f⁻¹)⁻¹ = f. x² 在 ℝ 上没有反函数, 但原像 f⁻¹({4}) = {−2, 2} 照样能算: 原像的括号里是集合, 反函数的括号里是元素. 区间上的连续严格单调函数在它的像上是双射 (严格单调保证不撞车), 所以可以反解, 例如 exp 的反函数是 ln.
 S umkehr | strmon | 严格单调 |  | 区间上严格单调的连续函数可以反解.
 
 D linab | Vektoren v₁, …, vₖ sind linear unabhängig, wenn c₁v₁ + … + cₖvₖ = 0 nur für c₁ = … = cₖ = 0 gilt.

@@ -1,4 +1,5 @@
 # MGTN · 读笔记后整理的知识网和术语. 德语课, 外文是德语. 字段说明见 SMIS.txt.
+# 2026-11-09 换版: 并入 Vl_7, 0.5.5 结合律证明补全, 0.6 重写 (单射/满射/双射、复合的保持性、反函数定理), 新增术语 linkseindeutig、rechtstotal.
 # 依据 MGTN-合集 0–2 部分 (2026-11-06). 第 1、2 部分笔记只写中文, 德语名用学科标准叫法 (见文末 DE 行).
 L DE
 H 数学的基本语法: 集合、命题逻辑、映射, 再到线性代数和一元分析.
@@ -35,8 +36,8 @@ N abbgl | abb | 映射相等 | Gleichheit von Abbildungen | s04 | 定义域相�
 N bild | abb | 像与原像 | Bild & Urbild | s04 | 像 f(M) 收集 M 的全部输出; 原像 f⁻¹(N) 收集落进 N 的全部输入. | 原像对任何映射都有定义, 不代表有逆映射 ;; 像总是值域的子集 ;; 求像要看整段, 不能只代端点 | M ⊆ f⁻¹(f(M))
 N graph | abb | 图像 | Graph | s04 | 所有 (输入, 输出) 对的集合, 正是定义里的关系 R. | 每条竖线和图像最多交一点, 就是右唯一性 | {(x, x²) ∣ x ∈ ℝ}
 N komp | abb | 复合 | Komposition | s04 | g ∘ f 先做 f 再做 g, 要求 f 的像落在 g 的定义域里. | 从右往左读 ;; 满足结合律, 但一般不能交换 | (g ∘ f)(x) = g(f(x))
-N injsur | abb | 单射、满射、双射 | Injektivität, Surjektivität, Bijektivität | s05 | 单射不撞车, 满射不落下目标集里的元素, 双射两者都满足. | 同一条公式换定义域或目标集, 性质就变 ;; 有限集两边一样大时三者一起成立或一起失败 | x ↦ x² 在 ℝ₀⁺ → ℝ₀⁺ 上是双射
-N umkehr | abb | 反函数 | Umkehrfunktion | s04 | 只有双射才有, 把每个输出唯一地送回它的输入. | 区间上严格单调的连续函数在像上可以反解 ;; f⁻¹(N) 作原像时不需要反函数 | exp 的反函数是 ln
+N injsur | abb | 单射、满射、双射 | Injektivität, Surjektivität, Bijektivität | s05 | 单射不撞车, 满射不落下目标集里的元素, 双射两者都满足. | 同一条公式换定义域或目标集, 性质就变 ;; 有限集两边一样大时三者一起成立或一起失败 ;; 证单射要对任意两点论证, 否定只需一对撞车的点 | x ↦ x² 在 ℝ₀⁺ → ℝ₀⁺ 上是双射
+N umkehr | abb | 反函数 | Umkehrfunktion | s05 | 只有双射才有, 把每个输出唯一地送回它的输入. | f 双射 ⇔ 存在 h 使 h(f(a)) = a 且 f(h(b)) = b ;; 区间上严格单调的连续函数在像上可以反解 ;; f⁻¹(N) 作原像时不需要反函数 | exp 的反函数是 ln
 
 N linab | la | 线性相关与线性无关 | Lineare Abhängigkeit | s11 | 只有系数全取 0 才能组合出零向量, 这组向量就线性无关. | 含零向量的一组一定线性相关 ;; ℝⁿ 里超过 n 个向量一定线性相关 ;; 两个向量相关 ⇔ 一个是另一个的倍数 | c₁v₁ + … + cₖvₖ = 0 ⇒ 全部 cᵢ = 0
 N linkomb | la | 线性组合 | Linearkombination | s11 | 先分别拉长再首尾相接: c₁v₁ + … + cₖvₖ. | 向量和数乘都按分量算 ;; 系数是每次拉长的倍数
@@ -105,6 +106,7 @@ E abb > komp | 复合是两个映射接力.
 E bild > injsur | 满射要求像等于整个值域.
 E abb > injsur | 单射和满射讨论映射定义不管的值域那一边.
 E injsur > umkehr | 只有双射才有反函数.
+E komp ~ injsur | 单射经复合保持; 满射和双射还要求前一个的值域等于后一个的定义域.
 E bild ~ umkehr | 原像的记号 f⁻¹ 不代表有反函数.
 E linkomb > linab | 线性无关看能否用非零系数组合出零向量.
 E linkomb > span | 张成是所有线性组合.
@@ -199,12 +201,14 @@ T Definitionsbereich | der | Definitionsbereiche | 定义域 | abb | Menge, aus 
 T Wertebereich | der | Wertebereiche | 值域 | abb | Menge, in der die Ausgaben einer Abbildung liegen müssen. | 规定输出只能落在里面的集合. | Bild | s04 | Zielmenge
 T Bild | das | Bilder | 像 | abb | Menge aller Funktionswerte f(x) mit x ∈ M. | M 里所有元素的函数值组成的集合. | Wertebereich | s04
 T Urbild | das | Urbilder | 原像 | abb | Menge aller x, deren Bild in N liegt. | 函数值落进 N 的所有输入. | Umkehrfunktion | s04
-T Umkehrfunktion | die | Umkehrfunktionen | 反函数 | abb | Abbildung, die jedem Bild seine eindeutige Eingabe zuordnet; existiert nur für Bijektionen. | 把每个输出送回唯一的输入, 只有双射才有. | Urbild | s04
+T Umkehrfunktion | die | Umkehrfunktionen | 反函数 | abb | Abbildung, die jedem Bild seine eindeutige Eingabe zuordnet; existiert nur für Bijektionen. | 把每个输出送回唯一的输入, 只有双射才有. | Urbild | s05
 T Graph | der | Graphen | 图像 | abb | Menge aller Paare (x, f(x)). | 所有 (x, f(x)) 组成的集合. |  | s04
 T Komposition | die | Kompositionen | 复合 | abb | g ∘ f: zuerst f, dann g anwenden. | 先用 f, 再用 g. |  | s04
 T Injektivität | die |  | 单射 | abb | Gleiche Funktionswerte haben gleiche Eingaben. | 输出相同就能推回输入相同. | Surjektivität | s05 | injektiv
 T Surjektivität | die |  | 满射 | abb | Das Bild ist der ganze Wertebereich. | 像等于整个目标集. | Injektivität | s05 | surjektiv
 T Bijektivität | die |  | 双射 | abb | Injektiv und surjektiv zugleich. | 既是单射又是满射. |  | s05 | bijektiv
+T linkseindeutig |  |  | 左唯一 | abb | Kein Element von B hat zwei verschiedene Partner in A. | 一个输出不能有两个输入; 映射的关系左唯一 ⇔ 映射是单射. | rechtstotal | s05
+T rechtstotal |  |  | 右全 | abb | Jedes Element von B hat mindestens einen Partner in A. | B 的每个元素都至少有一个输入; 映射的关系右全 ⇔ 映射是满射. | linkseindeutig | s05
 T Vektor | der | Vektoren | 向量 | la | Element eines Vektorraums, in ℝⁿ ein Tupel aus n reellen Zahlen. | 向量空间的元素, ℝⁿ 里是 n 个实数. | Skalar | s11
 T Skalar | der | Skalare | 标量 | la | Zahl, mit der ein Vektor multipliziert wird. | 用来拉长或反向的数. | Vektor | s11
 T Linearkombination | die | Linearkombinationen | 线性组合 | la | Summe c₁v₁ + … + cₖvₖ von Vielfachen von Vektoren. | 向量倍数之和. |  | s11
@@ -267,7 +271,7 @@ SKIP 章节标题, 内容在各小节 | 0 · 集合、命题逻辑与映射; 1 �
 
 # ---- 名称依据 (cover.py 溯源检查). 第 1、2 部分笔记只写中文, 德语名是德国大学数学课的标准叫法 ----
 ZH 学科标准译名 | 交换群; 重言式; 线性方程组; 转置矩阵; 容斥; 积法则; 商法则; 矩阵乘法; 理发师悖论; ε-N 定义; ε-δ 定义; 平行四边形法则
-ZH 描述性小标题, 不是术语 | 2ᵏ 个子集; 2ⁿ 行; |x| 在 0 不可导; 三个条件; 不相交时相加; 列是基向量的像; 只有一个空集; 含零向量; 常见函数; 无穷交; 有序取法; 有界且单调; 特解加核; 竖线检验; 解方程组检验; 解的三种情况; 闭区间上取到最值; 除以排列数; 集合作元素
+ZH 描述性小标题, 不是术语 | 复合的保持性; 2ᵏ 个子集; 2ⁿ 行; |x| 在 0 不可导; 三个条件; 不相交时相加; 列是基向量的像; 只有一个空集; 含零向量; 常见函数; 无穷交; 有序取法; 有界且单调; 特解加核; 竖线检验; 解方程组检验; 解的三种情况; 闭区间上取到最值; 除以排列数; 集合作元素
 DE 学科标准叫法 | Ableitungsregeln; Basis & Dimension; Basiswechsel; Binomialkoeffizient; Cauchy-Folge; Darstellungsmatrix & Basiswechsel; Differenzenquotient; Dimension; Dimensionsformel; Divergenz; Einheitsmatrix; Element; Erzeugendensystem; Gleichheit von Abbildungen; Grenzwert von Funktionen; Inverse & Rang; Junktoren; Kern; Kettenregel; Konvergenz & Grenzwert; Konvergenzkriterien; Konvergenzradius; Konvexität & Wendepunkt; Leibniz-Kriterium; Lineare Hülle; Lineares Gleichungssystem; Linearkombination; Mittelwertsatz; Partialsumme; Potenzreihe; Quotientenkriterium; Rang; Rechengesetze; Satz von Rolle; Skalar; Summen- und Produktzeichen; Teilfolge; Untervektorraum; Wendepunkt; Wurzelkriterium; Zahlbereiche; Zwischenwertsatz; absolute Konvergenz; atomare Aussage; geometrische Reihe; harmonische Reihe; inverse Matrix; transponierte Matrix
 
 # ---- 术语 → 图谱概念 ----
