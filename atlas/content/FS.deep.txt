@@ -117,3 +117,86 @@ D prio | Without brackets, unary operations are applied first, then concatenatio
 X prio | 优先级和算术「先乘方、再乘、最后加」同构: 一元运算 (幂、星号、加号、反转) 最先, 连接其次, 并、交、差最后. L₁ ∪ L₂L₃* 要读成 L₁ ∪ (L₂ · (L₃*)); 想先做并就必须加括号: (L₁ ∪ L₂)L₃*. 后面写正则表达式时同样按这个顺序读.
 S prio | order | 运算顺序 | Order of Operations | 一元运算 → 连接 → 集合运算.
 S prio | brackets | 括号 |  | 改变默认顺序必须加括号.
+
+# ---- FS 03 有限状态自动机 (2026-11-10) ----
+D nomem | Systems where the output or the next state is determined solely by the current state and the current input, without any need to remember past inputs.
+X nomem | 这类系统不另外保存输入的历史, 过去输入里有用的那一点信息已经体现在当前状态上 (current state). 售货机不记得先投了 1 分还是 2 分, 只记得「已经投了 3 分」. 闸机、售货机、红绿灯、数字电路和字符串搜索都是这样, 都可以实现成有限状态自动机 (finite state automaton). 状态个数有限, 能记住的信息也有限, 这就是有限自动机的能力边界.
+S nomem | nomemex | 例子 |  | 闸机、自动售货机、红绿灯、数字电路、字符串搜索.
+S nomem | curstate | 当前状态 |  | 过去输入里有用的信息全在当前状态里.
+
+D fsm | A finite state automaton is represented as a directed graph: a finite set of nodes (states) connected by a set of directed arcs (transitions).
+X fsm | 有限状态自动机画成有向图 (directed graph): 圆圈是状态 (state), 是系统停留一段时间的情形; 带标签的箭头是转移 (transition), 是瞬间发生的动作, 标签是触发它的输入. 例如电灯开关只有 ON 和 OFF 两个状态, switch off 从 ON 到 OFF, switch on 回到 ON. 它由输入带、读头和控制单元三部分组成, 是最简单的自动机.
+S fsm | fsmstate | 状态 | State | 系统停留一段时间的情形.
+S fsm | fsmtrans | 转移 | Transition | 瞬间发生的动作, 箭头上标着触发它的输入.
+S fsm | fsmextra | 更复杂的模型 |  | 加额外记忆、输出或左右移动的读头, 能力更强.
+
+D tape | The input tape contains the input string to be processed; it contains only symbols from the alphabet, is static, has finite length and is read from left to right.
+X tape | 输入带 (input tape) 上只有字母表 Σ 里的符号, 长度有限, 而且是静态的: 不能改写. 自动机没法把中间结果写回带上, 所以它唯一的记忆是控制单元里的当前状态. 以后的图灵机可以写带, 读头还能左右移动, 能力强得多.
+S tape | tapesym | 只含字母表符号 |  | 带上的每个符号都来自 Σ.
+S tape | tapestatic | 静态 |  | 不能修改, 长度有限.
+
+D head | The reader head reads one symbol at a time, starting with the leftmost symbol, and then moves one step to the right; it cannot move backward or modify the tape.
+X head | 读头 (reader head) 从最左边的符号开始, 读一个符号就右移一格, 不能后退也不能改写. 所以长度为 n 的串, 自动机正好走 n 步就结束, 每个符号只看一次, 这也是有限自动机识别字符串很快的原因.
+S head | headleft | 从最左边开始 |  | 初始化时读头放在最左边的符号上.
+S head | headright | 一步右移 |  | 每读一个符号右移一格, 不能后退.
+
+D cunit | The control unit determines transitions between states; it consists of the state register, which tracks the current state, and the transition function δ.
+X cunit | 控制单元 (control unit) 有两部分: 状态寄存器 (state register) 记住当前状态, 转移函数 δ (transition function) 给出「在这个状态读到这个符号, 下一步去哪里」. 有限自动机的有限记忆就在这里, 只用来记状态.
+S cunit | register | 状态寄存器 | State Register | 记住当前状态.
+S cunit | cudelta | 转移函数 | Transition Function | 由当前状态和输入符号算出下一个状态.
+
+D workflow | Initialization sets the control unit to the start state; each symbol is read and the next state computed via δ; at the end of the input the FSA accepts if it is in an accept state and rejects otherwise.
+X workflow | 运行分三步. 初始化: 输入串放上带, 读头在最左边, 控制单元置于初始状态 q₀ (start state). 处理: 读当前符号, 用当前状态和这个符号经 δ 算出下一个状态, 读头右移, 重复. 结束: 读完输入就停机, 在接受状态 (accept state, final state) 就接受 (accept), 否则拒绝 (reject). 只看读完整个串之后的状态, 中途经过终态不算.
+S workflow | init | 初始化 | Initialization | 读头在最左边, 控制单元在 q₀.
+S workflow | proc | 处理 | Processing | 读符号、经 δ 换状态、右移, 重复.
+S workflow | term | 结束 | Termination | 读完输入后在终态就接受, 否则拒绝.
+
+D dfa | In a deterministic FSA, for every state and input symbol there is exactly one transition to a new state; its behaviour is completely predictable.
+X dfa | 确定性有限自动机 (deterministic FSA, DFA) 的行为只由当前状态和输入决定, 完全可预测. 「确定」只管同一状态、同一符号不能有两个去向; 某个符号有没有转移是完全与否的问题. 严格按 δ : Q × Σ → Q 的定义, δ 是全函数, DFA 一定是完全的; 课件也把缺转移的自动机叫 DFA, 那是把 δ 放宽成部分函数.
+S dfa | onetrans | 恰好一个转移 |  | 每个状态和输入符号恰好对应一个下一状态.
+S dfa | predict | 完全可预测 |  | 行为由当前状态和输入唯一决定.
+
+D nfa | A nondeterministic FSA may have multiple possible transitions for a given state and input symbol and can choose among multiple paths.
+X nfa | 非确定性有限自动机 (nondeterministic FSA, NFA) 在同一状态读同一符号时可以有几个去向, 机器可以在几条路径里「选择」, 所以光看当前状态和输入预测不了它的行为. 课件在这一讲只提了一下 (stay tuned), 下一讲展开.
+S nfa | multitrans | 多个可能的转移 |  | 同一状态和符号可以有多个下一状态.
+
+D quint | An FSA is a quintuple (Σ, Q, q₀, δ, F): input alphabet, set of states, initial state, transition function and final states.
+X quint | 五元组 (quintuple) 把自动机的五个组成部分写全: 输入字母表 Σ, 有限的状态集合 Q, 初始状态 q₀ ∈ Q, 转移函数 δ : Q × Σ → Q, 终态集合 F ⊆ Q (可以有多个, 也可以为空). 读图时无起点的箭头 (或三角形) 指向初始状态, 双圈是终态. 课件写 (Σ, Q, q₀, δ, F), 练习和很多教材写 (Q, Σ, δ, q₀, F), 内容一样.
+S quint | qsigma | 输入字母表 | Input Alphabet | 自动机能读的符号.
+S quint | qstates | 状态集合 | Set of States | 有限个状态.
+S quint | qinit | 初始状态 | Initial State | q₀ ∈ Q, 运行从这里开始.
+S quint | qfinal | 终态 | Final States | F ⊆ Q, 读完时在这里就接受.
+
+D delta | The transition function δ : Q × Σ → Q defines how the state of the automaton changes in response to an input symbol and determines whether a string is accepted.
+X delta | 转移函数 (transition function) 把「状态, 符号」这一对映射到下一个状态. 它有三种等价写法: 逐条列出 δ(q₁, b) = q₂, 画成图上的箭头, 或写成转移表 (transition table). 一个串被不被接受, 由 δ 和终态集合一起决定. 课件 Slide 14 第一种写法把 δ(q₂, b) = q₂ 误印成了 δ(q₂, a) = q₂.
+S delta | dlist | 逐条列出 |  | δ(q₁, a) = q₁, δ(q₁, b) = q₂, …
+S delta | dgraph | 状态图 |  | 每条转移是一支带标签的箭头.
+
+D ttable | A transition table has the states as rows and the input symbols as columns; each cell gives the next state.
+X ttable | 转移表 (transition table) 把 δ 排成表: 第 q 行、a 列的格子就是 δ(q, a). DFA 的表每个格子恰好一个状态; 有空格说明缺转移, 是不完全的自动机. 练习里经常要在形式定义、转移表和图之间互相转换.
+
+D vend | A greedy vending machine with price 5 cents accepts any sequence of 1, 2 or 5 cent coins with total value 5 cents or bigger and returns no change.
+X vend | 状态名就是已投金额 0–5, 从状态 s 投 c 分到 min(s + c, 5), 5 是终态并对三种硬币自环, 多投的钱被吞掉. 字母表是 {1, 2, 5}, 被接受的投币序列就是自动机接受的串: 11111、221、1112、5、11115; 11、21 钱不够, 被拒绝. 售货机不记投币顺序, 只记金额, 正是「没有记忆的系统」.
+S vend | vexact | 恰好够 |  | 11111、221、1112、5.
+S vend | vmore | 投多了 |  | 11115 也接受, 不找零.
+S vend | vless | 不够 |  | 11、21 停在 2、3, 拒绝.
+
+D sheep | An FSA recognising sheep talk: strings that start with b, then one or more a, and end with !.
+X sheep | 状态 1 读 b 到 2, 2 读 a 到 3, 3 读 a 自环, 3 读 ! 到终态 4. 2 → 3 的 a 保证至少一个 a, 3 上的自环允许更多. 它只列了 4 个转移 (4 个状态 × 3 个符号本应有 12 个), 是不完全的 DFA; 加一个陷阱状态就能补成完全的. J&M 原书的羊叫是 baa+!, 课件简化成至少一个 a.
+S sheep | sheepok | 接受 |  | ba!、baa!、baaaa!.
+S sheep | sheepno | 拒绝 |  | b!、baa、aa!.
+
+D complete | A complete FSA has transitions defined for all input symbols in every state, contains no undefined transitions and always processes any input string.
+X complete | 完全的 FSA (complete FSA) 的转移表没有空格, 任何输入串都能读到底. 适合需要健壮的系统, 显式处理所有可能的输入, 常常带一个陷阱状态. 例子: 识别含 aba 的串的 DFA, 状态记的是已经匹配到 aba 的前几个字母; 一旦出现 aba 就停在终态自环里.
+S complete | cmprobust | 健壮 |  | 显式处理所有可能的输入.
+S complete | cmpaba | 含 aba 的串 |  | q₀ … q₃ 记已匹配到 aba 的前几个字母.
+
+D sink | A sink state (dead state, trap state) is a non-accepting state that the FSA never leaves once entered.
+X sink | 陷阱状态 (sink state) 对每个符号都自环, 而且不是终态. 完全的 FSA 要求每个状态对每个符号都有去向, 那些一出现就注定失败的输入就统一指向它. 例子: 识别以 ab 开头的串的 DFA 里, 开头读 b 或 aa 都进陷阱 q₁. 终态上的自环不叫陷阱状态.
+S sink | sinknames | 别名 |  | dead state、trap state.
+S sink | sinkuse | 用处 |  | 处理不想要的输入、错误处理、简化设计.
+
+D incompl | An incomplete FSA has missing transitions for certain inputs in some states; undefined transitions cause it to halt and reject the input.
+X incompl | 不完全的 FSA (incomplete FSA) 状态和转移更少, 画起来简单, 但未定义的情况可能要外部错误处理. 遇到缺的转移就直接停机拒绝, 不管后面还剩多少输入. 识别以 ab 开头的串, 去掉陷阱状态就得到不完全版; 反过来, 加一个陷阱状态、把缺的转移都指向它, 就补成完全的. 两者识别能力相同.
+S incompl | halt | 停机拒绝 |  | 遇到未定义的转移就停, 拒绝输入.
+S incompl | tocomplete | 补成完全的 |  | 加陷阱状态, 缺的转移都指向它.

@@ -191,3 +191,6 @@ X EICL:indep ~ SMIS:indep | 同一概念; EICL 用于检验词的共现.
 X EICL:mle ~ SMIS:mlest | 同一方法: 用相对频率估计概率.
 X EICL:markovo ~ SMIS:markov | 阶数即马尔可夫模型的 k.
 X EICL:superv ~ IML:sup | 词性标注是监督学习的一个实例.
+X FS:fsm ~ EICL:fsa | 同一概念: 有限状态自动机; EICL 用它分析词形, FS 讲它的组成和形式定义.
+X FS:quint ~ EIPS:automat | 同一个五元组定义; EIPS 写作 (Q, Σ, δ, q0, F), FS 写作 (Σ, Q, q₀, δ, F).
+X FS:fsm ~ EIPS:regex | 有限自动机和正则表达式描述同一类语言, FS 接下来几讲会证明这一点.
