@@ -1157,12 +1157,6 @@
 </header>
 <main class="wrap">
 
-<div class="zh">
-  <p><b>读法. </b>带边框的卡片是原题 (英语原文照录; 练习单是 Jupyter notebook, 卡片里按顺序收录每个任务的说明文字和代码框架, <code># TODO</code> 是要填的地方); 淡色底的框是翻译与思路, 不含答案; 「答案 (先自己做再看)」折叠框里是参考答案、代码、实际运行输出和讲解; 虚线框是补充; 红框标出原题的错误或漏洞. 按发布顺序编为练习 1–10: 练习课幻灯片和课上演示的 notebook (练习 1、2、5、6、10) 与五张作业 Exercise 01–05 (练习 3、4、7、8、<span class="nb">9) 交替排列.</span></p>
-  <p><b>运行环境.</b> 所有代码都在 Apple M1 (16 GB) 上实际运行过: Python 3.14、PyTorch 2.14; Hugging Face 部分用 transformers 5.20 / datasets 5.1, Exercise 03 的 T5 部分 (要用 summarization pipeline)、需要 <code>head_mask</code>、<code>prune_heads</code> 的 Exercise 04 和 Exercise 05 用 transformers 4.57.1, 这些接口在 transformers 5 里已经删除. 训练都用的是练习单要求的完整数据和超参数, 唯一的例外是 Exercise 03 的 T5 只训练了 1 轮 (题目要求 3 轮); 采样类的生成结果依赖随机种子, 你自己运行时文字会不同. 只有 Week 9 的 prompting 演示调用 OpenAI 的付费 API, 没有运行, 讲解里给出了应<span class="nb">得的结果.</span></p>
-</div>
-
-
 <!-- ======================= T1 ======================= -->
 <section class="part" id="t1">
 <h2>练习 1: 练习课组织与 Python 环境<br><span class="de-title"><span class="seg">Deep Learning for NLP Exercise Session ·</span> <span class="seg">ML Basics: Python Setup</span></span><small>源文件 dl4nlp_updated.pdf (S. 3–4)、slides-00-python.pdf (27 页)</small></h2>
