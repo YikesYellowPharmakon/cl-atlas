@@ -358,3 +358,97 @@ M annotation | annot
 M word list | stop
 M normalization | norm
 M morphology | norm
+
+# ===== SP 07 · 词性标注 (Lecture 6) 2026-11-13 =====
+B postag | 词性标注 | POS Tagging | 词性和标签集, 用 NLTK 从默认标注器一步步搭到后退链, 再用开发集和混淆矩阵评估.
+
+N posdef | postag | 词性与词性标注 | Parts of speech · POS tagging | 07:pos | 词性是形态句法上的词类; 词性标注给每个词标上它在上下文中的词性. | 同一词形可有不同标签 ;; 输出是 (词, 标签) 元组 | ('permit', 'VB') vs. ('permit', 'NN')
+N posuse | postag | 为什么要词性 | POS Tagging – Motivation | 07:motivation | 词性是句法和浅层语义分析的基础, 自动标注比更深的分析可靠. | 信息抽取、机器翻译、语音合成、句法分析都用 | lead 作动词和名词读音不同
+N openclosed | postag | 开放类与封闭类 | Open vs. Closed POS tag classes | 07:offen | 封闭类成员有限且基本不增, 开放类不断有新词加入. | 封闭: 限定词、介词、代词 ;; 开放: 名词、动词、形容词、副词 | to google
+N granul | postag | 粒度与形态特征 | Granularity and morphological features | 07:granularitaet | 标签集可以把大类细分, 还可以另标数、格、性、时态等形态特征. | 关系代词和疑问代词词形相同 ;; 特征取决于词性和语言
+N tagset | postag | 标签集 | POS Tagsets | 07:tagsets | 一个语料实际使用的标签集合, 决定标签的数量、粒度和定义. | Penn 36 个 ;; Universal 12 个 (NLTK) ;; 映射细到粗容易, 粗到细不行 | NN, NNS, NNP, NNPS
+N tagcorp | postag | 分析标注语料 | Analyzing manually POS-tagged corpora | 07:korpora | 用 FreqDist 和 ConditionalFreqDist 统计标签和词的标签分布. | 以词为条件看一个词有几种标签 ;; 以标签为条件看哪些词有这个标签 | cfd1['yield']: VERB 28, NOUN 20
+N posamb | postag | 词性歧义 | Tagging is a disambiguation task | 07:korpora | 按词型只有少数词有歧义, 按词元一半以上要消歧. | 有歧义的恰是高频词 | back: JJ, NN, VBP, VB, RP, RB
+N deftag | postag | 默认标注器 | Default Tagger | 07:default | 所有词都标最常见的标签, 作为最简单的基线. | Brown 上准确率约 13% ;; 最常见类基线要按每个词选 | DefaultTagger('NN')
+N regtag | postag | 正则表达式标注器 | Regular Expression Tagger | 07:regexp | 按词形的正则模式猜标签, 按顺序用第一条匹配的规则. | 约 20% ;; -es 规则要排在 -s 前 | (r'.*ing$', 'VBG')
+N lookup | postag | 查表标注器 | Lookup Tagger | 07:lookup | 记下高频词最可能的标签, 用 UnigramTagger 查表. | 只用 100 个词就到约 47% ;; 不在表里的词得到 None
+N backoff | postag | 后退 | Backoff | 07:lookup | 标注器查不到时交给下一个标注器, 可以串成链. | Default ← Unigram ← Bigram ;; 二元标注器离开后退几乎不能用 | UnigramTagger(model, backoff=DefaultTagger('NN'))
+N ngtag | postag | n 元标注器 | N-gram Tagger | 07:ngram | 用当前词和前面 n−1 个位置的标签预测当前标签. | 前面的词只以标签出现 ;; n 越大见过的上下文越少 | the wind vs. to wind
+N datasplit | postag | 训练、开发与测试数据 | Data Sets | 07:ngram | 训练数据学参数, 开发数据在开发中当测试集用, 测试数据只在最后用一次. | 在训练数据上评估结果偏高 ;; 训练数据要有代表性
+N tagdev | postag | 开发与优化标注器 | Developing a Tagger · Optimization | 07:optimierung | 迭代: 实现、训练、在开发集上测、分析错误、改进, 最后在测试集上测. | 混淆矩阵找出最常见的错误 ;; 可用 pickle 保存标注器
+N tageval | postag | 标注器的评估 | More on Evaluating a POS Tagger | 07:optimierung | 整体看准确率, 单个标签看精确率、召回率和 F1. | 精确率 TP/(TP+FP), 召回率 TP/(TP+FN) ;; F1 = 2TP/(2TP+FP+FN)
+
+E cfd > tagcorp | 用条件频率分布统计标注语料.
+E annot > tagcorp | 标注语料是分析对象.
+E posdef > tagset | 标注要先定标签集.
+E tagset > granul | 粒度由标签集决定.
+E posdef > openclosed | 词性分开放类和封闭类.
+E posdef > posuse | 词性用于后续分析.
+E tagcorp > posamb | 从语料统计出歧义.
+E posamb > deftag | 自动标注从最简单的基线开始.
+E deftag > regtag | 正则标注器改进默认标注器.
+E regtag > lookup | 查表比按词形猜准得多.
+E lookup > backoff | 查不到的词要后退.
+E backoff > ngtag | n 元标注器靠后退链工作.
+E pipe > posdef | 词性标注是流水线里预处理之后的第一步.
+E ngram ~ ngtag | n 元组和 n 元标注器都取前面 n−1 个单位作上下文.
+E lookup > datasplit | 发现了训练数据和测试数据重叠的问题.
+E datasplit > tagdev | 开发集用来反复改进.
+E tagdev > tageval | 开发中要评估.
+E openclosed ~ lookup | 封闭类都是高频词, 查表最有效.
+
+T part of speech |  |  | 词性 | postag | Morphosyntactic word class. | 形态句法上的词类. |  | 07:pos | POS; Wortart
+T POS tagging |  |  | 词性标注 | postag | Labeling each word with its corresponding part of speech. | 给每个词标上它的词性. |  | 07:def | POS-Tagging
+T tagset |  |  | 标签集 | postag | The set of POS tags actually used for a corpus. | 一个语料实际使用的词性标签集合. |  | 07:def | Tagset
+T closed class |  |  | 封闭类 | postag | A word class whose members are limited and usually do not grow. | 成员有限、一般不增加的词类. | open class | 07:offen | geschlossene Wortklasse
+T open class |  |  | 开放类 | postag | A word class with an unlimited number of words. | 成员无限、不断有新词的词类. | closed class | 07:offen | offene Wortklasse
+T adposition |  |  | 附置词 | postag | Cover term for prepositions and postpositions. | 介词和后置词的统称. |  | 07:pos | ADP
+T disambiguation |  |  | 消歧 | postag | Deciding the correct tag for a word in its specific context. | 按具体上下文选出正确标签. |  | 07:def | Disambiguierung
+T POS tagger |  |  | 词性标注器 | postag | A program that assigns a part-of-speech tag to each word. | 给每个词标词性的程序. |  | 07:auto | POS-Tagger
+T baseline |  |  | 基线 | postag | A simple reference method that any tagger must beat. | 任何标注器都要超过的简单参照方法. |  | 07:default | Baseline
+T most frequent class baseline |  |  | 最常见类基线 | postag | Assigning each token to the class it occurred in most often in the training set. | 给每个词元标上它在训练集里最常见的类. | default tagger | 07:default
+T default tagger |  |  | 默认标注器 | postag | Assigns the same tag to every token. | 给所有词元标同一个标签. |  | 07:default | DefaultTagger
+T regular expression tagger |  |  | 正则表达式标注器 | postag | Assigns tags on the basis of matching patterns. | 按模式匹配分配标签. |  | 07:regexp | RegexpTagger
+T unigram tagger |  |  | 一元标注器 | postag | Assigns each word its most likely tag regardless of context. | 不看上下文, 给每个词最可能的标签. | bigram tagger | 07:lookup | UnigramTagger; lookup tagger
+T bigram tagger |  |  | 二元标注器 | postag | Uses the current word and the previous tag. | 看当前词和前一个标签. | unigram tagger | 07:optimierung | BigramTagger
+T backoff |  |  | 后退 | postag | Passing a token on to another tagger when the first one cannot tag it. | 标不了时交给另一个标注器. |  | 07:lookup | Backoff
+T accuracy |  |  | 准确率 | postag | The share of tokens whose predicted tag matches the gold tag. | 预测标签等于金标准的词元比例. | precision | 07:default
+T gold standard |  |  | 金标准 | postag | The manually annotated correct labels. | 人工标注的正确标签. |  | 07:default | Goldstandard
+T training data |  |  | 训练数据 | postag | Examples with correct answers used to train a model. | 带正确答案、用来训练模型的数据. | test data | 07:ngram | Trainingsdaten
+T development data |  |  | 开发数据 | postag | Data used as test set during system development. | 开发过程中当测试集用的数据. | test data | 07:ngram | Entwicklungsdaten; validation set
+T test data |  |  | 测试数据 | postag | Data used to evaluate the final system. | 用来评估最终系统的数据. | development data | 07:ngram | Testdaten
+T confusion matrix |  |  | 混淆矩阵 | postag | Rows are gold labels, columns are predicted labels. | 行是金标准, 列是预测标签. |  | 07:optimierung | Konfusionsmatrix
+T precision |  |  | 精确率 | postag | Share of predictions of a tag that were correct. | 预测为某标签的里面对的比例. | recall | 07:optimierung
+T recall |  |  | 召回率 | postag | Share of actual tokens of a tag that were correctly tagged. | 真正属于某标签的被标对的比例. | precision | 07:optimierung
+
+M part of speech | posdef
+M POS tagging | posdef
+M tagset | tagset
+M closed class | openclosed
+M open class | openclosed
+M adposition | posdef
+M disambiguation | posamb
+M POS tagger | deftag
+M baseline | deftag
+M most frequent class baseline | deftag
+M default tagger | deftag
+M regular expression tagger | regtag
+M unigram tagger | lookup
+M bigram tagger | ngtag
+M backoff | backoff
+M accuracy | tageval
+M gold standard | tageval
+M training data | datasplit
+M development data | datasplit
+M test data | datasplit
+M confusion matrix | tagdev
+M precision | tageval
+M recall | tageval
+
+SKIP SP 07: 分节标题, 内容归入其下各概念 | POS Tagging Basics; Automatic POS tagging
+DROP SP 07: 并入其他术语 | Accuracy; Backoff; Baseline; Bigramm-Tagger; Disambiguierung; Entwicklungsdaten; Goldstandard; Konfusionsmatrix; Most Frequent Class Baseline; POS-Tagger; POS-Tagging; Precision; Recall; Tagset; Testdaten; Trainingsdaten; Unigramm-Tagger; Wortart; geschlossene Wortklasse; offene Wortklasse; validation set; held-out data
+DROP SP 07: 归入 混淆矩阵 / 标注器的评估的四格 | true positive; false positive; false negative; true negative
+DROP SP 07: 例子里的形态特征, 归入 粒度与形态特征 | evidentiality
+ZH 学科标准译名 | 为什么要词性; 分析标注语料; 开发与优化标注器; 标注器的评估; 训练、开发与测试数据
+ZH 描述性小标题, 不是术语 | 保存标注器; 学校里的九大词类; 标签集映射
+DE 学科标准叫法 | Parts of speech · POS tagging

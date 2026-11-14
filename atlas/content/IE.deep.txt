@@ -245,3 +245,13 @@ D pruning | Pruning first grows the full tree and then removes, from the bottom 
 X pruning | Andrew Moore 的油耗例子: 40 条记录, 先算每个属性的信息增益, 气缸数最高, 根节点按它分裂得到决策树桩; 再对每个子节点递归建子树, 直到输出相同或没有属性能再分. 节点里的 pchance 是卡方检验算出的偶然概率: 根节点 0.001 说明分裂极不可能是偶然; 下面有些节点达到 0.717、0.894, 很可能只是在拟合噪声. MaxPchance 是自己定的阈值, 越小剪得越多. 剪完后训练误差一般略升, 测试误差应该下降. 另一种做法是 Quinlan 的减错剪枝.
 S pruning | pch | 偶然概率 |  | 卡方检验, 大于阈值就剪.
 S pruning | stump | 决策树桩 |  | 只有一层的树.
+
+# ---- IE 07 · 线性模型与序列标注 (2026-11-13) ----
+X sparsefv | 6 个位置、5 万词元的词表, 光「位置 + 词元」就有 30 万维, 每个样本只有 6 个 1. 再加词类、大小写、语义类的组合维数还要加, 所以只记取 1 的特征.
+X bias | 规则「左边 at、右边数字、再右边 timeid」: 三个特征权重各 1, 偏置 −2. 三个都开 3 − 2 = 1 > 0; 只开两个 2 − 2 = 0, 不大于 0. 课件的阶跃函数在和为 0 时输出 1, 和手算的「> 0」不一致, 例子按「> 0」理解.
+X percrule | 感知机的误差只有 0 或 ±1, 梯度下降的误差是连续的 (h − y), 分对但没把握时也会小幅调整.
+X linvsdt | 再加规则「左二 Seminar + at + 数字」: 四个特征权重 1, 偏置 −2, 结果任意三个都触发, 多出两条没想要的规则. 决策树直接两条路径; 线性模型要把每条规则做成一个组合特征, 偏置设 0.
+X ctxemb | Llama 2 的隐藏层维度是 4096 / 5120 / 8192, 课件写的 5192 是 5120 的笔误.
+X ova | 二分类时再训练 notag 分类器是多余的: 它的正负例正好和 <stime> 的相反, W_notag ≈ −W_stime, 比大小就等于看 x · W_stime 的正负.
+X iob | Seminar at 4 pm will …: 逐词元贪心分类, 每次把上一步自己给的标签当特征: Seminar O (−1_Label_StartOfSentence), at O, 4 B-stime, pm I-stime.
+X spanmod | University of California Berkeley 里 California 误判为 O, 实体就被切成 University of 和一个以 I-ORG 开头的不合法片段.

@@ -313,3 +313,74 @@ M Query By Example | qbe
 M Tabellenskelett | qbe
 M Bedingungsfeld | qbe
 M relational vollständig | qbevgl
+
+# ===== DBS 05 · SQL (Paradies, Kapitel 5) 2026-11-13 =====
+B sqlq | SQL 查询 | SQL | SQL 的基本结构 SELECT-FROM-WHERE, NULL 与三值逻辑, 连接、集合运算、排序、聚合分组、子查询和数据修改.
+
+N qsql | sqlq | SQL 的由来与标准化 | SQL-Standardisierung | 05:sql | SQL 建立在关系代数之上, 但结果是多重集; 从 1986 年起不断标准化. | 1992 强调正交性 ;; 没有系统完整实现全部标准
+N qgrund | sqlq | SQL 查询的基本结构 | Grundstruktur einer SQL-Anfrage | 05:grund | FROM 做笛卡尔积, WHERE 做选择, SELECT 做投影; 读公式从里往外. | SELECT 是投影不是选择 ;; 不去重, 对应 SELECT DISTINCT
+N qselect | sqlq | SELECT 子句 | SELECT-Klausel | 05:select | 列出并可变换结果里的属性, 可写表达式、函数、常量, 用 AS 起名; DISTINCT 去重. | 不加引号的标识符转小写 ;; DISTINCT 作用于整行
+N qfrom | sqlq | FROM 子句 | FROM-Klausel | 05:from | 多个关系做笛卡尔积; 同名属性要完全限定, 关系可以起别名. | 自积要两个别名
+N qnull | sqlq | WHERE 子句与 NULL | WHERE-Klausel · NULL-Werte | 05:where | WHERE 只留条件为 true 的行; NULL 参与的比较结果是 null, 所以是三值逻辑. | 测 NULL 只能用 IS NULL ;; 聚合跳过 NULL, COUNT(*) 除外
+N qjoin | sqlq | SQL 中的连接 | Joins in SQL | 05:join | 连接 = 积 + 选择; JOIN … ON、USING、NATURAL JOIN, 以及左、右、全外连接和自连接. | NATURAL JOIN 按所有同名列连接, 危险 ;; 全外连接可用左右外连接求并模拟
+N qmengen | sqlq | 集合运算 | Mengenoperationen | 05:mengen | UNION、INTERSECT、EXCEPT 默认去重, ALL 版本按多重集计次数. | 只要求列数相同、类型兼容
+N qsort | sqlq | 排序 | Sortierung | 05:sort | ORDER BY 按一个或多个属性字典序排序, DESC 只作用于紧挨的属性. | NULL 位置因系统而异, 用 NULLS FIRST/LAST
+N qagg | sqlq | 聚合与分组 | Aggregation · Gruppierung | 05:agg | 聚合函数把多重集汇成一个值; GROUP BY 分组, HAVING 筛组. | SELECT 里聚合外的属性必须在 GROUP BY 里 ;; WHERE 筛行, HAVING 筛组 ;; LIMIT 做 Top-k
+N qorder | sqlq | SQL 的执行顺序 | SQL-Ausführungsreihenfolge | 05:reihenfolge | 逻辑上先 FROM、WHERE、GROUP BY, 最后才 SELECT 和 ORDER BY. | 解释 WHERE 里不能用聚合和别名
+N qsub | sqlq | 嵌套子查询 | Verschachtelte Unterabfragen (Subqueries) | 05:sub | 嵌在另一个查询里的 SELECT-FROM-WHERE; 相关子查询引用外层属性, 对外层每行重算. | SELECT 里的子查询必须单值
+N qmengsub | sqlq | 基于集合的子查询 | Mengenbasierte Unteranfragen | 05:mengsub | IN、ANY、ALL、EXISTS 把值和子查询结果的集合比较. | NOT IN 遇到 NULL 失灵 ;; < ALL (空集) 为真 ;; 除法写成两层 NOT EXISTS
+N qdml | sqlq | 修改数据库 | Änderungen an der Datenbank | 05:dml | DELETE、INSERT、UPDATE; 先确定所有要改的行再统一修改. | 不写 WHERE 就改全部行
+
+E sel > qgrund | WHERE 对应选择.
+E proj > qgrund | SELECT 对应投影.
+E qsql > qgrund | 从历史到基本结构.
+E qgrund > qselect | 逐个子句展开.
+E qgrund > qfrom | 逐个子句展开.
+E qgrund > qnull | 逐个子句展开.
+E theta > qjoin | 连接 = 积 + 选择.
+E outer > qjoin | 外连接的 SQL 写法.
+E setops > qmengen | 关系代数的集合运算.
+E gamma > qagg | 对应分组运算 γ.
+E qagg > qorder | 执行顺序解释聚合规则.
+E qnull > qmengsub | NOT IN 的 NULL 陷阱.
+E qsub > qmengsub | 子查询和集合比较.
+E div > qmengsub | 除法用两层 NOT EXISTS.
+E qsub > qdml | 修改语句里也用子查询.
+E qselect > qsort | 结果的行序要靠 ORDER BY 规定.
+E qsort > qorder | ORDER BY 在 SELECT 之后, 能用别名.
+
+T Multimenge | die | Multimengen | 多重集 | sqlq | Menge, in der Elemente mehrfach vorkommen dürfen. | 元素可以重复的集合. |  | 05:sql
+T Orthogonalität | die |  | 正交性 | sqlq | Sprachkonstrukte lassen sich frei kombinieren. | 语言构件可以自由组合. |  | 05:sql
+T vollständig qualifizieren |  |  | 完全限定 | sqlq | Attribut mit Relationsnamen schreiben, z. B. R.A. | 带关系名写属性. |  | 05:from
+T Alias | der | Aliasse | 别名 | sqlq | Kurzname für eine Relation oder Spalte. | 关系或列的简称. |  | 05:from
+T Selbst-Kreuzprodukt | das |  | 自积 | sqlq | Kreuzprodukt einer Relation mit sich selbst. | 关系和自己做笛卡尔积. |  | 05:from
+T dreiwertige Logik | die |  | 三值逻辑 | sqlq | Logik mit true, false und null (unknown). | 真、假、未知三个值的逻辑. |  | 05:where
+T Self-Join |  |  | 自连接 | sqlq | Join einer Relation mit sich selbst. | 关系和自己连接. |  | 05:join
+T LEFT JOIN |  |  | 左外连接 | sqlq | Behält alle Zeilen der linken Relation. | 保留左边所有行. | RIGHT JOIN | 05:join
+T RIGHT JOIN |  |  | 右外连接 | sqlq | Behält alle Zeilen der rechten Relation. | 保留右边所有行. | LEFT JOIN | 05:join
+T FULL OUTER JOIN |  |  | 全外连接 | sqlq | Behält die Zeilen beider Relationen. | 两边的行都保留. |  | 05:join
+T DESC |  |  | 降序 | sqlq | Absteigende Sortierung in ORDER BY. | ORDER BY 里的降序. |  | 05:sort
+T Aggregatfunktion | die | Aggregatfunktionen | 聚合函数 | sqlq | Fasst eine Multimenge von Werten zu einem Wert zusammen. | 把多重集的值汇成一个值. |  | 05:agg
+T Top-k |  |  | Top-k 查询 | sqlq | Nur die ersten k Zeilen eines sortierten Ergebnisses (LIMIT k). | 只取排序结果的前 k 行. |  | 05:agg
+T Unterabfrage | die | Unterabfragen | 子查询 | sqlq | In eine andere Anfrage eingebettete SELECT-FROM-WHERE-Anfrage. | 嵌在另一个查询里的查询. |  | 05:sub | Subquery
+T einzelwertig |  |  | 单值 | sqlq | Liefert genau eine Zeile und eine Spalte. | 只返回一行一列. |  | 05:sub
+T korreliert |  |  | 相关 | sqlq | Unterabfrage, die Attribute der äußeren Anfrage verwendet. | 引用外层属性的子查询. | unkorreliert | 05:sub
+T unkorreliert |  |  | 不相关 | sqlq | Unterabfrage, die nur eigene Attribute verwendet. | 只用自己属性的子查询. | korreliert | 05:sub
+
+M Multimenge | qsql
+M Orthogonalität | qsql
+M vollständig qualifizieren | qfrom
+M Alias | qfrom
+M Selbst-Kreuzprodukt | qfrom
+M dreiwertige Logik | qnull
+M Self-Join | qjoin
+M LEFT JOIN | qjoin
+M RIGHT JOIN | qjoin
+M FULL OUTER JOIN | qjoin
+M DESC | qsort
+M Aggregatfunktion | qagg
+M Top-k | qagg
+M Unterabfrage | qsub
+M einzelwertig | qsub
+M korreliert | qsub
+M unkorreliert | qsub

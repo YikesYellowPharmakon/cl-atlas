@@ -270,6 +270,12 @@
   html[data-mode="day"] { --syn-k: #0f6f84; --syn-f: #1a447f; --syn-s: #7b5f01; --syn-n: #1d7635; --syn-b: #105e60; --syn-c: #566d75; --syn-p: #566d75; }
   main pre .tk-k { color: var(--syn-k); } main pre .tk-f { color: var(--syn-f); } main pre .tk-s { color: var(--syn-s); } main pre .tk-n { color: var(--syn-n); } main pre .tk-b { color: var(--syn-b); } main pre .tk-c { color: var(--syn-c); } main pre .tk-p { color: var(--syn-p); }
 </style>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  .katex { font-size: 1.08em; }
+  .math-block { overflow-x: auto; overflow-y: hidden; margin: 10px 0; }
+  .math-block .katex-display { margin: 0.4em 0; }
+</style>
 <style id="glass">
   /* ===== 视觉层 v7 (= 样例 v21) =====
      点阵背景与渐变底色; 模块: 讲解 = 打孔卡 + 字符边, 补充 = 信号包, 纠错 = LED 校对, 答案 = 钥匙 + 翻牌, 表格 = 准星, 公式 = 字符边.
@@ -1145,6 +1151,8 @@
       <a href="#b3">Blatt 3 · 表达式求值</a>
       <a href="#z3">ZÜ 3 · 控制结构</a>
       <a href="#b4">Blatt 4 · 存储与条件</a>
+      <a href="#z4">ZÜ 4 · 循环</a>
+      <a href="#b5">Blatt 5 · while 与 for</a>
     </nav>
   </div>
 </header>
@@ -2964,6 +2972,382 @@ Ihr Jahresgehalt nach Steuern (netto) ist: 88888.8816</pre>
 </article>
 </section>
 
+
+<section class="part" id="z4">
+<h2>Zentralübung 4<br><span class="de-title"><span class="seg">Kontrollstrukturen ·</span> <span class="seg">Wiederholungsanweisungen</span></span><small><span class="rl">对应 <a href="EIPS-04-语句与控制结构.html#while">EIPS 04 · 循环</a>、<a href="EIPS-04-语句与控制结构.html#entwurf">怎样设计 while 循环</a>、<a href="EIPS-04-语句与控制结构.html#for">for 循环</a>;</span><span class="rl">源文件 Zentraluebung05.pdf;</span><span class="rl">中心练习课 (Zentralübung) 的讲义, 动画分步页合并, 选择题的答案页和题目页合并成一题.</span></small></h2>
+
+<article id="z4-1">
+<h3>1. Python 的循环语句<br><span class="de-title">Wiederholungsanweisungen in Python</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 4 · Folie 2</span>
+<pre data-lang="grammar">WhileStatement = "while" Expression ":" Block
+ForStatement   = "for" Variable "in" Value ":" Block
+
+Block       = { Statement }
+Statement   = Assignment
+            | Conditional
+            | Iteration
+Iteration   = WhileStatement
+            | ForStatement</pre>
+  <p>(Hinweis an Expression: vom Typ <b>bool</b>; an Block: <span class="nb">Sequenz)</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 循环语句的 EBNF. <code>while</code> 后面是一个 bool 类型的表达式、冒号和块; <code>for</code> 后面是一个变量、<code>in</code>、一个值 (要逐个遍历的东西, 如 <code>range(1, 11)</code>)、冒号和块. 块是语句的<b>序列</b> (Sequenz); 语句可以是赋值、条件语句或循环, 循环又分 while 和 for <span class="nb">两种.</span></p>
+  <p><b>思路</b>: 因为块里的语句又可以是循环, 循环可以嵌套, 第 4 题的九九表就是两层 for. 和 <a href="#z3-3">Zentralübung 3 第 3 题</a>的条件语句文法对照着看: 这一页的冒号位<span class="nb">置写对了.</span></p>
+</div>
+</article>
+
+<article id="z4-2">
+<h3>2. 不用 / 和 % 做整除和求余<br><span class="de-title">Aufgabe 1: Ganzzahlige Division mit Rest</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 4 · Folie 3–4</span>
+  <p>Gegeben seien zwei Variablen <b>x</b> und <b>y</b> vom Typ int. Berechnen Sie die ganzzahlige Division ”x geteilt durch y” und gleichzeitig deren Rest (Modulo) ohne Verwendung der Operatoren / <span class="nb">und %.</span></p>
+  <ul>
+    <li>Ganzzahlige Division: ”Wie oft passt y in x?”
+      <ul><li>Initialisierung der Zählvariable <b>anzahl</b> als Akkumulator <span class="nb">mit 0</span></li><li>Solange x ≥ y: erhöhe die Zählvariable anzahl um 1 und ziehe y von <span class="nb">x ab</span></li></ul></li>
+    <li>Rest: ”Wie viel bleibt nach der ganzzahligen Division übrig?”
+      <ul><li>Solange x ≥ y: ziehe y von <span class="nb">x ab</span></li><li>Sobald x &lt; y: x ist der Rest der ganzzahligen <span class="nb">Division</span></li></ul></li>
+  </ul>
+<pre data-lang="python">x = <span class="tk-n">13
+</span>y = <span class="tk-n">4
+
+</span>anzahl = <span class="tk-n">0
+</span><span class="tk-k">while </span>x &gt;= y:
+    anzahl += <span class="tk-n">1
+    </span>x = x - y
+
+<span class="tk-b">print</span>(<span class="tk-s">"Division: " </span>+ <span class="tk-b">str</span>(anzahl))
+<span class="tk-b">print</span>(<span class="tk-s">"Rest: " </span>+ <span class="tk-b">str</span>(x))</pre>
+  <p>Wie oft wird die Bedingung <code>x &gt;= y</code> für dieses Programm <span class="nb">ausgewertet?</span></p>
+  <ol type="a"><li>1x</li><li>2x</li><li>3x</li><li>4x</li></ol>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 有两个 int 变量 x 和 y. 不用 <code>/</code> 和 <code>%</code>, 同时算出 x 除以 y 的整数商和余数. 思路: 整除就是问「y 在 x 里能放几次」: 计数变量 anzahl 作<b>累加器</b> (Akkumulator) 从 0 开始, 只要 x ≥ y, 就把 anzahl 加 1、从 x 里减去 y. 余数就是「整除后还剩多少」: 一直减, 一旦 x &lt; y, x 本身就是余数. 问题: 对 x = 13、y = 4, 条件 <span class="nb"><code>x &gt;= y</code> 一共被求值几次?</span></p>
+  <p><b>思路</b>: 每次进循环之前都要判断一次条件, 包括最后那次判为 False 让循环结束的. 所以求值次数 = 循环体执行次数 + 1. 用一张存储变化表逐次记下 anza<span class="nb">hl 和 x.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>答案是 <b>d: 4 次</b>. 存储的变化 (Folie 5 的表, 每一列是一次条件判断<span class="nb">时的状态):</span></p>
+  <div class="tablewrap"><table class="nowrap">
+    <tr><th>Schleifentest</th><th></th><th>x&gt;=y? ✓</th><th>x&gt;=y? ✓</th><th>x&gt;=y? ✓</th><th class="wide">x&gt;=y? ✗ Abbruch</th></tr>
+    <tr><td class="wide">Zählvariable anzahl</td><td>0</td><td>1</td><td>2</td><td>3</td><td>3 = Div</td></tr>
+    <tr><td>Teiler y</td><td>4</td><td>4</td><td>4</td><td>4</td><td>4</td></tr>
+    <tr><td>Variable x</td><td>13</td><td>9</td><td>5</td><td>1</td><td>1 = Rest</td></tr>
+  </table></div>
+  <p>前三次 13、9、5 都 ≥ 4, 进循环; 第四次 1 &lt; 4, 循环结束. <span class="nb">实际运行输出:</span></p>
+<pre data-lang="output">Division: 3
+Rest: 1</pre>
+  <p>即 13 = 3 · 4 + 1. 注意 x 在循环里被改掉了, 原来的 13 没有保留; 如果后面还要用被除数, 应该先复制一份 (<code>rest = x</code>, <span class="nb">在 rest 上减).</span></p>
+  <p><b>易错</b>: y = 0 时条件 x ≥ 0 永远成立 (x 每次减 0), 程序不会停. 真正的除法遇到 0 会报 ZeroDivisionError, 这个写法则变成死循环, 应该先检查 y. 另外这个算法只对 x ≥ 0、y &gt; <span class="nb">0 正确.</span></p>
+</details>
+</article>
+
+<article id="z4-3">
+<h3>3. 循环测试: x 从 128 开始<br><span class="de-title">Aufgabe 2a: Schleifentest</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 4 · Folie 6</span>
+<pre data-lang="python">x = <span class="tk-n">128
+</span><span class="tk-k">while </span>x != <span class="tk-n">1</span>:
+    x = x - <span class="tk-n">2</span></pre>
+  <p>Was berechnet das <span class="nb">Programm?</span></p>
+  <ol type="a"><li>x = 1</li><li>x = -1</li><li>x = 2</li><li>x = -2</li><li>Programm terminiert <span class="nb">nicht</span></li></ol>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 这个程序算出什么? 五个选项: x 最后是 1、−1、2、−2, <span class="nb">或者程序不终止.</span></p>
+  <p><b>思路</b>: 循环停下的唯一条件是 x 恰好等于 1. 从 128 开始每次减 2, 想一想 x 会不会经过 1: <span class="nb">看奇偶性.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>答案是 <b>e: 程序不终止</b>. x 依次是 128, 126, …, 2, 0, −2, …, 一直是偶数, 永远不等于 1, 条件 <code>x != 1</code> 永远为 True, 是<b>Endlosschleife 死循环</b>. Folie 6 的表在 0 和 −2 <span class="nb">之后写了「Endlosschleife」.</span></p>
+  <p>写循环条件时用 <code>!=</code> 很危险: 一步跨过目标值就停不下来. 改成 <code class="lc">while x &gt; 1:</code> 就一定会终止 (从 128 出发停在 <span class="nb">0).</span></p>
+</details>
+</article>
+
+<article id="z4-4">
+<h3>4. 循环测试: x 从 127 开始<br><span class="de-title">Aufgabe 2b: Schleifentest</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 4 · Folie 7</span>
+<pre data-lang="python">x = <span class="tk-n">127
+</span><span class="tk-k">while </span>x != <span class="tk-n">1</span>:
+    x = x - <span class="tk-n">2</span></pre>
+  <p>Was berechnet das <span class="nb">Programm?</span></p>
+  <ol type="a"><li>x = 1</li><li>x = -1</li><li>x = 2</li><li>x = -2</li><li>Programm terminiert <span class="nb">nicht</span></li></ol>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 同上, <span class="nb">只是起始值改成 127.</span></p>
+  <p><b>思路</b>: 同样看奇偶: 127 是奇数, <span class="nb">每次减 2 仍是奇数.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>答案是 <b>a: x = 1</b>. x 依次是 127, 125, …, 3, 1; 到 1 时条件 <code>x != 1</code> 为 False, 循环结束 (Folie 7: 「Abbruch der Schleife」). 循环体执行了 63 次, 条件求值 64 次. 和上一题对比: 只差起始值的奇偶, <span class="nb">一个停一个不停.</span></p>
+</details>
+</article>
+
+<article id="z4-5">
+<h3>5. 九九乘法表<br><span class="de-title">Aufgabe 3: Kleines Einmaleins</span></h3>
+<div class="card de">
+  <span class="folie">Zentralübung 4 · Folie 8–9</span>
+  <p>Geben Sie das kleine Einmaleins auf der <span class="nb">Konsole aus.</span></p>
+  <p><b>Algorithmusidee:</b> x * y = <span class="nb">produkt</span></p>
+  <ul>
+    <li>Für x: gehe die Zahlen von 1 bis 10 <span class="nb">durch</span></li>
+    <li>Für y: gehe nochmal die Zahlen 1 bis 10 durch für jede Möglichkeit der <span class="nb">Zahl x</span></li>
+    <li>Berechne das Produkt aus den Zahlen x <span class="nb">und y.</span></li>
+  </ul>
+  <p><b>Implementierung:</b></p>
+<pre data-lang="python"><span class="tk-k">for </span>x <span class="tk-k">in </span><span class="tk-b">range</span>(<span class="tk-n">1</span>, <span class="tk-n">11</span>):
+    <span class="tk-k">for </span>y <span class="tk-k">in </span><span class="tk-b">range</span>(<span class="tk-n">1</span>, <span class="tk-n">11</span>):
+        produkt = x * y
+        <span class="tk-b">print</span>(<span class="tk-b">str</span>(x) + <span class="tk-s">" * " </span>+ <span class="tk-b">str</span>(y) + <span class="tk-s">" = " </span>+ <span class="tk-b">str</span>(produkt))</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 在控制台输出「小九九」(德语叫 kleines Einmaleins, 1 到 10 的乘法表). 算法思路: x 依次取 1 到 10; 对 x 的每一个值, y 再从 1 走到 10; 算 x 和 y 的积. 实现: <span class="nb">两层嵌套的 for 循环.</span></p>
+  <p><b>思路</b>: <code>range(1, 11)</code> 产生 1 到 10, 右端 11 不包含. 外层每走一步, 内层完整走一遍, 所以内层的 print 一共执行 10 × 10 = <span class="nb">100 次.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实际运行输出 100 行, <span class="nb">开头和结尾:</span></p>
+<pre data-lang="output">1 * 1 = 1
+1 * 2 = 2
+1 * 3 = 3
+...
+1 * 10 = 10
+2 * 1 = 2
+...
+10 * 9 = 90
+10 * 10 = 100</pre>
+  <p>输出顺序是先把 x = 1 的十行打完, 再到 x = 2: 外层变量变得慢, 内层变量变得快. 要一行打一整列 (表格形式), 可以在内层用 <code class="lc">print(..., end="\t")</code>, 内层循环结束后再 <code>print()</code> <span class="nb">换行.</span></p>
+  <p><b>易错</b>: 写成 <code>range(10)</code> 会得到 0 到 9, 多出 0 的那一行、<span class="nb">少了 10.</span></p>
+</details>
+</article>
+</section>
+
+<section class="part" id="b5">
+<h2>Übungsblatt 5<br><span class="de-title">Aufgabe 5-1 bis 5-4 · Wiederholungsanweisungen in Python (while- und for-Schleife)</span><small><span class="rl">对应 <a href="EIPS-04-语句与控制结构.html#while">EIPS 04 · 循环</a>、<a href="EIPS-04-语句与控制结构.html#entwurf">怎样设计 while 循环</a>、<a href="EIPS-04-语句与控制结构.html#for">for 循环</a>, 以及上面的 <a href="#z4">Zentralübung 4</a>;</span><span class="rl">源文件 angabe05.pdf;</span><span class="rl">5-1、5-3 是课堂题 (Präsenz, 在 13. 和 16.11.2026 的练习课上做), 5-2、5-4 是家庭作业 (Hausaufgabe, 25.11.2026 14:00 前通过 GATE 提交).</span></small></h2>
+
+<article id="b5-0">
+<h3>总说明<br><span class="de-title">Allgemeine Hinweise</span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Allgemeine Hinweise</span>
+  <ul>
+    <li>Dieses Übungsblatt bezieht sich noch auf Kapitel 4 der Vorlesung, da wir noch nicht alle Kontrollstrukturen im letzten Übungsblatt behandelt haben. Thema dieses Übungsblatts sind deshalb zunächst noch einmal Schleifen um diese zu vertiefen, Aufgaben zu Kapitel 5 sind dann auf dem nächsten <span class="nb">Übungsblatt.</span></li>
+    <li>Die Präsenzaufgaben werden in den Übungen am 13. und 16. November 2026 bearbeitet. Die Hausaufgaben können bis zum 25.11.2026 um 14:00 Uhr über GATE abgegeben <span class="nb">werden.</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 本练习单仍然对应讲义第 4 章, 因为上一张练习单还没覆盖所有控制结构. 所以这次先再练循环, 第 5 章的题放到下一张. 课堂题在 2026 年 11 月 13 日和 16 日的练习课上做; 家庭作业在 2026 年 11 月 25 日 14:00 前通过 GATE <span class="nb">提交.</span></p>
+  <p><b>思路</b>: 四道题都要自动测试, 所以输入的顺序、每行开头的关键词 (Jahr、Autos、Kosten……) 必须严格照题目. 下面的参考程序只用讲义第 4 章讲过的写法 (while、for、range、if、字符串拼接), 都用 Python 3.15 实际运行过, <span class="nb">输入用管道喂进去.</span></p>
+</div>
+</article>
+
+<article id="b5-1">
+<h3>Aufgabe 5-1: 投资回收计算 (while, 课堂题)<br><span class="de-title">Wiederholungsanweisungen in Python (while-Schleife) · Präsenz</span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-1</span>
+  <p>Ein Autokonzern investiert für die Entwicklung eines neuen Fahrzeug-Modells einen bestimmten Investitionsbetrag. Der Konzern möchte kalkulieren, nach wievielen Jahren sich der Investitionsbetrag amortisiert hat, d.h. nach wievielen Jahren der Gewinn aus den Einnahmen durch den Autoverkauf diesen Investitionsbetrag deckt. Dabei wird davon ausgegangen, dass ein Auto 22 500 Euro in der Herstellung kostet und für 25 000 Euro verkauft wird. Der Konzern schätzt dazu, wieviele Autos im ersten Jahr verkauft werden. Er geht davon aus, dass jedes Jahr 5 % mehr Autos als im Vorjahr verkauft <span class="nb">werden.</span></p>
+  <p>Schreiben Sie ein Python-Programm <code>investitionsrechner.py</code>, welches pro Jahr ausgibt, das wievielte Jahr gerade berechnet wird, wieviele Autos in diesem Jahr schätzungsweise verkauft werden, wie hoch die Herstellungskosten für alle verkauften Autos in diesem Jahr sind, mit welchem Umsatz in diesem Jahr gerechnet werden kann, wie hoch der Reingewinn (also Umsatz - Herstellungskosten) in diesem Jahr ist und wie hoch der aktuelle Gesamtgewinn über alle Jahre gerechnet ist. Das Python-Programm soll diese Berechnung stoppen, sobald der Gesamtgewinn über alle Jahre den Investitionsbetrag erreicht oder <span class="nb">überschreitet.</span></p>
+  <p>Bestimmen Sie zunächst, welche Variablen Sie benötigen und von welchem Typ der Wert ist, der darin gehalten wird. Testen Sie Ihr Programm für 1) einen Investitionsbetrag von einer Million Euro und einer geschätzten Anzahl von 50 im ersten Jahr verkauften Autos und 2) für einen Investitionsbetrag von 25 Millionen Euro und einer geschätzten Anzahl von 1000 im ersten Jahr verkauften <span class="nb">Autos.</span></p>
+  <p>Damit Ihr Programm von den automatischen Tests geprüft werden kann, lesen Sie zuerst die Höhe der Investition ein und danach die Anzahl der verkauften Autos. Achten Sie außerdem darauf, dass Sie das Jahr, die Anzahl verkaufter Autos, Kosten, Umsatz, Gewinn und Gesamtgewinn jeweils in einer eigenen Zeile ausgeben, in der zuerst das Wort Jahr, Autos, Kosten, Umsatz, Gewinn bzw. Gesamtgewinn und dann die jeweilige Zahl vorkommen soll. Groß-/Kleinschreibung und Umlaute spielen keine <span class="nb">Rolle.</span></p>
+  <p>Beispielausgabe:</p>
+<pre data-lang="output">Wie hoch ist die Investition: 1000000
+Wie viele Autos werden im ersten Jahr verkauft: 50
+Jahr 1:
+        Anzahl verkaufter Autos: 50
+        Kosten: 1125000
+        Umsatz: 1250000
+        Gewinn: 125000
+        Gesamtgewinn: 125000.0
+Jahr 2:
+        Anzahl verkaufter Autos: 52
+        Kosten: 1170000
+        Umsatz: 1300000
+        Gewinn: 130000
+        Gesamtgewinn: 255000.0
+...
+Jahr 8:
+        Anzahl verkaufter Autos: 66
+        Kosten: 1485000
+        Umsatz: 1650000
+        Gewinn: 165000
+        Gesamtgewinn: 1147500.0</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 一家汽车公司为开发新车型投入一笔钱, 想算出几年后投资能<b>amortisieren 收回</b>, 即卖车的累计利润覆盖这笔投资. 假定每辆车制造成本 22 500 欧元, 售价 25 000 欧元; 公司估计第一年卖出多少辆, 之后每年比上一年多卖 5 %. 写程序 <code>investitionsrechner.py</code>, 每年输出: 第几年、卖出的车数、所有车的制造成本、营业额、净利润 (营业额 − 成本)、累计总利润. 累计利润达到或超过投资额时停止. 先确定需要哪些变量、各是什么类型. 测试: 1) 投资 100 万、第一年 50 辆; 2) 投资 2500 万、第一年 1000 辆. 为了自动测试: 先读投资额, 再读车数; 每项单独一行, 行首是关键词再接数字, <span class="nb">大小写和变音不计.</span></p>
+  <p><b>思路</b>: 年数事先不知道, 所以用 while: 条件是「累计利润 &lt; 投资额」. 变量和类型: 投资额 (float, 可能带小数)、车数 (int)、年 (int)、成本/营业额/利润 (int)、累计利润 (示例输出是 125000.0, 所以是 float, 初值 0.0). 每年末车数乘 1.05. 示例第 2 年是 52 而不是 52.5, 说明车数每年都取整 <span class="nb">(截断).</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">investition = <span class="tk-b">float</span>(<span class="tk-b">input</span>(<span class="tk-s">"Wie hoch ist die Investition: "</span>))
+autos = <span class="tk-b">int</span>(<span class="tk-b">input</span>(<span class="tk-s">"Wie viele Autos werden im ersten Jahr verkauft: "</span>))
+herstellung = <span class="tk-n">22500
+</span>preis = <span class="tk-n">25000
+</span>jahr = <span class="tk-n">0
+</span>gesamtgewinn = <span class="tk-n">0.0
+</span><span class="tk-k">while </span>gesamtgewinn &lt; investition:
+    jahr += <span class="tk-n">1
+    </span>kosten = autos * herstellung
+    umsatz = autos * preis
+    gewinn = umsatz - kosten
+    gesamtgewinn += gewinn
+    <span class="tk-b">print</span>(<span class="tk-s">"Jahr " </span>+ <span class="tk-b">str</span>(jahr) + <span class="tk-s">":"</span>)
+    <span class="tk-b">print</span>(<span class="tk-s">"    Anzahl verkaufter Autos: " </span>+ <span class="tk-b">str</span>(autos))
+    <span class="tk-b">print</span>(<span class="tk-s">"    Kosten: " </span>+ <span class="tk-b">str</span>(kosten))
+    <span class="tk-b">print</span>(<span class="tk-s">"    Umsatz: " </span>+ <span class="tk-b">str</span>(umsatz))
+    <span class="tk-b">print</span>(<span class="tk-s">"    Gewinn: " </span>+ <span class="tk-b">str</span>(gewinn))
+    <span class="tk-b">print</span>(<span class="tk-s">"    Gesamtgewinn: " </span>+ <span class="tk-b">str</span>(gesamtgewinn))
+    autos = <span class="tk-b">int</span>(autos * <span class="tk-n">1.05</span>)</pre>
+  <p>测试 1 (输入 1000000 和 50) 共输出 8 年, 每一年都和示例逐字相同 (除了缩进); 车数依次是 50, 52, 54, 56, 58, 60, 63, 66, 第 7 年末累计 982500.0 还差一点, 第 8 年达到 1147500.0. 测试 2 (25000000 和 1000) 需要 9 年, <span class="nb">最后一年:</span></p>
+<pre data-lang="output">Jahr 9:
+    Anzahl verkaufter Autos: 1473
+    Kosten: 33142500
+    Umsatz: 36825000
+    Gewinn: 3682500
+    Gesamtgewinn: 27525000.0</pre>
+  <p>每辆车的利润固定是 2500 欧元, 所以累计利润 = 2500 × <span class="nb">累计车数.</span></p>
+  <p><b>易错</b>: ① 车数要用上一年的车数乘 1.05 再截断, 而不是 <code class="lc">int(50 * 1.05 ** (jahr - 1))</code>: 后者第 3 年得 55, 和示例的 54 对不上 (每年截断会累积少算). ② 用 <code>round</code> 第 2 年就得 52 (52.5 四舍五入到偶数), 但第 3 年得 55, 也对不上. ③ 条件写成 <code>&lt;=</code> 会在恰好等于投资额时多算一年, 题目说「达到或超<span class="nb">过」就停.</span></p>
+</details>
+</article>
+
+<article id="b5-2">
+<h3>Aufgabe 5-2: 还贷计算 (while, 家庭作业)<br><span class="de-title">Wiederholungsanweisungen in Python (while-Schleife) · Hausaufgabe</span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-2</span>
+  <p>Sie möchten ein Immobilien-Darlehen über eine unbegrenzte Laufzeit aufnehmen und berechnen, nach wievielen Jahren Sie das Darlehen komplett zurückgezahlt haben. Mit der Bank haben Sie einen jährlichen Zinssatz sowie einen Tilgungssatz vereinbart. Pro Jahr wird eine gleichbleibende Jahresrate an die Bank gezahlt in <span class="nb">Höhe von:</span></p>
+<pre data-lang="python">darlehensbetrag * (zinssatz + tilgungssatz)/<span class="tk-n">100.0</span></pre>
+  <p>Am Ende jedes Jahres sind Jahreszinsen entsprechend des vereinbarten Zinssatzes angewandt auf die Restschuld am Ende des vorherigen Jahres zu zahlen. Die Jahrestilgung am Ende jedes Jahres ergibt sich dann durch die Differenz aus Jahresrate und Jahreszinsen. Die Restschuld am Ende jedes Jahres verringert sich entsprechend der <span class="nb">Jahrestilgung.</span></p>
+  <p>Schreiben Sie ein Python-Programm <code>tilgungsrechner.py</code>, das für einen gegebenen Darlehensbetrag, Zinssatz und Tilgungssatz eine Ausgabeliste in der unten angegebenen Form ausgibt, in der, bis das Darlehen vollständig zurückgezahlt ist, pro Jahr die Jahreszinsen, die Jahrestilgung und die Restschuld am Ende des Jahres ausgewiesen <span class="nb">sind.</span></p>
+  <p>Testen Sie Ihr Programm für 1) einen Darlehensbetrag von 10 000 Euro, einen Zinssatz von 2.0 % sowie einen Tilgungssatz von 10.0 % und 2) einen Darlehensbetrag von 300 000 Euro, einen Zinssatz von 3.5 % sowie einen Tilgungssatz von 2.<span class="nb">0 %.</span></p>
+  <p>Damit Ihr Programm von den automatischen Tests geprüft werden kann, lesen Sie zuerst den Darlehensbetrag, danach den Zinssatz und zuletzt den Tilgungssatz ein. Achten Sie außerdem darauf, dass Sie das Jahr, die Jahreszinsen, Jahrestilgung, und Restschuld jeweils in einer eigenen Zeile ausgeben, in der zuerst das Wort Jahr, Zinsen, Tilgung bzw. Restschuld und dann die jeweilige Zahl vorkommen soll. Groß-/Kleinschreibung und Umlaute spielen keine <span class="nb">Rolle.</span></p>
+  <p>Beispielausgabe:</p>
+<pre data-lang="output">Darlehensbetrag: 10000
+Zinssatz: 2.0
+Tilgungssatz: 10
+Jahr 1:
+        Jahreszinsen: 200.0
+        Jahrestilgung: 1000.0
+        Restschuld: 9000.0
+Jahr 2:
+        Jahreszinsen: 180.0
+        Jahrestilgung: 1020.0
+        Restschuld: 7980.0
+...
+Jahr 10:
+        Jahreszinsen: 4.907431377689086
+        Jahrestilgung: 245.3715688844543
+        Restschuld: 0.0</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 你要借一笔不限期限的房贷, 想算出几年能全部还清. 和银行约定了年利率和<b>Tilgungssatz 还本率</b>. 每年付给银行固定的<b>Jahresrate 年供</b>: 贷款额 × (利率 + 还本率) / 100. 每年年底付的利息 = 上一年年底的<b>Restschuld 剩余本金</b> × 利率; 当年还掉的本金 (Jahrestilgung) = 年供 − 利息; 剩余本金减去当年还掉的本金. 写程序 <code>tilgungsrechner.py</code>, 直到还清为止, 每年输出利息、还本和年底的剩余本金. 测试: 1) 10 000 欧元, 利率 2.0 %, 还本率 10.0 %; 2) 300 000 欧元, 利率 3.5 %, 还本率 2.0 %. 输入顺序: 贷款额、利率、<span class="nb">还本率.</span></p>
+  <p><b>思路</b>: 年供不变, 利息随剩余本金逐年减少, 所以每年还的本金越来越多 (1000 → 1020 → …). 循环条件「剩余本金 &gt; 0」. 难点在最后一年: 年供 − 利息往往大于剩下的本金, 不能还多; 示例最后一年的还本 245.37… 正好等于剩余本金, 剩余本金是 0.0. 所以要在循环里判断: 还本额超过剩余本金时, <span class="nb">只还剩余本金.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">darlehen = <span class="tk-b">float</span>(<span class="tk-b">input</span>(<span class="tk-s">"Darlehensbetrag: "</span>))
+zinssatz = <span class="tk-b">float</span>(<span class="tk-b">input</span>(<span class="tk-s">"Zinssatz: "</span>))
+tilgungssatz = <span class="tk-b">float</span>(<span class="tk-b">input</span>(<span class="tk-s">"Tilgungssatz: "</span>))
+rate = darlehen * (zinssatz + tilgungssatz) / <span class="tk-n">100.0
+</span>restschuld = darlehen
+jahr = <span class="tk-n">0
+</span><span class="tk-k">while </span>restschuld &gt; <span class="tk-n">0</span>:
+    jahr += <span class="tk-n">1
+    </span>zinsen = restschuld * zinssatz / <span class="tk-n">100.0
+    </span>tilgung = rate - zinsen
+    <span class="tk-k">if </span>tilgung &gt; restschuld:
+        tilgung = restschuld
+    restschuld = restschuld - tilgung
+    <span class="tk-b">print</span>(<span class="tk-s">"Jahr " </span>+ <span class="tk-b">str</span>(jahr) + <span class="tk-s">":"</span>)
+    <span class="tk-b">print</span>(<span class="tk-s">"    Jahreszinsen: " </span>+ <span class="tk-b">str</span>(zinsen))
+    <span class="tk-b">print</span>(<span class="tk-s">"    Jahrestilgung: " </span>+ <span class="tk-b">str</span>(tilgung))
+    <span class="tk-b">print</span>(<span class="tk-s">"    Restschuld: " </span>+ <span class="tk-b">str</span>(restschuld))</pre>
+  <p>测试 1 共 10 年, 第 1、2、10 年和示例逐字相同 (包括 <code>4.907431377689086</code> 和 <code>245.3715688844543</code> 这些位数). 测试 2 的年供是 16 500 欧元, <span class="nb">开头和结尾:</span></p>
+<pre data-lang="output">Jahr 1:
+    Jahreszinsen: 10500.0
+    Jahrestilgung: 6000.0
+    Restschuld: 294000.0
+Jahr 2:
+    Jahreszinsen: 10290.0
+    Jahrestilgung: 6210.0
+    Restschuld: 287790.0
+...
+Jahr 30:
+    Jahreszinsen: 228.73214665140068
+    Jahrestilgung: 6535.20419004002
+    Restschuld: 0.0</pre>
+  <p>还本率越低, 还得越久: 2 % 的还本率要 30 年, <span class="nb">10 % 只要 10 年.</span></p>
+  <p><b>易错</b>: 不加最后一年的判断, 第 10 年会还 1000 多欧元的本金, 剩余本金变成负数 (多付了钱). 如果利率 × 贷款额 ≥ 年供 (还本率为 0), 本金永远不减, 这个 while 就是死循环; 题目的输入保证了还本率 <span class="nb">&gt; 0.</span></p>
+</details>
+</article>
+
+<article id="b5-3">
+<h3>Aufgabe 5-3: 住房储蓄账户 (for, 课堂题)<br><span class="de-title">Wiederholungsanweisungen in Python (for-Schleife) · Präsenz</span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-3</span>
+  <p>Sie möchten einen Bausparvertrag aufnehmen und berechnen, wieviel Bausparvermögen Sie nach einer vorgegebenen Zeit angespart haben. Die Verzinsung ist fix auf jährlich 4.5 % festgelegt und wird jeweils am Ende des Jahres aufgeschlagen. Verträge sind nur mit einer jährlichen Laufzeit möglich. Die Einzahlung in den Bausparvertrag erfolgt monatlich mit einem festen <span class="nb">Betrag.</span></p>
+  <p>Schreiben Sie ein Python-Programm <code>bausparkonto.py</code>, das für eine gegebene Laufzeit (in Monaten) und monatliche Einzahlungsrate das am Ende des Zeitraums angesparte Vermögen berechnet. Verwenden Sie dazu als Iterationsanweisung eine <b>for-Schleife</b>. Bestimmen Sie zunächst, welche Variablen Sie benötigen und von welchem Typ der Wert ist, der darin gehalten <span class="nb">wird.</span></p>
+  <p>Testen Sie Ihr Programm für eine Laufzeit von 6 Jahren (72 Monaten) und einer monatliche Einzahlung von 200 <span class="nb">Euro.</span></p>
+  <p>Damit Ihr Programm von den automatischen Tests geprüft werden kann, lesen Sie zuerst die monatliche Einzahlung und danach die Laufzeit. Achten Sie außerdem darauf, dass Sie den Monat und das angesparte Vermögen jeweils in einer eigenen Zeile ausgeben, in der zuerst das Wort Monat bzw. Vermögen und dann die jeweilige Zahl vorkommen soll. Groß-/Kleinschreibung und Umlaute spielen keine <span class="nb">Rolle.</span></p>
+  <p>Beispielausgabe:</p>
+<pre data-lang="output">Monatliche Einzahlung: 200
+Laufzeit: 72
+Monat: 1
+Angespartes Vermoegen: 200.0
+Monat: 2
+Angespartes Vermoegen: 400.0
+...
+Monat: 72
+Angespartes Vermoegen: 16845.96429150154</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 你要签一份<b>Bausparvertrag 住房储蓄合同</b>, 想算出一段时间后攒了多少钱. 年利率固定 4.5 %, 每年年底计息一次. 合同期只能是整年. 每月存入固定金额. 写程序 <code>bausparkonto.py</code>, 输入期限 (月数) 和每月存款, 算出期末的存款总额, 必须用 <b>for 循环</b>. 测试: 6 年 (72 个月), 每月 200 欧元. 输入顺序: 先每月存款, 再期限. 每个月输出月份和当前存款, <span class="nb">各占一行.</span></p>
+  <p><b>思路</b>: 月数事先知道, 所以用 <code class="lc">for monat in range(1, laufzeit + 1)</code>. 每个月先加上存款; 月份是 12 的倍数 (年底) 时再乘上利息. 判断年底用取余: <code class="lc">monat % 12 == 0</code>. 存款额是 float (示例输出 <span class="nb">200.0).</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">einzahlung = <span class="tk-b">float</span>(<span class="tk-b">input</span>(<span class="tk-s">"Monatliche Einzahlung: "</span>))
+laufzeit = <span class="tk-b">int</span>(<span class="tk-b">input</span>(<span class="tk-s">"Laufzeit: "</span>))
+zinssatz = <span class="tk-n">4.5
+</span>vermoegen = <span class="tk-n">0.0
+</span><span class="tk-k">for </span>monat <span class="tk-k">in </span><span class="tk-b">range</span>(<span class="tk-n">1</span>, laufzeit + <span class="tk-n">1</span>):
+    vermoegen += einzahlung
+    <span class="tk-k">if </span>monat % <span class="tk-n">12 </span>== <span class="tk-n">0</span>:
+        vermoegen += vermoegen * zinssatz / <span class="tk-n">100
+    </span><span class="tk-b">print</span>(<span class="tk-s">"Monat: " </span>+ <span class="tk-b">str</span>(monat))
+    <span class="tk-b">print</span>(<span class="tk-s">"Angespartes Vermoegen: " </span>+ <span class="tk-b">str</span>(vermoegen))</pre>
+  <p>运行 (200, 72) 得到 144 行, 第 1、2 个月和第 72 个月与示例相同: <code>16845.96429150154</code>. 第 12 个月是 2400 × 1.045 = <code>2508.0</code>, 第 13 个月 <span class="nb"><code>2708.0</code>.</span></p>
+  <p><b>易错</b>: 计息写成 <code class="lc">vermoegen = vermoegen * 1.045</code> 数学上一样, 但浮点结果是 <code>16845.964291501532</code>, 最后两位和示例不同: 两种算法的舍入步骤不一样. 自动测试如果逐字比对, 就要用「加上 vermoegen × 4.5 / 100」这种和参考解相同的写法. 另外利息是加在当时的全部余额上, 不是只加在当年的 2400 上 <span class="nb">(复利).</span></p>
+</details>
+</article>
+
+<article id="b5-4">
+<h3>Aufgabe 5-4: 积分规则 (for, 家庭作业)<br><span class="de-title">Wiederholungsanweisungen in Python (for-Schleife) · Hausaufgabe</span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-4</span>
+  <p>Bei Ihrem Supermarkt um die Ecke gibt es ein neues Bonuspunkte-System. Für jeden Tag, an dem Sie einkaufen gehen, erhalten Sie einen Bonuspunkt (unabhängig vom Betrag des Einkaufs). Gehen Sie aber an mehreren Tagen in Folge einkaufen, bekommen Sie pro Tag mehr Bonuspunkte, wie folgt: Am ersten Tag erhalten Sie einen Bonuspunkt. Am 2. und 3. Tag erhalten Sie je zwei Bonuspunkte; am 4. bis 6. Tag erhalten Sie je drei Bonuspunkt; am 7. bis 10. Tag erhalten Sie je vier Bonuspunkte usw. Das heißt, Sie erhalten einen Tag lang einen Bonuspunkt, zwei Tage lang zwei Bonuspunkte, drei Tage lang drei <span class="nb">Bonuspunkte usw.</span></p>
+  <p>Schreiben Sie ein Python-Programm <code>bonuspunkte.py</code>, das berechnet, wie viele Tage hintereinander Sie einkaufen gehen müssen, um eine gewisse Anzahl Punkte pro Tag zu erhalten. Das Programm soll die gewünschte Punktzahl als Eingabe abfragen und dann für jede Anzahl an Bonuspunkten kleiner/gleich der eingegebenen Zahl ausgeben, ab welchem Tag Sie diese Anzahl erhalten. Verwenden Sie dazu als Iterationsanweisung eine <b>for-Schleife</b>. Bestimmen Sie zunächst, welche Variablen Sie benötigen und von welchem Typ der Wert ist, der darin gehalten <span class="nb">wird.</span></p>
+  <p>Damit Ihr Programm von den automatischen Tests geprüft werden kann, geben sie in jeder Zeile zuerst das Wort Tag aus, gefolgt von dem jeweiligen Tag und der aktuellen Anzahl Bonuspunkte. Groß-/Kleinschreibung und Umlaute spielen keine <span class="nb">Rolle.</span></p>
+  <p>Testen Sie Ihr Programm mit einer Eingabe von 100 <span class="nb">Punkten.</span></p>
+  <p>Beispielausgabe:</p>
+<pre data-lang="output">Eingabe max. Punkte: 100
+Ab Tag 1 erhält man pro Einkauf: 1 Bonuspunkte
+Ab Tag 2 erhält man pro Einkauf: 2 Bonuspunkte
+Ab Tag 4 erhält man pro Einkauf: 3 Bonuspunkte
+Ab Tag 7 erhält man pro Einkauf: 4 Bonuspunkte
+Ab Tag 11 erhält man pro Einkauf: 5 Bonuspunkte
+Ab Tag 16 erhält man pro Einkauf: 6 Bonuspunkte
+Ab Tag 22 erhält man pro Einkauf: 7 Bonuspunkte
+...
+Ab Tag 4852 erhält man pro Einkauf: 99 Bonuspunkte
+Ab Tag 4951 erhält man pro Einkauf: 100 Bonuspunkte</pre>
+</div>
+<div class="zh">
+  <p><b>翻译</b>: 街角的超市有新的积分制度: 每天只要去购物就得 1 分 (和金额无关). 连续几天去, 每天得分会增加: 第 1 天 1 分, 第 2、3 天各 2 分, 第 4–6 天各 3 分, 第 7–10 天各 4 分, 依此类推. 也就是 1 分持续 1 天, 2 分持续 2 天, 3 分持续 3 天…… 写程序 <code>bonuspunkte.py</code>: 输入想要的每日积分, 对每个不超过它的积分数, 输出从第几天起每天能拿到这么多分. 必须用 for 循环. 每行以 Tag 开头, 再接天数和积分. <span class="nb">用 100 测试.</span></p>
+  <p><b>思路</b>: 让 for 循环遍历积分数 1, 2, …, 最大值; 用一个变量 tag 记「这个积分数从哪天开始」. 积分 p 持续 p 天, 所以下一个积分数的起始日 = 这一个的起始日 + p. 变量: 最大积分 (int)、积分 (int, 循环变量)、<span class="nb">tag (int).</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="python">max_punkte = <span class="tk-b">int</span>(<span class="tk-b">input</span>(<span class="tk-s">"Eingabe max. Punkte: "</span>))
+tag = <span class="tk-n">1
+</span><span class="tk-k">for </span>punkte <span class="tk-k">in </span><span class="tk-b">range</span>(<span class="tk-n">1</span>, max_punkte + <span class="tk-n">1</span>):
+    <span class="tk-b">print</span>(<span class="tk-s">"Ab Tag " </span>+ <span class="tk-b">str</span>(tag) + <span class="tk-s">" erhält man pro Einkauf: " </span>+ <span class="tk-b">str</span>(punkte) + <span class="tk-s">" Bonuspunkte"</span>)
+    tag = tag + punkte</pre>
+  <p>输入 100 时输出 100 行, 开头 7 行和最后两行与示例完全相同 (Ab Tag 4852 … 99, Ab Tag 4951 <span class="nb">… 100).</span></p>
+  <p>核对: 积分 p 的起始日是 <span class="katex" data-o="\(1 + (1 + 2 + \dots + (p-1)) = 1 + \frac{p(p-1)}{2}\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="minner">⋯</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.355em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mopen mtight">(</span><span class="mord mathnormal mtight">p</span><span class="mbin mtight">−</span><span class="mord mtight">1</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>. p = 100 时 <span class="katex" data-o="\(1 + 4950 = 4951\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4950</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4951</span></span></span></span>, p = 99 时 <span class="katex" data-o="\(1 + 4851 = 4852\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4851</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">4852</span></span></span></span>, 和示例一致. 所以要每天拿 100 分, 得连续购物 4951 天, 约 13.<span class="nb">5 年.</span></p>
+  <p><b>易错</b>: 先加再打印 (<code>tag += punkte</code> 放在 print 前) 会让所有天数错一格: 第一行变成「Ab Tag 2 <span class="nb">… 1」.</span></p>
+</details>
+</article>
+</section>
 
 </main>
 <script id="glass-js">

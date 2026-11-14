@@ -340,3 +340,46 @@ S ngram | ng | n 元组 | n-gram | 相邻 n 个词.
 
 D gen | Random text can be generated with a conditional frequency distribution over bigrams: the previous word is the condition and the following word the event.
 X gen | cfd["living"] 是 living 后面跟过的词的分布, max() 是 creature. 从 living 出发每次打印当前词, 再换成最常跟在后面的词, 很快陷入 the → land → of → the 的循环, 因为每一步都确定地取最大值, 而且只看前一个词. 改进: 按频率随机抽下一个词, 用更长的上下文 (三元组、n 元组), 这正是语言模型的基本思想.
+
+# ===== SP 07 · 词性标注 2026-11-13 =====
+D posdef | Parts of speech = morphosyntactic word classes; POS tagging = the task of labeling each word with its corresponding POS.
+X posdef | 同一词性的词共享句法和形态特征. 标注看的是词在这个位置的用法: They refuse to permit us to obtain the refuse permit 里 refuse 和 permit 各出现两次, 一次动词一次名词. NLTK 的 pos_tag 输出 (词, 标签) 元组, 用 Penn Treebank 标签.
+S posdef | classes | 学校里的九大词类 | Typical categories | 名词、动词、形容词、副词、代词、限定词、附置词、连词、叹词.
+S posdef | adp | 附置词 | Adposition | 介词和后置词的统称.
+D posuse | Why POS? Basis (or replacement) for analyzing texts at a syntactic or shallow semantic level.
+X posuse | 信息抽取: 名词指实体, 动词表关系; 机器翻译: like 是动词译 mag, 是介词译 wie; 语音合成: lead、wind、object 的读音随词性变; 句法分析: Time flies like an arrow 和 Fruit flies like a banana 结构不同. 自动得到的词性比更深的自动分析稳健.
+S posuse | ie | 信息抽取 | Information extraction | 名词指实体、动词指关系.
+S posuse | mt | 机器翻译 | Machine translation | 按词性选译词.
+S posuse | tts | 语音合成 | Speech synthesis | 同形异音词按词性定读音.
+D openclosed | Closed: limited number of words in each category; Open: unlimited number of words.
+X openclosed | 封闭类 (助动词、限定词、连词、代词、介词、小品词、叹词) 可以列表穷举, 而且都很高频; 开放类 (名词、动词、副词、形容词) 不断加入新词, 没见过的新词几乎一定属于开放类.
+D granul | Depending on the tagset, classes can be subdivided into more fine-grained classes; words are additionally annotated with morphological features.
+X granul | 名词分专有名词和普通名词, 普通名词再分可数和不可数; 代词分人称、物主、关系、疑问. 形态特征: 名词的数、格、性; 动词的时、体、式、示证、态; 形容词的比较级和一致.
+D tagset | The POS tagset defines the number and granularity of tags and how each tag is defined.
+X tagset | 英语常用 Penn Treebank (36 个核心标签, 加标点 45 个), 德语常用 STTS, 多语言用 Universal Dependencies (NLTK 用 12 个标签的早期版本, 当前 v2 有 17 个). 同一语言的标签集也差别很大: 从 17 到 137 个. 细到粗的映射容易, 粗到细不行, 边界情况也不同 (something 在 Penn 是 NN, 在 Universal 是 PRON).
+S tagset | penn | Penn Treebank | Penn Treebank tagset | 36 个核心标签, 非常英语化.
+S tagset | universal | Universal 标签集 | Universal tagset | NLTK 里 12 个粗标签.
+S tagset | mapping | 标签集映射 |  | 细到粗容易, 粗到细不行.
+D tagcorp | We can reverse the order of the pairs, so that the tags are the conditions, and the words are the events.
+X tagcorp | 把 (词, 标签) 交给 ConditionalFreqDist, 以词为条件得到每个词的标签分布 (yield: VERB 28, NOUN 20); 倒过来以标签为条件, 得到每个标签下的词. 以标签为条件时条件数就是 12 (Universal 标签数). 还能找出标签多于三种的词, 如 that、best、present、close、open.
+D posamb | Tag ambiguity in the Brown and WSJ corpora: 14–15 % of types, but 55–67 % of tokens are ambiguous.
+X posamb | 按词型 (Type) 大多数词只有一个标签, 按词元 (Token) 一半以上的出现要消歧, 因为有歧义的恰是 that、back、to 这些高频词. back 一个词就有 JJ、NN、VBP、VB、RP、RB 六种.
+D deftag | Use the most frequent word class – one label for all words.
+X deftag | DefaultTagger('NN') 给所有词元标 NN, 在 Brown 上准确率约 13%. 评价分类器至少要和「最常见类基线」比, 那是按每个词选它在训练集里最常见的类, 比默认标注器强得多.
+S deftag | mfc | 最常见类基线 | Most Frequent Class Baseline | 每个词标它最常见的类.
+D regtag | The regular expression tagger assigns tags to tokens on the basis of matching patterns; patterns are processed in order.
+X regtag | 规则按词尾猜: -ing → VBG, -ed → VBD, -es → VBZ, -'s → 属格, -s → NNS, 数字 → CD, 其余 NN. 顺序重要: 先匹配的规则先用. 在 Brown 上约 20%; the、a 这类虚词全错成 NN, was、this 因以 s 结尾被错标.
+D lookup | Find the hundred most frequent words and store their most likely tag, use this as the model for a lookup tagger (UnigramTagger).
+X lookup | 只用 100 个高频词的查表就把准确率从 20% 提到约 47%, 因为高频词占了文本的大半. 表外的词得到 None. 用全部词训练 UnigramTagger 在训练数据上有 92%, 在留出的 10% 上约 88%.
+D backoff | Many words have been assigned a tag of None; in these cases we would like to assign the default tag of NN – process known as backoff.
+X backoff | 查不到就交给下一个标注器: UnigramTagger(model, backoff=DefaultTagger('NN')) 把准确率提到约 60%. 可以串成链: 二元 → 一元 → 默认. 二元标注器单独用时一遇到没见过的组合就给 None, 之后整句都是 None, 所以离不开后退.
+D ngtag | Problem of unigram tagging: assigns one tag irrespective of context; n-gram tagging uses n items of context; preceding tokens are only represented by their POS tags.
+X ngtag | the wind 和 to wind 里 wind 词性不同, 一元标注器分不出. 二元看前一个标签, 三元看前两个. 前面的词只以标签出现, 因为标签只有几十种, 组合还见得够多. 开发集上: 默认 10.7%, 一元 89.1%, 二元 91.3%.
+D datasplit | Training data – Test data – Development data (validation set).
+X datasplit | 在训练数据上测会偏高. 训练数据越多越好, 测试集太小评估不客观, 训练数据要和测试数据同类. 开发集在开发过程中反复使用, 测试集只在最后用一次. 按句子随机划分简单, 但同一文档的句子会两边都有, 结果偏乐观.
+D tagdev | Developing a tagger is an iterative process: implement, train, test on development data, analyze errors, improve, finally test on test data.
+X tagdev | 用 nltk.ConfusionMatrix(gold, test) 看错误: 社论语料上最多的是动词和形容词被标成名词 (没见过的词后退到 NOUN). 改进办法: 更多训练数据、更大的 n、针对混淆最多的标签改. 训练好的标注器用 pickle 存起来复用.
+S tagdev | confusion | 混淆矩阵 | Confusion matrix | 行是金标准, 列是预测.
+S tagdev | pickle | 保存标注器 | Storing a tagger | 用 pickle 存取.
+D tageval | accuracy: #(pred=gold) / #(tokens); per tag: precision = TP/(TP+FP), recall = TP/(TP+FN), F1 = 2TP/(2TP+FP+FN).
+X tageval | 准确率看整体. 单个标签 (如 VERB) 的假正例是预测成 VERB 但其实不是, 假负例是应该是 VERB 却预测成别的; 真负例和这个问题无关. 精确率和召回率分子相同、分母不同, F1 是两者的调和平均.

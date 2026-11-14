@@ -56,7 +56,8 @@
   // 暗字场只画一次, 之后复用 (打开笔记的第一帧不再花时间画)
   var fldC = null, fldK = '';
   function field(day, ink) { var W = innerWidth, Hh = innerHeight, key = [W, Hh, day].join(); if (fldC && fldK === key) return fldC; fldK = key; var cv = fldC = document.createElement('canvas'), d = Math.min(2, devicePixelRatio || 1), c = cv.getContext('2d'); cv.className = 'fld'; cv.width = W * d; cv.height = Hh * d; c.setTransform(d, 0, 0, d, 0, 0);
-    c.font = '11px ' + GF; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = ink; c.globalAlpha = day ? .08 : .065; var rx = Math.min(W * .34, 330), ry = Math.min(Hh * .36, 300);
+    if (day) return cv; /* 2026-11-14: 白天不画静止暗字场 (浅底上是一片浅黑字影); 页面本身白天也不显示这层贴图, 前后一致 */
+    c.font = '11px ' + GF; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = ink; c.globalAlpha = .055; var rx = Math.min(W * .34, 330), ry = Math.min(Hh * .36, 300);
     for (var x = 0; x < W / CW; x++) for (var y = 0; y < Hh / CH; y++) { var px = x * CW + CW / 2, py = y * CH + CH / 2, dx = (px - W / 2) / rx, dy = (py - Hh / 2 + 46) / ry; if (Math.random() > .2 || dx * dx + dy * dy < 1) continue; c.fillText(gly(rk()), px, py); } return cv; }
 
   // 文字 glitch = 笔记和主页标题的「解密」效果 (touch.js decrypt) 的升级版: 同一套字符, 用文字自己的字体, 从左到右逐字定稿, 没定稿的字随机跳, 空格和标点保留

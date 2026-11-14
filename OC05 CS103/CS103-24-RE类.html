@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS103 24 · RE类</title>
+<style>
+  /* 同一门课沿用同目录已有笔记的整段 <style>；新课只改下面的颜色 token。 */
+  :root {
+    --bg: #1e1e12;
+    --ink: #ecede3;
+    --muted: #b5b59b;
+    --line: #4a4b30;
+    --card: #2b2b1a;
+    --code: #18180e;
+    --accent: #e1e481;
+    --chip: #3d3e23;
+    --zh: #2a2b17;
+    --add: #222318;
+    --add-line: #b5b686;
+    --warn: #2a1a1c;
+    --warn-line: #ff7b72;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16.5px/1.6 "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif;
+  }
+  header { position: static; background: transparent; border: 0; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 18px 22px 72px; }
+  header .wrap { padding-top: 18px; padding-bottom: 8px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 6px; font-weight: 650; }
+  h2 { font-size: 22px; margin: 44px 0 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+  h3 { font-size: 17px; margin: 24px 0 6px; }
+  h1 .de-title, h2 .de-title, h3 .de-title {
+    display: block; margin-top: 2px; color: var(--muted);
+    font-weight: 500; font-size: 0.92em; line-height: 1.35;
+  }
+  h1 .de-title { font-size: 0.62em; }
+  p { margin: 8px 0; }
+  .lede { color: var(--muted); margin: 0; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+  nav a {
+    color: var(--accent); text-decoration: none; background: var(--chip);
+    border-radius: 999px; padding: 3px 10px;
+    font: 13px/1.4 "ZH Latin", "PingFang SC", sans-serif;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 16px; margin: 12px 0;
+  }
+  .card p, .card li { margin: 4px 0; }
+  .de { position: relative; padding-top: 26px; }
+  .folie {
+    position: absolute; top: 7px; left: 16px;
+    font: 11.5px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); letter-spacing: .02em;
+  }
+  .de .def {
+    border-left: 3px solid var(--accent); padding: 4px 10px; margin: 6px 0;
+    background: var(--chip); border-radius: 0 8px 8px 0;
+  }
+  .zh {
+    background: var(--zh); border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .zh p { margin: 0 0 8px; }
+  .zh p:last-child, .zh ul:last-child, .zh ol:last-child { margin-bottom: 0; }
+  .add {
+    background: var(--add); border-left: 3px dashed var(--add-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .add::before { content: "补充（幻灯片之外）"; display: block; font-size: 12px; color: var(--add-line); font-weight: 600; margin-bottom: 4px; }
+  .add p { margin: 0 0 8px; }
+  .add p:last-child { margin-bottom: 0; }
+  .warn {
+    background: var(--warn); border-left: 3px solid var(--warn-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .vocab { font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14px; color: var(--muted); margin: 6px 0 2px; }
+  .vocab b { color: var(--ink); font-weight: 600; }
+  ul, ol { margin: 8px 0; padding-left: 1.3em; }
+  li { margin: 4px 0; }
+  ul ul { margin: 2px 0; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; margin: 12px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { font: 12px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); font-weight: 600; background: var(--chip); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  pre {
+    background: var(--code); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; overflow: auto; margin: 12px 0;
+    font: 13.5px/1.5 "SF Mono", ui-monospace, Menlo, monospace;
+  }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--chip); padding: 1px 5px; border-radius: 5px;
+  }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .src { color: var(--muted); font-size: 14px; }
+  blockquote { margin: 8px 0; padding: 4px 14px; border-left: 3px solid var(--line); font-style: italic; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 6px; }
+  .diagram { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .diagram > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14.5px; }
+  .diagram h4 { margin: 0 0 6px; font-size: 15px; }
+  @media (max-width: 560px) { .diagram { grid-template-columns: 1fr; } }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cols pre { margin: 0; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  /* ===== 前端细节优化 2026-10-16：只调排版与交互，不改内容和颜色 token ===== */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
+  p, li, a, code { overflow-wrap: break-word; }
+  [id] { scroll-margin-top: 16px; }
+  :focus-visible { outline: 2px solid var(--accent, var(--link)); outline-offset: 2px; border-radius: 4px; }
+  pre, .tablewrap { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  pre { tab-size: 4; }
+  .tablewrap { overflow-x: auto; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  @media print { pre, table, details, figure { break-inside: avoid; } h2, h3 { break-after: avoid; } }
+  ::selection { background: color-mix(in srgb, var(--accent, var(--link)) 35%, transparent); }
+  nav a { transition: background-color .15s ease, color .15s ease; }
+  nav a:hover { background: color-mix(in srgb, var(--accent, var(--link)) 22%, var(--chip, var(--paper))); }
+  details summary:hover { color: var(--accent, var(--link)); }
+  @media print { .card, .zh, .add, .warn, .de, .later, .vocab { break-inside: avoid; } }
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .wrap, header .wrap, main { padding-left: 16px; padding-right: 16px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    .card { padding-left: 12px; padding-right: 12px; }
+    .folie, .slide { left: 12px; }
+    .zh, .add, .warn { padding: 9px 12px; }
+    pre { padding: 10px 12px; font-size: 13px; }
+  }
+  /* ===== 排版统一层 v9（所有笔记共用；只管字体、尺寸、间距、对齐，不改颜色 token） ===== */
+  :root { --measure: 760px; --gutter: 24px; --serif: "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif; --sans: "ZH Latin", "PingFang SC", "Hiragino Sans GB", "Songti SC", sans-serif; --mono: "SF Mono", ui-monospace, Menlo, monospace; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { font: 16.5px/1.65 var(--serif); font-kerning: normal; }
+  /* 换行：中文按标点避头尾（strict），不用 balance / pretty（它们会在宽屏和手机上把中文行拆成一长一短、在词中间断开） */
+  body { line-break: strict; word-break: normal; overflow-wrap: break-word; font-feature-settings: "halt" 1; }
+  /* 中文讲解用英文标点（, . : ; ! ? ( )，由 scripts/zh_punct.py 转换）；剩下的「」、《》用 halt 压成半宽，不留大空白 */
+  pre, code, kbd, .katex { font-feature-settings: normal; }
+  /* 页首说明和副标题按「 · 」分段，只在段与段之间换行，不在一个段落中间断开 */
+  .seg, h1 .seg, h2 .seg, h3 .seg, .lede .seg { display: inline-block; margin: 0; font-size: inherit; font-weight: inherit; color: inherit; letter-spacing: inherit; }
+  p, li, td, th, dd, figcaption, summary, .lede { text-wrap: wrap; }
+  h1, h2, h3, h4 { text-wrap: wrap; word-break: keep-all; overflow-wrap: anywhere; }
+  /* 行内代码整体不拆行（bark() 不会断成 bark( / )）；只有页首、出处说明里的长文件名允许在放不下时断开 */
+  code { white-space: nowrap; }
+  .lede code, .src code, h1 code, h2 code, h3 code { white-space: normal; overflow-wrap: anywhere; }
+  td:first-child, th:first-child { min-width: 5em; }
+  /* 单元格内容不能断开的表（莫尔斯码之类）给 table 加 class="nowrap"，放不下就横向滚动（注释里不要写带尖括号的标签，wrap_tables.py 曾把它当成真表格） */
+  table.nowrap td, table.nowrap th { white-space: nowrap; text-wrap: nowrap; }
+  /* 代码块里的 code 跟随 pre 保留换行（上面的 nowrap 只给行内代码；漏了这条，多行代码会挤成一行） */
+  pre code { white-space: inherit; overflow-wrap: normal; word-break: normal; }
+  /* 长的行内代码（apply_typography.py 标 .lc，超过 24 个字符）在手机上放不下，允许在空格处换行，必要时任意处断开 */
+  code.lc { white-space: normal; overflow-wrap: anywhere; }
+  /* 版心：页首和正文同一列，左右对齐、整体居中 */
+  header .wrap, main.wrap, main { box-sizing: border-box; max-width: var(--measure); margin-left: auto; margin-right: auto; padding-left: var(--gutter); padding-right: var(--gutter); }
+  header .wrap { padding-top: 40px; padding-bottom: 8px; }
+  main.wrap, main { padding-top: 8px; padding-bottom: 96px; }
+  /* 标题层级 */
+  h1 { font-size: 28px; line-height: 1.3; font-weight: 650; margin: 0 0 4px; }
+  h1 .de-title, h1 > span { display: block; margin-top: 6px; font-size: 15px; line-height: 1.45; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  h2 { font-size: 22px; line-height: 1.35; font-weight: 650; margin: 56px 0 10px; padding-top: 16px; }
+  h2 .de-title { display: block; margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--muted); }
+  h3 { font-size: 17.5px; line-height: 1.45; font-weight: 650; margin: 32px 0 8px; }
+  h3 .de-title { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  h4 { font-size: 16px; margin: 24px 0 8px; }
+  /* 页首说明与导航 */
+  .lede { margin: 12px 0 0; font: 15.5px/1.65 var(--serif); color: var(--muted); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px 6px; margin: 18px 0 0; }
+  nav a { font: 12.5px/1.5 var(--sans); padding: 3px 11px; border-radius: 999px; text-decoration: none; }
+  /* 正文段落 */
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 1.4em; margin: 8px 0; }
+  li { margin: 4px 0; }
+  /* 原文卡片与各类框：统一宽度、圆角、内边距 */
+  .card { box-sizing: border-box; width: 100%; border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .card.de, .card.orig { padding-top: 30px; }
+  .folie, .slide { top: 9px; left: 18px; font: 11.5px/1.3 var(--sans); letter-spacing: .03em; }
+  .zh, .add, .warn, details.answer, .later { box-sizing: border-box; font: 15px/1.75 var(--sans); padding: 12px 16px; margin: 10px 0 6px; }
+  .zh p, .add p, .warn p, details.answer p { margin: 0 0 10px; }
+  .zh p:last-child, .add p:last-child, .warn p:last-child { margin-bottom: 0; }
+  .src { font: 14px/1.7 var(--sans); }
+  /* 居中元素：公式行、图、表格统一处理 */
+  p[style*="text-align:center"], p[style*="text-align: center"], .math-block { margin: 14px auto; text-align: center; font-size: 1.05em; }
+  figure, .src-fig { margin: 14px auto; text-align: center; }
+  /* 图注左对齐: 居中的两行图注第二行会孤零零缩在中间 */
+  figure figcaption, .src-fig figcaption { text-align: left; }
+  /* 图注按标点分句 (span.cs)，每行都在一个标点后结束，不在半句中间换行 */
+  figcaption .cs { display: inline-block; max-width: 100%; }
+  figure img, .src-fig img { display: block; margin: 0 auto; }
+  figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .tablewrap { width: 100%; overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; font: 14.5px/1.6 var(--sans); }
+  .card table, .tablewrap table { margin: 0; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 11px; }
+  td.num, th.num { text-align: right; }
+  /* 代码 */
+  pre { font: 13.5px/1.55 var(--mono); padding: 12px 16px; border-radius: 10px; margin: 12px 0; overflow-x: auto; tab-size: 4; }
+  code { font-family: var(--mono); font-size: .86em; }
+  pre code { font-size: inherit; }
+  .cols { gap: 12px; }
+  .cols > *, .pair > *, .card > *, .zh > *, details.answer > * { min-width: 0; }
+  img, video { max-width: 100%; height: auto; }
+  .katex svg { max-width: none; }
+  /* 折叠框 */
+  details > summary { font: 600 15px/1.5 var(--sans); }
+  /* 窄屏 */
+  @media (max-width: 600px) {
+    :root { --gutter: 16px; }
+    body { font-size: 16px; line-height: 1.65; }
+    header .wrap { padding-top: 24px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; margin-top: 44px; }
+    h3 { font-size: 17px; }
+    .card { padding-left: 13px; padding-right: 13px; }
+    .folie, .slide { left: 13px; }
+    .zh, .add, .warn, details.answer { padding: 10px 13px; font-size: 15px; line-height: 1.75; }
+    nav a { font-size: 12px; padding: 2px 9px; }
+    .cols { grid-template-columns: 1fr; }
+    /* 手机上表格列太窄时中文会一字一行（「需求分析」竖着排）：给单元格最小宽度，放不下就在 .tablewrap 里横向滚动 */
+    th, td { min-width: 4.5em; }
+    td.wide, th.wide { min-width: 9em; }
+  }
+  /* ===== /排版统一层 ===== */
+</style>
+<style id="oc-structure">
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) { list-style-position: inside; padding-left: 0; }
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) :is(ul, ol) { padding-left: 1.4em; }
+</style>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  .katex { font-size: 1.08em; }
+  .math-block { overflow-x: auto; overflow-y: hidden; margin: 10px 0; }
+  .math-block .katex-display { margin: 0.4em 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>RE 类<br><span class="de-title">The Class RE</span></h1>
+    <nav>
+      <a href="#halt">更多不可判定性结果</a>
+      <a href="#re">RE 这个类</a>
+      <a href="#verify">验证</a>
+      <a href="#equiv">验证器与识别器的等价</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<!-- ===== HALT ===== -->
+<h2 id="halt" data-nav="停机问题">更多不可判定性结果<br><span class="de-title">More Undecidability Results</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 2–4</span>
+  <p class="src">(图: Regular Languages ⊂ CFLs ⊂ R ⊊ RE ⊂ All Languages.)</p>
+  <p><b>The Halting Problem</b></p>
+  <ul>
+    <li>The most famous undecidable problem is the <b>halting problem</b>, which asks:
+      <p>Given a TM \( M \) and a string \( w \), will \( M \) halt* when run on \( w \)?</p></li>
+    <li>As a formal language, this problem would be expressed as
+      <p>\( \mathrm{HALT} = \{ \langle M, w\rangle \mid M \text{ is a TM that halts on } w \} \)</p></li>
+    <li>How hard is this problem to solve?</li>
+  </ul>
+  <p>* i.e., accept or reject (“halting” execution, as opposed to infinite loop)</p>
+</div>
+<div class="zh">
+  <p>上一讲证明了 R ≠ RE. 这一讲先看最著名的不可判定问题 <b>halting problem</b> 停机问题: 给定图灵机 M 和串 w, M 在 w 上会不会停机 (接受或拒绝, 而不是死循环)? 写成语言 HALT. 然后介绍 RE 的另一种刻画: 验证器. 重点是验证器的定义, 以及「有验证器 ⟺ 可识别」的双向构造.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 5–6</span>
+  <p><b>HALT ∈ RE</b></p>
+  <ul>
+    <li><b>Claim:</b> HALT ∈ RE.</li>
+    <li><b>Idea:</b> We can just run TM M on w, and see if it halts. (It might not, but that's ok, we just need a recognizer TM to show HALT ∈ RE.)</li>
+  </ul>
+  <pre data-lang="c">bool checkHalt(TM M, string w) {
+    // This might infinite loop, and if it does, we will
+    // not reach the "if" code below this
+    bool result = M(w);
+    // whether result is true or false, at least M did halt,
+    // so we return true
+    if (result || !result) {
+        return true;
+    }
+}</pre>
+  <p><b>HALT and \( A_{TM} \)</b>: Comparing recognizer TMs for HALT and \( A_{TM} \)</p>
+  <div class="cols">
+  <pre data-lang="c">bool checkHalt(TM M, string w) {
+    // This might infinite loop
+    bool result = M(w);
+    // Accept both true and false
+    if (result || !result) {
+        return true;
+    }
+}</pre>
+  <pre data-lang="c">bool checkATM(TM M, string w) {
+    // This might infinite loop
+    bool result = M(w);
+    // Accept only true
+    if (result) {
+        return true;
+    } else {
+        return false;
+    }
+}</pre>
+  </div>
+</div>
+<div class="zh">
+  <p>HALT 可识别: 直接运行 M(w). 若 M 停机 (无论结果是 true 还是 false), 就返回 true; 若 M 死循环, 识别器也跟着死循环, 这对识别器是允许的 (此时 ⟨M, w⟩ ∉ HALT, 识别器只需不接受).</p>
+  <p>和 \( A_{TM} \) 的识别器对比: 二者都先运行 M(w), 区别只在最后: HALT 对 true 和 false 都接受, \( A_{TM} \) 只接受 true. 代码里 <code>result || !result</code> 永远为真, 只是为了强调「只要能走到这里就接受」.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 7–8</span>
+  <p><b>HALT ∉ R</b></p>
+  <ul>
+    <li><b>Claim:</b> HALT ∉ R.</li>
+    <li>If HALT is decidable, there would exist some decider function <code>bool willHalt(TM M, string w)</code> that reports whether the program M will halt when run on the given input w.</li>
+    <li>Then, we could do a trickster setup like we did for \( A_{TM} \).</li>
+    <li>(skipping the formal proof for the sake of time, but it follows the same template as \( A_{TM} \), but using this version of trickster)</li>
+  </ul>
+  <pre data-lang="c">bool trickster(string input) {
+    string me = mySource();
+    if (willHalt(me, input)) {
+        while (true) {
+            // loop infinitely
+        }
+    } else {
+        return true;
+    }
+}</pre>
+</div>
+<div class="zh">
+  <p>HALT 不可判定. 若有判定器 willHalt, 构造新的 trickster: 问 willHalt「我在这个输入上会停机吗」, 若说会停就故意死循环, 若说不会停就立刻返回. 于是 trickster 停机 ⟺ willHalt 说它不停 ⟺ (由 willHalt 的正确性) trickster 不停机, 矛盾. 和 \( A_{TM} \) 的证明完全同一个模板, 只是把「取反返回值」换成「死循环与否取反」.</p>
+  <p>所以 HALT ∈ RE − R, 和 \( A_{TM} \) 一样处在 R 与 RE 之间的那一圈.</p>
+</div>
+
+<!-- ===== RE ===== -->
+<h2 id="re" data-nav="RE 类">RE 这个类<br><span class="de-title">The Class RE</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 9</span>
+  <p><b>The Class RE</b></p>
+  <ul>
+    <li>Languages \( L \) that are in RE, but not R, are those where:
+      <ul>
+        <li>We can build a TM \( M \), where \( \mathscr{L}(M) = L \)</li>
+        <li>That TM \( M \) has the risk of getting stuck in an infinite loop for at least one input string that is not in \( L \)</li>
+      </ul></li>
+    <li>Next: Just like the class Regular was defined in multiple ways (DFAs, NFAs, RegExes), today we'll learn another way to define this class</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>在 RE 但不在 R 中的语言: 能造出识别它的图灵机, 但任何这样的图灵机都至少在某个 L 外的串上死循环. 正则语言有 DFA、NFA、正则表达式三种等价描述; RE 也有另一种描述, 就是下面的验证器.</p>
+</div>
+
+<!-- ===== VERIFY ===== -->
+<h2 id="verify" data-nav="验证">验证<br><span class="de-title">Verification</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 10–14</span>
+  <p class="src">(代码框: /* imagine 5000 lines of TM code */)</p>
+  <p>Does this code HALT on input “abbababababbbb”?</p>
+  <p><b>Reflection:</b> Hard for humans! We know that TMs are also not able to answer this in the general case without the possibility of looping (HALT in RE, not R).</p>
+  <p><b>Idea:</b> What if I gave you a hint? What if I told you that this code HALTs on this input after exactly 20 steps of execution.</p>
+  <p>If your only job was deciding if my hint is truthful, could you write a decider TM to do that? It should accept if the hint is true, and reject otherwise. If so, describe what your decider TM does.</p>
+  <p>Here's the catch: You don't know if my hint is truthful.</p>
+  <p><b>Decider TM:</b> Run the code on the input for exactly 20 steps of execution. If on the 20th step we observe it HALT, accept. Otherwise reject (hint was not truthful).</p>
+</div>
+<div class="zh">
+  <p>给一段 5000 行的图灵机代码, 问它在某输入上会不会停机. 人难以回答, 图灵机也无法在一般情况下保证不陷入死循环 (HALT 不在 R 中).</p>
+  <p>换一个任务: 如果有人给你一个<b>提示</b>, 「它会在恰好第 20 步停机」, 你只需判断提示真不真. 这很容易, 而且一定能停: 模拟恰好 20 步, 第 20 步看到它停机就接受, 否则拒绝. 难点在于你不知道提示是否可信, 所以必须检查.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 15–18</span>
+  <p><b>Example:</b> Someone gives us the number of steps hint “20.” We run the TM on the input “abbababababbbb” and observe the TM accepts the input on step 20. This ⟨M, w⟩ is in the language HALT.</p>
+  <p>… and observe the TM rejects the input on step 20. Is this ⟨M, w⟩ in the language HALT? — This ⟨M, w⟩ is in the language HALT.</p>
+  <p>… and observe the TM has neither accepted nor rejected the input after 20 steps (M would keep running if we let it, but we stop after 20 steps). Is this ⟨M, w⟩ in the language HALT?</p>
+  <ul>
+    <li>In each of the preceding cases, we were given some TM M and some input string w, and some evidence/hint supporting the claim that M halts on w.</li>
+    <li>Given a truthful evidence/hint, we can write a decider TM to see that the answer is indeed “yes,” M halts on w.</li>
+    <li>Given false evidence, we aren't immediately sure whether M halts on w.
+      <ul>
+        <li>Maybe there's no evidence saying that the answer is “yes,” because the answer is no, M doesn't halt on w!</li>
+        <li>Or maybe there is some evidence, but just not the evidence we were given.</li>
+      </ul></li>
+    <li>Let's formalize this idea.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>三种情况:</p>
+  <ul>
+    <li>第 20 步接受: M 在 w 上停机, ⟨M, w⟩ ∈ HALT.</li>
+    <li>第 20 步拒绝: 也是停机, 同样 ⟨M, w⟩ ∈ HALT.</li>
+    <li>20 步后既没接受也没拒绝: <b>不能</b>下结论. 也许 M 永不停机; 也许它会在第 21 步、第 10 000 步停机, 只是提示给错了.</li>
+  </ul>
+  <p>总结: 真的提示能让我们确认「是」; 假的提示什么也说明不了. 下面把这个想法形式化.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 19–23</span>
+  <p><b>Verifiers</b></p>
+  <ul>
+    <li>A <b>verifier</b> for a language \( L \) is a TM \( V \) with the following properties:
+      <ul>
+        <li>\( V \) halts on all inputs.</li>
+        <li>For any string \( w \in \Sigma^* \), the following is true:
+          <p>\( w \in L \leftrightarrow \exists c \in \Sigma^*.\ V \text{ accepts } \langle w, c\rangle \)</p></li>
+      </ul></li>
+    <li>A string \( c \) where \( V \) accepts ⟨w, c⟩ is called a <b>certificate</b> for \( w \).
+      <ul><li>This is the “evidence.”</li></ul></li>
+    <li>Intuitively, what does this mean?</li>
+  </ul>
+  <p><b>Deciders and Verifiers</b></p>
+  <p>“Solve the problem”: input string (w) → Decider M for L → yes! / no! — If M accepts, then w ∈ L. If M rejects, then w ∉ L. M halts on all inputs. w ∈ L ↔ M accepts w</p>
+  <p>“Check the answer”: input string (w) + certificate (c) → Verifier V for L → yes! — If V accepts ⟨w, c⟩, then w ∈ L. If V rejects ⟨w, c⟩, we don't know whether w ∈ L. V halts on all inputs. w ∈ L ↔ ∃c ∈ Σ*. V accepts ⟨w, c⟩. “certificate” is the official term for a “hint” — Helpful certificate / Unhelpful certificate.</p>
+</div>
+<div class="zh">
+  <p><b>verifier</b> 验证器 V: 一个总停机的图灵机, 输入是串 w 和一个附加串 c, 满足: w ∈ L 当且仅当<b>存在</b>某个 c 使 V 接受 ⟨w, c⟩. 使 V 接受的 c 叫 w 的 <b>certificate</b> 证书 (即「提示」「证据」).</p>
+  <p>和判定器对比: 判定器「解决问题」, 只拿到 w, 必须自己给出对或错; 验证器「检查答案」, 拿到 w 和一个证书. V 接受, 就确定 w ∈ L; V 拒绝, 不能下结论 (证书可能只是没给对).</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 24–27</span>
+  <p><b>Verifiers</b></p>
+  <ul>
+    <li>Some notes about \( V \):
+      <ul>
+        <li>If \( V \) accepts ⟨w, c⟩, then we're guaranteed \( w \in L \).</li>
+        <li>If \( V \) does not accept ⟨w, c⟩, then either
+          <ul><li>\( w \in L \), but you gave the wrong \( c \), or</li><li>\( w \notin L \), so no possible \( c \) will work.</li></ul></li>
+      </ul></li>
+    <li>More notes about \( V \):
+      <ul>
+        <li>Notice that \( c \) is existentially quantified.</li>
+        <li>Notice \( V \) is required to halt always (like a decider).</li>
+        <li>Notice that \( \mathscr{L}(V) \ne L \). (Good question to hold on to for a second: what is \( \mathscr{L}(V) \)?)</li>
+        <li>The job of \( V \) is just to check certificates, not to decide membership in \( L \).</li>
+      </ul></li>
+    <li>A note about \( c \):
+      <ul><li>Figuring out what would make a good certificate (should it be a number of steps to take, an equation-solving variable assignment, a set of graph nodes, an array of numbers to fill in a whole Sudoku board?) is custom work to do for each different language \( L \).</li></ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>几点说明:</p>
+  <ul>
+    <li>V 不接受时, 要么 w ∈ L 但证书给错了, 要么 w ∉ L, 任何证书都不行.</li>
+    <li>c 是<b>存在</b>量化的: 只要有一个好证书就够, 不要求每个证书都好.</li>
+    <li>V 必须总停机, 这一点像判定器.</li>
+    <li>\( \mathscr{L}(V) \ne L \). V 接受的是<b>对</b> ⟨w, c⟩, 所以 \( \mathscr{L}(V) = \{ \langle w, c\rangle \mid c \text{ 是 } w \text{ 的证书} \} \), 是一个由对组成的语言, 不是 L 本身.</li>
+    <li>V 的任务只是检查证书, 不是判断 w 是否属于 L.</li>
+  </ul>
+  <p>好的证书长什么样, 要针对每个语言设计: 可能是步数、方程的一组解、图中的一组节点、填满的数独盘面.</p>
+</div>
+<div class="add">
+  <p>例子: 语言「有解的数独题」. 证书是一个填满的盘面. 验证器检查两件事: 盘面和题目给出的数字一致; 每行、每列、每宫都恰好是 1 到 9. 检查只需扫描固定的 81 格, 一定停机. 有解的题目存在证书 (它的解); 无解的题目不论给什么盘面都过不了检查. 再如立方和语言, 证书就是三元组 (x, y, z), 验证器只要算一次 \( x^3 + y^3 + z^3 \) 是否等于 n. 「找」证书可能极难, 「查」证书却很容易, 这就是验证器视角的价值.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 28–31</span>
+  <p><b>Some Verifiers</b></p>
+  <ul>
+    <li>Let \( L \) be the following language:
+      <p>\( L = \{ \langle n\rangle \mid n \in \mathbb{N} \text{ and the hailstone sequence terminates for } n \} \)</p></li>
+  </ul>
+  <pre data-lang="c">bool checkHailstone(int n, int c) {
+    for (int i = 0; i &lt; c; i++) {
+        if (n % 2 == 0) n /= 2;
+        else n = 3*n + 1;
+        if (n == 1) return true;
+    }
+    return n == 1;
+}</pre>
+  <p>Does this always halt?</p>
+  <p>For one given ⟨n⟩ ∈ L (say 11), how many different values of c will work to cause the verifier to accept?</p>
+  <p>How many of these statements are true of \( \mathscr{L}(V) \)?</p>
+  <ul><li>\( \mathscr{L}(V) = L \)</li><li>\( \mathscr{L}(V) \subseteq L \)</li><li>\( L \subseteq \mathscr{L}(V) \)</li></ul>
+</div>
+<div class="zh">
+  <p>冰雹序列语言的验证器: 证书 c 是步数, 最多模拟 c 步, 途中到达 1 就接受.</p>
+  <ul>
+    <li>总会停机吗? 会. 循环最多执行 c 次, 每次常数时间.</li>
+    <li>对 n = 11, 有多少个 c 能让它接受? <b>无穷多个</b>. 11 的冰雹序列在第 14 步到达 1 (Python 核对), 因为循环中途到 1 就返回 true, 所以任何 c ≥ 14 都行.</li>
+    <li>关于 \( \mathscr{L}(V) \) 的三句话<b>都不对</b>: V 接受的是数对 ⟨n, c⟩, L 里是单个的 ⟨n⟩, 两个集合的元素类型不同, 谁也不包含谁.</li>
+  </ul>
+</div>
+
+<!-- ===== EQUIV ===== -->
+<h2 id="equiv" data-nav="验证器与识别器">验证器与识别器的等价<br><span class="de-title">Equivalence of Verifiers and Recognizers</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 32–36</span>
+  <p><b>Where We've Been</b>: NFA → Regex (State Elimination); Regex → NFA (Thompson's Algorithm)</p>
+  <p><b>Where We're Going Today</b>: Verifier → Recognizer (Somehow build this); Recognizer → Verifier (Somehow build this)</p>
+  <p><b>Verifier for \( A_{TM} \)?</b></p>
+  <ul>
+    <li>Consider \( A_{TM} \): \( A_{TM} = \{ \langle M, w\rangle \mid M \text{ is a TM and } M \text{ accepts } w \} \).</li>
+    <li>This is our standard example of an undecidable language. There's no way, in general, to tell whether a TM M will accept a string w.</li>
+    <li>Although this language is undecidable, it's an RE language, and it's possible to build a verifier for it!</li>
+    <li>What would make a good certificate for a verifier for \( A_{TM} \)?</li>
+  </ul>
+  <p><b>A Verifier for \( A_{TM} \)</b></p>
+  <pre data-lang="pseudocode">bool checkWillAccept(TM M, string w, int c) {
+    set up a simulation of M running on w;
+    for (int i = 0; i &lt; c; i++) {
+        simulate the next step of M running on w;
+    }
+    return whether M is in an accepting state;
+}</pre>
+  <ul>
+    <li>Do you see why M accepts w iff there is some c such that checkWillAccept(M, w, c) returns true?</li>
+    <li>Do you see why checkWillAccept always halts?</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>就像正则语言里 NFA 和正则表达式能互相转换, 这一节要证明验证器和识别器能互相转换.</p>
+  <p>先看 \( A_{TM} \) 的验证器. 好的证书是「M 接受 w 所用的步数」. checkWillAccept 模拟 M 在 w 上运行 c 步, 看此时是否已接受.</p>
+  <ul>
+    <li>为什么总停机: 只模拟有限的 c 步.</li>
+    <li>为什么正确: 若 M 接受 w, 一定是在某个有限步数 c 时接受的, 用这个 c 就能让验证器接受; 若 M 不接受 w (拒绝或死循环), 无论模拟多少步都看不到接受, 任何 c 都不行.</li>
+  </ul>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 37–41</span>
+  <p><b>Equivalence of Verifiers and Recognizers</b>: Recognizer → Verifier: Enforce a step count; Verifier → Recognizer: Try all certificates.</p>
+  <p>What languages are verifiable?</p>
+  <p>Let \( V \) be a verifier for a language \( L \). Consider the following function given in pseudocode:</p>
+  <pre data-lang="pseudocode">bool mysteryFunction(string w) {
+    int i = 0;
+    while (true) {
+        for (each string c of length i) {
+            if (V accepts ⟨w, c⟩) return true;
+        }
+        i++;
+    }
+}</pre>
+  <p>What set of strings does mysteryFunction return true on?</p>
+  <p><b>Theorem:</b> If \( L \) is a language, then there is a verifier for \( L \) if and only if \( L \in \mathbf{RE} \).</p>
+</div>
+<div class="zh">
+  <p>两个方向的思路: 识别器 → 验证器, 用「限制步数」(把步数当证书); 验证器 → 识别器, 用「穷举所有证书」.</p>
+  <p>mysteryFunction 按长度从短到长穷举所有可能的证书 c, 每个都交给 V 检查, 找到能让 V 接受的就返回 true. 它返回 true 的串恰好是 L 中的串: w ∈ L 时存在证书, 它有某个有限长度, 穷举迟早会试到; w ∉ L 时没有证书, 函数永远找下去. 所以 mysteryFunction 是 L 的识别器.</p>
+  <p>按长度逐层穷举是关键: 每一层的串只有有限个, 所以任何具体的证书都会在有限时间内被试到. 由于 V 总停机, 检查单个证书不会卡住.</p>
+  <p>定理: L 有验证器 ⟺ L ∈ RE. 这给出了 RE 的第二种刻画.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 42–70</span>
+  <p><b>Verifiers and RE</b></p>
+  <ul>
+    <li><b>Theorem:</b> If there is a verifier \( V \) for a language \( L \), then \( L \in \mathbf{RE} \).</li>
+    <li><b>Proof goal:</b> Given a verifier \( V \) for a language \( L \), find a way to construct a recognizer \( M \) for \( L \).</li>
+  </ul>
+  <p>We will try all possible certificates (values of c): \( \varepsilon \), a, b, aa, ab, ba, bb, aaa, aab, aba, abb, baa, …</p>
+  <ul>
+    <li><b>Proof sketch:</b> Consider the following program:</li>
+  </ul>
+  <pre data-lang="pseudocode">bool isInL(string w) {
+    int i = 0;
+    while (true) {
+        for (each string c of length i) {
+            if (V accepts ⟨w, c⟩) return true;
+        }
+        i++;
+    }
+}</pre>
+  <ul>
+    <li><b>Theorem:</b> If \( L \in \mathbf{RE} \), then there is a verifier for \( L \).</li>
+    <li><b>Proof goal:</b> Beginning with a recognizer \( M \) for the language \( L \), show how to construct a verifier \( V \) for \( L \).</li>
+    <li>The challenges:
+      <ul>
+        <li>A recognizer \( M \) is not required to halt on all inputs. A verifier \( V \) must always halt.</li>
+        <li>A recognizer \( M \) takes in one single input. A verifier \( V \) takes in two inputs.</li>
+        <li>We'll need to find a way of reconciling these differences.</li>
+      </ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>第一个方向 (验证器 ⟹ RE) 就是上面的 mysteryFunction, 这里命名为 isInL, 证书按 \( \varepsilon \), a, b, aa, ab, … 的顺序枚举.</p>
+  <p>第二个方向 (RE ⟹ 验证器) 的困难: 识别器可能不停机, 验证器必须总停机; 识别器只有一个输入, 验证器有两个. 需要用第二个输入来弥补停机问题.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 71–72</span>
+  <p>Recall: If \( M \) is a recognizer for a language \( L \), then \( M \) accepts \( w \) iff \( w \in L \).</p>
+  <p><b>Key insight:</b> If \( M \) accepts a string \( w \), it always does so in a finite number of steps.</p>
+  <p><b>Idea:</b> Adapt the verifier for \( A_{TM} \) into a more general construction that turns any recognizer into a verifier by running it for a fixed number of steps.</p>
+  <p><b>Verifiers and RE</b></p>
+  <ul><li><b>Theorem:</b> If \( L \in \mathbf{RE} \), then there is a verifier for \( L \).</li><li><b>Proof sketch:</b> Consider the following program:</li></ul>
+  <pre data-lang="pseudocode">bool checkIsInL(string w, int c) {
+    set up a simulation of M running on w;
+    for (int i = 0; i &lt; c; i++) {
+        simulate the next step of M running on W;
+    }
+    return whether M is in an accepting state;
+}</pre>
+  <p>Notice that checkIsInL always halts, since each step takes only finite time to complete. Next, notice that if there is a \( c \) where checkIsInL(w, c) returns true, then \( M \) accepted \( w \) after running for \( c \) steps, so \( w \in L \). Conversely, if \( w \in L \), then \( M \) accepts \( w \) after some number of steps (call that number \( c \)). Then checkIsInL(w, c) will run \( M \) on \( w \) for \( c \) steps, watch \( M \) accept \( w \), then return true. \( \blacksquare \)</p>
+</div>
+<div class="zh">
+  <p>关键观察: 识别器若接受 w, 一定是在有限步内接受的. 所以把步数当证书, 套用 \( A_{TM} \) 验证器的构造: checkIsInL(w, c) 模拟识别器 M 在 w 上运行 c 步, 看是否已接受.</p>
+  <ul>
+    <li>总停机: 只模拟 c 步.</li>
+    <li>若存在 c 使它返回 true, 说明 M 在 c 步内接受了 w, 所以 w ∈ L.</li>
+    <li>若 w ∈ L, M 在某个 c 步时接受, 这个 c 就是证书.</li>
+  </ul>
+  <p>两个方向合起来, 定理得证.</p>
+</div>
+<div class="warn">
+  <p><b>原文笔误:</b> 代码里 “simulate the next step of M running on W” 的 W 应为小写 w, 和参数名一致.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 73–74</span>
+  <p><b>RE and Proofs</b></p>
+  <ul>
+    <li>Verifiers and recognizers give two different perspectives on the “proof” intuition for RE.</li>
+    <li>Verifiers are explicitly built to check proofs that strings are in the language.
+      <ul><li>If you know that some string \( w \) belongs to the language and you have the proof of it, you can convince someone else that \( w \in L \).</li></ul></li>
+    <li>You can think of a recognizer as a device that “searches” for a proof that \( w \in L \).
+      <ul><li>If it finds it, great!</li><li>If not, it might loop forever.</li></ul></li>
+  </ul>
+  <ul>
+    <li>If the RE languages represent languages where membership can be proven, what does a non-RE language look like?</li>
+    <li>Intuitively, a language is not in RE if there is no general way to prove that a given string \( w \in L \) actually belongs to \( L \).</li>
+    <li>In other words, even if you knew that a string was in the language, you may never be able to convince anyone of it!</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>RE 的直观含义: 「属于 L」这件事可以被<b>证明</b>. 验证器就是检查证明的机器: 你知道 w ∈ L 并有证明, 就能说服别人. 识别器是「搜索证明」的机器: 找到了就接受, 找不到可能永远找下去.</p>
+  <p>那么不在 RE 中的语言是什么样? 没有一般的方法能证明 w 属于它: 即使你知道 w 在里面, 也可能永远无法说服别人. 下一讲会找到这样的语言.</p>
+</div>
+
+</main>
+<script data-goatcounter="https://yikesyellowpharmakon.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

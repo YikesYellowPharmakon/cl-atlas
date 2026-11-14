@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS103 12 · 归纳法上</title>
+<style>
+  /* 同一门课沿用同目录已有笔记的整段 <style>；新课只改下面的颜色 token。 */
+  :root {
+    --bg: #1e1e12;
+    --ink: #ecede3;
+    --muted: #b5b59b;
+    --line: #4a4b30;
+    --card: #2b2b1a;
+    --code: #18180e;
+    --accent: #e1e481;
+    --chip: #3d3e23;
+    --zh: #2a2b17;
+    --add: #222318;
+    --add-line: #b5b686;
+    --warn: #2a1a1c;
+    --warn-line: #ff7b72;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16.5px/1.6 "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif;
+  }
+  header { position: static; background: transparent; border: 0; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 18px 22px 72px; }
+  header .wrap { padding-top: 18px; padding-bottom: 8px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 6px; font-weight: 650; }
+  h2 { font-size: 22px; margin: 44px 0 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+  h3 { font-size: 17px; margin: 24px 0 6px; }
+  h1 .de-title, h2 .de-title, h3 .de-title {
+    display: block; margin-top: 2px; color: var(--muted);
+    font-weight: 500; font-size: 0.92em; line-height: 1.35;
+  }
+  h1 .de-title { font-size: 0.62em; }
+  p { margin: 8px 0; }
+  .lede { color: var(--muted); margin: 0; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+  nav a {
+    color: var(--accent); text-decoration: none; background: var(--chip);
+    border-radius: 999px; padding: 3px 10px;
+    font: 13px/1.4 "ZH Latin", "PingFang SC", sans-serif;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 16px; margin: 12px 0;
+  }
+  .card p, .card li { margin: 4px 0; }
+  .de { position: relative; padding-top: 26px; }
+  .folie {
+    position: absolute; top: 7px; left: 16px;
+    font: 11.5px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); letter-spacing: .02em;
+  }
+  .de .def {
+    border-left: 3px solid var(--accent); padding: 4px 10px; margin: 6px 0;
+    background: var(--chip); border-radius: 0 8px 8px 0;
+  }
+  .zh {
+    background: var(--zh); border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .zh p { margin: 0 0 8px; }
+  .zh p:last-child, .zh ul:last-child, .zh ol:last-child { margin-bottom: 0; }
+  .add {
+    background: var(--add); border-left: 3px dashed var(--add-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .add::before { content: "补充（幻灯片之外）"; display: block; font-size: 12px; color: var(--add-line); font-weight: 600; margin-bottom: 4px; }
+  .add p { margin: 0 0 8px; }
+  .add p:last-child { margin-bottom: 0; }
+  .warn {
+    background: var(--warn); border-left: 3px solid var(--warn-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .vocab { font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14px; color: var(--muted); margin: 6px 0 2px; }
+  .vocab b { color: var(--ink); font-weight: 600; }
+  ul, ol { margin: 8px 0; padding-left: 1.3em; }
+  li { margin: 4px 0; }
+  ul ul { margin: 2px 0; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; margin: 12px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { font: 12px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); font-weight: 600; background: var(--chip); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  pre {
+    background: var(--code); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; overflow: auto; margin: 12px 0;
+    font: 13.5px/1.5 "SF Mono", ui-monospace, Menlo, monospace;
+  }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--chip); padding: 1px 5px; border-radius: 5px;
+  }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .src { color: var(--muted); font-size: 14px; }
+  blockquote { margin: 8px 0; padding: 4px 14px; border-left: 3px solid var(--line); font-style: italic; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 6px; }
+  .diagram { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .diagram > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14.5px; }
+  .diagram h4 { margin: 0 0 6px; font-size: 15px; }
+  @media (max-width: 560px) { .diagram { grid-template-columns: 1fr; } }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cols pre { margin: 0; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  /* ===== 前端细节优化 2026-10-16：只调排版与交互，不改内容和颜色 token ===== */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
+  p, li, a, code { overflow-wrap: break-word; }
+  [id] { scroll-margin-top: 16px; }
+  :focus-visible { outline: 2px solid var(--accent, var(--link)); outline-offset: 2px; border-radius: 4px; }
+  pre, .tablewrap { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  pre { tab-size: 4; }
+  .tablewrap { overflow-x: auto; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  @media print { pre, table, details, figure { break-inside: avoid; } h2, h3 { break-after: avoid; } }
+  ::selection { background: color-mix(in srgb, var(--accent, var(--link)) 35%, transparent); }
+  nav a { transition: background-color .15s ease, color .15s ease; }
+  nav a:hover { background: color-mix(in srgb, var(--accent, var(--link)) 22%, var(--chip, var(--paper))); }
+  details summary:hover { color: var(--accent, var(--link)); }
+  @media print { .card, .zh, .add, .warn, .de, .later, .vocab { break-inside: avoid; } }
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .wrap, header .wrap, main { padding-left: 16px; padding-right: 16px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    .card { padding-left: 12px; padding-right: 12px; }
+    .folie, .slide { left: 12px; }
+    .zh, .add, .warn { padding: 9px 12px; }
+    pre { padding: 10px 12px; font-size: 13px; }
+  }
+  /* ===== 排版统一层 v9（所有笔记共用；只管字体、尺寸、间距、对齐，不改颜色 token） ===== */
+  :root { --measure: 760px; --gutter: 24px; --serif: "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif; --sans: "ZH Latin", "PingFang SC", "Hiragino Sans GB", "Songti SC", sans-serif; --mono: "SF Mono", ui-monospace, Menlo, monospace; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { font: 16.5px/1.65 var(--serif); font-kerning: normal; }
+  /* 换行：中文按标点避头尾（strict），不用 balance / pretty（它们会在宽屏和手机上把中文行拆成一长一短、在词中间断开） */
+  body { line-break: strict; word-break: normal; overflow-wrap: break-word; font-feature-settings: "halt" 1; }
+  /* 中文讲解用英文标点（, . : ; ! ? ( )，由 scripts/zh_punct.py 转换）；剩下的「」、《》用 halt 压成半宽，不留大空白 */
+  pre, code, kbd, .katex { font-feature-settings: normal; }
+  /* 页首说明和副标题按「 · 」分段，只在段与段之间换行，不在一个段落中间断开 */
+  .seg, h1 .seg, h2 .seg, h3 .seg, .lede .seg { display: inline-block; margin: 0; font-size: inherit; font-weight: inherit; color: inherit; letter-spacing: inherit; }
+  p, li, td, th, dd, figcaption, summary, .lede { text-wrap: wrap; }
+  h1, h2, h3, h4 { text-wrap: wrap; word-break: keep-all; overflow-wrap: anywhere; }
+  /* 行内代码整体不拆行（bark() 不会断成 bark( / )）；只有页首、出处说明里的长文件名允许在放不下时断开 */
+  code { white-space: nowrap; }
+  .lede code, .src code, h1 code, h2 code, h3 code { white-space: normal; overflow-wrap: anywhere; }
+  td:first-child, th:first-child { min-width: 5em; }
+  /* 单元格内容不能断开的表（莫尔斯码之类）给 table 加 class="nowrap"，放不下就横向滚动（注释里不要写带尖括号的标签，wrap_tables.py 曾把它当成真表格） */
+  table.nowrap td, table.nowrap th { white-space: nowrap; text-wrap: nowrap; }
+  /* 代码块里的 code 跟随 pre 保留换行（上面的 nowrap 只给行内代码；漏了这条，多行代码会挤成一行） */
+  pre code { white-space: inherit; overflow-wrap: normal; word-break: normal; }
+  /* 长的行内代码（apply_typography.py 标 .lc，超过 24 个字符）在手机上放不下，允许在空格处换行，必要时任意处断开 */
+  code.lc { white-space: normal; overflow-wrap: anywhere; }
+  /* 版心：页首和正文同一列，左右对齐、整体居中 */
+  header .wrap, main.wrap, main { box-sizing: border-box; max-width: var(--measure); margin-left: auto; margin-right: auto; padding-left: var(--gutter); padding-right: var(--gutter); }
+  header .wrap { padding-top: 40px; padding-bottom: 8px; }
+  main.wrap, main { padding-top: 8px; padding-bottom: 96px; }
+  /* 标题层级 */
+  h1 { font-size: 28px; line-height: 1.3; font-weight: 650; margin: 0 0 4px; }
+  h1 .de-title, h1 > span { display: block; margin-top: 6px; font-size: 15px; line-height: 1.45; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  h2 { font-size: 22px; line-height: 1.35; font-weight: 650; margin: 56px 0 10px; padding-top: 16px; }
+  h2 .de-title { display: block; margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--muted); }
+  h3 { font-size: 17.5px; line-height: 1.45; font-weight: 650; margin: 32px 0 8px; }
+  h3 .de-title { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  h4 { font-size: 16px; margin: 24px 0 8px; }
+  /* 页首说明与导航 */
+  .lede { margin: 12px 0 0; font: 15.5px/1.65 var(--serif); color: var(--muted); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px 6px; margin: 18px 0 0; }
+  nav a { font: 12.5px/1.5 var(--sans); padding: 3px 11px; border-radius: 999px; text-decoration: none; }
+  /* 正文段落 */
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 1.4em; margin: 8px 0; }
+  li { margin: 4px 0; }
+  /* 原文卡片与各类框：统一宽度、圆角、内边距 */
+  .card { box-sizing: border-box; width: 100%; border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .card.de, .card.orig { padding-top: 30px; }
+  .folie, .slide { top: 9px; left: 18px; font: 11.5px/1.3 var(--sans); letter-spacing: .03em; }
+  .zh, .add, .warn, details.answer, .later { box-sizing: border-box; font: 15px/1.75 var(--sans); padding: 12px 16px; margin: 10px 0 6px; }
+  .zh p, .add p, .warn p, details.answer p { margin: 0 0 10px; }
+  .zh p:last-child, .add p:last-child, .warn p:last-child { margin-bottom: 0; }
+  .src { font: 14px/1.7 var(--sans); }
+  /* 居中元素：公式行、图、表格统一处理 */
+  p[style*="text-align:center"], p[style*="text-align: center"], .math-block { margin: 14px auto; text-align: center; font-size: 1.05em; }
+  figure, .src-fig { margin: 14px auto; text-align: center; }
+  /* 图注左对齐: 居中的两行图注第二行会孤零零缩在中间 */
+  figure figcaption, .src-fig figcaption { text-align: left; }
+  /* 图注按标点分句 (span.cs)，每行都在一个标点后结束，不在半句中间换行 */
+  figcaption .cs { display: inline-block; max-width: 100%; }
+  figure img, .src-fig img { display: block; margin: 0 auto; }
+  figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .tablewrap { width: 100%; overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; font: 14.5px/1.6 var(--sans); }
+  .card table, .tablewrap table { margin: 0; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 11px; }
+  td.num, th.num { text-align: right; }
+  /* 代码 */
+  pre { font: 13.5px/1.55 var(--mono); padding: 12px 16px; border-radius: 10px; margin: 12px 0; overflow-x: auto; tab-size: 4; }
+  code { font-family: var(--mono); font-size: .86em; }
+  pre code { font-size: inherit; }
+  .cols { gap: 12px; }
+  .cols > *, .pair > *, .card > *, .zh > *, details.answer > * { min-width: 0; }
+  img, video { max-width: 100%; height: auto; }
+  .katex svg { max-width: none; }
+  /* 折叠框 */
+  details > summary { font: 600 15px/1.5 var(--sans); }
+  /* 窄屏 */
+  @media (max-width: 600px) {
+    :root { --gutter: 16px; }
+    body { font-size: 16px; line-height: 1.65; }
+    header .wrap { padding-top: 24px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; margin-top: 44px; }
+    h3 { font-size: 17px; }
+    .card { padding-left: 13px; padding-right: 13px; }
+    .folie, .slide { left: 13px; }
+    .zh, .add, .warn, details.answer { padding: 10px 13px; font-size: 15px; line-height: 1.75; }
+    nav a { font-size: 12px; padding: 2px 9px; }
+    .cols { grid-template-columns: 1fr; }
+    /* 手机上表格列太窄时中文会一字一行（「需求分析」竖着排）：给单元格最小宽度，放不下就在 .tablewrap 里横向滚动 */
+    th, td { min-width: 4.5em; }
+    td.wide, th.wide { min-width: 9em; }
+  }
+  /* ===== /排版统一层 ===== */
+</style>
+<style id="oc-structure">
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) { list-style-position: inside; padding-left: 0; }
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) :is(ul, ol) { padding-left: 1.4em; }
+</style>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  .katex { font-size: 1.08em; }
+  .math-block { overflow-x: auto; overflow-y: hidden; margin: 10px 0; }
+  .math-block .katex-display { margin: 0.4em 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>数学归纳法, 第一部分<br><span class="de-title">Mathematical Induction, Part One</span></h1>
+    <nav>
+      <a href="#idea">数学归纳原理</a>
+      <a href="#sums">一些求和</a>
+      <a href="#coin">假币问题</a>
+      <a href="#wrong">归纳法的错误示范</a>
+      <a href="#mu">MU 谜题</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<!-- ===== IDEA ===== -->
+<h2 id="idea" data-nav="归纳原理">数学归纳原理<br><span class="de-title">The Principle of Mathematical Induction</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 2–3</span>
+  <p>Everybody – do the wave!</p>
+  <p><b>The Wave</b></p>
+  <ul>
+    <li>If done properly, everyone will eventually end up joining in.</li>
+    <li>Why is that?
+      <ul><li>Someone (me!) started everyone off.</li><li>Once the person before you did the wave, you did the wave.</li></ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>课堂上让大家做「人浪」. 只要做法正确, 最后每个人都会加入. 原因有两条: 有人起了头 (老师); 前一个人做了, 你就跟着做. 这正是数学归纳法的两个组成部分.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 4–14</span>
+  <p>Let \( P \) be some predicate. The <b>principle of mathematical induction</b> states that if</p>
+  <p>\( P(0) \) is true — If it starts true…<br>and<br>\( \forall k \in \mathbb{N}.\ (P(k) \to P(k+1)) \) — …and it stays true…<br>then<br>\( \forall n \in \mathbb{N}.\ P(n) \) — …then it's always true.</p>
+  <p><b>Induction, Intuitively</b></p>
+  <ul>
+    <li>It's true for 0.</li>
+    <li>Since it's true for 0, it's true for 1.</li>
+    <li>Since it's true for 1, it's true for 2.</li>
+    <li>Since it's true for 2, it's true for 3.</li>
+    <li>Since it's true for 3, it's true for 4.</li>
+    <li>…</li>
+  </ul>
+  <p><b>Why Induction Works</b></p>
+  <p class="src">(动画: 由 P(0) 和 P(k) → P(k + 1) 推出 P(1), 再由 P(1) 和同一条蕴含推出 P(2), 依次得到 P(3), ….)</p>
+</div>
+<div class="zh">
+  <p><b>principle of mathematical induction</b> 数学归纳原理: 对谓词 P, 如果</p>
+  <ol>
+    <li>P(0) 成立 (起点是真的),</li>
+    <li>对每个自然数 k, P(k) 成立就能推出 P(k + 1) 成立 (真值一步步保持下去),</li>
+  </ol>
+  <p>那么 P(n) 对所有自然数 n 都成立.</p>
+  <p>为什么可行: 把蕴含 P(k) → P(k + 1) 当成一台「推进机」. 喂进 P(0), 得到 P(1); 再喂进 P(1), 得到 P(2); 依此类推, 任何一个具体的 n 都能在 n 步之内推到. 像多米诺骨牌: 第一块会倒, 每一块倒下都会推倒下一块, 所以全部会倒.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 15</span>
+  <p><b>Proof by Induction</b></p>
+  <ul>
+    <li>A <b>proof by induction</b> is a way to use the principle of mathematical induction to show that some result is true for all natural numbers \( n \).</li>
+    <li>In a proof by induction, there are three steps:
+      <ul>
+        <li>Prove that \( P(0) \) is true.
+          <ul><li>This is called the <b>basis step</b> or the <b>base case</b>.</li></ul></li>
+        <li>Prove that for all naturals \( k \), if \( P(k) \) is true, then \( P(k+1) \) is true.
+          <ul><li>This is called the <b>inductive step</b>. (This part is generally done as a direct proof of a universal implication.)</li><li>The assumption that \( P(k) \) is true is called the <b>inductive hypothesis</b>.</li></ul></li>
+        <li>Conclude, by induction, that \( P(n) \) is true for all \( n \in \mathbb{N} \).</li>
+      </ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>proof by induction</b> 归纳证明有三步:</p>
+  <ol>
+    <li><b>base case</b> 基础步 (也叫 basis step): 证 P(0).</li>
+    <li><b>inductive step</b> 归纳步: 证「对所有自然数 k, 若 P(k) 则 P(k + 1)」. 这是一个全称蕴含, 通常用直接证明: 任取 k, 假设 P(k), 证 P(k + 1). 其中「假设 P(k) 成立」叫 <b>inductive hypothesis</b> 归纳假设.</li>
+    <li>由归纳原理得出结论: P(n) 对所有 n 成立.</li>
+  </ol>
+  <p><b>易错:</b> 归纳假设只假设<b>一个</b> k 上的 P(k), 不是假设「对所有 k 都成立」; 后者就是要证的结论, 假设它等于循环论证.</p>
+  <p>归纳证明的骨架可以直接套用:</p>
+  <ul>
+    <li>「设 P(n) 为命题 ……. 我们用归纳法证明 P(n) 对所有 n ∈ ℕ 成立.」</li>
+    <li>「基础步: P(0) 说的是 ……. 这成立, 因为 …….」</li>
+    <li>「归纳步: 任取 k ∈ ℕ, 假设 P(k) 成立, 即 ……. 我们要证 P(k + 1), 即 …….」</li>
+    <li>(证明, 中途用到归纳假设时注明.)</li>
+    <li>「所以 P(k + 1) 成立, 归纳完成.」</li>
+  </ul>
+  <p>课程的 Guide to Induction 和 Induction Checklist 对这些要求有更详细的说明.</p>
+</div>
+
+<!-- ===== SUMS ===== -->
+<h2 id="sums" data-nav="2 的幂之和">一些求和<br><span class="de-title">Some Sums</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 17–21</span>
+  <p>\( 2^0 = 1 = 2^1 - 1 \)<br>\( 2^0 + 2^1 = 1 + 2 = 3 = 2^2 - 1 \)<br>\( 2^0 + 2^1 + 2^2 = 1 + 2 + 4 = 7 = 2^3 - 1 \)<br>\( 2^0 + 2^1 + 2^2 + 2^3 = 1 + 2 + 4 + 8 = 15 = 2^4 - 1 \)<br>\( 2^0 + 2^1 + 2^2 + 2^3 + 2^4 = 1 + 2 + 4 + 8 + 16 = 31 = 2^5 - 1 \)</p>
+  <p>Hmm, 3 is close to 4 and 7 is close to 8, and 15 is close to 16, And 31 is close to 32</p>
+  <p><b>Quick check:</b> What is the pattern? The sum of first n powers of 2 is ...</p>
+</div>
+<div class="zh">
+  <p>先算几个例子找规律: 1, 3, 7, 15, 31, 每个都比下一个 2 的幂少 1. 规律是: <b>前 n 个 2 的幂</b> (\( 2^0 \) 到 \( 2^{n-1} \)) 之和等于 \( 2^n - 1 \).</p>
+  <p>注意「前 n 个」从 \( 2^0 \) 数起, 最后一项是 \( 2^{n-1} \). n = 0 时是零个数相加, 和为 0, 而 \( 2^0 - 1 = 0 \), 也符合.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 22–49</span>
+  <p><b>Theorem:</b> The sum of the first \( n \) powers of two is \( 2^n - 1 \).</p>
+  <p><b>Proof:</b> Let \( P(n) \) be the statement “the sum of the first \( n \) powers of two is \( 2^n - 1 \).” We will prove, by induction, that \( P(n) \) is true for all \( n \in \mathbb{N} \), from which the theorem follows.</p>
+  <p>For our base case, we need to show \( P(0) \) is true, meaning that the sum of the first zero powers of two is \( 2^0 - 1 \). Since the sum of the first zero powers of two is zero and \( 2^0 - 1 \) is zero as well, we see that \( P(0) \) is true.</p>
+  <p>For the inductive step, pick an arbitrary \( k \in \mathbb{N} \) and assume that \( P(k) \) holds, meaning that</p>
+  <p>\[ 2^0 + 2^1 + \dots + 2^{k-1} = 2^k - 1. \quad (1) \]</p>
+  <p>We need to show that \( P(k + 1) \) holds, meaning that the sum of the first \( k + 1 \) powers of two is \( 2^{k+1} - 1 \). To see this, notice that</p>
+  <p>\[ \begin{aligned} 2^0 + 2^1 + \dots + 2^{k-1} + 2^k &amp;= (2^0 + 2^1 + \dots + 2^{k-1}) + 2^k \\ &amp;= 2^k - 1 + 2^k \quad \text{(via (1))} \\ &amp;= 2(2^k) - 1 \\ &amp;= 2^{k+1} - 1. \end{aligned} \]</p>
+  <p>Therefore, \( P(k + 1) \) is true, completing the induction. \( \blacksquare \)</p>
+</div>
+<div class="zh">
+  <p>按三步走:</p>
+  <ol>
+    <li>先定义 P(n), 告诉读者要用归纳法证明什么.</li>
+    <li>基础步: n = 0 时左边是空和 0, 右边 \( 2^0 - 1 = 0 \), 成立.</li>
+    <li>归纳步: 任取 k, 假设式 (1). 要证前 k + 1 项之和是 \( 2^{k+1} - 1 \). 关键一步是把前 k 项用括号括起来, 用归纳假设换成 \( 2^k - 1 \), 再加上第 k + 1 项 \( 2^k \), 得到 \( 2 \cdot 2^k - 1 = 2^{k+1} - 1 \).</li>
+  </ol>
+  <p>「在大式子里找出归纳假设能处理的那一部分」是归纳证明里反复出现的手法.</p>
+</div>
+<div class="add">
+  <p>换个角度看这个公式: 用二进制写, \( 2^0 + 2^1 + \dots + 2^{n-1} \) 就是 n 个 1 组成的数 \( 11\ldots1_2 \). 给它加 1, 每一位都进位, 得到 1 后面跟 n 个 0, 即 \( 2^n \). 所以 n 个 1 等于 \( 2^n - 1 \). 例如 \( 1111_2 = 15 = 2^4 - 1 \). 归纳证明里「前 k 项和加上 \( 2^k \) 等于 \( 2^{k+1} - 1 \)」, 正对应二进制里再往高位添一个 1.</p>
+</div>
+<div class="warn">
+  <p><b>原文笔误:</b> Slide 22 证明第一个词写成 “Lt P(n) be …”, 应为 “Let”; Slide 23 起已改正.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 26–48</span>
+  <p>At the start of the proof, we tell the reader what predicate we're going to show is true for all natural numbers \( n \), then tell them we're going to prove it by induction.</p>
+  <p>In a proof by induction, we need to prove that ✓ \( P(0) \) is true ✓ For all naturals \( k \), if \( P(k) \) is true, then \( P(k+1) \) is true.</p>
+  <p>Here, we state what \( P(0) \) actually says. Now, can go prove this using any proof technique!</p>
+  <p><b>Quick check:</b> Ignore that kind of proof for us for a moment—if we were proving the theorem with a direct proof, what would the first sentence be?</p>
+  <p>The goal of this step is to prove “For all \( k \in \mathbb{N} \), if \( P(k) \), then \( P(k+1) \).” To do this, we'll choose an arbitrary \( k \), assume that \( P(k) \) is true, then try to prove \( P(k+1) \).</p>
+  <p>Here, we explicitly state \( P(k+1) \), which is what we want to prove. Now, we can use any proof technique we want to prove it.</p>
+  <p>Here, we'll use our inductive hypothesis (the assumption that \( P(k) \) is true) to simplify a complex expression. This is a common theme in inductive proofs.</p>
+</div>
+<div class="zh">
+  <p>课件对证明逐句的批注, 归纳为写作规范:</p>
+  <ul>
+    <li>开头: 写出谓词 P(n) 是什么, 并声明用归纳法.</li>
+    <li>基础步: 先写出 P(0) <b>具体说的是什么</b>, 再用任何方法证明它.</li>
+    <li>归纳步: 它要证的是「对所有 k, P(k) → P(k + 1)」, 所以按全称蕴含的直接证明写: 任取 k, 假设 P(k), 明确写出 P(k + 1) 说的是什么, 再证明.</li>
+    <li>证明中通常会用归纳假设化简一个复杂表达式.</li>
+  </ul>
+  <p>课堂小问「若用直接证明, 第一句是什么」: 直接证明会写「任取自然数 n」; 归纳证明不这样开头, 而是先定义 P(n) 并声明归纳.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 50</span>
+  <p><b>A Quick Aside</b></p>
+  <ul>
+    <li>This result helps explain the range of numbers that can be stored in an <code>int</code>.</li>
+    <li>If you have an unsigned 32-bit integer, the largest value you can store is given by \( 1 + 2 + 4 + 8 + \dots + 2^{31} = 2^{32} - 1 \).</li>
+    <li>This formula for sums of powers of two has many other uses as well. You'll see one next time.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>应用: 32 位无符号整数把 32 个二进制位全设为 1 时最大, 数值就是 \( 2^0 + 2^1 + \dots + 2^{31} \), 按刚证的公式等于 \( 2^{32} - 1 = 4\,294\,967\,295 \). 这就是 C/C++ 里 <code>unsigned int</code> (32 位时) 的最大值.</p>
+</div>
+
+<!-- ===== COIN ===== -->
+<h2 id="coin" data-nav="假币问题">假币问题<br><span class="de-title">The Counterfeit Coin Problem</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 52–60</span>
+  <p><b>Problem Statement</b></p>
+  <ul>
+    <li>You are given a set of three seemingly identical coins, two of which are real and one of which is counterfeit.</li>
+    <li>The counterfeit coin weighs more than the rest of the coins.</li>
+    <li>You are given a balance. Using only one weighing on the balance, find the counterfeit coin.</li>
+  </ul>
+  <p class="src">(动画: 把硬币 1 和 2 分别放上天平两端. 若一端下沉, 下沉的那枚是假币; 若平衡, 假币是没上秤的 3.)</p>
+</div>
+<div class="zh">
+  <p>三枚硬币, 一枚假币比真币重, 只能用天平称一次. 方法: 1 和 2 各放一边. 哪边重哪枚就是假币; 如果平衡, 假币是 3. 关键是天平有三种结果 (左重、右重、平衡), 正好对应三种可能.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 61–72</span>
+  <p><b>A Harder Problem</b></p>
+  <ul>
+    <li>You are given a set of nine seemingly identical coins, eight of which are real and one of which is counterfeit.</li>
+    <li>The counterfeit coin weighs more than the rest of the coins.</li>
+    <li>You are given a balance. Using only two weighings on the balance, find the counterfeit coin.</li>
+  </ul>
+  <p class="src">(动画: 九枚硬币分成三组 1–3、4–5–6、7–8–9. 把 1–3 与 4–6 放上天平; 哪组重假币就在哪组, 平衡则在 7–9.)</p>
+  <p>Now we have one weighing to find the counterfeit out of these three coins.</p>
+</div>
+<div class="zh">
+  <p>九枚硬币, 称两次. 方法: 分成三组, 每组三枚. 第一次称 1–3 对 4–6, 确定假币在哪一组 (重的一组, 或者平衡时没上秤的一组). 剩下三枚, 用上面三枚的方法再称一次. 这里已经能看到归纳的影子: 9 枚的问题用一次称量化成了 3 枚的问题.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 73–76</span>
+  <p>Can we generalize this?</p>
+  <p>1 coin: _?_ weighings<br>3 coins: 1 weighing<br>9 coins: 2 weighings</p>
+  <p><b>Quick check:</b> What is the pattern? The number of weighings we need to find a counterfeit in \( 3^n \) coins is…</p>
+  <p><b>A Pattern</b></p>
+  <ul>
+    <li>Assume out of the coins that are given, exactly one is counterfeit and weighs more than the other coins.</li>
+    <li>If we have no weighings, how many coins can we have while still being able to find the counterfeit?
+      <ul><li>One coin, since that coin has to be the counterfeit!</li></ul></li>
+    <li>If we have one weighing, we can find the counterfeit out of three coins.</li>
+    <li>If we have two weighings, we can find the counterfeit out of nine coins.</li>
+  </ul>
+  <p>So far, we have \( 1, 3, 9 = 3^0, 3^1, 3^2 \). Does this pattern continue?</p>
+</div>
+<div class="zh">
+  <p>推广: 一枚硬币不用称 (它就是假币), 三枚称一次, 九枚称两次. 规律: \( 3^n \) 枚硬币用 n 次称量就能找出假币. 下面用归纳法证明这个规律对所有 n 都成立.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 77–107</span>
+  <p><b>Theorem:</b> If exactly one coin in a group of \( 3^n \) coins is heavier than the rest, that coin can be found using only \( n \) weighings on a balance.</p>
+  <p><b>Proof:</b> Let \( P(n) \) be the following statement:</p>
+  <p>If exactly one coin in a group of \( 3^n \) coins is heavier than the rest, that coin can be found using only \( n \) weighings on a balance.</p>
+  <p>We'll use induction to prove that \( P(n) \) holds for every \( n \in \mathbb{N} \), from which the theorem follows.</p>
+  <p>As our base case, we'll prove that \( P(0) \) is true, meaning that if we have a set of \( 3^0 = 1 \) coins with one coin heavier than the rest, we can find that coin with zero weighings. This is true because if we have just one coin, it's vacuously heavier than all the others, and no weighings are needed.</p>
+  <p>For the inductive step, suppose \( P(k) \) is true for some arbitrary \( k \in \mathbb{N} \), so we can find the heavier of \( 3^k \) coins in \( k \) weighings. We'll prove \( P(k+1) \): that we can find the heavier of \( 3^{k+1} \) coins in \( k+1 \) weighings.</p>
+  <p>Suppose we have \( 3^{k+1} \) coins with one heavier than the others. Split the coins into three groups of \( 3^k \) coins each. Weigh two of the groups against one another. If one group is heavier than the other, the coins in that group must contain the heavier coin. Otherwise, the heavier coin must be in the group we didn't put on the scale. Therefore, with one weighing, we can find a group of \( 3^k \) coins containing the heavy coin. We can then use \( k \) more weighings to find the heavy coin in that group.</p>
+  <p>We've given a way to use \( k+1 \) weighings and find the heavy coin out of a group of \( 3^{k+1} \) coins. Thus \( P(k+1) \) is true, completing the induction. \( \blacksquare \)</p>
+</div>
+<div class="zh">
+  <p>证明结构和求和的证明完全相同, 只是 P(n) 不再是等式, 而是「能做到某件事」:</p>
+  <ul>
+    <li>基础步: \( 3^0 = 1 \) 枚硬币, 不用称. 「它比其他所有硬币重」是空真的 (没有其他硬币).</li>
+    <li>归纳步: \( 3^{k+1} \) 枚分成三组, 每组 \( 3^k \) 枚. 称一次, 锁定假币所在的组. 剩下的正是 P(k) 处理的问题: \( 3^k \) 枚里找假币, 由归纳假设再用 k 次. 总共 k + 1 次.</li>
+  </ul>
+  <p>这里归纳假设的用法是「把大问题化成小一号的同类问题」, 和递归算法的思路一样.</p>
+</div>
+<div class="add">
+  <p>按证明的方法实际走一遍 27 枚 (\( 3^3 \)) 的情形:</p>
+  <ol>
+    <li>分成三组各 9 枚, 称前两组, 确定假币在哪一组 9 枚里 (第 1 次).</li>
+    <li>这 9 枚再分成三组各 3 枚, 同样确定是哪 3 枚 (第 2 次).</li>
+    <li>3 枚里称两枚, 确定假币 (第 3 次).</li>
+  </ol>
+  <p>每次称量把候选范围缩小到三分之一, 3 次从 27 缩到 1. 这和二分查找每次缩小一半是同一种思路, 只是天平有三种结果, 所以是「三分」.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 108</span>
+  <p><b>Some Fun Problems</b></p>
+  <ul>
+    <li>Here's some nifty variants of this problem that you can work through:
+      <ul>
+        <li>Suppose that you have a group of coins where there's either exactly one heavier coin, or all coins weigh the same amount. If you only get \( k \) weighings, what's the largest number of coins where you can find the counterfeit or determine none exists?</li>
+        <li>What happens if the counterfeit can be either heavier or lighter than the other coins? What's the maximum number of coins where you can find the counterfeit if you have \( k \) weighings?</li>
+        <li>Can you find the counterfeit out of a group of more than \( 3^k \) coins with \( k \) weighings?</li>
+        <li>Can you find the counterfeit out of any group of at most \( 3^k \) coins with \( k \) weighings?</li>
+      </ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>课件留的几个变体 (没有给答案):</p>
+  <ul>
+    <li>可能有一枚重的假币, 也可能没有假币, k 次最多能处理多少枚?</li>
+    <li>假币可能偏重也可能偏轻, k 次最多能处理多少枚?</li>
+    <li>k 次能否处理多于 \( 3^k \) 枚? 提示: k 次称量最多有 \( 3^k \) 种不同的结果组合, 而要区分的可能性多于 \( 3^k \) 种, 所以不能.</li>
+    <li>任何不超过 \( 3^k \) 枚的一组都能用 k 次处理吗? 能: 分组时尽量平均, 两组上秤的一样多即可.</li>
+  </ul>
+</div>
+
+<!-- ===== WRONG ===== -->
+<h2 id="wrong" data-nav="错误示范">归纳法的错误示范<br><span class="de-title">How Not To Induct</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 110–127</span>
+  <p><b>Something's Wrong...</b></p>
+  <p><b>Theorem:</b> The sum of the first \( n \) powers of two is \( 2^n \).</p>
+  <p><b>Proof:</b> Let \( P(n) \) be the statement “the sum of the first \( n \) powers of two is \( 2^n \).” We will prove, by induction, that \( P(n) \) is true for all \( n \in \mathbb{N} \), from which the theorem follows.</p>
+  <p>For the inductive step, assume that for some arbitrary \( k \in \mathbb{N} \) that \( P(k) \) holds, meaning that</p>
+  <p>\[ 2^0 + 2^1 + \dots + 2^{k-1} = 2^k. \quad (1) \]</p>
+  <p>We need to show that \( P(k + 1) \) holds, meaning that the sum of the first \( k + 1 \) powers of two is \( 2^{k+1} \). To see this, notice that</p>
+  <p>\[ \begin{aligned} 2^0 + 2^1 + \dots + 2^{k-1} + 2^k &amp;= (2^0 + 2^1 + \dots + 2^{k-1}) + 2^k \\ &amp;= 2^k + 2^k \quad \text{(via (1))} \\ &amp;= 2(2^k) \\ &amp;= 2^{k+1}. \end{aligned} \]</p>
+  <p>Therefore, \( P(k + 1) \) is true, completing the induction. \( \blacksquare \)</p>
+  <p><b>Quick check:</b> Where did we prove the base case?</p>
+  <p>When writing a proof by induction, make sure to prove the base case! Otherwise, your proof is incomplete!</p>
+  <p><b>Why did this work?</b> You can prove anything from a faulty assumption. This is called the <b>principle of explosion</b>.</p>
+</div>
+<div class="zh">
+  <p>一个「证明」了错误结论的例子: 定理说前 n 个 2 的幂之和是 \( 2^n \) (其实是 \( 2^n - 1 \)). 归纳步每一步都没错, 问题在于<b>没有基础步</b>. 检查一下: P(0) 说空和等于 \( 2^0 = 1 \), 是假的. 实际上 P(n) 对每个 n 都是假的.</p>
+  <p>为什么归纳步还能「证」出来? 归纳步证的是「若 P(k) 则 P(k + 1)」. 前件 P(k) 本来就是假的, 从假的前提出发什么都能推出, 这叫 <b>principle of explosion</b> 爆炸原理. 蕴含本身是真的 (空真), 但没有一个真的起点, 推进机就没有东西可推.</p>
+  <p>教训: 写归纳证明一定要证基础步.</p>
+</div>
+<div class="add">
+  <p>反过来, 只有基础步而没有归纳步也不行. 例如「对所有 n, \( n^2 \lt 10 \)」在 n = 0 时成立, 也能验证 n = 1, 2, 3 成立, 但 n = 4 就失败了: 有限个例子不能代替归纳步. 两部分缺一不可, 就像多米诺骨牌, 既要推倒第一块, 也要每一块都能推倒下一块.</p>
+</div>
+<div class="warn">
+  <p><b>幻灯片前后不一致:</b> Slide 110 的错误证明里写 “We need to show that P(k + 1) holds, meaning that the sum of the first k + 1 powers of two is \( 2^{k+1} - 1 \)”, 和它自己定义的 P(n) (和为 \( 2^n \)) 对不上, 推导的结果也是 \( 2^{k+1} \). Slide 115 起改成 \( 2^{k+1} \), 上面按改正后的版本照录. 这个错误不是课件故意设的「错误示范」, 故意的错误只是缺了基础步.</p>
+</div>
+
+<!-- ===== MU ===== -->
+<h2 id="mu" data-nav="MU 谜题">MU 谜题<br><span class="de-title">The MU Puzzle</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 129–130</span>
+  <p><b>Gödel, Escher Bach: An Eternal Golden Braid</b></p>
+  <ul>
+    <li>Douglas Hofstadter, cognitive scientist at the University of Indiana, wrote this Pulitzer-Prize-winning mind trip of a book.</li>
+    <li>It's a great read after you've finished CS103 – you'll see so many of the ideas we'll cover presented in a totally different way!</li>
+  </ul>
+  <p><b>The MU Puzzle</b></p>
+  <ul>
+    <li>Begin with the string MI.</li>
+    <li>Repeatedly apply one of the following operations:
+      <ul>
+        <li>Double the contents of the string after the M: for example, MIIU becomes MIIUIIU, or MI becomes MII.</li>
+        <li>Replace III with U: MIIII becomes MUI or MIU.</li>
+        <li>Append U to the string if it ends in I: MI becomes MIU.</li>
+        <li>Remove any UU: MUUU becomes MU.</li>
+      </ul></li>
+    <li><b>Question:</b> How do you transform MI to MU?</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>MU 谜题出自侯世达 (Douglas Hofstadter) 的《哥德尔、艾舍尔、巴赫: 集异璧之大成》, 这本书获普利策奖, 课件推荐学完 CS103 后读.</p>
+  <p>规则: 从字符串 MI 出发, 反复使用四种操作:</p>
+  <ol>
+    <li>把 M 后面的部分复制一遍接上: MIIU → MIIUIIU.</li>
+    <li>把任意一处 III 换成 U: MIIII → MUI 或 MIU (看换哪三个).</li>
+    <li>末尾是 I 时可以在末尾加 U: MI → MIU.</li>
+    <li>删掉任意一处 UU: MUUU → MU.</li>
+  </ol>
+  <p>问: 怎样从 MI 得到 MU?</p>
+</div>
+<div class="warn">
+  <p><b>幻灯片小错:</b> 侯世达任职的学校是 Indiana University (印第安纳大学布卢明顿分校), 不叫 “University of Indiana”. 书名中 “Gödel, Escher Bach” 漏了逗号, 正式书名是 “Gödel, Escher, Bach”.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 131–135</span>
+  <p>MI →(a) MII →(a) MIIII →(c) MIIIIU →(b) MUIU →(a) MUIUUIU →(d) MUIIU</p>
+  <p>(a) Double the string after an M. (b) Replace III with U. (c) Append U, if the string ends in I. (d) Delete UU from the string.</p>
+  <p><b>Try It!</b> Starting with MI, apply these operations to make MU.</p>
+  <p>Not a single person in this room was able to solve this puzzle. Are we even sure that there is a solution?</p>
+  <p><b>Counting I's</b></p>
+  <div class="tablewrap"><table class="nowrap">
+    <tr><td>MI</td><td>1</td></tr>
+    <tr><td>MII</td><td>2</td></tr>
+    <tr><td>MIIII</td><td>4</td></tr>
+    <tr><td>MIIIIU</td><td>4</td></tr>
+    <tr><td>MIIIIUIIIIU</td><td>8</td></tr>
+    <tr><td>MIIIIUUIU</td><td>5</td></tr>
+    <tr><td>MIIIIUUIUIIIIUUIU</td><td>10</td></tr>
+    <tr><td>MUIUUIUIIIIUUIU</td><td>7</td></tr>
+  </table></div>
+  <p><b>The Key Insight</b></p>
+  <ul>
+    <li>Initially, the number of I's is not a multiple of three.</li>
+    <li>To make MU, the number of I's must end up as a multiple of three.</li>
+    <li>Can we ever make the number of I's a multiple of three?</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>试着推几步会发现怎么也得不到 MU. 也许根本无解? 要证明无解, 需要找一个所有操作都保持的量. 课件盯住字符串里 I 的个数: 起始 1 个, 不是 3 的倍数; MU 里有 0 个, 是 3 的倍数. 四种操作对 I 的个数的影响:</p>
+  <ul>
+    <li>复制: 个数乘 2.</li>
+    <li>III 换 U: 个数减 3.</li>
+    <li>加 U、删 UU: 个数不变.</li>
+  </ul>
+  <p>只要证明「不是 3 的倍数」在乘 2 和减 3 下都保持, 就永远到不了 0 个.</p>
+  <p>表里的例子可以逐行核对这三条规律: MII 复制成 MIIII, 2 变 4; MIIIIUIIIIU 把一处 III 换成 U 得 MIIIIUUIU, 8 变 5; 加 U 那一行个数不变. 每一行的个数 1, 2, 4, 4, 8, 5, 10, 7 都不是 3 的倍数.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 136</span>
+  <p><b>Lemma 1:</b> If \( n \) is an integer that is not a multiple of three, then \( n - 3 \) is not a multiple of three.</p>
+  <p><b>Proof:</b> By contrapositive; we'll prove that if \( n - 3 \) is a multiple of three, then \( n \) is also a multiple of three. Because \( n - 3 \) is a multiple of three, we can write \( n - 3 = 3k \) for some integer \( k \). Then \( n = 3(k+1) \), so \( n \) is also a multiple of three, as required. \( \blacksquare \)</p>
+  <p><b>Lemma 2:</b> If \( n \) is an integer that is not a multiple of three, then \( 2n \) is not a multiple of three.</p>
+  <p><b>Proof:</b> Let \( n \) be a number that isn't a multiple of three. If \( n \) is congruent to one modulo three, then \( n = 3k + 1 \) for some integer \( k \). This means \( 2n = 2(3k+1) = 6k + 2 = 3(3k) + 2 \), so \( 2n \) is not a multiple of three. Otherwise, \( n \) must be congruent to two modulo three, so \( n = 3k + 2 \) for some integer \( k \). Then \( 2n = 2(3k+2) = 6k+4 = 3(2k+1) + 1 \), and so \( 2n \) is not a multiple of three. \( \blacksquare \)</p>
+</div>
+<div class="zh">
+  <p>两个引理:</p>
+  <ul>
+    <li>引理 1: 不是 3 的倍数, 减 3 后仍不是. 用逆否证明: 若 n − 3 = 3k, 则 n = 3(k + 1).</li>
+    <li>引理 2: 不是 3 的倍数, 乘 2 后仍不是. 不是 3 的倍数的整数除以 3 余 1 或余 2 (「n ≡ 1 mod 3」读作 n 模 3 余 1), 分两种情况: 余 1 时 2n 余 2, 余 2 时 2n = 3(2k + 1) + 1 余 1. 都不是 3 的倍数.</li>
+  </ul>
+</div>
+<div class="warn">
+  <p><b>幻灯片错误:</b> 引理 2 第一种情况写 “2n = 6k + 2 = 3(3k) + 2”, 但 \( 3(3k) = 9k \ne 6k \), 应为 \( 3(2k) + 2 \). 结论 (2n 余 2, 不是 3 的倍数) 不受影响.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 138–154</span>
+  <p><b>Lemma:</b> No matter which moves are made, the number of I's in the string never becomes multiple of three.</p>
+  <p><b>Proof:</b> Let \( P(n) \) be the statement “after any \( n \) moves, the number of I's in the string will not be multiple of three.” We will prove, by induction, that \( P(n) \) is true for all \( n \in \mathbb{N} \), from which the theorem follows.</p>
+  <p>As a base case, we'll prove \( P(0) \), that the number of I's after 0 moves is not a multiple of three. After no moves, the string is MI, which has one I in it. Since one isn't a multiple of three, \( P(0) \) is true.</p>
+  <p>For our inductive step, suppose that \( P(k) \) is true for some arbitrary \( k \in \mathbb{N} \). We'll prove \( P(k+1) \) is also true. Consider any sequence of \( k+1 \) moves. Let \( r \) be the number of I's in the string after the \( k \)th move. By our inductive hypothesis (that is, \( P(k) \)), we know that \( r \) is not a multiple of three. Now, consider the four possible choices for the \( k+1 \)st move:</p>
+  <p><i>Case 1:</i> Double the string after the M. After this, we will have \( 2r \) I's in the string, and from our lemma \( 2r \) isn't a multiple of three.</p>
+  <p><i>Case 2:</i> Replace III with U. After this, we will have \( r - 3 \) I's in the string, and by our lemma \( r - 3 \) is not a multiple of three.</p>
+  <p><i>Case 3:</i> Either append U or delete UU. This preserves the number of I's in the string, so we don't have a multiple of three I's at this point.</p>
+  <p>Therefore, no sequence of \( k+1 \) moves ends with a multiple of three I's. Thus \( P(k+1) \) is true, completing the induction. \( \blacksquare \)</p>
+</div>
+<div class="zh">
+  <p>用归纳法对<b>操作次数</b>证明: P(n) 是「做了任意 n 步后, I 的个数都不是 3 的倍数」.</p>
+  <ul>
+    <li>基础步: 0 步时字符串是 MI, 1 个 I.</li>
+    <li>归纳步: 任意 k + 1 步的操作序列, 看前 k 步后的个数 r, 由归纳假设 r 不是 3 的倍数. 第 k + 1 步分三种情况: 复制得 2r (引理 2), 替换得 r − 3 (引理 1), 其他操作不变. 都不是 3 的倍数.</li>
+  </ul>
+  <p>注意 P(n) 里的「any」: 归纳假设必须覆盖所有可能的操作序列, 证明里也是对任意的 k + 1 步序列讨论.</p>
+</div>
+<div class="warn">
+  <p><b>幻灯片前后不一致:</b> Slide 138 的版本有三处后来改掉: 情况 2 写成 “Delete III from the string” (规则是把 III 换成 U, Slide 149 改正); 结尾写成 “Thus P(k) is true when n=k+1” (Slide 154 改为 “Thus P(k+1) is true”); Slide 152 还有 “on e” 的空格错误. 上面按改正后的版本照录.</p>
+  <p><b>原文笔误:</b> “never becomes multiple of three” 漏了冠词, 应为 “a multiple of three”; P(n) 的陈述同样. 另外这是一个引理, 证明里却写 “from which the theorem follows”.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 156</span>
+  <p><b>Theorem:</b> The MU puzzle has no solution.</p>
+  <p><b>Proof:</b> Assume for the sake of contradiction that the MU puzzle has a solution and that we can convert MI to MU. This would mean that at the very end, the number of I's in the string must be zero, which is a multiple of three. However, we've just proven that the number of I's in the string can never be a multiple of three.</p>
+  <p>We have reached a contradiction, so our assumption must have been wrong. Thus the MU puzzle has no solution. \( \blacksquare \)</p>
+</div>
+<div class="zh">
+  <p>最后用反证法收尾: 若能得到 MU, 那时 I 的个数是 0, 是 3 的倍数, 与引理矛盾. 所以 MU 谜题无解. 这个结论无法靠「试遍所有走法」得到 (字符串可以无限变长), 必须靠归纳证明一个对所有步数都成立的性质.</p>
+</div>
+<div class="add">
+  <p>侯世达书里的结论比这更强: 一个形如 MI…I (只含 I) 的字符串能否从 MI 得到, 恰好取决于 I 的个数是否是 3 的倍数. 课件只证明了「不可能是 3 的倍数」这一半, 已足够说明 MU 无解. 这种找一个所有操作都保持的量 (这里是「I 的个数模 3 不为 0」) 的方法, 叫找 <b>invariant</b> 不变量, 是证明「某状态永远到不了」的标准手段.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 157–158</span>
+  <p><b>Algorithms and Loop Invariants</b></p>
+  <ul>
+    <li>The proof we just made had the form
+      <ul><li>“If P is true before we perform an action, it is true after we perform an action.”</li></ul></li>
+    <li>We could therefore conclude that after any series of actions of any length, if P was true beforehand, it is true now.</li>
+    <li>In algorithmic analysis, this is called a <b>loop invariant</b>.</li>
+    <li>Proofs on algorithms often use loop invariants to reason about the behavior of algorithms.</li>
+    <li>Take CS161 for more details!</li>
+  </ul>
+  <p><b>Next Time</b></p>
+  <ul>
+    <li><b>Variations on Induction</b>
+      <ul><li>Starting induction later.</li><li>Taking larger steps.</li><li>Complete induction.</li></ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>MU 的证明形式是: 如果某性质在一次操作前成立, 那么操作后仍成立; 于是任意多次操作后它都成立. 在算法分析里, 这种性质叫 <b>loop invariant</b> 循环不变式: 循环每执行一次都保持的条件, 用来证明算法正确. 例如插入排序的不变式是「前 i 个元素已经有序」.</p>
+  <p>下一讲讲归纳法的变体: 从大于 0 的数开始归纳, 一次跨多步, 以及强归纳 (complete induction).</p>
+</div>
+
+</main>
+<script data-goatcounter="https://yikesyellowpharmakon.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

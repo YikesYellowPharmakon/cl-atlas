@@ -253,6 +253,12 @@
   html[data-mode="day"] { --syn-k: #4b58b7; --syn-f: #5a306e; --syn-s: #7f5d02; --syn-n: #0e7179; --syn-b: #365478; --syn-c: #63687b; --syn-p: #63687b; }
   main pre .tk-k { color: var(--syn-k); } main pre .tk-f { color: var(--syn-f); } main pre .tk-s { color: var(--syn-s); } main pre .tk-n { color: var(--syn-n); } main pre .tk-b { color: var(--syn-b); } main pre .tk-c { color: var(--syn-c); } main pre .tk-p { color: var(--syn-p); }
 </style>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  .katex { font-size: 1.08em; }
+  .math-block { overflow-x: auto; overflow-y: hidden; margin: 10px 0; }
+  .math-block .katex-display { margin: 0.4em 0; }
+</style>
 <style id="glass">
   /* ===== 视觉层 v7 (= 样例 v21) =====
      点阵背景与渐变底色; 模块: 讲解 = 打孔卡 + 字符边, 补充 = 信号包, 纠错 = LED 校对, 答案 = 钥匙 + 翻牌, 表格 = 准星, 公式 = 字符边.
@@ -1124,6 +1130,7 @@
       <a href="#u1">练习 1 · Python 基础</a>
       <a href="#u2">练习 2 · 面向对象与正则</a>
       <a href="#u3">练习 3 · NLTK 语料库</a>
+      <a href="#u4">练习 4 · NLTK 预处理</a>
     </nav>
   </div>
 </header>
@@ -2706,6 +2713,324 @@ guess for german text:  English</pre>
 </article>
 </section>
 
+
+<section class="part" id="u4">
+<h2>练习 4: NLTK 预处理<br><span class="de-title">Exercise Session 4: NLTK: Preprocessing</span><small><span class="rl">对应 <a href="SP-06-NLTK语料与预处理.html#annotiert">SP 06 · 带标注的语料</a>、<a href="SP-06-NLTK语料与预处理.html#wortlisten">词表</a>、<a href="SP-06-NLTK语料与预处理.html#pipeline">NLP 流水线</a>、<a href="SP-06-NLTK语料与预处理.html#vorverarbeitung">预处理</a>;</span><span class="rl">源文件 Symprog Exercise 4 Slides.pdf;</span><span class="rl">练习课幻灯片, Slide 12–15 据 Goran Glavaš 的信息检索课 (CC-BY-SA 4.0).</span></small></h2>
+
+<article id="u4-1">
+<h3>带标注的语料与词表<br><span class="de-title"><span class="seg">Annotated Corpora ·</span> <span class="seg">Wordlist Corpora</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 3–5</span>
+  <p><b>Overview</b>: Annotated Corpora &amp; Word Lists · NLP Pipeline · <span class="nb">Preprocessing</span></p>
+  <p><b>Annotated Corpora</b></p>
+  <ul>
+    <li>NLTK contains a number of annotated corpora enriched with linguistic <span class="nb">information.</span></li>
+    <li>Example sentence: Alice gave Bob a book.
+      <ul>
+        <li>Part-of-speech tags: word classes
+          <ul><li>Alice: PROPER NOUN; gave: VERB; a: DET; book: <span class="nb">NOUN</span></li></ul></li>
+        <li>Named entities: mentions of people, organizations places, etc.
+          <ul><li>Alice and Bob: <span class="nb">PERSON</span></li></ul></li>
+        <li>Syntactic structure: how words form phrases and grammatical relations, e.g. information on dependency trees
+          <ul><li>Alice: subject; Bob: indirect object; a book: direct <span class="nb">object</span></li></ul></li>
+        <li>Semantic roles: how participants relate to an event (e.g. agents, patients, recipients, etc.)
+          <ul><li>Alice: agent; Bob: <span class="nb">recipient</span></li></ul></li>
+      </ul></li>
+    <li>Download corpora using <span class="nb"><code>nltk.download()</code></span></li>
+  </ul>
+  <p><b>Wordlist Corpora</b></p>
+  <p>NLTK contains many specialized resources/corpora, that are have been annotated for particular use <span class="nb">cases:</span></p>
+  <ul><li><code>nltk.corpus.stopwords</code></li><li><code>nltk.corpus.names</code></li><li><code>nltk.corpus.swadesh</code></li><li><code>nltk.corpus.words</code></li></ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 这次练习课复习三块: 带标注的语料和词表、NLP 流水线、预处理. NLTK 带了很多加上语言学信息的标注语料. 以 Alice gave Bob a book 为例, 可以有四层标注: 词性 (Alice 专有名词, gave 动词, a 限定词, book 名词); 命名实体 (Alice 和 Bob 是 PERSON); 句法结构 (Alice 主语, Bob 间接宾语, a book 直接宾语); 语义角色 (Alice 施事, Bob 接受者). 语料用 <code>nltk.download()</code> 下载. 另有四种为特定用途整理的词表: 停用词、人名、Swadesh 核心词、<span class="nb">英语词表.</span></p>
+  <p><b>思路:</b> 同一句话四层标注回答的问题不同: 词性看每个词单独属于哪一类; 命名实体看哪几个词合起来指一个实体; 句法看词之间的语法关系; 语义角色看谁对谁做了什么. 句法和语义可以不一致: Bob was given a book by Alice 里 Bob 变成主语, <span class="nb">但语义上仍是接受者.</span></p>
+</div>
+<div class="warn"><p><b>原文笔误:</b> Slide 5 的 <i>that are have been annotated</i> 多了 are, 应为 <i>that have been annotated</i>; Slide 4 的 <i>people, organizations places</i> <span class="nb">少了一个逗号.</span></p></div>
+</article>
+
+<article id="u4-2">
+<h3>停用词<br><span class="de-title">Wordlists: stopwords</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 6–7</span>
+  <ul>
+    <li>Stopwords are function words that occur very frequently but contain very little semantic information. Their use is to form grammatical structure in a sentence. For example: the, and, or, <span class="nb">etc.</span></li>
+    <li>Traditionally, it’s useful for many applications to filter out those stopwords because they contribute very little to the content of a <span class="nb">text.</span></li>
+  </ul>
+  <p>Load the English stopword list and filter a <span class="nb">text.</span></p>
+<pre data-lang="python"><span class="tk-k">import </span>nltk
+<span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>stopwords
+
+stop_words = stopwords.words(<span class="tk-s">"english"</span>)
+text = <span class="tk-s">"This is a book about natural language processing"
+</span>tokens = text.lower().split()
+
+filtered = [w <span class="tk-k">for </span>w <span class="tk-k">in </span>tokens <span class="tk-k">if </span>w <span class="tk-k">not in </span>stop_words]
+<span class="tk-b">print</span>(filtered)
+<span class="tk-c"># ['book', 'natural', 'language', 'processing']</span></pre>
+  <ul><li>Lowercasing allows matching "This" with <span class="nb">"this".</span></li><li>Keep only words that are absent from the stopword <span class="nb">list.</span></li></ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> <b>Stoppwörter 停用词</b>是出现得非常频繁、但几乎不带语义信息的功能词, 作用是搭起句子的语法结构, 如 the、and、or. 很多应用传统上会把它们过滤掉, 因为它们对文本内容贡献很小. 代码: 读入英语停用词表, 把句子小写后按空格切开, 只保留不在停用词表里的词. 先小写, This 才能和表里的 this <span class="nb">匹配上.</span></p>
+  <p><b>思路:</b> 列表推导式 <code class="lc">[w for w in tokens if w not in stop_words]</code> 逐个检查. <code>stop_words</code> 是列表, 每次 <code>in</code> 都要从头找一遍; 文本长时先转成 <code>set(stop_words)</code> <span class="nb">会快得多.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实际运行 (NLTK 3.10) <span class="nb">输出与幻灯片相同:</span></p>
+<pre data-lang="output">['book', 'natural', 'language', 'processing']</pre>
+  <p>被删掉的是 this、is、a、about 四个, about 也在 NLTK 的英语停用词表里. 「传统上」这个词是有意的: 在情感分析里 not、no 也是停用词, 删掉会把 not good 变成 good; 在现代神经网络模型里一般不再<span class="nb">删停用词.</span></p>
+</details>
+</article>
+
+<article id="u4-3">
+<h3>人名词表<br><span class="de-title">Wordlists: names</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 8–9</span>
+  <ul>
+    <li>Contains close to 8000 names, categorized by gender (assuming binary gender and common (Anglophone) gender–name <span class="nb">pairings)</span></li>
+    <li>Male and females names are saved in two different <span class="nb">files.</span></li>
+    <li>Application:
+      <ul><li>Coreference resolution: Find all words that refer to the same entity. For example: “Maria tells Peter that she is <span class="nb">happy.”</span></li></ul></li>
+  </ul>
+  <p>Load the two name lists and check whether a name <span class="nb">occurs.</span></p>
+<pre data-lang="python"><span class="tk-k">import </span>nltk
+<span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>names
+
+male_names = names.words(<span class="tk-s">"male.txt"</span>)
+female_names = names.words(<span class="tk-s">"female.txt"</span>)
+
+<span class="tk-b">print</span>(<span class="tk-s">"Maria" </span><span class="tk-k">in </span>female_names)  <span class="tk-c"># True
+</span><span class="tk-b">print</span>(<span class="tk-s">"Peter" </span><span class="tk-k">in </span>male_names)    <span class="tk-c"># True
+</span><span class="tk-b">print</span>(<span class="tk-s">"Peter" </span><span class="tk-k">in </span>female_names)  <span class="tk-c"># False
+
+# Some names occur in both lists
+</span><span class="tk-b">print</span>(<span class="tk-s">"Alex" </span><span class="tk-k">in </span>male_names)     <span class="tk-c"># True
+</span><span class="tk-b">print</span>(<span class="tk-s">"Alex" </span><span class="tk-k">in </span>female_names)   <span class="tk-c"># True</span></pre>
+  <p>Names can provide clues for NLP tasks, but cannot reliably determine a person’s <span class="nb">gender.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 人名词表有将近 8000 个名字, 按性别分类 (假定二元性别和常见的英语世界名字—性别搭配), 男名和女名存在两个文件里. 应用: <b>Koreferenzauflösung 共指消解</b>, 找出指向同一实体的所有词, 例如「Maria 告诉 Peter 她很开心」里 she 指谁. 代码检查几个名字在不在两个表里, 有的名字两个表都有. 名字能给 NLP 任务提供线索, 但不能可靠地判断一个<span class="nb">人的性别.</span></p>
+  <p><b>思路:</b> 共指消解里, she 是阴性代词, 查表知道 Maria 是女名、Peter 是男名, 就倾向于让 she 指 Maria. Alex 这种两个表都有的名字就给<span class="nb">不出线索.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实测五行依次是 <code class="lc">True True False True True</code>, 与注释一致. 两个文件分别有 2943 个男名和 5001 个女名, 共 7944 个, 即幻灯片说的「将近 <span class="nb">8000」.</span></p>
+  <p>易错: <code>names.words("male.txt")</code> 返回列表, 区分大小写: <code class="lc">"maria" in female_names</code> 是 False. 如果先把文本小写化了再查, <span class="nb">要把名字表也小写.</span></p>
+</details>
+</article>
+
+<article id="u4-4">
+<h3>Swadesh 词表与简易词典<br><span class="de-title"><span class="seg">Wordlists: Swadesh ·</span> <span class="seg">Building a Dictionary</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 10–11</span>
+  <ul><li>Named after linguist Morris <span class="nb">Swadesh.</span></li><li>Contains around 200 basic vocabulary entries per <span class="nb">language.</span></li></ul>
+<pre data-lang="python"><span class="tk-k">import </span>nltk
+<span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>swadesh
+
+<span class="tk-c"># Available languages, identified by language codes
+</span><span class="tk-b">print</span>(swadesh.fileids())
+<span class="tk-c"># ['be', 'bg', 'bs', 'ca', 'cs', 'cu', ...]
+
+# First five entries in the English list
+</span><span class="tk-b">print</span>(swadesh.words(<span class="tk-s">"en"</span>)[:<span class="tk-n">5</span>])
+<span class="tk-c"># ['I', 'you (singular), thou', 'he', 'we', 'you (plural)']</span></pre>
+  <ul>
+    <li><code>entries()</code> returns corresponding word pairs from the selected <span class="nb">languages.</span></li>
+    <li><code>dict()</code> turns these pairs into a lookup <span class="nb">dictionary.</span></li>
+  </ul>
+<pre data-lang="python"><span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>swadesh
+
+<span class="tk-c"># Get German-English word pairs
+</span>de2en = swadesh.entries([<span class="tk-s">"de"</span>, <span class="tk-s">"en"</span>])
+
+<span class="tk-c"># Build a German-English dictionary
+</span>translate = <span class="tk-b">dict</span>(de2en)
+
+<span class="tk-c"># Look up a German word
+</span><span class="tk-b">print</span>(translate[<span class="tk-s">"Herz"</span>])   <span class="tk-c"># heart</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> Swadesh 词表以语言学家 Morris Swadesh 命名, 每种语言约 200 个基本词汇. <code>fileids()</code> 列出可用的语言代码, <code>words("en")</code> 取英语词表. <code class="lc">entries(["de", "en"])</code> 返回两种语言对应位置上的词对, <code>dict()</code> 把词对变成查找字典, 于是可以查德语词的英<span class="nb">语对应词.</span></p>
+  <p><b>思路:</b> 所有语言的 Swadesh 表顺序相同 (第 1 条都是「我」, 第 2 条都是「你」……), 所以按位置配对就是翻译. <code>dict()</code> 接收 (键, 值) 对的列表, <span class="nb">第一种语言做键.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实测与注释一致: 语言列表以 <code class="lc">['be', 'bg', 'bs', 'ca', 'cs', 'cu', …]</code> 开头, 英语前五条是 <code class="lc">['I', 'you (singular), thou', 'he', 'we', 'you (plural)']</code>, <code>translate["Herz"]</code> 得到 <code>'heart'</code>. <span class="nb">英语表实际有 207 条.</span></p>
+  <p>易错: 有的条目一格里有好几个词 (<code class="lc">'you (singular), thou'</code>), 查字典时键必须和表里的字符串完全一样. 德语表里同一个英语词可能对应两个德语词, <code>dict</code> <span class="nb">只保留最后一个.</span></p>
+</details>
+</article>
+
+<article id="u4-5">
+<h3>英语词表与拼写检查<br><span class="de-title">Wordlists: words</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 12</span>
+  <ul><li>Contains an English list of words (over 200.<span class="nb">000 words)</span></li><li>Can help identify possible spelling <span class="nb">errors</span></li></ul>
+<pre data-lang="python"><span class="tk-k">import </span>nltk
+<span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>words
+
+eng_words = words.words()
+text = <span class="tk-s">"The cat is sleping"
+</span>tokens = text.lower().split()
+
+unknown = [word <span class="tk-k">for </span>word <span class="tk-k">in </span>tokens <span class="tk-k">if </span>word <span class="tk-k">not in </span>eng_words]
+
+<span class="tk-b">print</span>(unknown)
+<span class="tk-c"># ['sleping']</span></pre>
+  <p>A missing word is not necessarily misspelled: names and technical terms may also be <span class="nb">absent.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> <code>words</code> 是一份英语词表 (二十多万个词), 可以用来找可能的拼写错误. 代码把句子小写切开, 列出不在词表里的词: 只有 sleping. 词表里没有的词不一定拼错了: 人名和专业术语也可能<span class="nb">不在表里.</span></p>
+  <p><b>思路:</b> 和停用词过滤是同一个模式, 只是条件反过来 (留下<b>不在</b>表里的). 词表有二十多万个词, 每次用列表做 <code>in</code> 都要扫一遍, 应该先 <span class="nb"><code>set(eng_words)</code>.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实测输出 <code>['sleping']</code>, 词表共 236736 个词. 这个方法的局限: 只看词在不在表里, 发现不了拼成另一个真词的错误 (form 写成 from); 屈折形式也可能不在表里. 实际的拼写检查还要找候选 (编辑距离小的词) <span class="nb">并结合上下文.</span></p>
+</details>
+</article>
+
+<article id="u4-6">
+<h3>NLP 流水线<br><span class="de-title">NLP Pipeline</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 13–14</span>
+  <p>Consists of a sequence of steps that are executed in order on a text. They can be separated into pre-processing and <span class="nb">processing.</span></p>
+  <div class="tablewrap"><table>
+    <tr><th class="wide">Pre-processing (Today’s focus)</th><th>Processing</th></tr>
+    <tr><td class="wide">Sentence splitting</td><td>POS tagging</td></tr>
+    <tr><td>Tokenization</td><td class="wide">Feature annotation e.g. sentiment, named entities</td></tr>
+    <tr><td class="wide">Normalization lowercasing, stemming, lemmatization</td><td class="wide">Syntactic, semantic and pragmatic analysis</td></tr>
+  </table></div>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> NLP 流水线是对文本依次执行的一串步骤, 分预处理和处理两部分. 预处理: 分句、分词、规范化 (小写化、词干提取、词形还原); 处理: 词性标注、特征标注 (情感、命名实体)、句法语义语用分析. <span class="nb">这次练习课只讲预处理.</span></p>
+  <p><b>思路:</b> 每一步的输入是上一步的输出, 所以顺序有依赖: 先分句再分词, 分完词才能规范化; 词性标注要在词形还原之前, 因为还原需要知道词性 (下面 Slide 20 的 <code class="lc">lemmatize("went", "v")</code>). 详见 <span class="nb"><a href="SP-07-词性标注.html#pipeline">SP 07 · NLP 流水线</a>.</span></p>
+</div>
+</article>
+
+<article id="u4-7">
+<h3>分词与小写化<br><span class="de-title">Preprocessing: Tokenization, Lowercasing</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 15</span>
+  <p><b>Tokenization:</b></p>
+  <ul>
+    <li>Splitting of texts into smaller units, e.g. words or <span class="nb">sentences.</span></li>
+    <li>Usually we tokenize on word level, but we can also split into sentences, paragraphs, or sub-word <span class="nb">units.</span></li>
+    <li>Tokenization is almost always the first step in an NLP <span class="nb">task.</span></li>
+    <li>Token ≠ Type. With type we usually refer to unique words in a <span class="nb">document/corpus.</span></li>
+    <li>Whitespace tokenization: Simple but error <span class="nb">prone.</span></li>
+    <li>Corner cases: Apostrophes, hyphens, multi word expressions that should not be split (e.g. The Rolling Stones, <span class="nb">New York).</span></li>
+  </ul>
+  <p><b>Lowercasing:</b> Turn all capital letters into lowercase <span class="nb">letters.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> <b>Tokenisierung 分词</b>是把文本切成更小的单位, 通常切到词, 也可以切成句子、段落或子词. 它几乎总是 NLP 任务的第一步. Token 不等于 Type: type 一般指文档或语料里不重复的词. 按空格切词简单但容易出错. 边界情况: 撇号、连字符、不该拆开的多词表达 (The Rolling Stones、New York). 小写化: 把所有大写字母<span class="nb">变成小写.</span></p>
+  <p><b>思路:</b> 按空格切, 标点会粘在词上 (book. 和 book 成了两个 type); don't 该切成 do + n't 还是保留整体, 不同分词器做法不同. 小写化也有代价: US (美国) 和 us (我们) <span class="nb">合并了.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>比较两种分词 (实测): <code class="lc">"I don't like New York.".split()</code> 得到 <code class="lc">['I', "don't", 'like', 'New', 'York.']</code>; <code>nltk.word_tokenize</code> 得到 <code class="lc">['I', 'do', "n't", 'like', 'New', 'York', '.']</code>. 后者把句号和 n't 分了出来, 但 New York 仍然被拆成两个词元: 多词表达要靠专门的工具 (如 <code class="lc">nltk.tokenize.MWETokenizer</code>) <span class="nb">合并.</span></p>
+</details>
+</article>
+
+<article id="u4-8">
+<h3>形态规范化: 词形还原与词干提取<br><span class="de-title">Preprocessing: Morphological normalization</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 16–17</span>
+  <ul>
+    <li><b>Inflectional normalization</b> (or lemmatization) reduces all lexico-syntactic forms of the same word to one standard form, lemma (dictionary form)
+      <ul><li>Nouns: Singular form in “nominative” case. For example, houses → <span class="nb">house</span></li><li>Verbs: Infinitive form, e.g., <span class="nb">tried → try</span></li></ul></li>
+    <li><b>Derivational normalization</b> reduces all words syntactically derived from some word to the original word (even if the derived word has different meaning)
+      <ul><li>Often change the part-of-speech of the <span class="nb">word</span></li><li>E.g., destruction → <span class="nb">destroy</span></li></ul></li>
+    <li>Most search engines perform inflectional but not derivational <span class="nb">normalization</span></li>
+  </ul>
+  <p><b>Lemmatization</b></p>
+  <ul><li>Reduces words to their dictionary <span class="nb">entries</span></li><li>The resulting lemma is a string that is again a valid word in the <span class="nb">language</span></li></ul>
+  <p><b>Stemming</b></p>
+  <ul>
+    <li>Reduces words to its grammatical (morphosyntactic) <span class="nb">root</span></li>
+    <li>The result of Stemming is not necessarily a valid word of the language: recognized → regoniz, incredibly → <span class="nb">incredibl</span></li>
+    <li>Stemming removes suffixes with heuristics: automates, automatic, automation → <span class="nb">automat</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> <b>屈折规范化</b> (也就是词形还原) 把同一个词的所有词形归到一个标准形式, 即<b>Lemma 词元/词典形</b>: 名词取单数主格 (houses → house), 动词取不定式 (tried → try). <b>派生规范化</b>把由某个词派生出来的词还原成原词, 即使意思已经变了, 而且常常改变词性 (destruction → destroy). 大多数搜索引擎只做屈折规范化, 不做派生规范化. 词形还原的结果是词典里的条目, 一定是真词; <b>Stemming 词干提取</b>把词还原到词根, 结果不一定是真词, <span class="nb">它用启发式规则砍后缀.</span></p>
+  <p><b>思路:</b> 区分两条线: 屈折 vs. 派生是「还原到哪」(同一个词的不同形式, 还是不同的词); 词形还原 vs. 词干提取是「怎么还原」(查词典, 还是按规则砍). 搜索引擎不做派生规范化, 因为 destruction 和 destroy 的搜索意图不一定相同, <span class="nb">合并会降低精确率.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>用 NLTK 的 Porter 词干提取器实测幻灯片的例子: recognized → <code>recogn</code>, incredibly → <code>incred</code> (原始 Porter 算法是 <code>incredibli</code>), automates → <code>autom</code>, automatic → <code>automat</code>, automation → <code>autom</code>. 结论「结果不一定是真词」成立, 但具体的词干和幻灯片不同, 见下面的红框. WordNet 词形还原: <code>lemmatize("houses")</code> → <code>house</code>, <code class="lc">lemmatize("tried", "v")</code> → <code>try</code>, <span class="nb">与幻灯片一致.</span></p>
+</details>
+<div class="warn">
+  <p><b>原文笔误:</b> recognized → <i>regoniz</i> 应为 <i>recogniz</i> (少了 c, <span class="nb">多了一个错位的 g).</span></p>
+  <p><b>幻灯片前后不一致:</b> automates, automatic, automation → automat 是信息检索教材里说明词干思想的经典例子, 不是某个真实算法的输出. Porter 实测会把 automates 和 automation 砍成 <code>autom</code>, automatic 是 <code>automat</code>, 三个词并没有归到同<span class="nb">一个词干.</span></p>
+</div>
+</article>
+
+<article id="u4-9">
+<h3>Porter 词干提取器<br><span class="de-title">Porter Stemmer</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 18–19</span>
+  <ul>
+    <li>Most common algorithm for English <span class="nb">stemming</span></li>
+    <li>Rule-based algorithm
+      <ul>
+        <li>Follows grammatical conventions, formulated as rewrite <span class="nb">rules</span></li>
+        <li>Rules are executed sequentially, <span class="nb">one at a time</span></li>
+        <li>Each rule consists of a set of concurrent suffix-trimming <span class="nb">rules</span></li>
+        <li>If multiple apply, use rule that removes longest <span class="nb">suffix</span></li>
+      </ul></li>
+    <li>More on Porter’s stemmer: http://snowball.tartarus.org/algorithms/porter/stemmer.<span class="nb">html</span></li>
+    <li>Similar algorithms have been developed for other languages as <span class="nb">well</span></li>
+  </ul>
+  <p><b>Examples</b></p>
+  <ul>
+    <li>-ing → ∅ (e.g., <span class="nb">going → go)</span></li>
+    <li>-ly → ∅ (e.g., scholarly → <span class="nb">scholar)</span></li>
+    <li>-sses → -ss (e.g., misses → <span class="nb">miss)</span></li>
+    <li>-ational → -ate (e.g., national → <span class="nb">nate)</span></li>
+    <li>-tional → -tion (e.g., constitutional → <span class="nb">constitution)</span></li>
+  </ul>
+  <ul>
+    <li>Rules consider sequences of consonants and <span class="nb">vowels</span></li>
+    <li>Rules often take into account the length of the remaining <span class="nb">“root”</span></li>
+    <li>E.g., ement → ∅ is valid only if the result has more than one syllable (replacement → replac, cement → <span class="nb">cement)</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> Porter 词干提取器是英语最常用的词干算法, 基于规则: 规则写成改写规则, 按顺序一步一步执行; 每一步是一组并列的砍后缀规则, 有几条都适用时用砍掉后缀最长的那条. 其他语言也有类似的算法 (Snowball 系列). 例子: -ing 删掉, -ly 删掉, -sses 变 -ss, -ational 变 -ate, -tional 变 -tion. 规则看辅音元音的排列, 也常常看砍完剩下的「词根」有多长: 比如 -ement 只有在剩下的部分多于一个音节时才删, 所以 replacement → replac, <span class="nb">而 cement 不变.</span></p>
+  <p><b>思路:</b> 「剩下的长度」在 Porter 里叫 measure <span class="katex" data-o="\(m\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>: 把词根写成 [C](VC)<sup>m</sup>[V], <span class="katex" data-o="\(m\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 是「元音串 + 辅音串」出现的次数. 很多规则都带条件 <span class="katex" data-o="\(m &amp;gt; 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 或 <span class="katex" data-o="\(m &amp;gt; 1\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>, 防止把短词砍光. ce|ment 里 c 的 <span class="katex" data-o="\(m = 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, <span class="nb">所以 cement 不动.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>用 <code>nltk.stem.PorterStemmer</code> 实测 (默认的 NLTK 扩展模式和原始算法模式结果相同): going → <code>go</code>, misses → <code>miss</code>, replacement → <code>replac</code>, cement → <code>cement</code>, 与幻灯片一致; scholarly → <code>scholarli</code>, national → <code>nation</code>, constitutional → <span class="nb"><code>constitut</code>.</span></p>
+  <p>最后一个不矛盾: -tional → -tion 是第 2 步的一条规则, 之后第 4 步还会把 -ion 砍掉, 所以完整跑下来是 constitut. 幻灯片的例子只演示<span class="nb">单条规则.</span></p>
+</details>
+<div class="warn">
+  <p><b>幻灯片错误:</b> national → <i>nate</i> 不对. -ational → -ate 这条规则带条件 <span class="katex" data-o="\(m &amp;gt; 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, national 去掉 -ational 后只剩 n, <span class="katex" data-o="\(m = 0\)"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, 规则不适用, 实测结果是 <code>nation</code>. 规则的正确例子是 relational → <span class="nb">relate.</span></p>
+  <p><b>幻灯片错误:</b> Porter 算法里没有「-ly → ∅」这条规则. 实测 scholarly → <code>scholarli</code>: 第 1 步把词尾 y 改成 i, <span class="nb">之后没有规则删 -li.</span></p>
+</div>
+</article>
+
+<article id="u4-10">
+<h3>用 NLTK 做词干提取和词形还原<br><span class="de-title">Preprocessing: Morphological normalization (NLTK)</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session 4 · Slide 20</span>
+  <p><b>Stemming:</b> Word forms are reduced to their stem. Given that this is based on heuristics the result may not necessarily be actual words (e.g. Häuser → Häus, went → went, flights → flight, rushed → <span class="nb">rush).</span></p>
+<pre data-lang="python"><span class="tk-k">from </span>nltk.stem <span class="tk-k">import </span>SnowballStemmer
+stemmer = SnowballStemmer()
+[stemmer.stem(<span class="tk-s">"went"</span>), stemmer.stem(<span class="tk-s">"flights"</span>)]
+<span class="tk-c"># ['went', 'flight']</span></pre>
+  <p><b>Lemmatization:</b> Surface forms of words are reduced to their lemmas, i.e. their canonical/dictionary form. Lemmatized words are always actual words. (e.g. Häuser → Haus, went → <span class="nb">go, ...).</span></p>
+<pre data-lang="python"><span class="tk-k">from </span>nltk.stem <span class="tk-k">import </span>WordNetLemmatizer
+lemmatizer = WordNetLemmatizer()
+lemmatizer.lemmatize(<span class="tk-s">"went"</span>, <span class="tk-s">"v"</span>)
+<span class="tk-c"># 'go'</span></pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 词干提取把词形还原到词干, 基于启发式, 结果不一定是真词 (Häuser → Häus, went → went, flights → flight, rushed → rush). 词形还原把词形还原到词元, 即规范的词典形式, 结果一定是真词 (Häuser → Haus, went → go). 代码分别用 NLTK 的 SnowballStemmer 和 <span class="nb">WordNetLemmatizer.</span></p>
+  <p><b>思路:</b> 对比 went: 词干提取只会砍后缀, went 没有可砍的, 原样不变; 词形还原查 WordNet 的不规则形式表, 知道 went 是 go 的过去式. 但要告诉它词性: <code>"v"</code> 表示动词, 不给时默认按名词查, <span class="nb">went 就原样返回.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>按幻灯片原样运行第一段, <span class="nb">第二行就报错:</span></p>
+<pre data-lang="output">TypeError: SnowballStemmer.__init__() missing 1 required positional argument: 'language'</pre>
+  <p>SnowballStemmer 支持多种语言, 必须指定是哪一种. 改成 <code class="lc">SnowballStemmer("english")</code> 后, <code class="lc">[stemmer.stem("went"), stemmer.stem("flights")]</code> 得到 <code class="lc">['went', 'flight']</code>, rushed 得到 <code>rush</code>. 第二段 <code class="lc">lemmatize("went", "v")</code> 得到 <code>'go'</code>, <span class="nb">与幻灯片一致.</span></p>
+  <p>德语例子: <code class="lc">SnowballStemmer("german").stem("Häuser")</code> 实测是 <code>haus</code>: 德语 Snowball 会先小写, 并把 ä 当作 a 处理. 幻灯片的 Häus 只是示意「词干不一定是真词」, <span class="nb">不是真实输出.</span></p>
+</details>
+<div class="warn"><p><b>幻灯片错误:</b> <code>SnowballStemmer()</code> 缺少必需的语言参数, 运行报 <code>TypeError</code>, 应为 <code class="lc">SnowballStemmer("english")</code>.</p></div>
+</article>
+</section>
 
 </main>
 <script id="glass-js">

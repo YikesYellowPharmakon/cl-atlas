@@ -328,3 +328,46 @@ X earley | 位置 (Position) 是词与词之间的边界. 状态 (Zustand) 里�
 S earley | pos | 位置 | Position | 词与词之间的边界.
 S earley | zust | 状态 | Zustand | 带点的规则加起始位置.
 S earley | compl | 完成 | COMPLETE | 推进在等这个符号的状态.
+
+# ---- SNS 05 · 依存语法与依存分析 (2026-11-13) ----
+D dmotiv | Ziel: Erfassen, welche Wörter das Auftreten oder die Form anderer Wörter bestimmen - also lizensieren.
+X dmotiv | 「允准」的例子: jagt 要求一个主格主语和一个宾格宾语, 所以 Hund、Katze 能出现在那个位置而且必须是那个格; Katze 是阴性, 所以冠词必须是 die. 从 nsubj 和 obj 两条边能直接读出三元组 (Hund, jagt, Katze), 这是信息抽取爱用依存的原因.
+D dstr | Eine Dependenzstruktur ist die Gesamtmenge solcher Relationen in einem Satz.
+X dstr | 形式上 G = ⟨M, R⟩, M 是词的集合, R 是有序对 (中心词, 依附词) 的集合. Der Hund jagt die Katze 的 R = {(jagt, Hund), (jagt, Katze), (Hund, Der), (Katze, die)}. 标签写的是依附词的功能: jagt → Hund 标 nsubj, 因为 Hund 是主语.
+D deigen | genau ein Kopf pro Dependent – aber mehrere Dependenten pro Kopf möglich
+X deigen | 几条性质合起来就是以根为起点的有向树: 一个中心词保证没有节点有两个父亲, 一个根且其余都可达保证连通, 再加不对称就没有环. 「不考虑线性词序」是后面非投射结构的来源. 课件写 Abstraktion von Lineare Ordnung, 应为 linearer.
+S deigen | binaer | 二元 | binär | 每个关系正好连两个词.
+S deigen | asym | 不对称 | asymmetrisch | Y 依附于 X 时 X 不依附于 Y.
+S deigen | einkopf | 一个中心词 | genau ein Kopf pro Dependent | 中心词可以有多个依附词.
+S deigen | einwurzel | 一个根 | genau ein Wurzelknoten | 其余词都直接或间接依附于它.
+X drich | 从依附词看是依存, 从中心词看是控制. 本课和 UD 一样箭头指向依附词; 早期文献有反过来画的, 读图先看约定.
+X kvd | PSG 里宾语在 VP 里面、主语在 VP 外面, 地位不同; DG 里两者都是动词的直接依附词, 只靠标签区分, 对主宾语可以换位的德语更自然.
+X implizit | Hund 的子树 = der kleine Hund = NP; 但 jagt 的子树是整句, jagt die Katze 不对应任何子树, 所以 DG 里没有 VP.
+X ergang | Er wartet auf den Bus seit einer Stunde: auf den Bus 是 warten 配价要求的, 是补足成分; seit einer Stunde 什么动词都能带, 是说明成分. 两者都挂在 wartet 下, 标签分别是 obl:arg 和 obl.
+X dvort | 词汇化 PCFG 给每个短语节点加中心词 (VP(jagt)), 「范畴 + 中心词」组合太多, 参数稀疏; 依存模型的参数只是「中心词—依附词—关系」.
+D headrule | Die Umwandlung einer PSG-Analyse in eine DG-Analyse erfolgt über sogenannte Head-Finding-Rules.
+X headrule | 中心词沿 head(S) = VP、head(VP) = V 往上传, 所以动词成了整句的根. 按 UD, PP 的中心语是 NP, 介词 auf 依附于 Straße (case). 从 PSG 树库转出来的一定是投射结构, 因为成分都是连续的一段.
+D dgram | Die Dependenzgrammatik (DG) ist ein formales Modell der Satzstruktur, das von Wortabhängigkeiten (Dependenzrelationen) statt von Phrasenregeln ausgeht.
+X dgram | 依存结构是一个句子的分析结果, 依存语法是规定哪些树允许的一组规则, 关系同 CFG 与句法树. NLTK 只支持不带标签的依存语法.
+X dgregel | CFG 规则左边是范畴、右边是有序的范畴序列; 依存规则两边都是具体的词, 不规定词序, Hund 在 jagt 左右都行.
+D dwohl | Ein Satz ist genau dann wohlgeformt, wenn er durch diese Regeln eine gültige Dependenzstruktur aufweist.
+X dwohl | 「每个词最多一个中心词」和性质里的「正好一个」不矛盾: 根没有中心词, 其余每个词正好一个.
+X nltkdg | der Mann schenkt der Frau das Buch 只得到 (schenkt (Mann der) (Frau der) (Buch das)): 第一个 der 要依附于 Frau 就得和 schenkt → Mann 交叉, 不投射.
+X depamb | I shot an elephant in my pajamas: 规则允许 in 依附于 shot 或 elephant, 投射分析器给出两棵树. 在 PSG 里是 PP 挂 NP 还是 VP, 在 DG 里只是 in 换了中心词.
+D projekt | Projektive Struktur: Alle Kanten können gezeichnet werden, ohne sich zu kreuzen.
+X projekt | 精确定义: 边是投射的, 当且仅当从中心词能走到它和依附词之间的每一个词. he gave a talk yesterday about Syntax 里 talk → about 夹着 yesterday, 而 yesterday 依附于 gave, 所以非投射.
+X projwhy | 投射树的每棵子树都是连续的一段, 就像 CFG 的成分, 所以大致和 CFG 等价. 基于转移的分析器只出投射树, 基于图的 (最大生成树不管词序) 能出非投射树.
+X diskont | Hunde beißen, die bellen: 关系从句修饰 Hunde 却放在句末. DG 直接画边 Hunde → bellen (跨过 beißen, 非投射); CFG 只能留语迹再加移位规则.
+X spur | What do you see? 里 see 的宾语位置放空 NP t_i, 和句首 What_i 同下标. 转换语法假设德语 VP 深层是 OV (den Hund sehen), 移位后留语迹.
+S spur | tiefe | 深层结构 | Tiefenstruktur | 抽象形式.
+S spur | ober | 表层结构 | Oberflächenstruktur | 看得见的形式.
+X transp | 每一步用分类器 (比如神经网络) 选操作, 线性时间. 课件这一页把 LEFTARC、RIGHTARC 说反了, 以后面的定义为准.
+X graphp | 要给 n² 条边打分, 再用 Chu-Liu/Edmonds 找最大生成树. 代表: MSTParser、双仿射分析器 (Dozat & Manning 2017).
+X uaslas | 一句 5 个词, 4 个中心词对、其中 3 个标签也对: UAS = 80%, LAS = 60%. 现代系统在资源充足的语言上 UAS 超过 95%.
+X srdep | book me the morning flight: SHIFT, SHIFT, RIGHTARC (book → me), SHIFT ×3, LEFTARC (morning ← flight), LEFTARC (the ← flight), RIGHTARC (book → flight), RIGHTARC (root → book). n 个词: n 次 SHIFT + n 次 ARC.
+S arcs | larc | LEFTARC | LEFTARC | 中心词在右, 次顶出栈; 次顶不能是 ROOT.
+S arcs | rarc | RIGHTARC | RIGHTARC | 中心词在左, 栈顶出栈.
+X rarcres | canceled flights to Houston: 栈 [root, canceled, flights] 时 canceled → flights 虽然对, 但现在 RIGHTARC 的话 flights 出栈, flights → Houston 就建不成. 正确: SHIFT to, SHIFT Houston, LEFTARC, RIGHTARC (flights → Houston), RIGHTARC (canceled → flights).
+X oracle | 给定正确树, 能算出每一步应做的转移, 这些 (格局, 转移) 对就是分类器的训练样本.
+X conllu | HEAD 一列就把树完全表示出来: 每个词记下自己的父亲. 德语 UD 例句 Alle wußten, daß uns nicht mehr viel Zeit blieb: wußten 的 HEAD 是 0 (根), blieb 以 ccomp 依附于它.
+X tbconv | 课件写 siehe Sitzung 5, 指的就是本讲 1.5 节. NP-SBJ 的中心词直接得到 nsubj, 不用从位置推断.

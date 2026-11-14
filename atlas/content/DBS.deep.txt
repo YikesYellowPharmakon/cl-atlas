@@ -284,3 +284,15 @@ X qbevgl | QBE 和域演算一一对应, 所以 QBE 查询能机械地翻译: �
 S qbevgl | leer | 空列 |  | 互不相同的 ∃ 变量.
 S qbevgl | algo | 翻译步骤 | Realisierung einer QBE-Abfrage | 列 → 变量 → 量词 → 原子 → 条件 → 化简.
 S qbevgl | relvoll | 关系完备 | relational vollständig | 能表达所有关系代数查询.
+
+# ---- DBS 05 · SQL (2026-11-13) ----
+X qsql | 和关系代数最大的不同: SQL 的结果是多重集, 投影后不自动去重, 要写 DISTINCT. 课件把 SQL:1999 的过程式扩展写成 PL/SQL, 标准里叫 SQL/PSM; PL/SQL 是 Oracle 自己的语言.
+X qgrund | SELECT A FROM R, S WHERE P 对应 π_A(σ_P(R × S)). SELECT 是投影, WHERE 才是选择; 严格对应关系代数 π 的是 SELECT DISTINCT.
+X qselect | PostgreSQL 把不加引号的标识符转成小写, "Telefon" 要求大小写一致, 建表时没加引号就会报错; DuckDB 对引号标识符也不区分大小写.
+X qnull | NULL = NULL 的结果是 null 不是 true. AND 里有 false 就是 false, OR 里有 true 就是 true, 其余涉及 null 的都是 null. WHERE L_ID = NULL 永远不返回行.
+X qjoin | 全外连接可以用左外连接 UNION 右外连接模拟 (MySQL 不支持 FULL OUTER JOIN). 自连接加 K1.K_ID < K2.K_ID, 既排除自己配自己, 又让每对只出现一次.
+X qmengen | INTERSECT ALL 取两边次数的较小值, EXCEPT ALL 按次数相减. 两个客户在 London、一个供应商在 London 时, EXCEPT ALL 给一个 London, EXCEPT 给零个.
+X qagg | 想让没有订单的供应商以 0 出现: 从供应商表 LEFT JOIN 订单再分组, 并用 COUNT(B.B_ID) 而不是 COUNT(*). 空表上 COUNT 是 0, SUM、AVG、MIN、MAX 是 NULL.
+X qorder | 所以 WHERE 里不能用聚合函数, 也不能用 SELECT 里起的别名; ORDER BY 可以用别名. 实际执行计划由优化器重排, 只要结果相同.
+X qmengsub | < ANY 等价于 < MAX, < ALL 等价于 < MIN, 但空集时不同: < ALL (空集) 是空真, 返回全部行; < MIN (空集) 是 null, 不返回. 课件的 'Beverages'、'Dairy' 在示例库里不存在, 正好演示了空集情形.
+X qdml | 删除余额低于平均值的客户: 先算出 AVG, 一次确定要删的行再统一删除, 不在删除过程中重算 (快照语义).

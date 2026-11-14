@@ -284,3 +284,46 @@ M Vektorraum | vr
 M Matrix | matrix
 M Ableitung | abl
 M lokales Extremum | extr.lokglob
+
+# ===== MGTN 新板书 (Vl 8): 0.7 无限集的势、1.1 向量空间 ℝⁿ 2026-11-13 =====
+N gleichm | menge | 无限集的势 | Mächtigkeit unendlicher Mengen | s06 | A 到 B 有单射就说 B 至少和 A 一样多; 两边都有单射 (等价于有双射) 就一样多. | 无限集可以和自己的真子集一样多 ;; 两个方向的单射推出双射是 Cantor-Bernstein-Schröder | 偶数和 ℕ 一样多
+N abzaehl | menge | 可数与不可数 | abzählbar & überabzählbar | s06 | 和 ℕ 一样多的集合可数; 正有理数可数, 实数不可数. | 有理数按对角线排队数 ;; 实数用对角线论证: 任何列表都漏掉一个数 | ℚ⁺ 可数, ℝ 不可数
+N cantor | menge | Cantor 定理 | Satz von Cantor | s06 | 任何集合的幂集都比它本身严格大, 所以无穷也有无穷多层. | 构造 {x ∣ x ∉ f(x)}, 它不在任何 f 的像里 ;; 有限时就是 2ⁿ > n | |𝒫(ℕ)| > |ℕ|
+N rn | la | 向量空间 ℝⁿ | ℝⁿ | s11 | n 个实数的有序组, 按分量做向量加法和数乘. | 写成列向量或行向量 ;; 每个位置叫一个分量 | (1, 2) + (3, 0) = (4, 2)
+
+E maecht > gleichm | 从有限集的计数推广到无限集.
+E injsur > gleichm | 比较大小靠单射和双射.
+E gleichm > abzaehl | 和 ℕ 比较.
+E gleichm > cantor | 幂集总比原集合大.
+E potenz > cantor | 幂集的势.
+E rn > linkomb | ℝⁿ 里的向量才能做线性组合.
+E rn > vr | ℝⁿ 是实向量空间的例子.
+
+T gleichmächtig |  |  | 等势 | menge | Zwischen beiden Mengen gibt es eine Bijektion. | 两个集合之间有双射. |  | s06
+T mindestens so mächtig |  |  | 至少一样多 | menge | Es gibt eine injektive Abbildung von A nach B. | 有从 A 到 B 的单射. |  | s06
+T abzählbar |  |  | 可数 | menge | Gleichmächtig zu ℕ. | 和 ℕ 等势. | überabzählbar | s06
+T überabzählbar |  |  | 不可数 | menge | Unendlich, aber nicht abzählbar, z. B. ℝ. | 无限但不可数, 如 ℝ. | abzählbar | s06
+T Satz von Cantor |  |  | Cantor 定理 | menge | Die Potenzmenge einer Menge ist echt mächtiger als die Menge. | 幂集严格比原集合大. |  | s06
+T Satz von Cantor-Bernstein-Schröder |  |  | 康托尔-伯恩斯坦定理 | menge | Injektionen in beide Richtungen ergeben eine Bijektion. | 两个方向都有单射就有双射. |  | s06
+T Komponente | die | Komponenten | 分量 | la | Eine der n Zahlen eines Vektors in ℝⁿ. | ℝⁿ 向量里的某一个数. |  | s11
+T Spaltenvektor | der | Spaltenvektoren | 列向量 | la | Vektor, untereinander geschrieben. | 竖着写的向量. | Zeilenvektor | s11
+T Zeilenvektor | der | Zeilenvektoren | 行向量 | la | Vektor, nebeneinander geschrieben. | 横着写的向量. | Spaltenvektor | s11
+T Vektoraddition | die |  | 向量加法 | la | Komponentenweise Addition zweier Vektoren. | 按分量相加. | Skalarmultiplikation | s11
+T Skalarmultiplikation | die |  | 数乘 | la | Multiplikation jeder Komponente mit derselben Zahl. | 每个分量乘同一个数. | Vektoraddition | s11
+
+M gleichmächtig | gleichm
+M mindestens so mächtig | gleichm
+M abzählbar | abzaehl
+M überabzählbar | abzaehl
+M Satz von Cantor | cantor
+M Satz von Cantor-Bernstein-Schröder | gleichm
+M Komponente | rn
+M Spaltenvektor | rn
+M Zeilenvektor | rn
+M Vektoraddition | rn
+M Skalarmultiplikation | rn
+
+DROP 人名, 归入 Cantor 定理 | Cantor
+ZH 描述性名称 (板书讲了内容, 没有这个词) | 至少一样多
+DE 描述性名称 (板书讲了内容, 没有这个标题) | Mächtigkeit unendlicher Mengen
+ZH 学科标准译名 | 康托尔-伯恩斯坦定理

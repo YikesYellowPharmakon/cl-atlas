@@ -267,3 +267,73 @@ M Assembler | build
 M syntaktischer Zucker | struct
 M Warteschlange | queues
 M Metrik | metrik
+
+# ===== BS 05 · 分页 (Teil 1: Virtualisierung · Paging) 2026-11-13 =====
+B page | 分页与虚拟内存 | Paging & virtueller Speicher | 把地址空间和物理内存切成等大的页, 用页表、TLB 和多级页表翻译地址, 再用换页让内存看起来比实际大.
+
+N paging | page | 分页 | Paging | 05:paging | 地址空间切成页、物理内存切成同样大的页框, 任何页能放进任何页框, 消除外部碎片. | 页大小是 2 的幂, 常见 4 KiB ;; 进程的页可以分散在物理内存各处
+N vpnoff | page | 页号与偏移 | Seitennummer & Offset | 05:paging | 高位页号翻译成页框号, 低位偏移原样保留, 拼起来就是物理地址. | 偏移位数 = log₂(页大小) ;; 页数 = 2^页号位数 | 0x00003ABC, 页 3 → 页框 7: 0x7ABC
+N ptab | page | 页表 | Seitentabelle | 05:seitentabelle | 每个进程一张, 记录每一页映射到哪个页框; 放在主存, 由控制寄存器指向. | 32 位、4 KiB 页、4 字节项: 4 MiB ;; 上下文切换只换控制寄存器 (CR3)
+N pte | page | 页表项 | Seitentabelleneintrag | 05:seitentabelle | 页框号加上 valid、present、保护、accessed、dirty 等标志位. | 页框地址低 12 位总为 0, 腾出来放标志 ;; x86 整项为 0 表示无效
+N pagepro | page | 分页的优缺点 | Vorteile & Nachteile von Paging | 05:seitentabelle | 没有外部碎片、分配快、容易换出; 但有内部碎片, 每次访存多读一次页表, 页表占地方. | 后两个缺点分别靠 TLB 和多级页表解决 ;; 访存次数翻倍
+N tlb | page | 快表 TLB | Translation Lookaside Buffer | 05:tlb | MMU 里缓存「页号 → 页框号」的小而快的缓存, 命中时不用读页表. | 顺序遍历数组每页只未命中一次 ;; 覆盖范围 = 项数 × 页大小
+N lokal | page | 空间局部性与时间局部性 | räumliche & zeitliche Lokalität | 05:tlb | 将来访问附近的地址 (空间), 或重复访问同样的地址 (时间), TLB 项就会被反复使用. | 时间局部性能否命中取决于 TLB 项数 ;; 虚拟内存也靠局部性
+N tlbersatz | page | TLB 替换策略 | LRU & Random | 05:tlb | 满了换掉最久没用的 (LRU) 或随便一项 (Random); 循环访问的页比 TLB 多一个时 LRU 每次都未命中. | 随机替换平均总能命中一部分
+N asid | page | 上下文切换与 TLB | Kontextwechsel & TLB | 05:tlb | 旧进程的翻译对新进程无效: 要么清空 TLB, 要么给每项打上地址空间标识符. | ASID 8 位 ;; x86 叫 PCID
+N mlpt | page | 多级页表 | Mehrstufige Seitentabellen | 05:mehrstufig | 把页表本身切成页, 由页目录指向; 全无效的页表页不分配, 页表不必连续存放. | 每级每张表正好一页 ;; 代价: TLB 未命中时多读几次内存 ;; 替代: 倒排页表、分段页表 | 32 位: 10 + 10 + 12
+N vmem | page | 虚拟内存 | virtueller Speicher | 05:swapping | 操作系统把暂时不用的页放在磁盘上, 制造物理内存比实际更大的错觉. | 主存当磁盘的缓存 ;; 只有工作集需要在内存 ;; 用时才调入
+N pfault | page | 缺页处理 | Seitenfehler | 05:swapping | 访问不在内存的页时陷入操作系统: 无效就终止进程, 否则调入该页再重执行那条指令. | 没有空闲页框时先选一页换出 ;; 缺页不是程序错误 ;; 被改过的页 (dirty) 才要写回磁盘
+
+E seg > paging | 分段的外部碎片促成分页.
+E frag > paging | 分页消除外部碎片.
+E paging > vpnoff | 地址拆成页号和偏移.
+E vpnoff > ptab | 每一页的映射记在页表里.
+E mmu > ptab | MMU 通过控制寄存器找到页表.
+E ptab > pte | 页表由页表项组成.
+E ptab > pagepro | 页表带来的代价.
+E pagepro > tlb | 多读一次页表的问题靠 TLB.
+E pagepro > mlpt | 页表太大的问题靠多级页表.
+E tlb > lokal | TLB 有效靠局部性.
+E tlb > tlbersatz | TLB 满了要替换.
+E ctxsw > asid | 上下文切换时 TLB 的处理.
+E tlb > asid | 旧翻译不能用.
+E lokal > vmem | 虚拟内存同样靠局部性.
+E pte > pfault | present 位决定是否缺页.
+E vmem > pfault | 页不在内存时缺页.
+
+T Paging |  |  | 分页 | page | Aufteilung von Adressraum und Speicher in gleich große Blöcke. | 把地址空间和内存切成等大的块. | Segmentierung | 05:paging
+T Seite | die | Seiten | 页 | page | Block fester Größe im virtuellen Adressraum. | 虚拟地址空间里固定大小的块. | Rahmen | 05:paging
+T Rahmen | der | Rahmen | 页框 | page | Block gleicher Größe im physischen Speicher. | 物理内存里同样大小的块. | Seite | 05:paging | Kachel
+T Seitennummer | die | Seitennummern | 页号 | page | Höherwertige Bits der virtuellen Adresse (VPN). | 虚拟地址的高位. | Rahmennummer | 05:paging
+T Rahmennummer | die | Rahmennummern | 页框号 | page | Nummer des physischen Rahmens (PFN). | 物理页框的编号. | Seitennummer | 05:paging
+T Offset | der | Offsets | 偏移 | page | Position innerhalb der Seite; wird unverändert übernommen. | 页内位置, 翻译时不变. |  | 05:paging
+T Seitentabelle | die | Seitentabellen | 页表 | page | Abbildung von Seitennummern auf Rahmennummern, eine pro Prozess. | 页号到页框号的映射, 每个进程一张. |  | 05:seitentabelle
+T Seitentabelleneintrag | der | Seitentabelleneinträge | 页表项 | page | Rahmennummer plus Flags wie Valid, Present, Dirty. | 页框号加标志位. |  | 05:seitentabelle | PTE
+T TLB-Reichweite | die |  | TLB 覆盖范围 | page | Anzahl der TLB-Einträge mal Seitengröße. | TLB 项数乘页大小. |  | 05:tlb
+T räumliche Lokalität | die |  | 空间局部性 | page | Künftige Zugriffe auf benachbarte Adressen. | 将来访问附近的地址. | zeitliche Lokalität | 05:tlb
+T zeitliche Lokalität | die |  | 时间局部性 | page | Künftige Zugriffe auf dieselben Adressen. | 将来重复访问同样的地址. | räumliche Lokalität | 05:tlb
+T Seitenverzeichnis | das | Seitenverzeichnisse | 页目录 | page | Äußere Tabelle, deren Einträge auf Seiten der Seitentabelle zeigen. | 外层表, 每项指向一页页表. |  | 05:mehrstufig
+T virtueller Speicher | der |  | 虚拟内存 | page | Illusion eines größeren physischen Speichers durch Auslagern auf die Platte. | 把页放到磁盘上, 制造内存更大的错觉. |  | 05:swapping
+T auslagern |  |  | 换出 | page | Seiten aus dem Hauptspeicher auf die Platte verschieben. | 把页从主存移到磁盘. | Einlagern | 05:seitentabelle
+T Einlagern | das |  | 调入 | page | Seite bei Bedarf von der Platte in den Speicher kopieren. | 需要时把页从磁盘复制进内存. | auslagern | 05:swapping
+T Policy | die | Policies | 策略 | page | Entscheidung, welche Seiten im Speicher bleiben. | 决定哪些页留在内存. |  | 05:swapping
+
+M Paging | paging
+M Seite | paging
+M Rahmen | paging
+M Seitennummer | vpnoff
+M Rahmennummer | vpnoff
+M Offset | vpnoff
+M Seitentabelle | ptab
+M Seitentabelleneintrag | pte
+M TLB-Reichweite | tlb
+M räumliche Lokalität | lokal
+M zeitliche Lokalität | lokal
+M Seitenverzeichnis | mlpt
+M virtueller Speicher | vmem
+M auslagern | vmem
+M Einlagern | vmem
+M Policy | vmem
+
+DROP BS 05: 并入 Page Fault | Seitenfehler
+ZH 描述性名称 | TLB 替换策略

@@ -1148,6 +1148,7 @@
   <a href="#b2">练习单 2 · SQL-DDL</a>
   <a href="#b3">练习单 3 · 关系代数</a>
   <a href="#b4">练习单 4 · 键与关系代数</a>
+  <a href="#b5">练习单 5 · SQL (一)</a>
 </nav>
 <main class="wrap">
 
@@ -1644,6 +1645,212 @@ WHERE c</span>.supported <span class="tk-k">AND c</span>.osname = <span class="t
 <div class="warn"><p><b>原题笔误: </b>b) 问的是「Attribut OS」, 但 Compatibility 里没有叫 OS 的属性, OS 是关系名; 指的应是 <b>OsName</b>. 两问的句子都少了从句前的逗号 (Welche Implikationen hätte es, <span class="nb">wenn …).</span></p></div>
 </article>
 
+</section>
+
+<section class="part" id="b5">
+<h2>练习单 5: SQL (一)<br><span class="de-title">Übungsblatt 5: SQL #1</span><small><span class="rl">对应 <a href="DBS-05-SQL.html#join">DBS 05 · 连接</a>、<a href="DBS-05-SQL.html#sort">排序</a>、<a href="DBS-05-SQL.html#agg">聚合与分组</a>、<a href="DBS-05-SQL.html#sub">子查询</a>、<a href="DBS-05-SQL.html#mengsub">集合子查询</a>;</span><span class="rl">源文件 Zettel05.pdf;</span><span class="rl">讨论时间: Besprechung ab 23.11.</span></small></h2>
+
+<div class="zh">
+  <p>题目没有给数据. 下面每条 SQL 都在 PostgreSQL 18.6 (PGlite) 和 DuckDB 2.0 上用一份自造的小数据库跑过: 7 个客户 (3 个在 Stuttgart、2 个在 Landshut, 两个客户同名 Huber)、6 个员工 (其中两个姓 Hartinger、两个姓 Winter, 两对工资相同)、10 个订单、6 种商品 (两种价格并列最低). 数据故意放进了会让错误写法露馅的情况, 下面的「易错」都是实际<span class="nb">跑出来的.</span></p>
+</div>
+
+<article id="b5-1">
+<h3>题 5-1 a): 价格等于某两位员工工资的商品<br><span class="de-title"><span class="seg">Aufgabe 5-1 ·</span> <span class="seg">Anfragen in SQL ·</span> <span class="seg">a)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-1</span>
+  <p>Gegeben seien die folgenden Relationen als Datenmodell für die Datenbank eines <span class="nb">Möbelhauses:</span></p>
+  <ul>
+    <li>Kunde (<u>kund_nr</u>, kund_name, adresse, ort, <span class="nb">plz)</span></li>
+    <li>Personal (<u>pers_nr</u>, nachname, vorname, einsatz, vorgesetzt, <span class="nb">gehalt)</span></li>
+    <li>Verkauf (<u>auftr_nr</u>, bestelldatum, pers_nr → Personal, kund_nr → <span class="nb">Kunde)</span></li>
+    <li>Inventar (<u>art_nr</u>, art_bez, lagerbest, lagerort, <span class="nb">preis)</span></li>
+    <li>Auftragsposten (<u>auftr_nr → Verkauf, art_nr → Inventar</u>, <span class="nb">menge)</span></li>
+  </ul>
+  <p>Formulieren Sie folgende Anfragen in SQL-DQL. Formulieren Sie die Teilaufgaben a) und b) jeweils einmal mit Hilfe von Join-Operationen und einmal nur mittels Unterabfragen ohne Join oder Kreuzprodukt. Das Ergebnis der Anfragen soll keine Duplikate <span class="nb">enthalten.</span></p>
+  <p>a) Finden Sie die Nummern und Bezeichnungen aller Artikel, deren Preis entweder dem Gehalt von Roswita Hartinger oder Margot Winter <span class="nb">entspricht.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 给定一个家具店数据库的关系: 客户、员工 (einsatz 工作地点, vorgesetzt 上级的员工号, gehalt 工资)、销售单 (下单日期、经手员工、客户)、库存 (商品号、名称、库存量、存放地点、价格)、订单明细 (哪张单买了哪种商品多少件). 用 SQL 的查询部分 (DQL) 写出下面的查询. a) 和 b) 各写两遍: 一遍用连接, 一遍只用子查询 (不能有 JOIN, 也不能在 FROM 里列多张表做积). 结果不能有重复行. a) 找出价格等于 Roswita Hartinger 或 Margot Winter 的工资的所有商品的编<span class="nb">号和名称.</span></p>
+  <p><b>思路:</b> 连接版: 把 Inventar 和 Personal 按「价格 = 工资」连起来, 再筛这两个人. 子查询版: 先查出两个人的工资 (一个集合), 外层用 IN. 人名要同时比较名和姓, 只比姓会把同姓的人<span class="nb">也算进来.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>连接版:</p>
+<pre data-lang="sql"><span class="tk-k">SELECT DISTINCT </span>i.art_nr, i.art_bez
+<span class="tk-k">FROM </span>Inventar i <span class="tk-k">JOIN </span>Personal p <span class="tk-k">ON </span>i.preis = p.gehalt
+<span class="tk-k">WHERE </span>(p.vorname = <span class="tk-s">'Roswita' </span><span class="tk-k">AND </span>p.nachname = <span class="tk-s">'Hartinger'</span>)
+   <span class="tk-k">OR </span>(p.vorname = <span class="tk-s">'Margot'  </span><span class="tk-k">AND </span>p.nachname = <span class="tk-s">'Winter'</span>);</pre>
+  <p>子查询版:</p>
+<pre data-lang="sql"><span class="tk-k">SELECT DISTINCT </span>art_nr, art_bez
+<span class="tk-k">FROM </span>Inventar
+<span class="tk-k">WHERE </span>preis <span class="tk-k">IN </span>(<span class="tk-k">SELECT </span>gehalt
+                <span class="tk-k">FROM </span>Personal
+                <span class="tk-k">WHERE </span>(vorname = <span class="tk-s">'Roswita' </span><span class="tk-k">AND </span>nachname = <span class="tk-s">'Hartinger'</span>)
+                   <span class="tk-k">OR </span>(vorname = <span class="tk-s">'Margot'  </span><span class="tk-k">AND </span>nachname = <span class="tk-s">'Winter'</span>));</pre>
+  <p>测试数据里 Roswita 工资 3200、Margot 4100, 两个版本在两个系统上都返回 500 Sofa (3200)、501 Schrank (4100)、505 Bett <span class="nb">(3200).</span></p>
+  <p>连接版必须加 DISTINCT: 如果两位员工工资相同, 一件商品会和两个人都连上, 出现两次. 子查询版里 art_nr 是主键, 每件商品本来只出现一次, DISTINCT 只是保险. 两个 OR 条件要分别加括号: AND 的优先级比 OR 高, 不加括号也对, <span class="nb">但加上更清楚.</span></p>
+  <p><b>易错:</b> 只写 <code class="lc">p.nachname IN ('Hartinger', 'Winter')</code>, 测试数据里另一个 Hartinger (Anna, 3500) 把 502 Tisch 也带进来了, <span class="nb">实测多出一行.</span></p>
+</details>
+</article>
+
+<article id="b5-2">
+<h3>题 5-1 b): 某天从汉堡员工那里买过东西的客户<br><span class="de-title"><span class="seg">Aufgabe 5-1 ·</span> <span class="seg">b)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-1 b</span>
+  <p>b) Geben Sie alle Kundennamen an, die am 24.07.2023 etwas von einem Mitarbeiter mit dem Einsatzort Hamburg gekauft <span class="nb">haben.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 列出 2023 年 7 月 24 日从一位工作地点在汉堡的员工那里买过东西的所有客户的名字. 同样写连接版和<span class="nb">子查询版.</span></p>
+  <p><b>思路:</b> 客户、销售单、员工三张表要连起来: Kunde 和 Verkauf 按 kund_nr, Verkauf 和 Personal 按 pers_nr. 条件: 日期是那一天, 员工地点是汉堡. 子查询版要嵌两层 IN: 先找汉堡员工, 再找他们那天的销售单<span class="nb">里的客户.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>连接版:</p>
+<pre data-lang="sql"><span class="tk-k">SELECT DISTINCT </span>k.kund_name
+<span class="tk-k">FROM </span>Kunde k
+<span class="tk-k">JOIN </span>Verkauf v  <span class="tk-k">ON </span>k.kund_nr = v.kund_nr
+<span class="tk-k">JOIN </span>Personal p <span class="tk-k">ON </span>v.pers_nr = p.pers_nr
+<span class="tk-k">WHERE </span>v.bestelldatum = <span class="tk-s">'2023-07-24' </span><span class="tk-k">AND </span>p.einsatz = <span class="tk-s">'Hamburg'</span>;</pre>
+  <p>子查询版:</p>
+<pre data-lang="sql"><span class="tk-k">SELECT DISTINCT </span>kund_name
+<span class="tk-k">FROM </span>Kunde
+<span class="tk-k">WHERE </span>kund_nr <span class="tk-k">IN </span>(<span class="tk-k">SELECT </span>kund_nr
+                  <span class="tk-k">FROM </span>Verkauf
+                  <span class="tk-k">WHERE </span>bestelldatum = <span class="tk-s">'2023-07-24'
+                    </span><span class="tk-k">AND </span>pers_nr <span class="tk-k">IN </span>(<span class="tk-k">SELECT </span>pers_nr
+                                    <span class="tk-k">FROM </span>Personal
+                                    <span class="tk-k">WHERE </span>einsatz = <span class="tk-s">'Hamburg'</span>));</pre>
+  <p>测试数据: 7 月 24 日有 4 张单, 其中客户 1 (Huber) 从两个汉堡员工那里各买了一次, 客户 7 (另一个 Huber) 从汉堡员工那里买了一次, 客户 2 (Maier) 的单是 Stuttgart 的员工经手的. 两个版本都只返回一行 <span class="nb">Huber.</span></p>
+  <p>DISTINCT 在这里有两层作用: 客户 1 有两张符合条件的单, 连接版不加 DISTINCT 会输出两次; 两个不同的客户都叫 Huber, 加了 DISTINCT 也合并成一行. 题目要的是「客户名」, 按字面这样就对; 想区分同名客户, 应该同时输出 <span class="nb">kund_nr.</span></p>
+  <p>日期常量写成 ISO 格式 <code>'2023-07-24'</code>, 两个系统都会自动转成 date 和列比较. 德式写法 <code>'24.07.2023'</code> 在 PostgreSQL 里取决于 DateStyle 设置, <span class="nb">不可靠.</span></p>
+</details>
+</article>
+
+<article id="b5-3">
+<h3>题 5-1 c): 按工资排序的员工表<br><span class="de-title"><span class="seg">Aufgabe 5-1 ·</span> <span class="seg">c)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-1 c</span>
+  <p>c) Erzeugen Sie eine Liste aller Mitarbeiter Vornamen, Nachnamen und Gehalt, absteigend sortiert nach Gehalt. Bei gleichem Gehalt wird alphabetisch aufsteigend zunächst nach Nachnamen und dann nach Vornamen <span class="nb">sortiert.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 列出所有员工的名、姓和工资, 按工资降序排列; 工资相同时, 先按姓、再按名的字母顺<span class="nb">序升序排.</span></p>
+  <p><b>思路:</b> 一个 ORDER BY 里三个排序键, 每个键单独指定方向 (DESC 只管紧挨着它的那一个, 见 DBS 05 <span class="nb">Folie 23).</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>vorname, nachname, gehalt
+<span class="tk-k">FROM </span>Personal
+<span class="tk-k">ORDER BY </span>gehalt <span class="tk-k">DESC</span>, nachname <span class="tk-k">ASC</span>, vorname <span class="tk-k">ASC</span>;</pre>
+  <p>测试数据的实际输出 <span class="nb">(两个系统相同):</span></p>
+<pre data-lang="output">Anna     Berger      4100.00
+Margot   Winter      4100.00
+Anna     Hartinger   3500.00
+Roswita  Hartinger   3200.00
+Zoe      Abel        2800.00
+Paul     Winter      2800.00</pre>
+  <p>4100 和 2800 各有两人并列, 并列时按姓升序: Berger 在 Winter 前, Abel 在 Winter 前. ASC 是默认值, 可以省略, <span class="nb">写出来更清楚.</span></p>
+  <p><b>易错:</b> 写成 <code class="lc">ORDER BY gehalt, nachname, vorname DESC</code> 会让工资升序、名字降序, <span class="nb">正好反了.</span></p>
+</details>
+</article>
+
+<article id="b5-4">
+<h3>题 5-1 d): 最便宜的商品<br><span class="de-title"><span class="seg">Aufgabe 5-1 ·</span> <span class="seg">d)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-1 d</span>
+  <p>d) Bestimmen Sie die Artikelnummern, Artikelbezeichnung und Preise des Inventars, die den niedrigsten Preis <span class="nb">aufweisen.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 找出库存中价格最低的商品的编号、<span class="nb">名称和价格.</span></p>
+  <p><b>思路:</b> 这正是 DBS 05 Folie 31 的模式: 不能把 MIN(preis) 和 art_nr 写在同一个 SELECT 里, 要用子查询先求最低价, 再找价格等于它的商品. 注意题目用复数: <span class="nb">最低价可能有好几件.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>art_nr, art_bez, preis
+<span class="tk-k">FROM </span>Inventar
+<span class="tk-k">WHERE </span>preis = (<span class="tk-k">SELECT MIN</span>(preis) <span class="tk-k">FROM </span>Inventar);</pre>
+  <p>等价写法 <code class="lc">WHERE preis &lt;= ALL (SELECT preis FROM Inventar)</code>. 测试数据里 503 Hocker 和 504 Kissen 都是 19.90, <span class="nb">两种写法都返回这两行.</span></p>
+  <p><b>易错:</b> <code class="lc">ORDER BY preis LIMIT 1</code> 只返回其中一件, 并列的另一件丢了. <code class="lc">SELECT art_nr, art_bez, MIN(preis) FROM Inventar</code> 直接报错 (art_nr 必须出现在 GROUP BY <span class="nb">里).</span></p>
+</details>
+</article>
+
+<article id="b5-5">
+<h3>题 5-1 e): 至少两位 Stuttgart 客户买过的商品<br><span class="de-title"><span class="seg">Aufgabe 5-1 ·</span> <span class="seg">e)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-1 e</span>
+  <p>e) Finden Sie die Artikelnummern, die von mindestens zwei unterschiedlichen Kunden mit Wohnsitz in Stuttgart gekauft <span class="nb">wurden.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 找出至少被两位不同的、住在 Stuttgart <span class="nb">的客户买过的商品编号.</span></p>
+  <p><b>思路:</b> 路径是 Auftragsposten → Verkauf → Kunde: 订单明细里有商品, 通过销售单找到客户, 筛住在 Stuttgart 的. 然后按商品分组, 数每组里<b>不同</b>客户的个数, 用 HAVING 留下至少 2 <span class="nb">个的.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>a.art_nr
+<span class="tk-k">FROM </span>Auftragsposten a
+<span class="tk-k">JOIN </span>Verkauf v <span class="tk-k">ON </span>a.auftr_nr = v.auftr_nr
+<span class="tk-k">JOIN </span>Kunde k   <span class="tk-k">ON </span>v.kund_nr  = k.kund_nr
+<span class="tk-k">WHERE </span>k.ort = <span class="tk-s">'Stuttgart'
+</span><span class="tk-k">GROUP BY </span>a.art_nr
+<span class="tk-k">HAVING COUNT</span>(<span class="tk-k">DISTINCT </span>k.kund_nr) &gt;= <span class="tk-n">2</span>;</pre>
+  <p>测试数据里返回 503、504、505, 每件都由两位不同的 Stuttgart 客户买过. 分组后每个 art_nr 只出现一次, 不需要再加 <span class="nb">DISTINCT.</span></p>
+  <p><b>易错:</b> 写成 <code class="lc">HAVING COUNT(*) &gt;= 2</code> 数的是订单明细的行数, 同一位客户买两次也算 2. 测试数据里客户 1 两次买了 502 Tisch, 这个写法实测多返回了 502. 题目强调 unterschiedliche Kunden, 必须 COUNT(DISTINCT <span class="nb">kund_nr).</span></p>
+</details>
+</article>
+
+<article id="b5-6">
+<h3>题 5-1 f): 从没买过东西的客户<br><span class="de-title"><span class="seg">Aufgabe 5-1 ·</span> <span class="seg">f)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-1 f</span>
+  <p>f) Finden Sie die Nummern und Namen aller Kunden, die noch nie etwas gekauft <span class="nb">haben.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 找出从没买过东西的所有客户的编<span class="nb">号和名字.</span></p>
+  <p><b>思路:</b> 「从没」= 不存在属于这个客户的销售单: NOT EXISTS 的相关子查询 (DBS 05 Folie 43). 也可以用 NOT IN 或左外连接 + IS <span class="nb">NULL.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>kund_nr, kund_name
+<span class="tk-k">FROM </span>Kunde k
+<span class="tk-k">WHERE NOT EXISTS </span>(<span class="tk-k">SELECT </span><span class="tk-n">1 </span><span class="tk-k">FROM </span>Verkauf v <span class="tk-k">WHERE </span>v.kund_nr = k.kund_nr);</pre>
+  <p>测试数据里返回 (6, Fischer). <span class="nb">另外两种写法:</span></p>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>kund_nr, kund_name <span class="tk-k">FROM </span>Kunde
+<span class="tk-k">WHERE </span>kund_nr <span class="tk-k">NOT IN </span>(<span class="tk-k">SELECT </span>kund_nr <span class="tk-k">FROM </span>Verkauf);
+
+<span class="tk-k">SELECT </span>k.kund_nr, k.kund_name
+<span class="tk-k">FROM </span>Kunde k <span class="tk-k">LEFT JOIN </span>Verkauf v <span class="tk-k">ON </span>k.kund_nr = v.kund_nr
+<span class="tk-k">WHERE </span>v.auftr_nr <span class="tk-k">IS NULL</span>;</pre>
+  <p>在这份数据上三种结果相同. NOT IN 有隐患: 只要 Verkauf 里有一张 kund_nr 为 NULL 的单 (外键列允许 NULL 时可能出现), 它就一行都不返回 (见 DBS 05 Folie 39). 左外连接的写法检查的是右表主键 auftr_nr 为 NULL, <span class="nb">也就是「没有匹配的单」.</span></p>
+</details>
+</article>
+
+<article id="b5-7">
+<h3>题 5-1 g): 卖给过所有 Landshut 客户的员工<br><span class="de-title"><span class="seg">Aufgabe 5-1 ·</span> <span class="seg">g)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 5 · Aufgabe 5-1 g</span>
+  <p>g) Finden Sie die Nummern und Nachnamen aller Angestellten (Personal), welche allen Kunden mit Wohnsitz Landshut bereits etwas verkauft <span class="nb">haben.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 找出已经向<b>所有</b>住在 Landshut 的客户卖过东西的员工的<span class="nb">编号和姓.</span></p>
+  <p><b>思路:</b> 「对所有……」是关系代数的除法 (<a href="DBS-03-关系代数.html#division">DBS 03 · 除法</a>). SQL 没有全称量词, 改写成双重否定: 员工 p 满足条件, 当且仅当<b>不存在</b>这样一位 Landshut 客户 k, 使得 p <b>没有</b>卖给过 k. 两层 NOT EXISTS 正好写出这句话. 另一种思路是计数: p 卖给过的不同 Landshut 客户数 = Landshut <span class="nb">客户总数.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>双重 NOT <span class="nb">EXISTS:</span></p>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>p.pers_nr, p.nachname
+<span class="tk-k">FROM </span>Personal p
+<span class="tk-k">WHERE NOT EXISTS </span>(
+    <span class="tk-k">SELECT </span><span class="tk-n">1 </span><span class="tk-k">FROM </span>Kunde k
+    <span class="tk-k">WHERE </span>k.ort = <span class="tk-s">'Landshut'
+      </span><span class="tk-k">AND NOT EXISTS </span>(
+          <span class="tk-k">SELECT </span><span class="tk-n">1 </span><span class="tk-k">FROM </span>Verkauf v
+          <span class="tk-k">WHERE </span>v.pers_nr = p.pers_nr <span class="tk-k">AND </span>v.kund_nr = k.kund_nr));</pre>
+  <p>计数:</p>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>p.pers_nr, p.nachname
+<span class="tk-k">FROM </span>Personal p
+<span class="tk-k">JOIN </span>Verkauf v <span class="tk-k">ON </span>p.pers_nr = v.pers_nr
+<span class="tk-k">JOIN </span>Kunde k   <span class="tk-k">ON </span>v.kund_nr = k.kund_nr
+<span class="tk-k">WHERE </span>k.ort = <span class="tk-s">'Landshut'
+</span><span class="tk-k">GROUP BY </span>p.pers_nr, p.nachname
+<span class="tk-k">HAVING COUNT</span>(<span class="tk-k">DISTINCT </span>k.kund_nr) = (<span class="tk-k">SELECT COUNT</span>(*) <span class="tk-k">FROM </span>Kunde <span class="tk-k">WHERE </span>ort = <span class="tk-s">'Landshut'</span>);</pre>
+  <p>测试数据有两位 Landshut 客户 (4 和 5): 员工 14 (Berger) 两位都卖过, 员工 13 只卖给过客户 4. 两种写法都只返回 (14, <span class="nb">Berger).</span></p>
+  <p>读内层: 对固定的员工 p 和客户 k, 最内层子查询找「p 卖给 k 的单」; 找不到 (NOT EXISTS 为真) 说明 k 是 p 漏掉的客户. 中间一层问「有没有漏掉的 Landshut 客户」, <span class="nb">外层要求「没有」.</span></p>
+  <p>两种写法有一个边界差别: 如果数据库里根本没有 Landshut 客户, 双重 NOT EXISTS 返回<b>所有</b>员工 (「对空集的所有元素都成立」是空真), 计数写法返回空 (连接后没有行可分组). 按逻辑, 前者才是全称量词的正确含义. 计数写法里 COUNT(DISTINCT …) 不能换成 COUNT(*): 同一位员工卖给同一位客户两次会<span class="nb">被数两次.</span></p>
+</details>
+<div class="warn"><p><b>原题小错:</b> 练习单抬头写的是「WS 2025/26」, 但日期是 13.11.2026、讨论从 23.11. 开始, 应为 WS 2026/27 <span class="nb">(沿用了去年的模板).</span></p></div>
+</article>
 </section>
 
 </main>

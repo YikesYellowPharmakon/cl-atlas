@@ -308,7 +308,7 @@ T PREDICT |  |  | 预测 | parse | Expandiert ein Nichtterminal mit einer Regel.
 T SCAN |  |  | 扫描 | parse | Vergleicht das vorhergesagte Wort mit dem nächsten Eingabewort. | 和输入里的下一个词比对. | PREDICT | 04:rd | MATCH
 T Bottom-Up-Parsing | das |  | 自底向上分析 | parse | Analyse von den Wörtern aufwärts bis zum Startsymbol. | 从词往上合成. | Top-Down-Parsing | 04:sr | Aufwärtsparsen
 T Shift-Reduce |  |  | 移进归约 | parse | Bottom-up-Verfahren mit einem Stapel und den Operationen SHIFT und REDUCE. | 用栈和移进、归约两种操作. |  | 04:sr
-T Stapel | der |  | 栈 | parse | Datenstruktur, auf die beim Shift-Reduce-Parsing die Wörter gelegt werden. | 移进归约用的数据结构. |  | 04:sr
+T Stapel | der |  | 栈 | parse | Datenstruktur, auf die beim Shift-Reduce-Parsing die Wörter gelegt werden. | 移进归约用的数据结构. |  | 04:sr | Stack
 T Chart-Parsing | das |  | 图表分析 | parse | Parsing, das Zwischenergebnisse in einer Chart speichert. | 把中间结果存进图表. |  | 04:earley
 T dynamische Programmierung | die |  | 动态规划 | parse | Vermeidung von Mehrfachberechnungen durch Speichern von Teilergebnissen. | 存下中间结果, 避免重复计算. |  | 04:earley
 T COMPLETE |  |  | 完成 | parse | Ein vollständig gefundenes A schiebt den Punkt in den Zuständen weiter, die auf A warten. | 完整找到 A 后推进等 A 的状态. |  | 04:earley-alg
@@ -389,3 +389,169 @@ M Parsingalgorithmus | parsing
 M Top-Down-Parsing | rd
 M Bottom-Up-Parsing | sr
 M Stapel | sr
+
+# ===== SNS 05 · 依存语法与依存分析 (Wisiorek, 2026-11-11) 2026-11-13 =====
+B depg | 依存语法与依存分析 | Dependenzgrammatik & Dependency Parsing | 只看词与词的依存关系; 依存树的性质、投射性, 以及怎样自动分析出依存树.
+
+N dmotiv | depg | 为什么要依存结构 | Warum Dependenzstrukturen? | 05:motivation | 依存结构抓住哪些词允准别的词出现和取什么形式, 能直接读出「谁对谁做了什么」. | 积木视角对关系视角 ;; 跨语言适用 (UD) ;; 信息抽取、语义分析、机器翻译的基础 | (Hund, jagt, Katze)
+N dstr | depg | 依存结构 | Dependenzstruktur | 05:eigenschaften | 一句话里所有中心词—依附词关系的总和, 形式上是有向树 G = ⟨M, R⟩. | 节点是词 ;; 关系是有序对 (中心词, 依附词) ;; 边有方向、带标签 | jagt → Hund (nsubj)
+N deigen | depg | 依存结构的性质 | Eigenschaften der Dependenzstruktur | 05:eigenschaften | 二元、不对称、每个依附词一个中心词、正好一个根、不管线性词序. | 合起来就是以根为起点的有向树 ;; 直接依存与间接依存 ;; 不管词序, 所以会有非投射结构
+N stemma | depg | 依存树 | Stemma | 05:eigenschaften | 把依存结构画成树, 方向由上下位置表示: 上面是中心词, 下面是依附词. | Tesnière 的说法 ;; 加虚线投射就同时看出层级和词序
+N drich | depg | 依存的方向 | Richtung der Dependenzrelation | 05:eigenschaften | 箭头从中心词指向依附词, 表示允准方向; 依存和控制是同一关系的两个视角. | 标签写依附词的功能 ;; 早期文献有反向画法
+N kvd | depg | 成分结构与依存结构 | Konstituenten- vs. Dependenzstruktur | 05:psg | 成分结构的信息在节点 (范畴), 依存结构的信息在边 (关系). | DG 没有短语节点, 更扁平 ;; DG 里主语、宾语都是动词平等的论元 ;; 从动词出发由内向外分析
+N implizit | depg | 两种结构互相隐含 | Beziehung zwischen Dependenz- und Konstituentenstruktur | 05:psg | PSG 靠中心语原则隐含依存, DG 的每棵子树隐含一个成分. | DG 里没有独立的 VP ;; 去掉 XP 层, 让 X 直接支配姐妹
+N ergang | depg | 补足成分与说明成分 | Ergänzung & Angabe | 05:psg | X-bar 按结构位置区分补足语和附加语, 依存理论按允准方式: 配价要求的是补足成分, 不要求的是说明成分. | 补足成分可必有也可可有可无 ;; 依存图里两者都挂在中心词下, 只靠标签区分 | auf den Bus 对 seit einer Stunde
+N dvort | depg | 依存模型的优点 | Vorteile von Dependenzmodellen | 05:psg | 关系信息直接就有; 作为词语法不需要词汇化, 能减轻参数估计的数据稀疏. | 词汇化 PCFG 的「范畴 + 中心词」组合太多 ;; 依存参数只是中心词—依附词—关系
+N headrule | depg | 中心语查找规则 | Head-Finding-Rules | 05:trafo | 为每个短语定出中心语, 其他成分的中心词成为它的依附词, 再加功能标签, 就把短语树转成依存树. | head(S) = VP, head(VP) = V ;; PP 的中心语按 UD 是 NP, 传统是 P ;; 得到的一定是投射结构 | head(NP) = N
+N dgram | depg | 依存语法 | Dependenzgrammatik | 05:dg | 规定哪些中心词允准哪些依附词、用哪些关系标签的形式模型; 由它判断句子是否合式. | 依存结构是分析结果, 依存语法是规则 ;; NLTK 只支持不带标签的
+N dgregel | depg | 依存规则 | Dependenzregeln | 05:dg | 一条规则描述一种允许的中心词—依附词关系, 两边都是具体的词, 不规定词序. | 全部规则合起来允准所有合式结构 | jagt → Hund
+N dwohl | depg | 依存结构的合式条件 | Wohlgeformtheit | 05:dg | 句子当且仅当能用规则构成有效的依存结构时才合式: 一个根, 每个词最多一个中心词. | 单中心约束 ;; 根没有中心词, 其余每个词正好一个
+N psgdg | depg | 短语结构文法与依存语法 | Phrasenstrukturgrammatik vs. Dependenzgrammatik | 05:dg | CFG 的规则组合范畴, 信息在节点; DG 的规则组合具体的词, 信息在边. | S → NP VP 对 jagt → Hund ;; 短语树对依存树
+N nltkdg | depg | NLTK 里的依存语法 | Dependenzgrammatik in NLTK | 05:dg | fromstring 读入「中心词 -> 依附词」规则, 投射分析器只找投射树. | 输出 (schenkt (Mann der) (Frau der) (Buch das)) | 'shot' -> 'I' ∣ 'elephant' ∣ 'in'
+N depamb | depg | 依存结构的歧义 | Ambiguität in der Dependenzgrammatik | 05:proj | 一个词可以挂到不同的中心词上, 一句话就有几棵依存树; 典型是介词短语附着. | 歧义只表现为一个词换了中心词 ;; I shot an elephant in my pajamas 得两棵树 | Er sah den Mann mit dem Fernglas
+N projekt | depg | 投射性 | Projektivität | 05:proj | 每条边从中心词出发都能走到它和依附词之间的每一个词; 等价于边画在句子上方不相交. | 非投射 = 边交叉 = 有不连续成分 ;; 判断: 边覆盖的一段里有没有不在子树里的词 | he gave a talk yesterday about Syntax
+N projwhy | depg | 投射性的意义 | Warum Projektivität wichtig ist | 05:proj | 投射树可以用上下文无关的方式建模, 非投射要更复杂的模型; 很多分析算法只能产生投射树. | 基于转移的只出投射树 ;; 基于图的也能出非投射
+N diskont | depg | 不连续成分 | diskontinuierliche Konstituente | 05:proj | 一个成分的一部分被分离出去, 树里会出现交叉边; 来自自由语序和长距离依存. | 原因: 关系从句、话题化、外置 ;; DG 可以直接表示, CFG 不行 | Hunde beißen, die bellen
+N spur | depg | 语迹 | Spur | 05:proj | 成分语法处理不连续成分的办法: 在原位留一个空节点, 用下标和移出的成分连起来. | 来自转换语法: 深层结构经转换得到表层结构 ;; 写作 0、ε、t、NONE | What_i do you see t_i?
+N dparse | depg | 依存分析 | Dependency Parsing | 05:parsing | 自动给句子生成有向、带标签的依存树; 输入是分好词、标了词性的词序列. | 基于语法或训练好的模型 ;; 两大类: 基于转移、基于图
+N transp | depg | 基于转移的分析器 | Übergangsbasierter Parser | 05:parsing | 用栈、缓冲区和关系集合一步步建树, 每一步由分类器选 SHIFT、LEFTARC 或 RIGHTARC. | 线性时间 ;; 局部决定, 一步错会连带后面 ;; MaltParser、spaCy
+N graphp | depg | 基于图的分析器 | Graphbasierter Parser | 05:parsing | 给所有可能的中心词—依附词边打分, 找权重和最大的生成树. | 考虑全局, 能出非投射结构 ;; 计算更复杂, 不能增量处理 ;; MSTParser、双仿射分析器
+N uaslas | depg | UAS 与 LAS | UAS & LAS | 05:parsing | UAS 是中心词找对的词的比例, LAS 要求中心词和标签都对. | LAS ≤ UAS ;; 在金标准树库上算 | 4/5 = 80%, 3/5 = 60%
+N srdep | depg | 移进归约依存分析 | Shift-Reduce-Dependency-Parser | 05:sr | 栈从 ROOT 开始, 移进词, 归约时在栈顶两个词之间建一条边并删掉依附词; 缓冲区空、栈上只剩 ROOT 时结束. | n 个词正好 2n 步 ;; 删依附词是因为一个词只有一个中心词 | book me the morning flight
+N arcs | depg | LEFTARC 与 RIGHTARC | LEFTARC & RIGHTARC | 05:sr | LEFTARC: 中心词在右 (栈顶), 次顶成为依附词出栈; RIGHTARC: 中心词在左 (次顶), 栈顶成为依附词出栈. | the ← flights ;; book → me ;; Folie 47 的描述说反了
+N rarcres | depg | RIGHTARC 的限制 | Einschränkung bei RIGHTARC | 05:sr | 只有栈顶的词已经收齐自己的依附词时才能 RIGHTARC, 否则它出栈后依附词再也找不到它. | canceled flights to Houston 要先 SHIFT ;; LEFTARC 的次顶不能是 ROOT
+N oracle | depg | 神谕 | Oracle | 05:sr | 训练时用树库里的正确树推出每一步该做哪个转移, 得到 (格局, 转移) 训练样本. | 分类器把格局映射到转移
+N deptb | depg | 依存树库 | Dependency Treebank | 05:treebanks | 所有句子都标了完整依存结构的语料, 用来训练和测试分析器. | UD 树库 100 多种语言 ;; TIGER Dependency Bank 由成分树库转来
+N conllu | depg | CoNLL-U 格式 | CoNLL-U | 05:treebanks | 一行一个词, 十列; HEAD 一列记中心词的 ID (0 = 根), DEPREL 记关系, 树就完全表示出来了. | ID、FORM、LEMMA、UPOS、XPOS、FEATS、HEAD、DEPREL、DEPS、MISC | 3 jagt jagen VERB … 0 root
+N tbconv | depg | 成分树库转依存 | Konversion konstituentenbasierter Treebanks | 05:treebanks | 用中心语查找规则找出依存, 再用手写规则按结构位置或功能标注加标签. | 母节点是 S 的 NP ⇒ subj ;; Penn Treebank 用 NP-SBJ 这类功能标注 | NP-SBJ, PP-CLR, NP-TMP
+
+E dep > dmotiv | 依存的概念在导论里已经引入, 这一讲展开.
+E dmotiv > dstr | 先说为什么, 再定义依存结构.
+E dstr > deigen | 性质是对结构的限制.
+E dstr > stemma | 依存树是依存结构的一种画法.
+E dstr > drich | 依存关系有方向.
+E kstr > kvd | 和前几讲的成分结构对照.
+E dstr > kvd | 对照的另一边.
+E kvd > implizit | 两种结构可以互相推出一部分.
+E kopf > implizit | PSG 里的依存靠中心语原则.
+E ka > ergang | 补足语和附加语在依存理论里的对应.
+E xbar ~ ergang | 一个按位置、一个按允准区分.
+E kvd > dvort | 对照之后说依存模型的好处.
+E implizit > headrule | 中心语查找规则把隐含的依存显式化.
+E dstr > dgram | 依存语法规定哪些依存结构允许.
+E dgram > dgregel | 依存语法写成一组规则.
+E prodreg ~ dgregel | 一个组合范畴且有序, 一个组合词且不管词序.
+E deigen > dwohl | 合式条件就是依存结构的性质.
+E dgram > dwohl | 由语法判断合式.
+E psg ~ psgdg | 和短语结构文法逐项对比.
+E dgram > psgdg | 对比的另一边.
+E dgregel > nltkdg | NLTK 按这种规则写依存语法.
+E attach > depamb | 附着歧义在依存里换一种表现.
+E dgram > depamb | 一部语法可以给一句话几棵树.
+E deigen > projekt | 不管词序才会出现非投射.
+E projekt > projwhy | 投射性决定能用哪些模型和算法.
+E projekt > diskont | 非投射来自不连续成分.
+E diskont > spur | 成分语法用语迹处理不连续成分.
+E dstr > dparse | 依存分析自动产生依存结构.
+E dparse > transp | 第一类分析器.
+E dparse > graphp | 第二类分析器.
+E transp ~ graphp | 局部线性对全局最优.
+E projwhy > graphp | 只有基于图的能出非投射树.
+E dparse > uaslas | 分析器的评估指标.
+E sr > srdep | 和 CFG 的移进归约同一个思路, 归约改成建边.
+E transp > srdep | 基于转移的分析器就是移进归约系统.
+E srdep > arcs | 归约分两种.
+E arcs > rarcres | RIGHTARC 有额外条件.
+E srdep > oracle | 分类器的训练样本由神谕给出.
+E deptb > oracle | 神谕要用树库里的正确树.
+E treebank > deptb | 依存版本的树库.
+E deptb > conllu | 依存树库的标准格式.
+E headrule > tbconv | 转换的第一步就是中心语查找规则.
+E deptb > uaslas | 在金标准树库上评估.
+
+T Dependenzstruktur | die | Dependenzstrukturen | 依存结构 | depg | Gesamtmenge der Kopf-Dependent-Relationen eines Satzes; formal ein gerichteter Baum. | 一句话里所有中心词—依附词关系; 形式上是有向树. | Konstituentenstruktur | 05:eigenschaften
+T Dependenzgrammatik | die | Dependenzgrammatiken | 依存语法 | depg | Formales Modell, das festlegt, welche Köpfe welche Dependenten lizenzieren. | 规定哪些中心词允准哪些依附词的形式模型. | Phrasenstrukturgrammatik | 05:dg | DG
+T Kopf | der | Köpfe | 中心词 | depg | Das lizenzierende Wort einer Dependenzrelation. | 依存关系里允准的一方. | Dependent | 05:eigenschaften
+T Dependent | der | Dependenten | 依附词 | depg | Das vom Kopf lizenzierte, abhängige Wort. | 被中心词允准、依附于它的词. | Kopf | 05:eigenschaften
+T lizenzieren |  |  | 允准 | depg | Das Auftreten oder die Form eines anderen Wortes bestimmen. | 决定另一个词能否出现、以什么形式出现. |  | 05:motivation | lizensieren
+T Wurzelknoten | der | Wurzelknoten | 根节点 | depg | Der einzige Knoten ohne Kopf, typischerweise das Verb. | 唯一没有中心词的节点, 一般是动词. |  | 05:eigenschaften
+T Determinierer | der | Determinierer | 限定词 | depg | Wort wie der, die, das, das vom Nomen abhängt (det). | der、die 这类依附于名词的词 (det). |  | 05:eigenschaften
+T Stemma | das | Stemmata | 依存树 | depg | Darstellung der Dependenzstruktur als Baum; die Richtung zeigt die vertikale Anordnung. | 依存结构的树形画法, 方向由上下位置表示. |  | 05:eigenschaften
+T Kontrolle | die |  | 控制 | depg | Sicht vom Kopf aus: der Kopf steuert seinen Dependenten. | 从中心词看: 中心词控制它的依附词. | Dependenz | 05:eigenschaften
+T Valenz | die | Valenzen | 配价 | depg | Eigenschaft eines Wortes, bestimmte Ergänzungen zu fordern. | 一个词要求特定补足成分的性质. |  | 05:psg
+T Ergänzung | die | Ergänzungen | 补足成分 | depg | Valenzgeforderter Dependent eines Kopfes. | 中心词配价要求的依附词. | Angabe | 05:psg
+T Angabe | die | Angaben | 说明成分 | depg | Nicht valenzgeforderter Dependent, ein Modifikator. | 配价不要求的依附词, 即修饰语. | Ergänzung | 05:psg
+T Lexikalisierung | die |  | 词汇化 | depg | Anreicherung von Phrasenknoten um ihr Kopfwort, z. B. VP(jagt). | 给短语节点加上它的中心词. |  | 05:psg
+T Head-Finding-Rules |  |  | 中心语查找规则 | depg | Regeln, die für jede Phrase ihren Kopf bestimmen. | 为每个短语定出中心语的规则. |  | 05:trafo | head-finding rules
+T Wohlgeformtheit | die |  | 合式 | depg | Ein Satz ist wohlgeformt, wenn er eine gültige Dependenzstruktur hat. | 句子有有效的依存结构时就是合式的. |  | 05:dg
+T Ein-Kopf-Beschränkung | die |  | 单中心约束 | depg | Jedes Wort hat höchstens einen Kopf. | 每个词最多一个中心词. |  | 05:dg
+T Projektivität | die |  | 投射性 | depg | Alle Kanten lassen sich ohne Überkreuzung zeichnen. | 所有边都能画得互不相交. | Nicht-Projektivität | 05:proj
+T Diskontinuität | die | Diskontinuitäten | 不连续 | depg | Getrennte Teile einer Konstituente; zeigt sich als Kantenkreuzung. | 成分被拆开, 表现为边交叉. |  | 05:proj
+T diskontinuierliche Konstituente | die | diskontinuierliche Konstituenten | 不连续成分 | depg | Konstituente, aus der Teile herausgetrennt sind. | 一部分被分离出去的成分. |  | 05:proj
+T long distance dependencies |  |  | 长距离依存 | depg | Abhängigkeiten über größere Abstände im Satz, z. B. bei Wh-fronting. | 跨越较远距离的依存, 如 wh 前置. |  | 05:proj
+T leerer Knoten | der | leere Knoten | 空节点 | depg | Unsichtbarer Knoten an der Ausgangsposition einer bewegten Konstituente. | 移走的成分在原位留下的看不见的节点. |  | 05:proj | leere Knoten
+T Spur | die | Spuren | 语迹 | depg | Leerer Knoten (t), den eine Transformation an der Ausgangsposition zurücklässt. | 转换在原位留下的空节点 t. |  | 05:proj | trace
+T Transformationsgrammatik | die |  | 转换语法 | depg | Grammatiktheorie, die Oberflächenstrukturen durch Transformationen aus Tiefenstrukturen ableitet. | 用转换从深层结构推出表层结构的语法理论. |  | 05:proj
+T Tiefenstruktur | die | Tiefenstrukturen | 深层结构 | depg | Angenommene abstrakte Form eines Satzes. | 假设的句子抽象形式. | Oberflächenstruktur | 05:proj
+T Oberflächenstruktur | die | Oberflächenstrukturen | 表层结构 | depg | Beobachtbare Form eines Satzes. | 看得见的句子形式. | Tiefenstruktur | 05:proj
+T Dependency Parsing |  |  | 依存分析 | depg | Automatische Erzeugung der Dependenzstruktur eines Satzes. | 自动生成句子的依存结构. |  | 05:parsing
+T übergangsbasierter Parser | der | übergangsbasierte Parser | 基于转移的分析器 | depg | Parser, der die Struktur schrittweise mit SHIFT, LEFTARC und RIGHTARC aufbaut. | 用 SHIFT、LEFTARC、RIGHTARC 一步步建树的分析器. | graphbasierter Parser | 05:parsing
+T graphbasierter Parser | der | graphbasierte Parser | 基于图的分析器 | depg | Parser, der den maximal gewichteten Baum über alle möglichen Kanten sucht. | 在所有可能的边里找权重最大的树. | übergangsbasierter Parser | 05:parsing
+T Maximum Spanning Tree |  |  | 最大生成树 | depg | Spannbaum mit der größten Summe der Kantengewichte. | 边权重和最大的生成树. |  | 05:parsing | MST
+T UAS |  |  | 无标签附着得分 | depg | Unlabeled Attachment Score: Anteil der Wörter mit richtigem Kopf. | 中心词对的词所占比例. | LAS | 05:parsing | Unlabeled Attachment Score
+T LAS |  |  | 带标签附着得分 | depg | Labeled Attachment Score: Anteil der Wörter mit richtigem Kopf und Label. | 中心词和标签都对的比例. | UAS | 05:parsing | Labeled Attachment Score
+T Buffer | der | Buffer | 缓冲区 | depg | Enthält die noch nicht verarbeiteten Wörter. | 存放还没处理的词. | Stapel | 05:sr
+T LEFTARC |  |  | 左弧 | depg | Kopf steht rechts: das zweitoberste Stack-Element wird Dependent und entfernt. | 中心词在右, 次顶成为依附词并出栈. | RIGHTARC | 05:sr
+T RIGHTARC |  |  | 右弧 | depg | Kopf steht links: das oberste Stack-Element wird Dependent und entfernt. | 中心词在左, 栈顶成为依附词并出栈. | LEFTARC | 05:sr
+T Konfiguration | die | Konfigurationen | 格局 | depg | Zustand des Parsers aus Stack, Buffer und Relationenmenge. | 栈、缓冲区和关系集合构成的分析器状态. |  | 05:sr
+T Übergang | der | Übergänge | 转移 | depg | Ein Schritt des Parsers: SHIFT, LEFTARC oder RIGHTARC. | 分析器的一步操作. |  | 05:sr
+T Oracle | das | Oracles | 神谕 | depg | Leitet aus einem Goldbaum die richtige Übergangsfolge für das Training ab. | 从正确树推出训练用的正确转移序列. |  | 05:sr
+T Dependency Treebank |  |  | 依存树库 | depg | Korpus, dessen Sätze vollständig mit Dependenzstrukturen annotiert sind. | 句子都标了完整依存结构的语料. | Treebank | 05:treebanks | Dependency-Treebank
+T Universal Dependencies |  |  | 通用依存 | depg | Sprachübergreifendes, einheitliches Set von Dependenzrelationen und Treebanks. | 跨语言统一的依存关系标签和树库. |  | 05:motivation | UD
+T CoNLL-U |  |  | CoNLL-U 格式 | depg | Tabellenformat mit einer Zeile pro Wort, u. a. HEAD und DEPREL. | 一行一个词的表格格式, 含 HEAD 和 DEPREL. |  | 05:treebanks
+
+M Dependenzstruktur | dstr
+M Dependenzgrammatik | dgram
+M Kopf | dstr
+M Dependent | dstr
+M lizenzieren | dmotiv
+M Wurzelknoten | deigen
+M Determinierer | dstr
+M Stemma | stemma
+M Kontrolle | drich
+M Valenz | ergang
+M Ergänzung | ergang
+M Angabe | ergang
+M Lexikalisierung | dvort
+M Head-Finding-Rules | headrule
+M Wohlgeformtheit | dwohl
+M Ein-Kopf-Beschränkung | dwohl
+M Projektivität | projekt
+M Diskontinuität | diskont
+M diskontinuierliche Konstituente | diskont
+M long distance dependencies | diskont
+M leerer Knoten | spur
+M Spur | spur
+M Transformationsgrammatik | spur
+M Tiefenstruktur | spur
+M Oberflächenstruktur | spur
+M Dependency Parsing | dparse
+M übergangsbasierter Parser | transp
+M graphbasierter Parser | graphp
+M Maximum Spanning Tree | graphp
+M UAS | uaslas
+M LAS | uaslas
+M Buffer | srdep
+M LEFTARC | arcs
+M RIGHTARC | arcs
+M Konfiguration | srdep
+M Übergang | srdep
+M Oracle | oracle
+M Dependency Treebank | deptb
+M Universal Dependencies | deptb
+M CoNLL-U | conllu
+
+SKIP SNS 05: 章节标题, 内容归入其下各概念 | Dependenzstruktur; Dependenzgrammatik; Dependency Parsing; Dependency-Treebanks
+DROP SNS 05: 并入 挂靠歧义 | PP-Attachment
+ZH 描述性小标题, 不是术语 | 两种结构互相隐含; 依存结构的合式条件; 依存规则; 成分树库转依存
+ZH 学科标准译名 | 左弧; 右弧; 通用依存

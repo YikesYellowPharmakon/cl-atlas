@@ -367,3 +367,72 @@ S viterbi | init | 初始化 | initialization | 第一列 = 起始概率 × 发�
 S viterbi | recur | 递推 | recursion | 取前驱最大值, 记回溯指针.
 S viterbi | term | 终止 | termination | 取最后一列最大值并回溯.
 S viterbi | readout | 读出路径 | Read out path | 顺 bptr 倒着读.
+
+# ===== EICL 08 · 文本分类与朴素贝叶斯 2026-11-13 =====
+D tcdef | Given a document space X, a fixed set of classes C and a training set D of labeled documents, learn a classifier γ: X → C.
+X tcdef | 训练阶段: 从带标签的训练集 (training set) 学出分类器 γ; 应用阶段: 对新文档求 γ(d). 类别是人按应用需要定的, 例如冒犯 / 不冒犯. 「文档」可以是任何一段文本, 所以句子分类是同一件事. 应用有语言识别、垃圾网页检测、情感分析、垂直搜索.
+S tcdef | train | 训练 | Training | 从训练集学出 γ.
+S tcdef | apply | 应用 | Application/Testing | 对新文档求 γ(d).
+S tcdef | docs | 文档的含义 |  | 句子、短语、提示词都算文档.
+D tcmeth | Classification methods: 1. Manual, 2. Rule-based, 3. Statistical/Probabilistic.
+X tcmeth | 人工分类在小规模时准而一致, 但不能扩展; 基于规则的方法 (非字母数字字符超过 5% 判低质量) 难以写全, 冒犯内容就很难用规则抓; 统计方法把分类看成学习问题, 需要人工标注的训练数据, 但训练完以后分类很便宜.
+S tcmeth | manual | 人工分类 | Manual | 准, 但又贵又不能扩展.
+S tcmeth | rules | 基于规则 | Rule-based | 写 if-then 规则, 如按文字系统分类.
+S tcmeth | stat | 统计方法 | Statistical/Probabilistic | 从标注数据学出分类函数.
+D nbrule | The Naive Bayes classifier: P(c|d) ∝ P(c) ∏_{1≤k≤n_d} P(t_k|c); the best class is the maximum a posteriori class.
+X nbrule | 先验 P(c) 表示类有多常见, 条件概率 P(t_k|c) 表示词 t_k 为类 c 提供的证据. 选使乘积最大的类, 即最大后验类 (MAP class). 等号严格说是「argmax 相等」: 省掉的分母 P(d) 对所有类相同.
+S nbrule | prior | 先验 | prior | 不看文档时类的概率.
+S nbrule | condp | 条件概率 | conditional probability | 词对类的证据.
+S nbrule | map | 最大后验类 | maximum a posteriori class | 后验最大的类.
+D nblog | Since log(xy) = log(x) + log(y), we can sum log probabilities instead of multiplying probabilities.
+X nblog | 很多小概率连乘会下溢 (underflow) 成 0. 对数单调, 取对数后得分最高的类不变. 每个 log P(t_k|c) 是一份权重, 先验的对数也是权重, 加起来是证据总量.
+S nblog | underflow | 下溢 | underflow | 连乘结果比最小可表示数还小.
+S nblog | weights | 对数权重 |  | 求和就是证据总量.
+D nbest | Prior: P̂(c) = N_c / N; conditional probabilities: P̂(t|c) = T_ct / Σ_{t'∈V} T_ct'.
+X nbest | 最大似然估计就是相对频率. 先验的分母是文档数, 条件概率的分母是该类所有文档的词元总数 (重复出现都算). 训练算法把一类的文档拼成一个长文本再数. 问题: 没在某类出现过的词估计为 0, 一个 0 让整个乘积为 0.
+S nbest | prior | 先验估计 |  | 文档数之比.
+S nbest | cond | 条件概率估计 |  | 词元次数之比.
+S nbest | zero | 零概率问题 |  | 含 WTO 的文档永远分不到 China.
+D addone | Add one to each count to avoid zeros: P̂(t|c) = (T_ct + 1) / ((Σ_{t'} T_ct') + B), B = |V|.
+X addone | 每个计数先加 1, 分母因此加 B (词表大小, 即 bins 的个数), 概率之和仍为 1. 例题: China 类 8 个词元、词表 6 个词, Chinese 出现 5 次, 得 (5+1)/(8+6) = 3/7; Tokyo 没出现, 得 1/14 而不是 0.
+S addone | bins | 格子数 B | bins | 整个训练集的词表大小.
+S addone | laplace | 拉普拉斯平滑 | Laplace | 加一平滑的另一个名字.
+D unkw | An UNK is a word that occurs in the test set, but did not occur in the training set.
+X unkw | 两种处理: 直接忽略 (测试算法只保留词表里的词); 或者把 UNK 当作一个词加进词表, 训练时计数为 0, 测试时所有新词都换成 UNK, 平滑后每类得到一个小概率.
+S unkw | ignore | 忽略 |  | 新词不影响结果.
+S unkw | token | UNK 词元 |  | 加入词表并统一替换.
+D nbderiv | c_map = argmax_c P(c|d) = argmax_c P(d|c)P(c)/P(d) = argmax_c P(d|c)P(c).
+X nbderiv | 用贝叶斯定理 (Satz von Bayes) 翻转条件, 再去掉对所有类相同的分母 P(d). P(c|d) 没法直接数, 而 P(c) 好数, P(d|c) 在条件独立假设下能拆成好数的小块.
+D sparse | There are too many parameters P(⟨t_1, …, t_nd⟩|c), one for each unique combination of a class and a sequence of words.
+X sparse | 要估计这么多参数需要极多的训练样本, 这就是数据稀疏 (Datenknappheit). Reuters 有 40 万个词型, 200 词的文档可能的序列数是天文数字, 训练集只有 80 万篇.
+D bow | P(d|c) = P(⟨t_1, …, t_nd⟩|c) = ∏_{1≤k≤nd} P(X_k = t_k|c).
+X bow | 条件独立假设: 给定类别, 各位置的词互相独立. 估计的 P(t|c) 又和位置无关, 所以文档等于一袋词, 只看每个词出现几次. 参数降到 |V|·|C| 个. 这个假设对语言几乎从不成立 (Hong 之后 Kong 的概率暴涨), 「朴素」由此得名.
+S bow | indep | 条件独立假设 | conditional independence assumption | 给定类别, 词互相独立.
+S bow | order | 丢掉词序 |  | 只看出现次数.
+D genmod | Generate a class with probability P(c); generate each of the words conditional on the class, but independent of each other, with probability P(t_k|c).
+X genmod | 朴素贝叶斯讲了一个文档怎样产生的故事: 先抽类, 再在每个位置独立抽词. 分类时把过程反推, 找最可能生成这篇文档的类. 和 HMM 的区别: HMM 每个位置有自己的标签并有转移, 朴素贝叶斯整篇只有一个类.
+D nbgood | Naive Bayes is not so naive: robust, very fast, low storage requirements, a good dependable baseline for text classification.
+X nbgood | 它赢过 KDD-CUP 97; 对无关特征、概念漂移 (concept drift) 比复杂方法稳健; 特征多且同样重要时优于决策树. 独立假设成立时最优. 假设不成立也常分得好, 因为分类只要 argmax 对, 不需要概率准. 在 Reuters 上 SVM 稳定地比它好.
+S nbgood | robust | 稳健 |  | 对无关特征和概念漂移.
+S nbgood | fast | 快且省存储 |  | 训练是计数, 测试是求和.
+S nbgood | baseline | 基线 | baseline | 可靠但不是最好.
+D testsep | Evaluation must be done on test data that are independent of the training data, i.e., training and test sets are disjoint.
+X testsep | 学习器见过测试集就能把它背下来, 分数说明不了对新文档的能力. 在 LLM 时代, 公开评测集混进预训练数据 (数据污染) 是同一个问题.
+D precrec | precision: P = TP/(TP+FP); recall: R = TP/(TP+FN).
+X precrec | 四格表: 真正例 (TP)、假正例 (FP)、假负例 (FN)、真负例 (TN), 都是文档数. 精确率: 我说是的里面有多少真是; 召回率: 该找的找到多少. 分子相同, 分母一个是「预测为正」, 一个是「真实为正」. 练习: TP 18, FP 2, FN 82 得 P = 0.9, R = 0.18.
+S precrec | tp | 真正例 | true positive | 预测属于且确实属于.
+S precrec | fp | 假正例 | false positive | 预测属于但其实不属于.
+S precrec | fn | 假负例 | false negative | 属于但没找出.
+S precrec | tn | 真负例 | true negative | 不属于且没被预测.
+D prtrade | You can easily increase recall by returning more results; it is easy to get high precision for very low recall.
+X prtrade | 召回率随返回结果数非递减, 全部返回就是 100%; 只返回最有把握的一两个, 精确率很高. 大多数应用两者都要, 所以要找折中, 例如调整判定阈值.
+D f1 | F1 = 1 / (½·1/P + ½·1/R) = 2PR/(P+R), the harmonic mean of P and R.
+X f1 | 调和平均 (harmonic mean) 靠近两者中较小的那个, 是一种「软最小值». P = 1、R = 0.1 时算术平均 0.55, F1 只有约 0.18. 练习里 P = 0.9、R = 0.18 得 F1 = 0.3.
+D accur | accuracy = (TP + TN) / (TP + TN + FP + FN).
+X accur | 准确率把正负两边都算上. 类别很不平衡时没用: 练习里 TN 是十亿, 准确率约 0.99999992, 却看不出漏掉了 82% 的目标. 所以这时看精确率、召回率和 F1.
+D confmat | Confusion matrix: rows are true classes, columns are assigned classes; off-diagonal cells are errors.
+X confmat | 对角线是分对的, 其余格子说明错成了什么. 例: 14 篇 grain 被分到 wheat. wheat、corn、grain 互相混得最厉害, 因为用词几乎一样. 单类的召回率 = 对角线 / 行和, 精确率 = 对角线 / 列和.
+D microavg | micro-avg vs. macro-avg F1 over 90 classes of Reuters: NB 80 vs. 47.
+X microavg | 宏平均每个类权重相同, 先算各类 F1 再平均; 微平均把所有类的 TP、FP、FN 加起来再算, 由大类主导. Reuters 大类少、小类多, 所以朴素贝叶斯的宏平均远低于微平均, 说明它在小类上弱.
+S microavg | micro | 微平均 | micro-averaging | 合并计数, 大类主导.
+S microavg | macro | 宏平均 | macro-averaging | 各类平均, 小类同样重要.

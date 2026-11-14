@@ -248,3 +248,51 @@ M Viterbi | viterbi
 M EM algorithm | em
 M multi-hop question | multihop
 M diffusion model | diffhvae
+
+# ===== DPNLP II 05 · 混合专家模型与潜在分词 2026-11-13 =====
+B moe | 混合专家与潜在分词 | Mixture of Experts and Latent Tokenization | 把 FFN 换成稀疏专家, 把嵌入表和分词器换成模型内部按熵分块的字节模型.
+
+N ffnkv | moe | FFN 作为键值记忆 | The Position-Wise Feed-Forward Network | 05:s5-ffn | W⁽¹⁾ 的列是键, W⁽²⁾ 的行是值; 输入和键匹配得到系数, 输出是值的加权和. | 键和值是参数, 不由序列算出 ;; 系数不归一化 ;; 每个 token 只有 10–50 % 的记忆激活
+N experts | moe | 稀疏专家 | From One FFN to Many Experts · Sparse Experts | 05:s5-experts | 把 FFN 的记忆分成 E 组就是 E 个小专家; 每个 token 只算其中 k 个. | 分组只是改写, 因为 f 逐元素 ;; 计算量只剩 k/E
+N router | moe | 路由器与门控 | Router · Top-k | 05:s5-experts | 线性层给每个专家打分, 取前 k 个, 在选中的专家间做 softmax 得门控权重. | 选择不可导, 梯度经门控回到路由器 ;; 没被选的专家没有梯度
+N activep | moe | 总参数与激活参数 | Total vs. Active Parameters | 05:s5-arch | 总参数决定显存, 激活参数决定每个 token 的计算量. | Mixtral 8x7B: 总 46.7B, 激活 12.9B ;; 注意力和嵌入只有一份 ;; 专家并行要 all-to-all 通信
+N balance | moe | 负载均衡 | Load Balancing | 05:s5-balance | 路由会坍缩到少数专家; 用容量上限、辅助均衡损失或按负载调的偏置来防止. | 辅助损失 E·Σ f_e P_e, 均匀时最小 ;; DeepSeek-V3 用偏置, 不加梯度
+N finegr | moe | 细粒度专家、共享专家与升级改造 | Fine-Grained and Shared Experts · Upcycling | 05:s5-variants | 把专家切细增加组合数, 共享专家存通用知识; 也可以从稠密模型复制 FFN 升级成 MoE. | 64 选 8 约 4.4 × 10⁹ 种组合 ;; 升级后起点就是原模型 ;; 稀疏度缩放定律
+N hardlex | moe | 硬词典与软词典 | Where Does Lexical Knowledge Live? | 05:s5-lex | 嵌入表是稀疏查找表 (硬词典); 模型在前中层另建一个大得多的软词典. | 嵌入在 mT5-Small 里占 85 % 参数 ;; 嵌入也是一种稀疏专家
+N byt5 | moe | ByT5 | ByT5 | 05:s5-byt5 | 去掉分词器, 直接读 UTF-8 字节, 省下的参数加深编码器. | 对噪声文本更鲁棒 ;; 序列长约 4 倍, 推理最多慢 10 倍
+N latenttok | moe | 潜在分词 | Tokenize Inside the Model | 05:s5-latent | 输入输出是字节, 小编码器把字节分组, 大模型处理组, 小解码器预测下一个字节. | 定边界: 固定大小、规则、学习、熵
+N blt | moe | Byte Latent Transformer | Byte Latent Transformer | 05:s5-blt | 用小字节模型的下一字节熵定块边界, 难预测处块小; 局部编码器、潜在 Transformer、局部解码器三部分. | 哈希 n 元组嵌入代替词表 ;; 块大小可调, 能换更大的潜在模型 ;; 拼写任务约是 Llama 3 的两倍
+N byteif | moe | 字节化 | Byteification | 05:s5-blt | 用训练好的 Llama 3.1 权重初始化潜在 Transformer, 再短暂训练. | 和升级改造同一思路 ;; 可用任务算术加回后训练能力
+
+E params > ffnkv | FFN 是参数最多的一块.
+E ffnkv > experts | 大部分记忆不激活, 就分组只算一部分.
+E experts > router | 由路由器决定算哪几个.
+E router > activep | 每个 token 只用 k 个专家.
+E router > balance | 没被选的专家拿不到梯度, 路由会坍缩.
+E experts > finegr | 专家的几种变体.
+E params > hardlex | 嵌入是另一大块参数.
+E hardlex > byt5 | 去掉硬词典.
+E bpe > byt5 | 不再用子词分词.
+E byt5 > latenttok | 字节太多太贵, 在内部分组.
+E latenttok > blt | 按熵定边界.
+E blt > byteif | 不从头训练.
+E finegr ~ byteif | 都复用训练好的稠密模型.
+E hardlex ~ experts | 嵌入查表也是一种稀疏专家.
+
+T expert |  |  | 专家 | moe | One of the E smaller FFNs in a MoE layer. | MoE 层里 E 个小 FFN 之一. |  | 05:s5-experts | Experte
+T router |  |  | 路由器 | moe | Linear layer that scores every expert for a token. | 给每个专家打分的线性层. |  | 05:s5-experts | Router
+T top-k routing |  |  | top-k 路由 | moe | Only the k highest-scoring experts are computed. | 只算得分最高的 k 个专家. |  | 05:s5-experts | Top-k
+T total parameters |  |  | 总参数 | moe | All parameters, which must fit in memory. | 全部参数, 决定显存. | active parameters | 05:s5-arch | Gesamtparameter
+T active parameters |  |  | 激活参数 | moe | Parameters used per token; determine the compute. | 每个 token 用到的参数, 决定计算量. | total parameters | 05:s5-arch | aktive Parameter
+T expert parallelism |  |  | 专家并行 | moe | Placing different experts on different GPUs. | 把不同专家放到不同 GPU 上. |  | 05:s5-arch | Expertenparallelität
+T upcycling |  |  | 升级改造 | moe | Initializing a MoE from a trained dense model by copying its FFN. | 复制稠密模型的 FFN 初始化 MoE. |  | 05:s5-variants | Upcycling
+
+M expert | experts
+M router | router
+M top-k routing | router
+M total parameters | activep
+M active parameters | activep
+M expert parallelism | activep
+M upcycling | finegr
+ZH 描述性名称 | FFN 作为键值记忆
+DE 描述性名称 (课件讲了内容, 标题写法不同: BYTEIFICIATION 是笔误) | Byteification; Router · Top-k

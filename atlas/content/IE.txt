@@ -188,7 +188,7 @@ T false discovery rate |  |  | 错误发现率 | eval | FP / (TP + FP), equal to
 T ROC curve |  |  | ROC 曲线 | eval | Curve of true positive rate against false positive rate over all thresholds. | 真阳性率对假阳性率. |  | 04:more | ROC
 T AUC |  |  | AUC | eval | Area under the ROC curve. | ROC 曲线下的面积. |  | 04:more
 T cosine similarity |  |  | 余弦相似度 | eval | How well the directions of two vectors agree. | 两个向量方向有多一致. |  | 04:more
-T gold standard |  |  | 金标准 | eval | Manually annotated reference data. | 人工标注的参考数据. |  | 04:learn | gold label
+T gold standard |  |  | 金标准 | eval | Manually annotated reference data. | 人工标注的参考数据. |  | 04:learn | gold label; Goldstandard
 T silver label |  |  | 银标签 | eval | Automatically produced, less reliable label. | 自动产生、不太可靠的标签. | gold standard | 06:eval
 T named entity |  |  | 命名实体 | rule | Real-world object such as a person, organisation, location or date. | 现实世界的对象. |  | 04:rule
 T rule-based NER |  |  | 基于规则的 NER | rule | Recognising named entities with hand-written or learned rules. | 用规则识别命名实体. |  | 04:rule | Rule-Based NER
@@ -250,3 +250,106 @@ M partial match | match
 M accuracy | acc
 M named entity | netypes
 M sliding window | window
+
+# ===== IE 07 · 线性模型与序列标注 (Alaçam, Week 5; 英语课件) 2026-11-13 =====
+B lin | 线性模型与序列标注 | Linear Models, Sequence Tagging | 稀疏特征向量和感知机, 怎样训练权重; 从二分类到多分类和 IOB 序列标注.
+
+N mlsteps | lin | 监督学习的基本步骤 | Basic supervised ML steps | 07:steps | 看清输入输出, 定任务类型, 设计和表示特征, 选模型, 在标注语料上训练, 再在测试集上测试. | 特征工程是其中一步 ;; 例子: 某个位置要不要插 <stime>
+N sparsefv | lin | 稀疏特征向量 | Feature Vector | 07:features | 用二值特征表示一个位置: 维数 = 位置数 × 词表大小, 但只有少数取 1. | 只记取 1 的特征 ;; 位置相对候选插入点算 | +1_lemma_4, +2_timeid
+N linscore | lin | 线性打分 | Linear model | 07:features | 每个特征值乘权重再相加, 加上偏置项; 写成特征向量和权重向量的点积. | 偏置 = 恒为 1 的特征 ;; 和线性回归、逻辑回归同形 | h = x · W
+N percep | lin | 感知机 | Perceptron | 07:perceptron | 加权和加偏置, 经阶跃函数输出 0 或 1; 点积大于 0 判为 true. | 最简单的神经网络 ;; 不是概率性的, 换成 sigmoid 就是逻辑回归
+N bias | lin | 偏置与决策边界 | Bias and decision boundary | 07:perceptron | 给恒为 1 的特征配权重, 就能移动决策边界; 偏置 −2 让「三个都开」才判 true. | 没有偏置时规则退化成「三者之一」 ;; 课件 ≥ 0 和 > 0 不一致 | 1 + 1 + 1 − 2 = 1 > 0
+N percrule | lin | 感知机更新规则 | Perceptron learning rule | 07:perceptron | 分对不动, 分错就把每个激活特征的权重朝正确方向调一小步. | W_j ← W_j + η (y − ŷ) x_j ;; 只调值为 1 的特征
+N costfn | lin | 代价函数与对数损失 | Cost function · log loss | 07:perceptron | 代价函数是各样本代价的平均; 对数损失比较 sigmoid 概率和真实标签. | 越有把握地判错损失越大 ;; h = 0.5, y = 1 时损失约 0.69
+N graddesc | lin | 梯度下降 | Gradient descent | 07:perceptron | 反复让每个权重减去学习率乘代价函数对它的导数, 直到收敛. | 导数是 (h − y) x_j ;; 误差连续, 分对但没把握也会调
+N lrate | lin | 学习率 | Learning rate | 07:training | 每步更新多大: 太低要很多步, 太高会跨过谷底来回震荡甚至发散. | 常在开发集上试几个值
+N traintest | lin | 训练与测试 | Learning the Weight Vector · Training | 07:training | 训练时有金标准, 自动调权重拟合训练语料; 测试时用同样的特征抽取, 点积决定, 再把标签写回原文. | 特征抽取必须和训练一致 ;; 训练误差低、测试误差高就是过拟合
+N linvsdt | lin | 线性模型与决策树 | Linear Models versus Decision Trees | 07:vsdt | 同样的特征下线性模型能表达的决策比决策树少, 正因为弱才不容易过拟合, NLP 常用. | 两条规则共四个特征时任意三个都会触发 ;; 用组合特征可以只编码想要的规则
+N featsel | lin | 特征选择 | Feature Selection | 07:vsdt | 自动寻找有用的特征组合: 试各种组合看误差. | 只看训练误差容易过拟合, 应看开发集
+N staticemb | lin | 静态词向量 | Static word embeddings | 07:embeddings | 每个词型一个在海量文本上学出的向量, 相似的词彼此靠近. | 一个词只有一个向量, 不能消歧 ;; 某一维可以相当于手工的 timeid | AM 和 PM 很近
+N ctxemb | lin | 上下文词向量 | Contextualized embeddings | 07:embeddings | 每次出现 (词元) 一个依赖整句上下文的向量. | river bank 和 bank account 不同 ;; 捕捉词性、义项、句法位置、语义角色 ;; bert-base 768 维
+N binmulti | lin | 二分类与多分类 | Binary versus Multiclass Classification | 07:multiclass | 只问有没有 <stime> 是二分类; 开始和结束都要标时, 训练两个分类器, 都说 true 取点积大的. | 推广到多个标签就是多分类
+N ova | lin | 一对其余 | One-against-all | 07:multiclass | 每个标签训练一个二分类器, 其余位置都是负例; 取点积最大的类. | notag 分类器在二分类时冗余, W_notag ≈ −W_stime ;; 其他: one-vs-one 投票
+N greedyseq | lin | 独立分类器与贪心解码 | Binary classifiers and sequences | 07:sequence | 两个独立的开始/结束分类器互不知情, 会出两个开始或超长实体; 贪心扫描只能保证成对. | 局部对全局 ;; 更好: 依赖前面的分类决定
+N prevlabel | lin | 前一个标签作特征 | Sequence Classification | 07:sequence | 加特征模板 −1_label_XXX 表示前一个位置的标签, 并让实体内部的标签和外面不同. | 训练时用金标准标签 (teacher forcing) ;; 测试时一步错会往后传 | −1_label_<stime>
+N iob | lin | IOB 标注 | IOB / BIO | 07:sequence | 实体第一个词元标 B-类型, 后续标 I-类型, 实体外标 O; 把抽取变成给每个词元分类. | n 个词元 n 个决定 ;; 有 B 才分得开紧挨着的两个实体 | 4 pm → B-stime I-stime
+N biewo | lin | BIEWO 标注 | BIEWO | 07:sequence | 在 IOB 上加 E (实体最后一个词元) 和 W (单词元实体). | 也叫 BIOES / BILOU ;; 明确结束位置, 代价是每类 4 个标签 | 4 → W-stime
+N spanmod | lin | 错误传播与基于片段的建模 | Span-based modeling | 07:sequence | 逐词元标注时一个词元分错整个实体就坏; 片段方法直接对 (起点, 终点) 分类. | 不会出现半个实体 ;; 候选片段 O(n²), 要限长度 | (0, 1, PERSON)
+N slotcrf | lin | BiLSTM-CRF 槽位填充 | Slot filling with LSTM and CRF | 07:sequence | 嵌入经双向 LSTM 得上下文表示, 最上层 CRF 在相邻标签间加连线, 整句一起找最好的标签序列. | 不是每个位置独立取最大 | San Francisco → B-DES I-DES
+
+E nerml > mlsteps | 上周把 NER 当分类, 这周换线性模型.
+E window > sparsefv | 上周的窗口特征变成稀疏向量.
+E mlsteps > sparsefv | 步骤里的特征表示.
+E sparsefv > linscore | 特征向量和权重向量做点积.
+E linscore > percep | 感知机用阈值把打分变成 0 或 1.
+E percep > bias | 偏置决定阈值的位置.
+E percep > percrule | 感知机的训练.
+E linscore > costfn | 打分经 sigmoid 后算损失.
+E costfn > graddesc | 梯度下降最小化代价函数.
+E percrule ~ graddesc | 都是「误差 × 特征值」, 误差一个离散一个连续.
+E graddesc > lrate | 学习率决定每步多大.
+E percrule > traintest | 训练就是反复更新权重.
+E dtree > linvsdt | 和上周的决策树比较.
+E percep > linvsdt | 比较的另一边.
+E overfit > linvsdt | 线性模型弱所以不易过拟合.
+E linvsdt > featsel | 用组合特征补足线性模型.
+E wordrep > staticemb | 词向量取代手工特征.
+E staticemb > ctxemb | 从词型向量到词元向量.
+E featsel ~ staticemb | 手工特征工程对学到的表示.
+E percep > binmulti | 一个感知机只能做二分类.
+E binmulti > ova | 用二分类器组合出多分类.
+E binmulti > greedyseq | 开始和结束两个分类器互相独立.
+E greedyseq > prevlabel | 让分类决定依赖前面的决定.
+E prevlabel > iob | 改成给每个词元标签.
+E iob > biewo | 加上结束和单词元标签.
+E iob > spanmod | 逐词元标注的缺点.
+E iob > slotcrf | 更复杂的序列模型做 IOB.
+
+T sparse vector |  |  | 稀疏向量 | lin | A vector in which almost all entries are zero. | 绝大多数分量为 0 的向量. |  | 07:features
+T weight vector |  |  | 权重向量 | lin | The vector W of feature weights. | 每个特征的权重组成的向量. | feature vector | 07:features | Gewichtsvektor
+T bias term |  |  | 偏置项 | lin | Constant term W₀, a feature that is always 1. | 常数项 W₀, 相当于恒为 1 的特征. |  | 07:features | bias; offset
+T perceptron |  |  | 感知机 | lin | The simplest neural network: weighted sum plus bias, then an activation function. | 最简单的神经网络: 加权和加偏置再经激活函数. |  | 07:perceptron | Perzeptron
+T step function |  |  | 阶跃函数 | lin | Activation that outputs 1 if the sum reaches the threshold, else 0. | 达到阈值输出 1, 否则 0 的激活函数. | sigmoid | 07:perceptron | Stufenfunktion
+T decision boundary |  |  | 决策边界 | lin | Where the classifier switches from false to true. | 分类器从 false 变成 true 的位置. |  | 07:perceptron | Entscheidungsgrenze
+T perceptron learning rule |  |  | 感知机更新规则 | lin | On an error, move the weights of active features a small step towards the correct class. | 分错时把激活特征的权重朝正确方向调一小步. | gradient descent | 07:perceptron | Perzeptron-Lernregel
+T dot product |  |  | 点积 | lin | Sum of the products of corresponding entries of two vectors. | 两个向量对应分量乘积之和. |  | 07:perceptron | Skalarprodukt
+T cost function |  |  | 代价函数 | lin | J(θ), the average cost over all training examples. | 所有训练样本代价的平均 J(θ). |  | 07:perceptron | Kostenfunktion
+T log loss |  |  | 对数损失 | lin | −[y log h + (1−y) log(1−h)]. | 比较预测概率和真实标签的损失. |  | 07:perceptron
+T gradient descent |  |  | 梯度下降 | lin | Repeatedly subtract the learning rate times the derivative of the cost. | 反复减去学习率乘代价函数的导数. | perceptron learning rule | 07:perceptron | Gradientenabstieg
+T learning rate |  |  | 学习率 | lin | Step size α of each update. | 每次更新的步长 α. |  | 07:training | Lernrate
+T feature selection |  |  | 特征选择 | lin | Automatically searching for useful (combined) features. | 自动寻找有用的 (组合) 特征. | feature engineering | 07:vsdt
+T static word embedding |  |  | 静态词向量 | lin | One fixed vector per word type, learned from large corpora. | 每个词型一个固定向量. | contextualized word embedding | 07:embeddings | statische Worteinbettung
+T contextualized word embedding |  |  | 上下文词向量 | lin | A different vector for each token, depending on the whole sentence. | 每个词元一个依赖整句的向量. | static word embedding | 07:embeddings | kontextualisierte Worteinbettung
+T binary classification |  |  | 二分类 | lin | Deciding between two classes, e.g. tag or no tag. | 在两个类之间做决定. | multiclass classification | 07:multiclass | binäre Klassifikation
+T multiclass classification |  |  | 多分类 | lin | Choosing one class from a set of classes. | 从一组类别里选一个. | binary classification | 07:multiclass | Mehrklassenklassifikation
+T one-against-all |  |  | 一对其余 | lin | One binary classifier per label; pick the label with the highest score. | 每个标签一个二分类器, 取得分最高的. | one-vs-one | 07:multiclass | one-vs-rest
+T sequence classification |  |  | 序列分类 | lin | Labelling every token of a sequence, using previous decisions. | 利用前面的决定给序列的每个词元标签. |  | 07:sequence | Sequenzklassifikation
+T IOB tagging |  |  | IOB 标注 | lin | B for the first token of an entity, I for the following ones, O outside. | 实体首词元 B, 后续 I, 实体外 O. | BIEWO | 07:sequence | IOB / BIO; BIO
+T BIEWO |  |  | BIEWO 标注 | lin | IOB plus E (last token) and W (single-token entity). | IOB 加上 E (末词元) 和 W (单词元实体). | IOB tagging | 07:sequence | BIOES; BILOU
+
+M sparse vector | sparsefv
+M weight vector | linscore
+M bias term | bias
+M perceptron | percep
+M step function | percep
+M decision boundary | bias
+M perceptron learning rule | percrule
+M dot product | linscore
+M cost function | costfn
+M log loss | costfn
+M gradient descent | graddesc
+M learning rate | lrate
+M feature selection | featsel
+M static word embedding | staticemb
+M contextualized word embedding | ctxemb
+M binary classification | binmulti
+M multiclass classification | binmulti
+M one-against-all | ova
+M sequence classification | prevlabel
+M IOB tagging | iob
+M BIEWO | biewo
+
+SKIP IE 07: 本讲小结和阅读清单, 内容已在各概念里 | In this lecture; Further reading
+DROP IE 07: 并入 金标准 / 引用别的课的概念, 本讲只作类比 | Hidden-Markov-Modell
+ZH 描述性名称 | BiLSTM-CRF 槽位填充; 前一个标签作特征; 独立分类器与贪心解码; 线性打分
+DE 描述性名称 (课件讲了内容, 没有这个标题) | Bias and decision boundary; Cost function · log loss; Learning rate; Perceptron learning rule; Slot filling with LSTM and CRF

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS103 23 · 不可解问题上</title>
+<style>
+  /* 同一门课沿用同目录已有笔记的整段 <style>；新课只改下面的颜色 token。 */
+  :root {
+    --bg: #1e1e12;
+    --ink: #ecede3;
+    --muted: #b5b59b;
+    --line: #4a4b30;
+    --card: #2b2b1a;
+    --code: #18180e;
+    --accent: #e1e481;
+    --chip: #3d3e23;
+    --zh: #2a2b17;
+    --add: #222318;
+    --add-line: #b5b686;
+    --warn: #2a1a1c;
+    --warn-line: #ff7b72;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16.5px/1.6 "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif;
+  }
+  header { position: static; background: transparent; border: 0; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 18px 22px 72px; }
+  header .wrap { padding-top: 18px; padding-bottom: 8px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 6px; font-weight: 650; }
+  h2 { font-size: 22px; margin: 44px 0 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+  h3 { font-size: 17px; margin: 24px 0 6px; }
+  h1 .de-title, h2 .de-title, h3 .de-title {
+    display: block; margin-top: 2px; color: var(--muted);
+    font-weight: 500; font-size: 0.92em; line-height: 1.35;
+  }
+  h1 .de-title { font-size: 0.62em; }
+  p { margin: 8px 0; }
+  .lede { color: var(--muted); margin: 0; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+  nav a {
+    color: var(--accent); text-decoration: none; background: var(--chip);
+    border-radius: 999px; padding: 3px 10px;
+    font: 13px/1.4 "ZH Latin", "PingFang SC", sans-serif;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 16px; margin: 12px 0;
+  }
+  .card p, .card li { margin: 4px 0; }
+  .de { position: relative; padding-top: 26px; }
+  .folie {
+    position: absolute; top: 7px; left: 16px;
+    font: 11.5px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); letter-spacing: .02em;
+  }
+  .de .def {
+    border-left: 3px solid var(--accent); padding: 4px 10px; margin: 6px 0;
+    background: var(--chip); border-radius: 0 8px 8px 0;
+  }
+  .zh {
+    background: var(--zh); border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .zh p { margin: 0 0 8px; }
+  .zh p:last-child, .zh ul:last-child, .zh ol:last-child { margin-bottom: 0; }
+  .add {
+    background: var(--add); border-left: 3px dashed var(--add-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .add::before { content: "补充（幻灯片之外）"; display: block; font-size: 12px; color: var(--add-line); font-weight: 600; margin-bottom: 4px; }
+  .add p { margin: 0 0 8px; }
+  .add p:last-child { margin-bottom: 0; }
+  .warn {
+    background: var(--warn); border-left: 3px solid var(--warn-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .vocab { font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14px; color: var(--muted); margin: 6px 0 2px; }
+  .vocab b { color: var(--ink); font-weight: 600; }
+  ul, ol { margin: 8px 0; padding-left: 1.3em; }
+  li { margin: 4px 0; }
+  ul ul { margin: 2px 0; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; margin: 12px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { font: 12px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); font-weight: 600; background: var(--chip); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  pre {
+    background: var(--code); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; overflow: auto; margin: 12px 0;
+    font: 13.5px/1.5 "SF Mono", ui-monospace, Menlo, monospace;
+  }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--chip); padding: 1px 5px; border-radius: 5px;
+  }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .src { color: var(--muted); font-size: 14px; }
+  blockquote { margin: 8px 0; padding: 4px 14px; border-left: 3px solid var(--line); font-style: italic; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 6px; }
+  .diagram { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .diagram > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14.5px; }
+  .diagram h4 { margin: 0 0 6px; font-size: 15px; }
+  @media (max-width: 560px) { .diagram { grid-template-columns: 1fr; } }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cols pre { margin: 0; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  /* ===== 前端细节优化 2026-10-16：只调排版与交互，不改内容和颜色 token ===== */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
+  p, li, a, code { overflow-wrap: break-word; }
+  [id] { scroll-margin-top: 16px; }
+  :focus-visible { outline: 2px solid var(--accent, var(--link)); outline-offset: 2px; border-radius: 4px; }
+  pre, .tablewrap { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  pre { tab-size: 4; }
+  .tablewrap { overflow-x: auto; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  @media print { pre, table, details, figure { break-inside: avoid; } h2, h3 { break-after: avoid; } }
+  ::selection { background: color-mix(in srgb, var(--accent, var(--link)) 35%, transparent); }
+  nav a { transition: background-color .15s ease, color .15s ease; }
+  nav a:hover { background: color-mix(in srgb, var(--accent, var(--link)) 22%, var(--chip, var(--paper))); }
+  details summary:hover { color: var(--accent, var(--link)); }
+  @media print { .card, .zh, .add, .warn, .de, .later, .vocab { break-inside: avoid; } }
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .wrap, header .wrap, main { padding-left: 16px; padding-right: 16px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    .card { padding-left: 12px; padding-right: 12px; }
+    .folie, .slide { left: 12px; }
+    .zh, .add, .warn { padding: 9px 12px; }
+    pre { padding: 10px 12px; font-size: 13px; }
+  }
+  /* ===== 排版统一层 v9（所有笔记共用；只管字体、尺寸、间距、对齐，不改颜色 token） ===== */
+  :root { --measure: 760px; --gutter: 24px; --serif: "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif; --sans: "ZH Latin", "PingFang SC", "Hiragino Sans GB", "Songti SC", sans-serif; --mono: "SF Mono", ui-monospace, Menlo, monospace; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { font: 16.5px/1.65 var(--serif); font-kerning: normal; }
+  /* 换行：中文按标点避头尾（strict），不用 balance / pretty（它们会在宽屏和手机上把中文行拆成一长一短、在词中间断开） */
+  body { line-break: strict; word-break: normal; overflow-wrap: break-word; font-feature-settings: "halt" 1; }
+  /* 中文讲解用英文标点（, . : ; ! ? ( )，由 scripts/zh_punct.py 转换）；剩下的「」、《》用 halt 压成半宽，不留大空白 */
+  pre, code, kbd, .katex { font-feature-settings: normal; }
+  /* 页首说明和副标题按「 · 」分段，只在段与段之间换行，不在一个段落中间断开 */
+  .seg, h1 .seg, h2 .seg, h3 .seg, .lede .seg { display: inline-block; margin: 0; font-size: inherit; font-weight: inherit; color: inherit; letter-spacing: inherit; }
+  p, li, td, th, dd, figcaption, summary, .lede { text-wrap: wrap; }
+  h1, h2, h3, h4 { text-wrap: wrap; word-break: keep-all; overflow-wrap: anywhere; }
+  /* 行内代码整体不拆行（bark() 不会断成 bark( / )）；只有页首、出处说明里的长文件名允许在放不下时断开 */
+  code { white-space: nowrap; }
+  .lede code, .src code, h1 code, h2 code, h3 code { white-space: normal; overflow-wrap: anywhere; }
+  td:first-child, th:first-child { min-width: 5em; }
+  /* 单元格内容不能断开的表（莫尔斯码之类）给 table 加 class="nowrap"，放不下就横向滚动（注释里不要写带尖括号的标签，wrap_tables.py 曾把它当成真表格） */
+  table.nowrap td, table.nowrap th { white-space: nowrap; text-wrap: nowrap; }
+  /* 代码块里的 code 跟随 pre 保留换行（上面的 nowrap 只给行内代码；漏了这条，多行代码会挤成一行） */
+  pre code { white-space: inherit; overflow-wrap: normal; word-break: normal; }
+  /* 长的行内代码（apply_typography.py 标 .lc，超过 24 个字符）在手机上放不下，允许在空格处换行，必要时任意处断开 */
+  code.lc { white-space: normal; overflow-wrap: anywhere; }
+  /* 版心：页首和正文同一列，左右对齐、整体居中 */
+  header .wrap, main.wrap, main { box-sizing: border-box; max-width: var(--measure); margin-left: auto; margin-right: auto; padding-left: var(--gutter); padding-right: var(--gutter); }
+  header .wrap { padding-top: 40px; padding-bottom: 8px; }
+  main.wrap, main { padding-top: 8px; padding-bottom: 96px; }
+  /* 标题层级 */
+  h1 { font-size: 28px; line-height: 1.3; font-weight: 650; margin: 0 0 4px; }
+  h1 .de-title, h1 > span { display: block; margin-top: 6px; font-size: 15px; line-height: 1.45; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  h2 { font-size: 22px; line-height: 1.35; font-weight: 650; margin: 56px 0 10px; padding-top: 16px; }
+  h2 .de-title { display: block; margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--muted); }
+  h3 { font-size: 17.5px; line-height: 1.45; font-weight: 650; margin: 32px 0 8px; }
+  h3 .de-title { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  h4 { font-size: 16px; margin: 24px 0 8px; }
+  /* 页首说明与导航 */
+  .lede { margin: 12px 0 0; font: 15.5px/1.65 var(--serif); color: var(--muted); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px 6px; margin: 18px 0 0; }
+  nav a { font: 12.5px/1.5 var(--sans); padding: 3px 11px; border-radius: 999px; text-decoration: none; }
+  /* 正文段落 */
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 1.4em; margin: 8px 0; }
+  li { margin: 4px 0; }
+  /* 原文卡片与各类框：统一宽度、圆角、内边距 */
+  .card { box-sizing: border-box; width: 100%; border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .card.de, .card.orig { padding-top: 30px; }
+  .folie, .slide { top: 9px; left: 18px; font: 11.5px/1.3 var(--sans); letter-spacing: .03em; }
+  .zh, .add, .warn, details.answer, .later { box-sizing: border-box; font: 15px/1.75 var(--sans); padding: 12px 16px; margin: 10px 0 6px; }
+  .zh p, .add p, .warn p, details.answer p { margin: 0 0 10px; }
+  .zh p:last-child, .add p:last-child, .warn p:last-child { margin-bottom: 0; }
+  .src { font: 14px/1.7 var(--sans); }
+  /* 居中元素：公式行、图、表格统一处理 */
+  p[style*="text-align:center"], p[style*="text-align: center"], .math-block { margin: 14px auto; text-align: center; font-size: 1.05em; }
+  figure, .src-fig { margin: 14px auto; text-align: center; }
+  /* 图注左对齐: 居中的两行图注第二行会孤零零缩在中间 */
+  figure figcaption, .src-fig figcaption { text-align: left; }
+  /* 图注按标点分句 (span.cs)，每行都在一个标点后结束，不在半句中间换行 */
+  figcaption .cs { display: inline-block; max-width: 100%; }
+  figure img, .src-fig img { display: block; margin: 0 auto; }
+  figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .tablewrap { width: 100%; overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; font: 14.5px/1.6 var(--sans); }
+  .card table, .tablewrap table { margin: 0; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 11px; }
+  td.num, th.num { text-align: right; }
+  /* 代码 */
+  pre { font: 13.5px/1.55 var(--mono); padding: 12px 16px; border-radius: 10px; margin: 12px 0; overflow-x: auto; tab-size: 4; }
+  code { font-family: var(--mono); font-size: .86em; }
+  pre code { font-size: inherit; }
+  .cols { gap: 12px; }
+  .cols > *, .pair > *, .card > *, .zh > *, details.answer > * { min-width: 0; }
+  img, video { max-width: 100%; height: auto; }
+  .katex svg { max-width: none; }
+  /* 折叠框 */
+  details > summary { font: 600 15px/1.5 var(--sans); }
+  /* 窄屏 */
+  @media (max-width: 600px) {
+    :root { --gutter: 16px; }
+    body { font-size: 16px; line-height: 1.65; }
+    header .wrap { padding-top: 24px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; margin-top: 44px; }
+    h3 { font-size: 17px; }
+    .card { padding-left: 13px; padding-right: 13px; }
+    .folie, .slide { left: 13px; }
+    .zh, .add, .warn, details.answer { padding: 10px 13px; font-size: 15px; line-height: 1.75; }
+    nav a { font-size: 12px; padding: 2px 9px; }
+    .cols { grid-template-columns: 1fr; }
+    /* 手机上表格列太窄时中文会一字一行（「需求分析」竖着排）：给单元格最小宽度，放不下就在 .tablewrap 里横向滚动 */
+    th, td { min-width: 4.5em; }
+    td.wide, th.wide { min-width: 9em; }
+  }
+  /* ===== /排版统一层 ===== */
+</style>
+<style id="oc-structure">
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) { list-style-position: inside; padding-left: 0; }
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) :is(ul, ol) { padding-left: 1.4em; }
+</style>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  .katex { font-size: 1.08em; }
+  .math-block { overflow-x: auto; overflow-y: hidden; margin: 10px 0; }
+  .math-block .katex-display { margin: 0.4em 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>不可解问题, 第一部分<br><span class="de-title">Unsolvable Problems, Part One</span></h1>
+    <nav>
+      <a href="#recap">本讲内容与回顾</a>
+      <a href="#selfdef">自我否定的对象</a>
+      <a href="#fortune">算命先生</a>
+      <a href="#loop">为什么程序会死循环</a>
+      <a href="#proof">综合起来: A_TM 不可判定</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<!-- ===== RECAP ===== -->
+<h2 id="recap" data-nav="回顾">本讲内容与回顾<br><span class="de-title">Outline for Today · Recap from Last Time</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 2</span>
+  <p><b>Outline for Today</b></p>
+  <ul>
+    <li>Self-Reference Revisited<ul><li>Programs that compute on themselves.</li></ul></li>
+    <li>Self-Defeating Objects<ul><li>Objects “too powerful” to exist.</li></ul></li>
+    <li>The Fortune Teller<ul><li>Can you escape your fate?</li></ul></li>
+    <li>Why Do Programs Loop?</li>
+    <li>Undecidable Problems<ul><li>Something beyond the reach of algorithms.</li></ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>这一讲是课程的高潮之一: 证明 \( A_{TM} \) (「图灵机 M 是否接受 w」) 不可判定. 铺垫有三步: 自指程序, 「自我否定的对象」(如最大的整数), 以及算命先生的故事. 重点是 trickster 程序的构造和整个反证法的逻辑.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 4–8</span>
+  <p><b>R and RE</b></p>
+  <ul>
+    <li>A language \( L \) is <b>recognizable</b> if there is a TM \( M \) with the following property: \( \forall w \in \Sigma^*.\ (M \text{ accepts } w \leftrightarrow w \in L) \).
+      <ul>
+        <li>That is, for any string \( w \): If \( w \in L \), then \( M \) accepts \( w \). If \( w \notin L \), them \( M \) does not accept \( w \). – It might reject \( w \), or it might loop on \( w \).</li>
+      </ul></li>
+    <li>This is a “weak” notion of solving a problem.</li>
+    <li>The class <b>RE</b> consists of all the recognizable languages.</li>
+    <li>A language \( L \) is <b>decidable</b> if there is a TM \( M \) with the following properties: \( M \) halts on all inputs. \( \forall w \in \Sigma^*.\ (M \text{ accepts } w \leftrightarrow w \in L) \). That is: If \( w \in L \), then \( M \) accepts \( w \). If \( w \notin L \), then \( M \) rejects \( w \).</li>
+    <li>This is a “strong” notion of solving a problem.</li>
+    <li>The class <b>R</b> consists of all the decidable languages.</li>
+  </ul>
+  <p><b>The Universal TM</b></p>
+  <ul>
+    <li>The universal Turing machine, denoted \( U_{TM} \), is a TM with the following behavior: when run on a string ⟨M, w⟩, where M is a TM and w is a string, \( U_{TM} \) will accept / reject / loop on ⟨M, w⟩ exactly as M does on w.</li>
+    <li>\( A_{TM} \) is the language recognized by the universal TM. This is the language
+      <p>\( A_{TM} = \{ \langle M, w\rangle \mid M \text{ is a TM and } M \text{ accepts } w \} \)</p></li>
+    <li>\( U_{TM} \) is a ??? for \( A_{TM} \). — \( U_{TM} \) is a recognizer for \( A_{TM} \).</li>
+  </ul>
+  <p><b>Self-Referential Programs</b>: <b>Theorem:</b> It is possible to construct TMs that perform arbitrary computations on their own source code.</p>
+</div>
+<div class="zh">
+  <p>复习: 可识别 (在 L 外可以拒绝或死循环) 与可判定 (总停机, L 外一定拒绝); RE 和 R; 通用图灵机 \( U_{TM} \) 是 \( A_{TM} \) 的<b>识别器</b>; 程序可以拿到自己的源代码. 详见 <a href="CS103-21-图灵机下.html">CS103 21</a> 和 <a href="CS103-22-图灵机三.html">CS103 22</a>.</p>
+</div>
+<div class="warn">
+  <p><b>原文笔误:</b> “If w ∉ L, them M does not accept w” 中 them 应为 then.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 10</span>
+  <pre data-lang="c">void cormorant() {
+    string me = /* source code of
+                 * cormorant
+                 */;
+    cout &lt;&lt; me &lt;&lt; endl;
+}
+
+bool curlew(string input) {
+    string me = /* source code of
+                 * curlew
+                 */;
+    return input == me;
+}
+
+int avocet() {
+    string me = /* source code of
+                 * avocet
+                 */;
+    int result = 0;
+    for (char ch: me) {
+        if (ch == 'a') result++;
+    }
+    return result;
+}</pre>
+  <p>What do each of these pieces of code do?</p>
+</div>
+<div class="zh">
+  <p>三个自指程序 (函数名都是水鸟: 鸬鹚、杓鹬、反嘴鹬):</p>
+  <ul>
+    <li>cormorant 打印自己的源代码, 是一个 quine.</li>
+    <li>curlew 判断输入是否等于自己的源代码, 只接受这一个串 (上一讲的 narcissist).</li>
+    <li>avocet 统计自己源代码里有多少个字母 a, 并返回这个数.</li>
+  </ul>
+</div>
+
+<!-- ===== SELFDEF ===== -->
+<h2 id="selfdef" data-nav="自我否定">自我否定的对象<br><span class="de-title">Part One: Self-Defeating Objects</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 13–16</span>
+  <p>A <b>self-defeating object</b> is an object whose essential properties ensure it doesn't exist.</p>
+  <p><b>Question:</b> Why is there no largest integer? <b>Answer:</b> Because if \( n \) is the largest integer, what happens when we look at \( n+1 \)?</p>
+  <p><b>Self-Defeating Objects</b></p>
+  <p><b>Theorem:</b> There is no largest integer.</p>
+  <p><b>Proof sketch:</b> Suppose for the sake of contradiction that there is a largest integer. Call that integer \( n \). Consider the integer \( n+1 \). Notice that \( n \lt n+1 \). But then \( n \) isn't the largest integer. Contradiction! ■-ish</p>
+  <p>We're using \( n \) to construct something that undermines \( n \), hence the term “self-defeating.”</p>
+</div>
+<div class="zh">
+  <p><b>self-defeating object</b> 自我否定的对象: 它的本质属性保证了它不可能存在. 经典例子是「最大的整数」: 假设 n 是最大的整数, 用它造出 n + 1, 比 n 还大, 矛盾. 关键在于用 n <b>本身</b>构造出推翻 n 的东西, 所以叫「自我否定」. 第 2 讲证明「不存在最大的集合」(用幂集) 也是这个套路.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 17–19</span>
+  <p><b>An Important Detail</b></p>
+  <p><b>Claim:</b> There is a largest integer.</p>
+  <p><b>Proof:</b> Assume \( x \) is the largest integer. Notice that \( x \gt x - 1 \). So there's no contradiction. ■-ish</p>
+  <p>Careful – we're assuming what we're trying to prove!</p>
+  <p>How do we know there's no contradiction? We just checked one case.</p>
+  <p><b>Self-Defeating Objects</b></p>
+  <ul>
+    <li>If you can show \( x \text{ exists} \to \bot \) then you know that \( x \) doesn't exist. (A proof by contradiction.)</li>
+    <li>If you can show \( x \text{ exists} \to \top \) you cannot conclude that \( x \) exists. (Not a valid proof technique.)</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>一个错误的「证明」: 「存在最大整数」, 假设 x 最大, 检查 x &gt; x − 1, 没有矛盾, 所以成立? 错在两处: 它假设了要证的东西; 「没发现矛盾」只是检查了一种情况, 不等于没有矛盾.</p>
+  <p>规则: 若「x 存在 → 矛盾 (⊥)」, 可以断定 x 不存在, 这是反证法. 若只得到「x 存在 → 某个真命题 (⊤)」, 不能断定 x 存在, 因为蕴含的前件可能是假的 (空真). 用逻辑说, \( P \to \top \) 永远为真, 什么也说明不了.</p>
+</div>
+
+<!-- ===== FORTUNE ===== -->
+<h2 id="fortune" data-nav="算命先生">算命先生<br><span class="de-title">Part Two: The Fortune Teller</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 21–23</span>
+  <p><b>The Fortune Teller</b></p>
+  <ul>
+    <li>A fortune teller appears who claims they can see into the future.</li>
+    <li>For a nominal fee, the fortune teller will tell you anything you want to know about the future.</li>
+    <li>Of course, the fortune teller is a lying liar who lies. No one can see the future!</li>
+    <li>The fortune teller makes a living taking money from unsuspecting townsfolk.</li>
+    <li>Someone needs to put an end to this!</li>
+  </ul>
+  <ul>
+    <li>One day, a trickster arrives.</li>
+    <li>The trickster wants to expose that the fortune teller is a fraud.</li>
+    <li>The trickster says the following:
+      <p>“I have a yes/no question about the future. But before I ask my question, let's talk payment. If you answer ‘yes,’ then I'll pay you $42. If you answer ‘no,’ then I'll pay you $137.”</p></li>
+    <li>The fortune teller thinks for a moment, then agrees.</li>
+    <li>The trickster then asks this question: “Am I going to pay you $137?”</li>
+    <li>The fortune teller is trapped!</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>故事: 一个算命先生声称能预知未来, 收费回答任何关于未来的问题 (当然是骗人的). 一个捣蛋鬼想揭穿他: 先约定付款方式, 回答「是」付 42 美元, 回答「否」付 137 美元; 然后问: 「我会付给你 137 美元吗?」</p>
+  <p>算命先生无论怎么答都错: 答「是」, 按约定只付 42, 那么「付 137」没发生, 答错; 答「否」, 按约定付 137, 「付 137」发生了, 又答错.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 24–25</span>
+  <p>The payment scheme the fortune teller agreed to means</p>
+  <p>Fortune Teller Says Yes ↔ Trickster Pays $42.</p>
+  <p>The trickster's question to the fortune teller means</p>
+  <p>Fortune Teller Says Yes ↔ Trickster Pays $137.</p>
+  <p>Putting this together, we get</p>
+  <p>Trickster Pays $137 ↔ Trickster Pays $42.</p>
+  <p>This is impossible!</p>
+  <ul>
+    <li>The fortune teller is a self-defeating object.</li>
+    <li>The trickster's strategy is to couple the fortune teller's behavior to what the future holds.</li>
+    <li>The trickster's behavior is chosen in advance to make the fortune teller's answer wrong.</li>
+    <li>Therefore, the fortune teller can't answer all questions about all people in the future.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>用逻辑写出来: 约定说「答是 ↔ 付 42」; 算命先生若总说真话, 问题要求「答是 ↔ 付 137」. 合起来「付 137 ↔ 付 42」, 但这两件事恰好只发生一件, 矛盾.</p>
+  <p>所以「能正确回答所有关于未来问题的算命先生」是自我否定的对象. 捣蛋鬼的策略: 让未来<b>依赖于</b>算命先生的回答, 并事先安排成与回答相反. 下面把它变成程序.</p>
+</div>
+<div class="add">
+  <p>同类的悖论还有很多: 说谎者悖论「这句话是假的」; 理发师悖论「村里的理发师只给所有不给自己理发的人理发, 那他给不给自己理发?」; 罗素悖论「所有不包含自身的集合组成的集合, 包含它自己吗?」. 它们的共同结构是: 一个对象对「自己」的某种判断取反. 在集合论里, 罗素悖论说明「所有集合的集合」这种东西不能随便存在; 在计算理论里, 同样的结构说明「能预言一切程序行为的程序」不能存在.</p>
+</div>
+
+<!-- ===== LOOP ===== -->
+<h2 id="loop" data-nav="为什么会死循环">为什么程序会死循环<br><span class="de-title">Part Three: Why Do Programs Loop?</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 27–28</span>
+  <p><b>Thoughts on Loops</b></p>
+  <ul>
+    <li>In practice, the programs we write sometimes go into infinite loops.</li>
+    <li>In Theoryland, Turing machines are allowed to loop. This happens if they don't accept and don't reject.</li>
+    <li><b>Question:</b> Why are infinite loops possible?</li>
+    <li>Or rather: are infinite loops an inherent part of computation, or are they some weird sort of “accident” in how we program computers?</li>
+  </ul>
+  <p><b>[Major] Theorem:</b> The language \( A_{TM} \) is recognizable, but undecidable.</p>
+  <ul>
+    <li>There's a recognizer for \( A_{TM} \) (specifically, the universal Turing machine \( U_{TM} \)).</li>
+    <li>It is impossible to build a decider for this language.</li>
+    <li>Stated differently, there's a program we can write (a universal TM) that has to loop infinitely on some inputs.</li>
+    <li><b>Goal:</b> Prove this theorem, and explore its theoretical and philosophical implications.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>实际编程中程序有时会死循环, 理论上图灵机也允许死循环. 问题: 死循环是计算固有的, 还是编程方式的「意外」? 能不能设计一种总会停机、又和图灵机一样强的模型?</p>
+  <p>重大定理: \( A_{TM} \) 可识别 (\( U_{TM} \) 就是识别器), 但<b>不可判定</b>. 换句话说, 通用图灵机这个程序<b>不可避免</b>地要在某些输入上死循环, 无法改进成总会停机的版本. 死循环是计算的本质, 不是意外.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 29–31</span>
+  <p><b>\( A_{TM} \) Revisited</b></p>
+  <ul>
+    <li>As a refresher, the language \( A_{TM} \) is \( A_{TM} = \{ \langle M, w\rangle \mid M \text{ is a TM and } M \text{ accepts } w \} \).</li>
+    <li>The universal TM \( U_{TM} \) has the following behavior when given as input a TM M and a string w: If M accepts w, then \( U_{TM} \) accepts ⟨M, w⟩. If M rejects w, then \( U_{TM} \) rejects ⟨M, w⟩. If M loops on w, then \( U_{TM} \) loops on ⟨M, w⟩.</li>
+    <li>\( U_{TM} \) is a recognizer for \( A_{TM} \), but because of that last case it's not a decider for \( A_{TM} \).</li>
+  </ul>
+  <p>Given a TM M and a string w, a decider D for \( A_{TM} \) would need to have this behavior: If M accepts w, then D accepts ⟨M, w⟩. If M rejects w, then D <b>rejects</b> ⟨M, w⟩. If M loops on w, then D <b>rejects</b> ⟨M, w⟩.</p>
+  <p>This is basically the same set of requirements as \( U_{TM} \), except for what happens if M loops on w. Our goal is to prove that there is no way to build a program that meets these requirements.</p>
+  <p>We can envision a decider for \( A_{TM} \) as a function <code>bool willAccept(string fn, string input)</code> that takes as input the source code of a function (fn) and a string representing an input to that function (input). It then does the following:</p>
+  <ul>
+    <li>If fn(input) returns true, willAccept(fn, input) returns true.</li>
+    <li>If fn(input) returns false, willAccept(fn, input) returns false.</li>
+    <li>If fn(input) loops, then willAccept(fn, input) returns false.</li>
+  </ul>
+  <p>We're going to show it's impossible to write a function that actually does this. But for now, let's just explore what such a decider would do.</p>
+</div>
+<div class="zh">
+  <p>\( U_{TM} \) 不是判定器, 原因只在第三种情况: M 在 w 上死循环时它也死循环. 判定器 D 要求在这种情况下<b>拒绝</b>. 课堂投票的两个问号都是「rejects」.</p>
+  <p>用程序语言表述: 假想一个函数 willAccept(fn, input), 输入一个函数的源代码和一个输入, fn(input) 返回 true 时它返回 true, 返回 false 或死循环时它返回 false, 而且它自己总会停. 目标是证明这样的函数写不出来.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 32</span>
+  <pre data-lang="c">function = "bool f(string input) {
+    if (input == "") return false;
+    return input[0] == 'a';
+}";
+input = "abbababba";
+willAccept(function, input) = ?</pre>
+  <pre data-lang="c">function = "bool g(string input) {
+    while (true) {
+        input += input;
+    }
+}";
+input = "yay! ";
+willAccept(function, input) = ?</pre>
+  <pre data-lang="c">function = "bool h(string input) {
+    int n = input.length();
+    while (n &gt; 1) {
+        if (n % 2 == 0) n /= 2;
+        else n = 3*n + 1;
+    }
+    return true;
+}";
+input = /* 10^137 a's */;
+willAccept(function, input) = ?</pre>
+  <p>For each of these instances, what does willAccept(function, input) return?</p>
+</div>
+<div class="zh">
+  <p>三个例子:</p>
+  <ul>
+    <li>f 判断首字符是否为 a, "abbababba" 首字符是 a, f 返回 true, 所以 willAccept 返回 <b>true</b>.</li>
+    <li>g 永远循环 (不断把输入翻倍), 所以 willAccept 返回 <b>false</b> (判定器要在这里停下并说 false, 这正是 \( U_{TM} \) 做不到的).</li>
+    <li>h 对输入长度 n = \( 10^{137} \) 跑冰雹序列, 终止就返回 true. 用 Python 实际计算, 这个序列 2208 步后到达 1, 所以 willAccept 返回 <b>true</b>. 但 willAccept 不能靠「运行一下」来判断, 一般情形下它必须事先知道序列是否终止.</li>
+  </ul>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 33–35</span>
+  <p><b>Deciding \( A_{TM} \)</b></p>
+  <p>Surprising fact: until 2019, no one knew whether there were integers \( x \), \( y \), and \( z \) where \( x^3 + y^3 + z^3 = 33 \). A heavily optimized computer search found this answer: \( x = 8{,}866{,}128{,}975{,}287{,}528 \), \( y = -8{,}778{,}405{,}442{,}862{,}239 \), \( z = -2{,}736{,}111{,}468{,}807{,}040 \). As of May 2025, no one knows whether there are integers \( x \), \( y \), and \( z \) where \( x^3 + y^3 + z^3 = 114 \).</p>
+  <p>Here's code for a recognizer to see whether such a triple exists:</p>
+  <pre data-lang="c">bool hasTriple(int n) {
+    for (int max = 0; ; max++)
+        for (int x = -max; x &lt;= max; x++)
+            for (int y = -max; y &lt;= max; y++)
+                for (int z = -max; z &lt;= max; z++)
+                    if (x*x*x + y*y*y + z*z*z == n)
+                        return true;
+}</pre>
+  <p>Imagine calling willAccept(/* hasTriple code */, 114). If such a triple exists, willAccept returns true. If no such triple exists, willAccept returns false.</p>
+  <p><b>Key Intuition:</b> However willAccept is implemented, it has to be clever enough to resolve open problems in mathematics!</p>
+  <p><b>Why is \( A_{TM} \) Hard?</b></p>
+  <ul>
+    <li>Intuition: A decider for \( A_{TM} \) would be able to…
+      <ul>
+        <li>… solve the Collatz conjecture for any input. (Write a recognizer that runs the hailstone sequence, then feed it into the decider for \( A_{TM} \).)</li>
+        <li>… determine whether \( x^3 + y^3 + z^3 = n \) has a solution for any \( n \). (Write a recognizer that tries all infinitely many triples of integers, then feed it into the decider for \( A_{TM} \).)</li>
+      </ul></li>
+    <li>In other words, this seemingly simple problem of “is this program going to terminate?” accidentally scoops up a bunch of other seemingly harder problems.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>直觉上 \( A_{TM} \) 为什么难: 把上一讲的立方和识别器 hasTriple 交给 willAccept, 问它在 114 上是否返回 true, 就等于问「114 能否写成三个立方之和」, 这是未解决的数学问题. 同样, 把冰雹序列程序交给它, 就能对任何 n 判断考拉兹猜想. 所以 willAccept 必须聪明到能解决这些开放问题.</p>
+  <p>「这个程序会不会终止」看似简单, 却「顺带」包含了大量困难的数学问题. 这让人怀疑它根本不可能实现, 下面给出证明.</p>
+  <p>注意论证的方向: 这只是「直觉上难」, 不是证明. 一个问题能推出难题的答案, 说明它<b>至少</b>和那些难题一样难, 但那些难题本身也许有一天会被解决 (33 的立方和就在 2019 年被解决了). 真正的不可判定性需要下面的自指论证.</p>
+</div>
+
+<!-- ===== PROOF ===== -->
+<h2 id="proof" data-nav="不可判定性证明">综合起来: A_TM 不可判定<br><span class="de-title">Part Four: Putting It All Together</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 37–41</span>
+  <p><b>To Recap</b></p>
+  <ul>
+    <li>We're assuming that, somehow, someone wrote a function <code>bool willAccept(string function, string input);</code> that takes the code of a function and an input to that function, then
+      <ul><li>returns true if function(input) returns true, and</li><li>returns false if function(input) doesn't return true.</li></ul></li>
+    <li><b>Goal:</b> Show that this decider is “self-defeating;” its power is so great that it undermines itself.</li>
+    <li><b>Idea:</b> Convert the fortune teller story into a program.</li>
+  </ul>
+  <pre data-lang="c">bool willAccept(string function, string input) {
+    // Returns true if function(input) returns true.
+    // Returns false otherwise.
+}
+
+bool trickster(string input) {
+    string me = /* source code of trickster */;
+    return !willAccept(me, input);
+}</pre>
+  <p>A decider for \( A_{TM} \) has to have this behavior: trickster(input) returns true ⟷ willAccept(me, input) returns true.</p>
+  <p>Because of how we wrote trickster: willAccept(me, input) returns true ⟷ trickster(input) does not return true.</p>
+  <p>willAccept — A self-defeating object. — “The largest integer n.” trickster — Using that object against itself. — “The integer n + 1.”</p>
+</div>
+<div class="zh">
+  <p>把算命先生的故事写成程序. willAccept 是「算命先生」, 能预言任何程序在任何输入上会不会返回 true. trickster 是「捣蛋鬼」:</p>
+  <ol>
+    <li>它拿到自己的源代码 me (上一讲的自指能力).</li>
+    <li>它问 willAccept: 「我 (trickster) 在这个输入上会返回 true 吗?」</li>
+    <li>然后返回相反的答案.</li>
+  </ol>
+  <p>两条等价关系: 由 willAccept 的定义, trickster(input) 返回 true ⟷ willAccept(me, input) 返回 true; 由 trickster 的写法, willAccept(me, input) 返回 true ⟷ trickster(input) 不返回 true. 对应关系: willAccept 是「最大的整数 n」这种自我否定的对象, trickster 是用它构造出的「n + 1」.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 42–53</span>
+  <p><b>Theorem:</b> \( A_{TM} \notin \mathbf{R} \).</p>
+  <p><b>Proof:</b> By contradiction; assume that \( A_{TM} \in \mathbf{R} \). Then there is a decider D for \( A_{TM} \). We can represent D as a function</p>
+  <pre data-lang="c">bool willAccept(string function, string w);</pre>
+  <p>that takes in the source code of a function function and a string w, then returns true if function(w) returns true and returns false otherwise. Given this, consider this function trickster:</p>
+  <pre data-lang="c">bool trickster(string input) {
+    string me = /* source code of trickster */;
+    return !willAccept(me, input);
+}</pre>
+  <p>Since willAccept decides \( A_{TM} \) and me holds the source of trickster, we know that</p>
+  <p>willAccept(me, input) returns true if and only if trickster(input) returns true.</p>
+  <p>Given how trickster is written, we see that</p>
+  <p>willAccept(me, input) returns true if and only if trickster(input) doesn't return true.</p>
+  <p>This means that</p>
+  <p>trickster(input) returns true if and only if trickster(input) doesn't return true.</p>
+  <p>This is impossible. We've reached a contradiction, so our assumption was wrong and \( A_{TM} \) is undecidable. \( \blacksquare \)</p>
+</div>
+<div class="zh">
+  <p>正式证明的结构:</p>
+  <ol>
+    <li>反设 \( A_{TM} \) 可判定, 则有判定器, 写成函数 willAccept, 它总会返回, 而且答案正确.</li>
+    <li>构造 trickster. 注意 trickster 一定会停机: willAccept 总会返回, 取反后返回.</li>
+    <li>由判定器的正确性: willAccept(me, input) 为 true 当且仅当 trickster(input) 返回 true.</li>
+    <li>由 trickster 的写法: willAccept(me, input) 为 true 当且仅当 trickster(input) 不返回 true.</li>
+    <li>两式合并: trickster(input) 返回 true 当且仅当它不返回 true. 矛盾.</li>
+  </ol>
+  <p>所以判定器不存在, \( A_{TM} \) 不可判定. 这和康托尔定理的对角线论证 (CS103 08) 结构相同: 对角集合 D 是「x ∉ f(x)」, trickster 是「对自己的预言取反」.</p>
+</div>
+<div class="add">
+  <p>也可以按情况直接看矛盾. 任取一个输入 x, willAccept(me, x) 总会返回, 只有两种可能:</p>
+  <ul>
+    <li>若它返回 true, 意思是「trickster(x) 会返回 true」. 但 trickster 取反后返回 false. 预言错了.</li>
+    <li>若它返回 false, 意思是「trickster(x) 不会返回 true」. 但 trickster 取反后返回 true. 又错了.</li>
+  </ul>
+  <p>无论 willAccept 怎样实现, 都会在 trickster 上答错, 所以它不是 \( A_{TM} \) 的判定器. 这就是算命先生被问「我会付你 137 吗」时的处境.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 54–55</span>
+  <p class="src">(图: Regular Languages ⊂ CFLs ⊂ R ⊊ RE ⊂ All Languages.)</p>
+  <p><b>What Does This Mean?</b></p>
+  <ul>
+    <li>In one fell swoop, we've proven that
+      <ul>
+        <li>\( A_{TM} \) is <b>undecidable</b>; there is no general algorithm that can determine whether a TM will accept a string.</li>
+        <li>\( \mathbf{R} \ne \mathbf{RE} \), because \( A_{TM} \notin \mathbf{R} \) but \( A_{TM} \in \mathbf{RE} \).</li>
+      </ul></li>
+    <li>What do these three statements really mean? As in, why should you care?</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>一举证明了两件事: \( A_{TM} \) <b>undecidable</b> 不可判定, 没有通用算法能判断图灵机是否接受给定的串; 以及 R ≠ RE, 因为 \( A_{TM} \) 在 RE 中却不在 R 中. 上一讲的两种图景里, 正确的是 R 严格小于 RE.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 56–60</span>
+  <p><b>\( A_{TM} \notin \mathbf{R} \)</b></p>
+  <ul>
+    <li>What exactly does it mean for \( A_{TM} \) to be undecidable?</li>
+    <li><b>Intuition:</b> The only general way to find out what a program will do is to run it.</li>
+    <li>As you'll see, this means that it's provably impossible for computers to be able to answer most questions about what a program will do.</li>
+  </ul>
+  <ul>
+    <li>At a more fundamental level, the existence of undecidable problems tells us the following:
+      <p><b>There is a difference between what is true and what we can discover is true.</b></p></li>
+    <li>Given a TM M and a string w, one of these two statements is true: M accepts w / M does not accept w</li>
+    <li>But since \( A_{TM} \) is undecidable, there is no algorithm that can always determine which of these statements is true!</li>
+  </ul>
+  <p><b>\( \mathbf{R} \ne \mathbf{RE} \)</b></p>
+  <ul>
+    <li>Because \( \mathbf{R} \ne \mathbf{RE} \), there is a difference between decidability and recognizability:
+      <p>In some sense, it is fundamentally harder to solve a problem than it is to check an answer.</p></li>
+    <li>There are problems where, when the answer is “yes,” you can confirm it (run a recognizer), but where if you don't have the answer, you can't come up with it in a mechanical way (build a decider).</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>含义一 (\( A_{TM} \notin \) R): 想知道一个程序会做什么, 一般只能运行它. 下一讲会看到, 关于程序行为的大多数问题都无法由计算机回答.</p>
+  <p>含义二: <b>真</b>和<b>能被发现为真</b>之间有差别. 对任何 M 和 w, 「M 接受 w」和「M 不接受 w」恰有一个为真, 但没有算法总能告诉我们是哪一个.</p>
+  <p>含义三 (R ≠ RE): 某种意义上, <b>解决问题</b>比<b>验证答案</b>本质上更难. 有些问题, 答案为「是」时能确认, 但不知道答案时无法机械地算出来.</p>
+</div>
+<div class="add">
+  <p>和 \( A_{TM} \) 密切相关的是著名的 <b>halting problem</b> 停机问题: 给定程序和输入, 判断它是否会停机. 用同样的 trickster 思路 (问「我会停机吗」, 会停就故意死循环, 不会停就立刻返回) 可以证明它也不可判定. 下一讲会看到它和更多「实际」问题的联系, 比如自动检查程序有没有死循环或安全漏洞的工具, 都不可能对所有程序都给出正确答案.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 61</span>
+  <p><b>Next Time</b></p>
+  <ul>
+    <li><b>Why All This Matters</b><ul><li>Important, practical, undecidable problems.</li></ul></li>
+    <li><b>Intuiting RE</b><ul><li>What exactly is the class RE all about?</li></ul></li>
+    <li><b>Verifiers</b><ul><li>A totally different perspective on problem solving.</li></ul></li>
+    <li><b>Beyond RE</b><ul><li>Finding an impossible problem using very familiar techniques.</li></ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>下一讲: 实际中重要的不可判定问题 (停机问题等); RE 的直观含义; 验证器这一新视角; 以及用熟悉的方法找到连 RE 都不属于的问题.</p>
+</div>
+
+</main>
+<script data-goatcounter="https://yikesyellowpharmakon.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

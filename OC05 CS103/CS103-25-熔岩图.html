@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS103 25 · 熔岩图</title>
+<style>
+  /* 同一门课沿用同目录已有笔记的整段 <style>；新课只改下面的颜色 token。 */
+  :root {
+    --bg: #1e1e12;
+    --ink: #ecede3;
+    --muted: #b5b59b;
+    --line: #4a4b30;
+    --card: #2b2b1a;
+    --code: #18180e;
+    --accent: #e1e481;
+    --chip: #3d3e23;
+    --zh: #2a2b17;
+    --add: #222318;
+    --add-line: #b5b686;
+    --warn: #2a1a1c;
+    --warn-line: #ff7b72;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16.5px/1.6 "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif;
+  }
+  header { position: static; background: transparent; border: 0; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 18px 22px 72px; }
+  header .wrap { padding-top: 18px; padding-bottom: 8px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 6px; font-weight: 650; }
+  h2 { font-size: 22px; margin: 44px 0 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+  h3 { font-size: 17px; margin: 24px 0 6px; }
+  h1 .de-title, h2 .de-title, h3 .de-title {
+    display: block; margin-top: 2px; color: var(--muted);
+    font-weight: 500; font-size: 0.92em; line-height: 1.35;
+  }
+  h1 .de-title { font-size: 0.62em; }
+  p { margin: 8px 0; }
+  .lede { color: var(--muted); margin: 0; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+  nav a {
+    color: var(--accent); text-decoration: none; background: var(--chip);
+    border-radius: 999px; padding: 3px 10px;
+    font: 13px/1.4 "ZH Latin", "PingFang SC", sans-serif;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 16px; margin: 12px 0;
+  }
+  .card p, .card li { margin: 4px 0; }
+  .de { position: relative; padding-top: 26px; }
+  .folie {
+    position: absolute; top: 7px; left: 16px;
+    font: 11.5px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); letter-spacing: .02em;
+  }
+  .de .def {
+    border-left: 3px solid var(--accent); padding: 4px 10px; margin: 6px 0;
+    background: var(--chip); border-radius: 0 8px 8px 0;
+  }
+  .zh {
+    background: var(--zh); border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .zh p { margin: 0 0 8px; }
+  .zh p:last-child, .zh ul:last-child, .zh ol:last-child { margin-bottom: 0; }
+  .add {
+    background: var(--add); border-left: 3px dashed var(--add-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .add::before { content: "补充（幻灯片之外）"; display: block; font-size: 12px; color: var(--add-line); font-weight: 600; margin-bottom: 4px; }
+  .add p { margin: 0 0 8px; }
+  .add p:last-child { margin-bottom: 0; }
+  .warn {
+    background: var(--warn); border-left: 3px solid var(--warn-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .vocab { font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14px; color: var(--muted); margin: 6px 0 2px; }
+  .vocab b { color: var(--ink); font-weight: 600; }
+  ul, ol { margin: 8px 0; padding-left: 1.3em; }
+  li { margin: 4px 0; }
+  ul ul { margin: 2px 0; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; margin: 12px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { font: 12px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); font-weight: 600; background: var(--chip); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  pre {
+    background: var(--code); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; overflow: auto; margin: 12px 0;
+    font: 13.5px/1.5 "SF Mono", ui-monospace, Menlo, monospace;
+  }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--chip); padding: 1px 5px; border-radius: 5px;
+  }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .src { color: var(--muted); font-size: 14px; }
+  blockquote { margin: 8px 0; padding: 4px 14px; border-left: 3px solid var(--line); font-style: italic; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 6px; }
+  .diagram { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .diagram > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14.5px; }
+  .diagram h4 { margin: 0 0 6px; font-size: 15px; }
+  @media (max-width: 560px) { .diagram { grid-template-columns: 1fr; } }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cols pre { margin: 0; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  /* ===== 前端细节优化 2026-10-16：只调排版与交互，不改内容和颜色 token ===== */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
+  p, li, a, code { overflow-wrap: break-word; }
+  [id] { scroll-margin-top: 16px; }
+  :focus-visible { outline: 2px solid var(--accent, var(--link)); outline-offset: 2px; border-radius: 4px; }
+  pre, .tablewrap { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  pre { tab-size: 4; }
+  .tablewrap { overflow-x: auto; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  @media print { pre, table, details, figure { break-inside: avoid; } h2, h3 { break-after: avoid; } }
+  ::selection { background: color-mix(in srgb, var(--accent, var(--link)) 35%, transparent); }
+  nav a { transition: background-color .15s ease, color .15s ease; }
+  nav a:hover { background: color-mix(in srgb, var(--accent, var(--link)) 22%, var(--chip, var(--paper))); }
+  details summary:hover { color: var(--accent, var(--link)); }
+  @media print { .card, .zh, .add, .warn, .de, .later, .vocab { break-inside: avoid; } }
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .wrap, header .wrap, main { padding-left: 16px; padding-right: 16px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    .card { padding-left: 12px; padding-right: 12px; }
+    .folie, .slide { left: 12px; }
+    .zh, .add, .warn { padding: 9px 12px; }
+    pre { padding: 10px 12px; font-size: 13px; }
+  }
+  /* ===== 排版统一层 v9（所有笔记共用；只管字体、尺寸、间距、对齐，不改颜色 token） ===== */
+  :root { --measure: 760px; --gutter: 24px; --serif: "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif; --sans: "ZH Latin", "PingFang SC", "Hiragino Sans GB", "Songti SC", sans-serif; --mono: "SF Mono", ui-monospace, Menlo, monospace; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { font: 16.5px/1.65 var(--serif); font-kerning: normal; }
+  /* 换行：中文按标点避头尾（strict），不用 balance / pretty（它们会在宽屏和手机上把中文行拆成一长一短、在词中间断开） */
+  body { line-break: strict; word-break: normal; overflow-wrap: break-word; font-feature-settings: "halt" 1; }
+  /* 中文讲解用英文标点（, . : ; ! ? ( )，由 scripts/zh_punct.py 转换）；剩下的「」、《》用 halt 压成半宽，不留大空白 */
+  pre, code, kbd, .katex { font-feature-settings: normal; }
+  /* 页首说明和副标题按「 · 」分段，只在段与段之间换行，不在一个段落中间断开 */
+  .seg, h1 .seg, h2 .seg, h3 .seg, .lede .seg { display: inline-block; margin: 0; font-size: inherit; font-weight: inherit; color: inherit; letter-spacing: inherit; }
+  p, li, td, th, dd, figcaption, summary, .lede { text-wrap: wrap; }
+  h1, h2, h3, h4 { text-wrap: wrap; word-break: keep-all; overflow-wrap: anywhere; }
+  /* 行内代码整体不拆行（bark() 不会断成 bark( / )）；只有页首、出处说明里的长文件名允许在放不下时断开 */
+  code { white-space: nowrap; }
+  .lede code, .src code, h1 code, h2 code, h3 code { white-space: normal; overflow-wrap: anywhere; }
+  td:first-child, th:first-child { min-width: 5em; }
+  /* 单元格内容不能断开的表（莫尔斯码之类）给 table 加 class="nowrap"，放不下就横向滚动（注释里不要写带尖括号的标签，wrap_tables.py 曾把它当成真表格） */
+  table.nowrap td, table.nowrap th { white-space: nowrap; text-wrap: nowrap; }
+  /* 代码块里的 code 跟随 pre 保留换行（上面的 nowrap 只给行内代码；漏了这条，多行代码会挤成一行） */
+  pre code { white-space: inherit; overflow-wrap: normal; word-break: normal; }
+  /* 长的行内代码（apply_typography.py 标 .lc，超过 24 个字符）在手机上放不下，允许在空格处换行，必要时任意处断开 */
+  code.lc { white-space: normal; overflow-wrap: anywhere; }
+  /* 版心：页首和正文同一列，左右对齐、整体居中 */
+  header .wrap, main.wrap, main { box-sizing: border-box; max-width: var(--measure); margin-left: auto; margin-right: auto; padding-left: var(--gutter); padding-right: var(--gutter); }
+  header .wrap { padding-top: 40px; padding-bottom: 8px; }
+  main.wrap, main { padding-top: 8px; padding-bottom: 96px; }
+  /* 标题层级 */
+  h1 { font-size: 28px; line-height: 1.3; font-weight: 650; margin: 0 0 4px; }
+  h1 .de-title, h1 > span { display: block; margin-top: 6px; font-size: 15px; line-height: 1.45; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  h2 { font-size: 22px; line-height: 1.35; font-weight: 650; margin: 56px 0 10px; padding-top: 16px; }
+  h2 .de-title { display: block; margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--muted); }
+  h3 { font-size: 17.5px; line-height: 1.45; font-weight: 650; margin: 32px 0 8px; }
+  h3 .de-title { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  h4 { font-size: 16px; margin: 24px 0 8px; }
+  /* 页首说明与导航 */
+  .lede { margin: 12px 0 0; font: 15.5px/1.65 var(--serif); color: var(--muted); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px 6px; margin: 18px 0 0; }
+  nav a { font: 12.5px/1.5 var(--sans); padding: 3px 11px; border-radius: 999px; text-decoration: none; }
+  /* 正文段落 */
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 1.4em; margin: 8px 0; }
+  li { margin: 4px 0; }
+  /* 原文卡片与各类框：统一宽度、圆角、内边距 */
+  .card { box-sizing: border-box; width: 100%; border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .card.de, .card.orig { padding-top: 30px; }
+  .folie, .slide { top: 9px; left: 18px; font: 11.5px/1.3 var(--sans); letter-spacing: .03em; }
+  .zh, .add, .warn, details.answer, .later { box-sizing: border-box; font: 15px/1.75 var(--sans); padding: 12px 16px; margin: 10px 0 6px; }
+  .zh p, .add p, .warn p, details.answer p { margin: 0 0 10px; }
+  .zh p:last-child, .add p:last-child, .warn p:last-child { margin-bottom: 0; }
+  .src { font: 14px/1.7 var(--sans); }
+  /* 居中元素：公式行、图、表格统一处理 */
+  p[style*="text-align:center"], p[style*="text-align: center"], .math-block { margin: 14px auto; text-align: center; font-size: 1.05em; }
+  figure, .src-fig { margin: 14px auto; text-align: center; }
+  /* 图注左对齐: 居中的两行图注第二行会孤零零缩在中间 */
+  figure figcaption, .src-fig figcaption { text-align: left; }
+  /* 图注按标点分句 (span.cs)，每行都在一个标点后结束，不在半句中间换行 */
+  figcaption .cs { display: inline-block; max-width: 100%; }
+  figure img, .src-fig img { display: block; margin: 0 auto; }
+  figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .tablewrap { width: 100%; overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; font: 14.5px/1.6 var(--sans); }
+  .card table, .tablewrap table { margin: 0; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 11px; }
+  td.num, th.num { text-align: right; }
+  /* 代码 */
+  pre { font: 13.5px/1.55 var(--mono); padding: 12px 16px; border-radius: 10px; margin: 12px 0; overflow-x: auto; tab-size: 4; }
+  code { font-family: var(--mono); font-size: .86em; }
+  pre code { font-size: inherit; }
+  .cols { gap: 12px; }
+  .cols > *, .pair > *, .card > *, .zh > *, details.answer > * { min-width: 0; }
+  img, video { max-width: 100%; height: auto; }
+  .katex svg { max-width: none; }
+  /* 折叠框 */
+  details > summary { font: 600 15px/1.5 var(--sans); }
+  /* 窄屏 */
+  @media (max-width: 600px) {
+    :root { --gutter: 16px; }
+    body { font-size: 16px; line-height: 1.65; }
+    header .wrap { padding-top: 24px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; margin-top: 44px; }
+    h3 { font-size: 17px; }
+    .card { padding-left: 13px; padding-right: 13px; }
+    .folie, .slide { left: 13px; }
+    .zh, .add, .warn, details.answer { padding: 10px 13px; font-size: 15px; line-height: 1.75; }
+    nav a { font-size: 12px; padding: 2px 9px; }
+    .cols { grid-template-columns: 1fr; }
+    /* 手机上表格列太窄时中文会一字一行（「需求分析」竖着排）：给单元格最小宽度，放不下就在 .tablewrap 里横向滚动 */
+    th, td { min-width: 4.5em; }
+    td.wide, th.wide { min-width: 9em; }
+  }
+  /* ===== /排版统一层 ===== */
+</style>
+<style id="oc-structure">
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) { list-style-position: inside; padding-left: 0; }
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) :is(ul, ol) { padding-left: 1.4em; }
+</style>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  .katex { font-size: 1.08em; }
+  .math-block { overflow-x: auto; overflow-y: hidden; margin: 10px 0; }
+  .math-block .katex-display { margin: 0.4em 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>熔岩图 (不可判定性总结)<br><span class="de-title">The Lava Diagram (Wrap-Up of Undecidability)</span></h1>
+    <nav>
+      <a href="#rice">熔岩图解题提示</a>
+      <a href="#beyond">RE 之外</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<!-- ===== RICE ===== -->
+<h2 id="rice" data-nav="Rice 定理">熔岩图解题提示<br><span class="de-title">Lava Diagram Problem Tips</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 2–4</span>
+  <p class="src">(图: 「熔岩图」Regular Languages ⊂ CFLs ⊂ R ⊂ RE ⊂ All Languages, 问: How do you identify an RE language?)</p>
+  <p><b>(Lava Diagram Problem Tips)</b></p>
+  <ul>
+    <li>You've seen two examples of RE (but not R) problems so far: \( A_{TM} \) and HALT. They both have this form:
+      <p>L = {⟨M,w⟩ | /* something about M's behavior on w */}</p></li>
+    <li>You've also seen how we used the Trickster approach to prove both are undecidable (not in R).</li>
+    <li>You may have found yourself thinking, “Couldn't I always just use Trickster on any language that looks like ⟨M⟩ or ⟨M,w⟩ or similar, to show it's undecidable?”</li>
+    <li>And the answer, in fact, is yes! (with a couple caveats)</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>「熔岩图」(lava diagram) 是课程对语言分类图的叫法: 正则 ⊂ 上下文无关 ⊂ R ⊂ RE ⊂ 所有语言, 越往外越「烫手」. 作业要求把给定语言放进正确的区域. 这一讲给出分类的工具: Rice 定理 (判断是否在 R 外) 和 RE 外语言的直觉. 重点是 Rice 定理的两条附加条件.</p>
+  <p>已知的 RE − R 例子 \( A_{TM} \) 和 HALT 都形如「⟨M, w⟩ 使得 M 在 w 上的行为满足某条件」, 都用 trickster 证明不可判定. 是否任何这种形式的语言都可以如法炮制? 答案是可以, 但有两条附加条件.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 5–6</span>
+  <p><b>Rice's Theorem</b></p>
+  <p>Any language that consists of strings that are TM code, and filters those TMs based on a criteria that has anything to do with the TM's language or behavior, is undecidable.</p>
+  <ul>
+    <li>So languages matching these templates will always be undecidable:
+      <ul>
+        <li>L = {⟨M⟩ | /* something about M's behavior */}</li>
+        <li>L = {⟨M⟩ | /* something about M's language */}</li>
+        <li>L = {⟨M1, M2⟩ | /* something comparing M1 and M2's languages or behaviors */}</li>
+      </ul></li>
+    <li>Example language or behavior criteria: “M accepts at least one string,” “M's language is finite,” “M loops on w”</li>
+  </ul>
+  <p>Reminder: Undecidable means not in R. At best in RE, maybe not even that.</p>
+</div>
+<div class="zh">
+  <p><b>Rice's theorem</b> 莱斯定理 (课件的通俗表述): 由图灵机代码组成、按图灵机的<b>语言或行为</b>筛选的语言, 都不可判定. 三种模板: 关于 M 的行为、关于 M 的语言、比较两台机器. 例子: 「M 至少接受一个串」「M 的语言有限」「M 在 w 上死循环」.</p>
+  <p>不可判定只说明不在 R 中, 它可能在 RE 中, 也可能连 RE 都不在.</p>
+</div>
+<div class="add">
+  <p>课件的说法比教科书宽. 严格的 Rice 定理只针对<b>语言的性质</b> (semantic property): 若一个性质只取决于 \( \mathscr{L}(M) \) (两台语言相同的机器要么都满足要么都不满足), 并且非平凡 (有机器满足、也有机器不满足), 则 \( \{ \langle M\rangle \mid \mathscr{L}(M) \text{ 具有该性质} \} \) 不可判定. 关于「行为」的条件 (例如「M 在 w 上死循环」「M 运行超过 100 步」) 不在定理的直接范围内, 有的仍不可判定 (前者), 有的反而可判定 (后者, 只需模拟 100 步). 做题时遇到行为类条件, 最好用 trickster 单独论证.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 7–9</span>
+  <ul>
+    <li><b>Caveat 1:</b> not all languages of the form L = {⟨M⟩ | /* criteria */} are undecidable; only criteria about the TM's language or behavior.</li>
+    <li>Questions relating purely to the text of the code, and not its behavior when run are generally decidable. Decidable examples:
+      <ul>
+        <li>L1 = {⟨M,w⟩ | the string ⟨M⟩ contains more a's than the string w}</li>
+        <li>L2 = {⟨M⟩ | the string ⟨M⟩ has odd length}</li>
+      </ul></li>
+    <li>Intuition: You don't need to try running the TM M to see how many a's its code has or that its code is an odd-length string.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>附加条件一: 条件必须关于 M 的<b>语言或行为</b>. 只关于代码<b>文本</b>的问题通常可判定, 例如「M 的代码里的 a 比 w 多」「M 的代码长度是奇数」. 这些只需数一数字符, 不用运行 M.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 10–12</span>
+  <ul>
+    <li><b>Caveat 2:</b> not all languages of the form L = {⟨M⟩ | /* criteria */} are undecidable, only if the criteria actually filters. In other words the criteria can't be true of zero TMs or all TMs.
+      <ul>
+        <li>L = {⟨M⟩ | /* criteria true of all TMs */} = Σ*, a regular language!
+          <ul><li>Example: {⟨M⟩ | /* M has at least one state */}</li></ul></li>
+        <li>L = {⟨M⟩ | /* criteria true of zero TMs */} = ∅, also a regular language!
+          <ul><li>Example: ??</li></ul></li>
+        <li>Intuition: A problem can't be hard if there's no real question there.</li>
+      </ul></li>
+  </ul>
+  <p>PollEv: Give an example of a criteria that is true of zero TMs.</p>
+</div>
+<div class="zh">
+  <p>附加条件二: 条件必须真正起到<b>筛选</b>作用, 不能对所有图灵机都成立, 也不能对所有都不成立. 对所有都成立时语言就是 Σ* (假设每个串都解释成某台图灵机), 对所有都不成立时是空集, 两者都是正则语言, 当然可判定. 没有真正的问题, 也就谈不上难.</p>
+  <p>投票题的答案举例: 「M 接受的串的个数是负数」「M 既接受又不接受某个串」「\( \mathscr{L}(M) \) 不是 Σ* 的子集」, 这些对任何图灵机都不成立.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 13</span>
+  <p>PollEv: Is L decidable or undecidable? (Pset9 Q5 part 1)</p>
+  <ul>
+    <li>L = Σ*</li>
+    <li>L = {⟨M⟩ | M is a TM and M is a recognizer for ∅}</li>
+  </ul>
+  <p>Pset9 Q5 parts 9–12: how many are …</p>
+</div>
+<div class="zh">
+  <p>L = Σ* 可判定 (正则, 全部接受). L = {⟨M⟩ | M 是 ∅ 的识别器}, 也就是「M 不接受任何串」, 是关于 M 的语言的非平凡性质 (有的机器满足, 有的不满足), 由 Rice 定理不可判定. 进一步, 它连 RE 都不在: 它的补「M 至少接受一个串」在 RE 中却不在 R 中, 由下文「不可判定 RE 语言的补在 RE 外」可知.</p>
+</div>
+
+<!-- ===== BEYOND ===== -->
+<h2 id="beyond" data-nav="RE 之外">RE 之外<br><span class="de-title">Beyond RE</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 14–18</span>
+  <p class="src">(图: Rice's Theorem helps us identify what is outside R (may or may not be in RE). What is outside RE?)</p>
+  <p><b>How Many Problems Are Outside the Reach of Turing Machines?</b></p>
+  <ul>
+    <li>It's sad to think about problems that no TM can even recognize!
+      <ul><li>Not just undecidable but unrecognizable!</li><li>How many are there? Hopefully only a few!</li></ul></li>
+    <li>A TM is fundamentally just a string (a piece of code). Let's say we can interpret any string as a TM (if not syntactically correct according to some TM code system, we'll just say it is a TM that always rejects).</li>
+    <li>So the number of TMs that exist is \( |\Sigma^*| \) (the count of all possible strings).</li>
+    <li>The number of languages that exist is \( |\wp(\Sigma^*)| \) (the count of all possible sets of strings).</li>
+    <li>Sadly, Cantor's Theorem says \( |\Sigma^*| \lt |\wp(\Sigma^*)| \).
+      <ul><li>Not nearly enough Turing machines to go around for all the languages that exist.</li></ul></li>
+    <li>So there are many problems (languages) that we can't solve with TMs.
+      <ul><li>Infinitely many!!</li></ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>Rice 定理帮我们判断语言在 R 之外; 那 RE 之外有多少语言? 计数论证 (回到第 00 讲): 每台图灵机就是一段代码, 即一个字符串 (语法不合法的串约定为总拒绝的机器), 所以图灵机最多 \( |\Sigma^*| \) 个; 语言是字符串的集合, 共 \( |\wp(\Sigma^*)| \) 个. 由康托尔定理后者严格更大, 每台机器只识别一个语言, 所以绝大多数语言没有识别器, 有无穷多个.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 19–20</span>
+  <p class="src">(图: What does an outside-RE problem look like?)</p>
+  <p><b>The Class Unrecognizable</b> (Lava Diagram Category “All Languages”)</p>
+  <ul>
+    <li>Languages \( L \) that are outside RE are those where:
+      <ul>
+        <li>We cannot even build a recognizer TM \( M \), where \( \mathscr{L}(M) = L \).</li>
+        <li>We cannot build a verifier for \( L \).
+          <ul><li>i.e., there is no finite-length certificate/hint that proves a string is in \( L \).</li></ul></li>
+      </ul></li>
+    <li>Fun fact: this class includes all the complements of undecidable RE languages.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>RE 外 (熔岩图最外层) 的语言: 造不出识别器, 也造不出验证器, 即不存在有限长的证书能证明某个串属于它. 一个重要事实: 所有「不可判定的 RE 语言」的补都在 RE 外. 理由 (见 CS103 21 的补充): 若 L 和它的补都可识别, L 就可判定; 所以 L ∈ RE − R 时, 补不可能在 RE 中.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 21–23</span>
+  <p>What makes a language non-RE? In our discussion of verifiers, we've brushed up against one reason a language could be unverifiable: it's inherently hard to provide a piece of evidence to prove a negative.</p>
+  <p>The complements of undecidable RE languages are always outside of RE.</p>
+  <p>\( A_{TM} \) — Certificate (hint): n, the number of steps of M(w) execution until we will observe M halt and accept or reject w.</p>
+  <p>\( \overline{\mathrm{HALT}} \) — Certificate (hint): n, the number of steps of M(w) execution until we observe…what? Not halting?? A step count doesn't work. :-(</p>
+</div>
+<div class="zh">
+  <p>为什么会在 RE 外? 一个原因: 很难为「否定」提供证据. \( A_{TM} \) 的证书是「M 在第 n 步接受」, 可以检查. 但 HALT 的补 (「M 在 w 上<b>不</b>停机」) 用什么当证书? 「到第 n 步还没停」证明不了永远不停. 步数行不通, 所以 HALT 的补在 RE 外.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 24–26</span>
+  <p><b>The Class Unrecognizable</b> (Lava Diagram Category “All Languages”)</p>
+  <ul>
+    <li>Example languages:
+      <ul>
+        <li>The complements of undecidable RE languages.</li>
+        <li>\( \mathrm{EQ}_{TM} \) = {⟨M1, M2⟩ | where ℒ(M1) = ℒ(M2) }</li>
+        <li>L = {⟨M⟩ | M loops on at least five strings }</li>
+      </ul></li>
+    <li>For each of the above, ask yourself: what certificate/hint could possibly help?
+      <ul><li>Of course, not being able to think of one isn't a proof that these are unrecognizable, but it's a good intuition for judging.</li></ul></li>
+  </ul>
+  <p>PollEv: A very similar language is: L' = {⟨M⟩ | M accepts at least five strings }. How would you categorize it on the Lava Diagram?</p>
+  <ul>
+    <li>Note that we can write a verifier for the language {⟨M⟩ | M accepts at least five strings }, using the certificate ⟨w1,n1,w2,n2,w3,n3,w4,n4,w5,n5⟩, which is a mouthful, but still finite.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>RE 外语言的例子: 不可判定 RE 语言的补; \( \mathrm{EQ}_{TM} \) (两台机器的语言是否相同); 「M 在至少五个串上死循环」. 试着想想什么证书能证明它们, 想不出来不是证明, 但是很好的直觉: 语言相等要比较无穷多个串, 死循环要证明「永远不停」.</p>
+  <p>投票题: 相似的语言 L' = 「M 至少接受五个串」在 RE 中但不在 R 中. 在 RE 中: 证书是五个不同的串和各自被接受的步数, 有限长, 验证器逐个模拟即可. 不在 R 中: 由 Rice 定理, 它是关于语言的非平凡性质. 对比可见: 「接受」可以被证明, 「死循环」不能.</p>
+</div>
+<div class="warn">
+  <p><b>幻灯片前后不一致:</b> Slide 25 重复这个列表时把 \( \mathrm{EQ}_{TM} \) 写成 “ℒ(M1) = ℒ(M1)”, 应为 ℒ(M1) = ℒ(M2) (Slide 24 是对的).</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 27–30</span>
+  <p><b>The Language \( L_D \)</b></p>
+  <ul>
+    <li>\( L_D \) = {⟨M⟩ | M does not accept ⟨M⟩ } = {⟨M⟩ | ⟨M⟩ ∈ ℒ(M)}</li>
+    <li>This is a classic example of an unrecognizable language.</li>
+    <li>To see why we can't build a TM for this language, ask yourself:
+      <ul><li>If you did build a TM for \( L_D \), called \( M_{L_D} \), would \( M_{L_D} \) accept ⟨\( M_{L_D} \)⟩?</li></ul></li>
+  </ul>
+  <p><b>Happy Story Time</b></p>
+  <p>In a certain isolated town, every house has a lawn and the city requires them all to be mowed. The town has only one gardener, who is also a resident of the town, and this gardener mows the lawns of residents iff they do not mow their own lawn.</p>
+  <p>True or false: The gardener mows their own lawn.</p>
+  <p>The existence of a TM for \( L_D \) creates a contradiction, so that's our proof that a TM for \( L_D \) cannot exist.</p>
+</div>
+<div class="zh">
+  <p>经典的不可识别语言 \( L_D \) (D 指 diagonal 对角): 所有<b>不接受自己的代码</b>的图灵机. 假设有识别器 \( M_{L_D} \), 问它接受自己的代码吗?</p>
+  <ul>
+    <li>若接受, 由识别器定义 ⟨\( M_{L_D} \)⟩ ∈ \( L_D \), 即它不接受自己, 矛盾.</li>
+    <li>若不接受, 则 ⟨\( M_{L_D} \)⟩ 满足 \( L_D \) 的条件, 属于 \( L_D \), 识别器应该接受它, 又矛盾.</li>
+  </ul>
+  <p>所以 \( L_D \) 没有识别器, 不在 RE 中. 这和园丁的故事一样: 园丁给所有「不自己修草坪」的居民修草坪, 他自己修不修? 修, 就违反规则; 不修, 他就得修. 问题无法回答, 结论是这样的园丁不可能存在. 这又是康托尔对角线论证的结构: \( L_D \) 恰好是 CS103 08 里的对角集合 D.</p>
+</div>
+<div class="warn">
+  <p><b>幻灯片错误:</b> \( L_D \) 的第二种写法 “{⟨M⟩ | ⟨M⟩ ∈ ℒ(M)}” 应为 “{⟨M⟩ | ⟨M⟩ ∉ ℒ(M)}”: 「M 不接受 ⟨M⟩」就是「⟨M⟩ 不在 M 的语言里」. 原文写成 ∈ 恰好是相反的语言 (接受自己代码的机器), 那个语言是可识别的. Slide 27 和 Slide 30 两处都有这个错.</p>
+</div>
+
+</main>
+<script data-goatcounter="https://yikesyellowpharmakon.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

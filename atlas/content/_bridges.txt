@@ -194,3 +194,18 @@ X EICL:superv ~ IML:sup | 词性标注是监督学习的一个实例.
 X FS:fsm ~ EICL:fsa | 同一概念: 有限状态自动机; EICL 用它分析词形, FS 讲它的组成和形式定义.
 X FS:quint ~ EIPS:automat | 同一个五元组定义; EIPS 写作 (Q, Σ, δ, q0, F), FS 写作 (Σ, Q, q₀, δ, F).
 X FS:fsm ~ EIPS:regex | 有限自动机和正则表达式描述同一类语言, FS 接下来几讲会证明这一点.
+X SMIS:nbwsd ~ EICL:nbrule | 同一个朴素贝叶斯分类器: SMIS 用来做词义消歧, EICL 用来做文本分类.
+X IML:nb ~ EICL:nbrule | 同一个朴素贝叶斯; IML 从机器学习的角度讲, EICL 讲文本分类里的多项式模型.
+X SMIS:addk ~ EICL:addone | 加一平滑是加 k 平滑在 k = 1 时的特例.
+X IE:pr ~ EICL:precrec | 同一对指标: 精确率和召回率.
+X IE:confusion ~ EICL:confmat | 同一个混淆矩阵.
+X IE:fscore ~ EICL:f1 | 同一个 F 值, F1 是 β = 1 的情形.
+X EICL:postag ~ SP:posdef | 同一个任务: EICL 讲 HMM 标注, SP 用 NLTK 实现各种标注器.
+X EICL:hmmmod ~ SP:ngtag | n 元标注器只看前面的标签, HMM 再把整句一起解码.
+X EICL:dep ~ SNS:dstr | 同一个依存结构; EICL 只作入门介绍, SNS 讲性质、投射性和依存分析.
+X EICL:ud ~ SNS:deptb | Universal Dependencies 的标签集和它的树库.
+X SMIS:perceptron ~ IE:percrule | 同一个感知机更新: 分错时朝正确答案调权重.
+X IDP:neuron ~ IE:percep | 单个神经元就是感知机.
+X IE:iob ~ EICL:hmmmod | IOB 标注把信息抽取变成序列标注, 可以用 HMM 来解.
+X DPNLP1:moe ~ DPNLP2:experts | 同一个混合专家模型; DPNLP II 细讲路由、负载均衡和激活参数.
+X DPNLP2:byt5 ~ DPNLP1:bpe | 字节级模型去掉了 BPE 这类子词分词器.

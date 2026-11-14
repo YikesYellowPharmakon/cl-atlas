@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="dark">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS103 21 · 图灵机下</title>
+<style>
+  /* 同一门课沿用同目录已有笔记的整段 <style>；新课只改下面的颜色 token。 */
+  :root {
+    --bg: #1e1e12;
+    --ink: #ecede3;
+    --muted: #b5b59b;
+    --line: #4a4b30;
+    --card: #2b2b1a;
+    --code: #18180e;
+    --accent: #e1e481;
+    --chip: #3d3e23;
+    --zh: #2a2b17;
+    --add: #222318;
+    --add-line: #b5b686;
+    --warn: #2a1a1c;
+    --warn-line: #ff7b72;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16.5px/1.6 "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif;
+  }
+  header { position: static; background: transparent; border: 0; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 18px 22px 72px; }
+  header .wrap { padding-top: 18px; padding-bottom: 8px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 6px; font-weight: 650; }
+  h2 { font-size: 22px; margin: 44px 0 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+  h3 { font-size: 17px; margin: 24px 0 6px; }
+  h1 .de-title, h2 .de-title, h3 .de-title {
+    display: block; margin-top: 2px; color: var(--muted);
+    font-weight: 500; font-size: 0.92em; line-height: 1.35;
+  }
+  h1 .de-title { font-size: 0.62em; }
+  p { margin: 8px 0; }
+  .lede { color: var(--muted); margin: 0; }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+  nav a {
+    color: var(--accent); text-decoration: none; background: var(--chip);
+    border-radius: 999px; padding: 3px 10px;
+    font: 13px/1.4 "ZH Latin", "PingFang SC", sans-serif;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 12px 16px; margin: 12px 0;
+  }
+  .card p, .card li { margin: 4px 0; }
+  .de { position: relative; padding-top: 26px; }
+  .folie {
+    position: absolute; top: 7px; left: 16px;
+    font: 11.5px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); letter-spacing: .02em;
+  }
+  .de .def {
+    border-left: 3px solid var(--accent); padding: 4px 10px; margin: 6px 0;
+    background: var(--chip); border-radius: 0 8px 8px 0;
+  }
+  .zh {
+    background: var(--zh); border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .zh p { margin: 0 0 8px; }
+  .zh p:last-child, .zh ul:last-child, .zh ol:last-child { margin-bottom: 0; }
+  .add {
+    background: var(--add); border-left: 3px dashed var(--add-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .add::before { content: "补充（幻灯片之外）"; display: block; font-size: 12px; color: var(--add-line); font-weight: 600; margin-bottom: 4px; }
+  .add p { margin: 0 0 8px; }
+  .add p:last-child { margin-bottom: 0; }
+  .warn {
+    background: var(--warn); border-left: 3px solid var(--warn-line);
+    border-radius: 0 10px 10px 0; padding: 10px 14px; margin: 8px 0 4px;
+    font-family: "ZH Latin", "PingFang SC", "Songti SC", sans-serif; font-size: 15px;
+  }
+  .vocab { font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14px; color: var(--muted); margin: 6px 0 2px; }
+  .vocab b { color: var(--ink); font-weight: 600; }
+  ul, ol { margin: 8px 0; padding-left: 1.3em; }
+  li { margin: 4px 0; }
+  ul ul { margin: 2px 0; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; margin: 12px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th { font: 12px/1.3 "ZH Latin", "PingFang SC", sans-serif; color: var(--muted); font-weight: 600; background: var(--chip); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  pre {
+    background: var(--code); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; overflow: auto; margin: 12px 0;
+    font: 13.5px/1.5 "SF Mono", ui-monospace, Menlo, monospace;
+  }
+  code {
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--chip); padding: 1px 5px; border-radius: 5px;
+  }
+  pre code { background: none; padding: 0; }
+  a { color: var(--accent); }
+  .src { color: var(--muted); font-size: 14px; }
+  blockquote { margin: 8px 0; padding: 4px 14px; border-left: 3px solid var(--line); font-style: italic; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details[open] summary { margin-bottom: 6px; }
+  .diagram { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .diagram > div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; font-family: "ZH Latin", "PingFang SC", sans-serif; font-size: 14.5px; }
+  .diagram h4 { margin: 0 0 6px; font-size: 15px; }
+  @media (max-width: 560px) { .diagram { grid-template-columns: 1fr; } }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cols pre { margin: 0; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  /* ===== 前端细节优化 2026-10-16：只调排版与交互，不改内容和颜色 token ===== */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
+  p, li, a, code { overflow-wrap: break-word; }
+  [id] { scroll-margin-top: 16px; }
+  :focus-visible { outline: 2px solid var(--accent, var(--link)); outline-offset: 2px; border-radius: 4px; }
+  pre, .tablewrap { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  pre { tab-size: 4; }
+  .tablewrap { overflow-x: auto; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  @media print { pre, table, details, figure { break-inside: avoid; } h2, h3 { break-after: avoid; } }
+  ::selection { background: color-mix(in srgb, var(--accent, var(--link)) 35%, transparent); }
+  nav a { transition: background-color .15s ease, color .15s ease; }
+  nav a:hover { background: color-mix(in srgb, var(--accent, var(--link)) 22%, var(--chip, var(--paper))); }
+  details summary:hover { color: var(--accent, var(--link)); }
+  @media print { .card, .zh, .add, .warn, .de, .later, .vocab { break-inside: avoid; } }
+  @media (max-width: 560px) {
+    body { font-size: 16px; }
+    .wrap, header .wrap, main { padding-left: 16px; padding-right: 16px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; }
+    .card { padding-left: 12px; padding-right: 12px; }
+    .folie, .slide { left: 12px; }
+    .zh, .add, .warn { padding: 9px 12px; }
+    pre { padding: 10px 12px; font-size: 13px; }
+  }
+  /* ===== 排版统一层 v9（所有笔记共用；只管字体、尺寸、间距、对齐，不改颜色 token） ===== */
+  :root { --measure: 760px; --gutter: 24px; --serif: "Iowan Old Style", Palatino, "Songti SC", "PingFang SC", serif; --sans: "ZH Latin", "PingFang SC", "Hiragino Sans GB", "Songti SC", sans-serif; --mono: "SF Mono", ui-monospace, Menlo, monospace; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { font: 16.5px/1.65 var(--serif); font-kerning: normal; }
+  /* 换行：中文按标点避头尾（strict），不用 balance / pretty（它们会在宽屏和手机上把中文行拆成一长一短、在词中间断开） */
+  body { line-break: strict; word-break: normal; overflow-wrap: break-word; font-feature-settings: "halt" 1; }
+  /* 中文讲解用英文标点（, . : ; ! ? ( )，由 scripts/zh_punct.py 转换）；剩下的「」、《》用 halt 压成半宽，不留大空白 */
+  pre, code, kbd, .katex { font-feature-settings: normal; }
+  /* 页首说明和副标题按「 · 」分段，只在段与段之间换行，不在一个段落中间断开 */
+  .seg, h1 .seg, h2 .seg, h3 .seg, .lede .seg { display: inline-block; margin: 0; font-size: inherit; font-weight: inherit; color: inherit; letter-spacing: inherit; }
+  p, li, td, th, dd, figcaption, summary, .lede { text-wrap: wrap; }
+  h1, h2, h3, h4 { text-wrap: wrap; word-break: keep-all; overflow-wrap: anywhere; }
+  /* 行内代码整体不拆行（bark() 不会断成 bark( / )）；只有页首、出处说明里的长文件名允许在放不下时断开 */
+  code { white-space: nowrap; }
+  .lede code, .src code, h1 code, h2 code, h3 code { white-space: normal; overflow-wrap: anywhere; }
+  td:first-child, th:first-child { min-width: 5em; }
+  /* 单元格内容不能断开的表（莫尔斯码之类）给 table 加 class="nowrap"，放不下就横向滚动（注释里不要写带尖括号的标签，wrap_tables.py 曾把它当成真表格） */
+  table.nowrap td, table.nowrap th { white-space: nowrap; text-wrap: nowrap; }
+  /* 代码块里的 code 跟随 pre 保留换行（上面的 nowrap 只给行内代码；漏了这条，多行代码会挤成一行） */
+  pre code { white-space: inherit; overflow-wrap: normal; word-break: normal; }
+  /* 长的行内代码（apply_typography.py 标 .lc，超过 24 个字符）在手机上放不下，允许在空格处换行，必要时任意处断开 */
+  code.lc { white-space: normal; overflow-wrap: anywhere; }
+  /* 版心：页首和正文同一列，左右对齐、整体居中 */
+  header .wrap, main.wrap, main { box-sizing: border-box; max-width: var(--measure); margin-left: auto; margin-right: auto; padding-left: var(--gutter); padding-right: var(--gutter); }
+  header .wrap { padding-top: 40px; padding-bottom: 8px; }
+  main.wrap, main { padding-top: 8px; padding-bottom: 96px; }
+  /* 标题层级 */
+  h1 { font-size: 28px; line-height: 1.3; font-weight: 650; margin: 0 0 4px; }
+  h1 .de-title, h1 > span { display: block; margin-top: 6px; font-size: 15px; line-height: 1.45; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  h2 { font-size: 22px; line-height: 1.35; font-weight: 650; margin: 56px 0 10px; padding-top: 16px; }
+  h2 .de-title { display: block; margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--muted); }
+  h3 { font-size: 17.5px; line-height: 1.45; font-weight: 650; margin: 32px 0 8px; }
+  h3 .de-title { display: block; margin-top: 2px; font-size: 14px; font-weight: 500; color: var(--muted); }
+  h4 { font-size: 16px; margin: 24px 0 8px; }
+  /* 页首说明与导航 */
+  .lede { margin: 12px 0 0; font: 15.5px/1.65 var(--serif); color: var(--muted); }
+  nav { display: flex; flex-wrap: wrap; gap: 6px 6px; margin: 18px 0 0; }
+  nav a { font: 12.5px/1.5 var(--sans); padding: 3px 11px; border-radius: 999px; text-decoration: none; }
+  /* 正文段落 */
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 1.4em; margin: 8px 0; }
+  li { margin: 4px 0; }
+  /* 原文卡片与各类框：统一宽度、圆角、内边距 */
+  .card { box-sizing: border-box; width: 100%; border-radius: 12px; padding: 14px 18px; margin: 14px 0; }
+  .card.de, .card.orig { padding-top: 30px; }
+  .folie, .slide { top: 9px; left: 18px; font: 11.5px/1.3 var(--sans); letter-spacing: .03em; }
+  .zh, .add, .warn, details.answer, .later { box-sizing: border-box; font: 15px/1.75 var(--sans); padding: 12px 16px; margin: 10px 0 6px; }
+  .zh p, .add p, .warn p, details.answer p { margin: 0 0 10px; }
+  .zh p:last-child, .add p:last-child, .warn p:last-child { margin-bottom: 0; }
+  .src { font: 14px/1.7 var(--sans); }
+  /* 居中元素：公式行、图、表格统一处理 */
+  p[style*="text-align:center"], p[style*="text-align: center"], .math-block { margin: 14px auto; text-align: center; font-size: 1.05em; }
+  figure, .src-fig { margin: 14px auto; text-align: center; }
+  /* 图注左对齐: 居中的两行图注第二行会孤零零缩在中间 */
+  figure figcaption, .src-fig figcaption { text-align: left; }
+  /* 图注按标点分句 (span.cs)，每行都在一个标点后结束，不在半句中间换行 */
+  figcaption .cs { display: inline-block; max-width: 100%; }
+  figure img, .src-fig img { display: block; margin: 0 auto; }
+  figure svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .tablewrap { width: 100%; overflow-x: auto; margin: 12px 0; }
+  table { width: 100%; font: 14.5px/1.6 var(--sans); }
+  .card table, .tablewrap table { margin: 0; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 11px; }
+  td.num, th.num { text-align: right; }
+  /* 代码 */
+  pre { font: 13.5px/1.55 var(--mono); padding: 12px 16px; border-radius: 10px; margin: 12px 0; overflow-x: auto; tab-size: 4; }
+  code { font-family: var(--mono); font-size: .86em; }
+  pre code { font-size: inherit; }
+  .cols { gap: 12px; }
+  .cols > *, .pair > *, .card > *, .zh > *, details.answer > * { min-width: 0; }
+  img, video { max-width: 100%; height: auto; }
+  .katex svg { max-width: none; }
+  /* 折叠框 */
+  details > summary { font: 600 15px/1.5 var(--sans); }
+  /* 窄屏 */
+  @media (max-width: 600px) {
+    :root { --gutter: 16px; }
+    body { font-size: 16px; line-height: 1.65; }
+    header .wrap { padding-top: 24px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 20px; margin-top: 44px; }
+    h3 { font-size: 17px; }
+    .card { padding-left: 13px; padding-right: 13px; }
+    .folie, .slide { left: 13px; }
+    .zh, .add, .warn, details.answer { padding: 10px 13px; font-size: 15px; line-height: 1.75; }
+    nav a { font-size: 12px; padding: 2px 9px; }
+    .cols { grid-template-columns: 1fr; }
+    /* 手机上表格列太窄时中文会一字一行（「需求分析」竖着排）：给单元格最小宽度，放不下就在 .tablewrap 里横向滚动 */
+    th, td { min-width: 4.5em; }
+    td.wide, th.wide { min-width: 9em; }
+  }
+  /* ===== /排版统一层 ===== */
+</style>
+<style id="oc-structure">
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) { list-style-position: inside; padding-left: 0; }
+  main :is(.card.de, .zh, .add, .warn, details.answer) :is(ul, ol) :is(ul, ol) { padding-left: 1.4em; }
+</style>
+<link rel="stylesheet" href="katex/katex.min.css">
+<style>
+  .katex { font-size: 1.08em; }
+  .math-block { overflow-x: auto; overflow-y: hidden; margin: 10px 0; }
+  .math-block .katex-display { margin: 0.4em 0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>图灵机, 第二部分<br><span class="de-title">Turing Machines, Part Two</span></h1>
+    <nav>
+      <a href="#recap">本讲内容与回顾</a>
+      <a href="#ct">Church-Turing 论题</a>
+      <a href="#solve">可判定性与可识别性</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<!-- ===== RECAP ===== -->
+<h2 id="recap" data-nav="回顾">本讲内容与回顾<br><span class="de-title">Outline for Today · Recap from Last Time</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 2–4</span>
+  <p><b>Outline for Today</b></p>
+  <ul>
+    <li>The Church-Turing Thesis<ul><li>Just how powerful are TMs?</li></ul></li>
+    <li>What Does it Mean to Solve a Problem?<ul><li>Rethinking what “solving” a problem means, and two possible answers to that question.</li></ul></li>
+  </ul>
+  <p><b>Turing Machines</b></p>
+  <ul>
+    <li>A Turing machine is a program that controls a tape head as it moves around an infinite tape.</li>
+    <li>There are six commands: Move <i>direction</i>; Write <i>symbol</i>; Goto <i>label</i>; Return <i>boolean</i>; If <i>symbol command</i>; If Not <i>symbol command</i></li>
+    <li>Despite their limited vocabulary, TMs are surprisingly powerful.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>这一讲回答两个问题: 图灵机到底有多强 (Church-Turing 论题); 「解决一个问题」究竟是什么意思 (可识别与可判定). 重点是接受、拒绝、死循环三种结果的区分, 以及 R 和 RE 两个语言类的定义. 图灵机的六条指令见 <a href="CS103-20-图灵机上.html">CS103 20</a>.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 5</span>
+  <p><b>A Sample Turing Machine</b></p>
+  <ul>
+    <li>Inputs over the alphabet \( \Sigma = \{a, b\} \).</li>
+    <li>What strings does this TM accept?</li>
+    <li>Can you write a regex that matches precisely the strings this TM accepts?</li>
+  </ul>
+  <pre data-lang="pseudocode">Start:
+  If Not 'a' Return False
+Loop:
+  Move Right
+  If Not Blank Goto Loop
+  Move Left
+  If Not 'b' Return False
+  Return True</pre>
+</div>
+<div class="zh">
+  <p>逐段读: 第一个字符不是 a 就拒绝 (包括空串); Loop 一直右移到空白, 再左移一格回到最后一个字符; 最后一个字符不是 b 就拒绝, 否则接受. 所以它接受「以 a 开头、以 b 结尾」的串, 正则表达式是 a(a ∪ b)*b, 即 aΣ*b. 单独一个 a 会被拒绝: 它的最后一个字符是 a 而不是 b.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 6</span>
+  <p><b>What Can We Do With a TM?</b></p>
+  <ul>
+    <li>Last time, we saw TMs that
+      <ul>
+        <li>check if a string has the form \( a^n b^n \),</li>
+        <li>check if a string has the same number of a's and b's and</li>
+        <li>sort a string of a's and b's.</li>
+      </ul></li>
+    <li>Here's a list of some other things TMs can do; we'll give you these TMs with the starter files for PS8 this week.
+      <ul>
+        <li>Check if a number is a Fibonacci number.</li>
+        <li>Convert the number \( n \) into a string of \( n \) a's.</li>
+        <li>Check if a string is a <b>tautonym</b> (the same string repeated twice).</li>
+        <li>So much more!</li>
+      </ul></li>
+    <li>This hints at the idea that TMs might be more powerful than they look.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>上一讲的图灵机能检查 \( a^n b^n \)、a 和 b 个数相等、对 a、b 排序. 习题里还会给出更多: 判断一个数是不是斐波那契数, 把数 n 转成 n 个 a, 判断一个串是不是 <b>tautonym</b> 重叠词 (同一个串写两遍, 如 abab). 这些例子暗示图灵机比它看上去强大得多.</p>
+</div>
+
+<!-- ===== CT ===== -->
+<h2 id="ct" data-nav="Church-Turing">Church-Turing 论题<br><span class="de-title">Just how powerful are Turing machines?</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 8–12</span>
+  <p><b>Main Questions for Today:</b> Just how powerful are Turing machines? What problems can you solve with a computer?</p>
+  <p><b>Real and “Ideal” Computers</b></p>
+  <ul>
+    <li>A real computer has memory limitations: you have a finite amount of RAM, a finite amount of disk space, etc.</li>
+    <li>However, as computers get more and more powerful, the amount of memory available keeps increasing.</li>
+    <li>An <b>idealized computer</b> is like a regular computer, but with unlimited RAM and disk space. It functions just like a regular computer, but never runs out of memory.</li>
+  </ul>
+  <p><b>Theorem:</b> Turing machines are equal in power to idealized computers. That is, any computation that can be done on a TM can be done on an idealized computer and vice-versa.</p>
+  <p><b>Key Idea:</b> Two models of computation are equally powerful if they can simulate each other.</p>
+</div>
+<div class="zh">
+  <p>真实计算机内存有限, 但内存在不断变大. <b>idealized computer</b> 理想化计算机: 和普通计算机一样工作, 只是内存无限、永不耗尽. 定理: 图灵机和理想化计算机能力相同, 一方能做的计算另一方也能做.</p>
+  <p>比较两个计算模型的方法: 如果它们能<b>互相模拟</b>, 就一样强. 下面分两个方向说明.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 13–14</span>
+  <p><b>Simulating a TM</b></p>
+  <ul>
+    <li>The individual commands in a TM are simple and perform only basic operations: Move Write Goto Return If</li>
+    <li>The memory for a TM can be thought of as a string with some number keeping track of the current index.</li>
+    <li>To simulate a TM, we need to
+      <ul><li>see which line of the program we're on,</li><li>determine what command it is, and</li><li>simulate that single command.</li></ul></li>
+    <li><b>Claim:</b> An idealized computer can simulate a TM.
+      <ul><li>The “core” logic for the TM simulator is under fifty lines of code, including comments.</li></ul></li>
+  </ul>
+  <p>Because a computer can simulate each individual TM instruction, an idealized computer can do anything a TM can do.</p>
+  <p><b>Key Idea:</b> Even the most complicated TM is made out of individual instructions, and if we can simulate those instructions, we can simulate an arbitrarily complicated TM.</p>
+</div>
+<div class="zh">
+  <p>方向一: 计算机能模拟图灵机. 纸带可以存成一个字符串 (或字典) 加一个表示读写头位置的下标; 模拟时只需记住当前执行到第几行, 判断是哪条指令, 执行它. 核心逻辑不到五十行代码. 本笔记前一讲就用一个 Python 小程序模拟了课件里的几个图灵机.</p>
+  <p>要点: 再复杂的图灵机也是由一条条简单指令组成的, 能模拟每条指令, 就能模拟整个机器.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 15–16</span>
+  <p><b>Simulating a Computer</b></p>
+  <ul>
+    <li>Programming languages provide a set of simple constructs.
+      <ul><li>Think things like variables, arrays, loops, functions, classes, etc.</li></ul></li>
+    <li>You, the programmer, then combine these basic constructs together to assemble larger programs.</li>
+    <li><b>Key Idea:</b> A TM is powerful enough to simulate each of these individual pieces. It's therefore powerful enough to simulate anything a real computer can do.</li>
+  </ul>
+  <p><b>A Leap of Faith</b></p>
+  <ul>
+    <li><b>Claim:</b> A TM is powerful enough to simulate any computer program that gets an input, processes that input, then returns some result.</li>
+    <li>The resulting TM might be colossal, or really slow, or both, but it would still faithfully simulate the computer.</li>
+    <li>We're going to take this as an article of faith in CS103.
+      <ul><li>If you curious for more details, come talk to me after class.</li></ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>方向二: 图灵机能模拟计算机. 编程语言由变量、数组、循环、函数、类等基本构件组成, 图灵机能模拟每一种构件, 也就能模拟任何「读入输入、处理、返回结果」的程序. 模拟出的图灵机可能极其庞大、极其缓慢, 但结果一样. CS103 不给出完整证明, 把它当作接受的前提.</p>
+</div>
+<div class="warn">
+  <p><b>原文笔误:</b> “If you curious for more details” 漏了动词, 应为 “If you're curious”.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 17–19</span>
+  <p><b>Can a TM Work With…</b></p>
+  <ul>
+    <li>“cat pictures?” — Sure! A picture is just a 2D array of colors, and a color can be represented as a series of numbers.</li>
+    <li>“cat videos?” — If you think about it, a video is just a series of pictures!</li>
+    <li>“music?” — Sure! Music is encoded as a compressed waveform. That's just a list of numbers.</li>
+    <li>“ChatGPT?” — Sure! That's just applying a bunch of matrices and nonlinear functions to some input.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>图灵机只能处理纸带上的符号, 能处理图片、视频、音乐、ChatGPT 吗? 都可以, 因为它们最终都编码成数字: 图片是颜色的二维数组, 视频是一串图片, 音乐是压缩后的波形数值, 大语言模型是一堆矩阵运算和非线性函数. 只要能编码成字符串, 图灵机就能处理.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 20–24</span>
+  <p>The <b>Church-Turing Thesis</b> claims that every feasible method of computation is either equivalent to or weaker than a Turing machine.</p>
+  <p>“This is not a theorem – it is a falsifiable scientific hypothesis. And it has been thoroughly tested!” — Ryan Williams</p>
+  <p class="src">(图: Regular Languages ⊂ CFLs ⊂ Problems Solvable by Any Feasible Computing Machine ⊂ All Languages; 由论题, 「任何可行计算机器能解决的问题」就是「图灵机能解决的问题」.)</p>
+  <p><b>TMs and Computation</b></p>
+  <ul>
+    <li>Because Turing machines have the same computational powers as regular computers, we can (essentially) reason about Turing machines by reasoning about actual computer programs.</li>
+    <li>Going forward, we're going to switch back and forth between TMs and computer programs based on whatever is most appropriate.</li>
+    <li>In fact, our eventual proofs about the existence of impossible problems will involve a good amount of pseudocode. Stay tuned for details!</li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>Church-Turing thesis</b> 丘奇-图灵论题: 任何可行的计算方法, 能力都等于或弱于图灵机. 它<b>不是定理</b>, 因为「可行的计算方法」不是一个数学定义, 无法证明; 它是一个可以被证伪的科学假说, 至今经受住了所有检验 (λ 演算、递归函数、现代计算机、量子计算机在「能算什么」上都不超过图灵机).</p>
+  <p>后果: 图灵机能解决的问题就是任何计算机能解决的问题. 以后可以在图灵机和普通程序 (伪代码) 之间自由切换, 后面证明「不可能解决的问题」时会大量使用伪代码.</p>
+</div>
+
+<!-- ===== SOLVE ===== -->
+<h2 id="solve" data-nav="解决问题">可判定性与可识别性<br><span class="de-title">Decidability and Recognizability</span></h2>
+
+<div class="card de">
+  <span class="folie">Slide 29–33</span>
+  <p>What problems can we solve with a computer? — What kind of computer? — What does it mean to “solve” a problem?</p>
+  <p><b>The Hailstone Sequence</b></p>
+  <ul>
+    <li>Consider the following procedure, starting with some \( n \in \mathbb{N} \), where \( n \gt 0 \):
+      <ul>
+        <li>If \( n = 1 \), you are done.</li>
+        <li>If \( n \) is even, set \( n = n / 2 \).</li>
+        <li>Otherwise, set \( n = 3n + 1 \).</li>
+        <li>Repeat.</li>
+      </ul></li>
+    <li><b>Question:</b> Given a natural number \( n \gt 0 \), does this process terminate?</li>
+  </ul>
+  <p class="src">(动画: 17 → 52 → 26 → … → 16 → 8 → 4 → 2 → 1.)</p>
+  <p>Does the Hailstone Sequence terminate for… n = 5? Yes, after 5 steps. n = 20? Yes, after 7 steps. n = 7? Yes, after 16 steps. n = 27? Yes, after 111 steps.</p>
+</div>
+<div class="zh">
+  <p>「什么样的计算机」已经回答了 (图灵机), 现在问「解决」是什么意思. 例子: <b>hailstone sequence</b> 冰雹序列. 从正整数 n 出发, 偶数就除以 2, 奇数就乘 3 加 1, 直到变成 1. 问题: 这个过程对给定的 n 会不会终止?</p>
+  <p>试几个: 5 → 16 → 8 → 4 → 2 → 1, 5 步; 20 要 7 步; 7 要 16 步; 27 要 111 步, 途中最高升到 9232. 步数用 Python 核对过.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 34–37</span>
+  <p><b>The Hailstone Turing Machine</b></p>
+  <ul>
+    <li>Let \( \Sigma = \{a\} \) and consider the language
+      <p>\( L = \{ a^n \mid n \gt 0 \text{ and the hailstone sequence terminates for } n \} \).</p></li>
+    <li>We can build a TM for \( L \) as follows:
+      <ul>
+        <li>If the input is \( \varepsilon \), reject.</li>
+        <li>While the string is not a:
+          <ul>
+            <li>If the input has even length, halve the length of the string.</li>
+            <li>If the input has odd length, triple the length of the string and append a a.</li>
+          </ul></li>
+        <li>Accept.</li>
+      </ul></li>
+  </ul>
+  <p>Does this Turing machine accept all nonempty strings?</p>
+  <p><b>The Collatz Conjecture</b></p>
+  <ul>
+    <li>It is unknown whether this process will terminate for all natural numbers.
+      <ul><li>In other words, no one knows whether this TM always terminates!</li></ul></li>
+    <li>The conjecture (unproven claim) that the hailstone sequence always terminates is called the <b>Collatz Conjecture</b>.</li>
+    <li>This problem has eluded a solution for a long time. The influential mathematician Paul Erdős is reported to have said “mathematics may not be ready for such problems.”</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>把问题写成语言: 用 n 个 a 表示数 n, L 是冰雹序列会终止的那些 \( a^n \). 图灵机直接模拟序列: 串长偶数就减半, 奇数就变成三倍再加一个 a, 变成单个 a 时接受.</p>
+  <p>这个图灵机接受所有非空串吗? <b>没人知道</b>. 「冰雹序列对所有正整数都终止」就是著名的 <b>Collatz conjecture</b> 考拉兹猜想, 至今未被证明或推翻. 埃尔德什曾说「数学也许还没准备好处理这类问题」.</p>
+  <p>关键: 如果某个 n 的序列永不终止, 这个图灵机在 \( a^n \) 上就会永远运行下去, 既不接受也不拒绝.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 38–40</span>
+  <p><b>An Important Observation</b></p>
+  <ul>
+    <li>Unlike finite automata, which automatically halt after all the input is read, TMs keep running until they explicitly return true or return false.</li>
+    <li>As a result, it's possible for a TM to run forever without accepting or rejecting.</li>
+    <li>This leads to several important questions:
+      <ul><li>How do we formally define what it means to build a TM for a language?</li><li>What implications does this have about problem-solving?</li></ul></li>
+  </ul>
+  <p><b>Very Important Terminology</b></p>
+  <ul>
+    <li>Let \( M \) be a Turing machine.</li>
+    <li>\( M \) <b>accepts</b> a string \( w \) if it returns true on \( w \).</li>
+    <li>\( M \) <b>rejects</b> a string \( w \) if it returns false on \( w \).</li>
+    <li>\( M \) <b>loops infinitely</b> (or just <b>loops</b>) on a string \( w \) if when run on \( w \) it neither returns true nor returns false.</li>
+    <li>\( M \) <b>does not accept</b> \( w \) if it either rejects \( w \) or loops on \( w \).</li>
+    <li>\( M \) <b>does not reject</b> w \( w \) if it either accepts \( w \) or loops on \( w \).</li>
+    <li>\( M \) <b>halts</b> on \( w \) if it accepts \( w \) or rejects \( w \).</li>
+  </ul>
+  <p class="src">(图: Accept、Reject、Loop 三块; Accept 和 Reject 合起来是 halts, Reject 和 Loop 合起来是 does not accept, Accept 和 Loop 合起来是 does not reject.)</p>
+</div>
+<div class="zh">
+  <p>和有限自动机不同, 有限自动机读完输入自动停机; 图灵机要执行到 Return 才停, 所以可能<b>永远运行</b>. 术语 (非常重要):</p>
+  <ul>
+    <li><b>accepts</b> 接受: 返回 true.</li>
+    <li><b>rejects</b> 拒绝: 返回 false.</li>
+    <li><b>loops</b> 死循环: 永远不返回.</li>
+    <li><b>halts</b> 停机: 接受或拒绝.</li>
+    <li><b>does not accept</b> 不接受: 拒绝<b>或</b>死循环.</li>
+    <li><b>does not reject</b> 不拒绝: 接受<b>或</b>死循环.</li>
+  </ul>
+  <p><b>易错:</b> 「不接受」不等于「拒绝」. 三种结果互斥, 「不接受」包括了另外两种.</p>
+</div>
+<div class="warn">
+  <p><b>原文笔误:</b> “M does not reject w w if …” 中 w 重复了一次.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 41–42</span>
+  <p><b>Recognizers and Recognizability</b></p>
+  <ul>
+    <li>A TM \( M \) is called a <b>recognizer</b> for a language \( L \) over \( \Sigma \) if the following statement is true:
+      <p>\( \forall w \in \Sigma^*.\ (w \in L \leftrightarrow M \text{ accepts } w) \)</p></li>
+    <li>A language \( L \) is called <b>recognizable</b> if there is a recognizer for it.</li>
+    <li>If you are absolutely certain that \( w \in L \), then running a recognizer for \( L \) on \( w \) will (eventually) confirm this.
+      <ul><li>Eventually, \( M \) will accept \( w \).</li></ul></li>
+    <li>If you don't know whether \( w \in L \), running \( M \) on \( w \) may never tell you anything.
+      <ul><li>\( M \) might loop on \( w \) – but you can't differentiate between “it'll accept if you wait longer” and “it will never come back with an answer.”</li></ul></li>
+    <li>Does this feel like “solving a problem” to you?</li>
+  </ul>
+  <p>The hailstone TM \( M \) we saw earlier is a recognizer for the language \( L = \{ a^n \mid n \gt 0 \text{ and the hailstone sequence terminates for } n \} \).</p>
+  <ul>
+    <li>If the sequence does terminate starting at \( n \), then \( M \) accepts \( a^n \).</li>
+    <li>If the sequence doesn't terminate, then \( M \) loops forever on \( a^n \) and never gives an answer.</li>
+  </ul>
+  <p>If you somehow knew the hailstone sequence terminated for \( n \), this machine would (eventually) confirm this. If you didn't know, this machine might not help.</p>
+</div>
+<div class="zh">
+  <p><b>recognizer</b> 识别器: 图灵机 M 恰好接受 L 中的串, 即 w ∈ L 当且仅当 M 接受 w. 对 L 之外的串, M 可以拒绝也可以死循环. 有识别器的语言叫 <b>recognizable</b> 可识别的.</p>
+  <p>识别器的局限: 如果 w ∈ L, 等足够久它一定会接受, 用来<b>确认</b>已知的事实没问题. 但如果你不知道 w 是否在 L 中, 它一直不返回时, 你分不清是「再等等就会接受」还是「永远不会返回」. 冰雹图灵机就是 L 的识别器: 序列终止时接受, 不终止时死循环.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 43–46</span>
+  <p>Earlier this quarter you explored sums of five cubes. Now, let's talk about sums of three cubes.</p>
+  <p>Are there integers \( x \), \( y \), and \( z \) where…</p>
+  <ul>
+    <li>\( x^3 + y^3 + z^3 = 10 \)? Yes! \( x = 2, y = 1, z = 1 \).</li>
+    <li>\( x^3 + y^3 + z^3 = 11 \)? Yes! \( x = 3, y = -2, z = -2 \).</li>
+    <li>\( x^3 + y^3 + z^3 = 12 \)? Yes! \( x = 7, y = 10, z = -11 \).</li>
+    <li>\( x^3 + y^3 + z^3 = 13 \)? Nope!</li>
+  </ul>
+  <p><b>Surprising fact:</b> until 2019, no one knew whether there were integers \( x \), \( y \), and \( z \) where \( x^3 + y^3 + z^3 = 33 \).</p>
+  <p>A heavily optimized computer search found this answer:</p>
+  <p>\( x = 8{,}866{,}128{,}975{,}287{,}528 \)<br>\( y = -8{,}778{,}405{,}442{,}862{,}239 \)<br>\( z = -2{,}736{,}111{,}468{,}807{,}040 \)</p>
+  <p>As of early 2025, no one knows whether there are integers \( x \), \( y \), and \( z \) where \( x^3 + y^3 + z^3 = 114 \).</p>
+</div>
+<div class="zh">
+  <p>另一个例子: 整数立方和. 10、11、12 都能写成三个整数的立方和, 13 不能: 整数的立方除以 9 的余数只能是 0、1、8, 三个相加除以 9 余数不可能是 4 或 5, 而 13 除以 9 余 4.</p>
+  <p>33 是否可以? 直到 2019 年才由大规模计算机搜索找到答案 (课件给出的三个数, 用 Python 验证立方和确实是 33). 114 至今 (课件说 2025 年初) 未知: 既没找到解, 也没证明无解.</p>
+</div>
+<div class="add">
+  <p>验证「立方模 9 只有 0、1、8」: 整数 x 模 9 的余数是 0 到 8 之一, 逐个算 \( x^3 \bmod 9 \): 0, 1, 8, 0, 1, 8, 0, 1, 8. 三个这样的数相加, 可能的余数是 0+0+0 = 0, 0+0+1 = 1, …, 8+8+8 = 24 ≡ 6, 枚举可知所有组合恰好覆盖 0、1、2、3、6、7、8, 唯独没有 4 和 5. 所以模 9 余 4 或 5 的数 (如 13、22、31) 都不是三个立方之和. 33 模 9 余 6, 114 模 9 余 6, 都不能用这个方法排除, 只能靠搜索.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 47–48</span>
+  <p>Consider the language \( L = \{ a^n \mid \exists x \in \mathbb{Z}.\ \exists y \in \mathbb{Z}.\ \exists z \in \mathbb{Z}.\ x^3 + y^3 + z^3 = n \} \)</p>
+  <p>Here's pseudocode for a recognizer to see whether such a triple exists:</p>
+  <pre data-lang="pseudocode">for max = 0, 1, 2, …
+  for x from -max to +max:
+    for y from -max to +max:
+      for z from -max to +max:
+        if x³ + y³ + z³ = n: return true</pre>
+  <p>If you somehow knew there was a triple \( x \), \( y \), and \( z \) where \( x^3 + y^3 + z^3 = n \), running this program will (eventually) convince you of this.</p>
+  <p>If you weren't sure whether a triple exists, this recognizer might not be useful to you.</p>
+  <p>The class <b>RE</b> consists of all recognizable languages. Formally speaking:</p>
+  <p>\( \mathbf{RE} = \{ L \mid L \text{ is a language and there's a recognizer for } L \} \)</p>
+  <ul>
+    <li>You can think of RE as “all problems with yes/no answers where “yes” answers can be confirmed by a computer.”
+      <ul>
+        <li>Given a recognizable language \( L \) and a string \( w \in L \), running a recognizer for \( L \) on \( w \) will eventually confirm \( w \in L \).</li>
+        <li>The recognizer will never have a “false positive” of saying that a string is in \( L \) when it isn't.</li>
+      </ul></li>
+    <li>This is a “weak” notion of solving a problem.</li>
+    <li>Is there a “stronger” one?</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>立方和问题的识别器: 搜索范围 max 从 0 开始逐步扩大, 在范围内枚举所有 (x, y, z). 有解时迟早会搜到并接受; 无解时永远搜下去. 注意外层要逐步扩大范围, 不能先把 x 从 −∞ 枚举到 +∞, 否则会卡在某个 x 上永远出不来.</p>
+  <p>所有可识别语言组成的类叫 <b>RE</b> (来自 recursively enumerable 递归可枚举). 直觉: 「是」的答案能被计算机确认的判定问题. 识别器不会误报 (不会接受不在 L 中的串), 但对「否」的情形可能永不回答. 这是「解决问题」的弱意义.</p>
+  <p>对比两种「失败」: 识别器对 L 之外的串可以拒绝, 也可以死循环, 定义只要求它<b>不接受</b>. 所以同一个语言可以有很多识别器, 有的对某些串拒绝, 有的死循环, 只要接受的集合恰好是 L 就都算. 例如立方和识别器也可以加一条规则: 若 n 模 9 余 4 或 5 就直接拒绝; 这让它在部分「否」实例上停机, 但对 114 这样的 n 仍然只能无限搜索.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 49–50</span>
+  <p><b>Deciders and Decidability</b></p>
+  <ul>
+    <li>Some, but not all, TMs have the following property: the TM halts on all inputs.</li>
+    <li>If you are given a TM \( M \) that always halts, then for the TM \( M \), the statement “\( M \) does not accept \( w \)” means “\( M \) rejects \( w \).”</li>
+  </ul>
+  <p class="src">(图: 只有 Accept 和 Reject 两块, 合起来是 halts (always).)</p>
+  <ul>
+    <li>A TM \( M \) is called a <b>decider</b> for a language \( L \) over \( \Sigma \) if the following statements are true:
+      <p>\( \forall w \in \Sigma^*.\ M \text{ halts on } w. \)<br>\( \forall w \in \Sigma^*.\ (w \in L \leftrightarrow M \text{ accepts } w) \)</p></li>
+    <li>A language \( L \) is called <b>decidable</b> if there is a decider for it.</li>
+    <li>A decider \( M \) for a language \( L \) accepts all strings in \( L \) and rejects all strings not in \( L \).</li>
+    <li>A decider \( M \) for a language \( L \) is a recognizer for \( L \) that halts on all inputs.</li>
+    <li>Intuitively, if you don't know whether \( w \in L \), running \( M \) on \( w \) will “create new knowledge” by telling you the answer.</li>
+    <li>This is a “strong” notion of “solving a problem.”</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>有些图灵机对所有输入都停机. 这时「不接受」就等于「拒绝」. <b>decider</b> 判定器: 对所有输入都停机, 并且恰好接受 L 中的串. 等价说法: 判定器是一个永远停机的识别器; 它接受 L 中的串, 拒绝其他串. 有判定器的语言叫 <b>decidable</b> 可判定的.</p>
+  <p>判定器能「创造新知识」: 不知道 w 是否在 L 中时, 运行它, 一定会得到答案. 这是「解决问题」的强意义.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 51–52</span>
+  <p>The hailstone TM \( M \) we saw earlier is a recognizer for the language \( L = \{ a^n \mid n \gt 0 \text{ and the hailstone sequence terminates for } n \} \).</p>
+  <ul>
+    <li>If the hailstone sequence terminates for \( n \), then \( M \) accepts \( a^n \). If it doesn't, then \( M \) does not accept \( a^n \).</li>
+    <li>We don't know if \( M \) is a decider for this language.
+      <ul>
+        <li>If the hailstone sequence always terminates, then \( M \) always halts and is a decider for \( L \).</li>
+        <li>If the hailstone sequence doesn't always terminate, then \( M \) will loop on some inputs and isn't a decider for \( L \).</li>
+      </ul></li>
+  </ul>
+  <p>While no one knows whether there are integers \( x \), \( y \), and \( z \) where \( x^3 + y^3 + z^3 = 114 \), it is very easy to figure out whether there are integers \( x \), \( y \), and \( z \) where \( x^2 + y^2 + z^2 = 114 \).</p>
+  <p>Take a minute to discuss – why is this?</p>
+</div>
+<div class="zh">
+  <p>冰雹图灵机是不是判定器? 取决于考拉兹猜想: 若序列总会终止, 它总停机, 就是判定器; 若有不终止的 n, 它在那里死循环, 就不是. 目前没人知道.</p>
+  <p>讨论题: 为什么平方和容易? 因为平方非负, \( x^2 \le 114 \) 意味着 |x| ≤ 10, 只需检查有限多种组合 (例如 1 + 49 + 64 = 114). 立方可以是负数, 正负可以互相抵消, 解的大小没有上界, 所以只能无限搜索.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 53</span>
+  <p>Consider the language \( L = \{ a^n \mid \exists x \in \mathbb{Z}.\ \exists y \in \mathbb{Z}.\ \exists z \in \mathbb{Z}.\ x^2 + y^2 + z^2 = n \} \).</p>
+  <p>Here's pseudocode for a decider to see whether such a triple exists:</p>
+  <pre data-lang="pseudocode">for x from 0 to n:
+  for y from 0 to n:
+    for z from 0 to n:
+      if x² + y² + z² = n: return true
+return false</pre>
+  <p>After trying all possible options, this program will either find a triple that works or report that none exists.</p>
+  <p>The class <b>R</b> consists of all decidable languages. Formally speaking:</p>
+  <p>\( \mathbf{R} = \{ L \mid L \text{ is a language and there's a decider for } L \} \)</p>
+  <ul>
+    <li>You can think of R as “all problems with yes/no answers that can be fully solved by computers.”
+      <ul>
+        <li>Given a decidable language, run a decider for \( L \) and see what happens.</li>
+        <li>Think of this as “knowledge creation” – if you don't know whether a string is in \( L \), running the decider will, given enough time, tell you.</li>
+      </ul></li>
+    <li>The class R contains all the regular languages, all the context-free languages, most of CS161, etc.</li>
+    <li>This is a “strong” notion of solving a problem.</li>
+  </ul>
+</div>
+<div class="zh">
+  <p>平方和的判定器: 只需枚举 0 到 n 的 x、y、z (负数的平方和正数一样, 不必枚举), 有限步后要么找到要么返回 false. 所以这个语言可判定.</p>
+  <p>所有可判定语言组成的类叫 <b>R</b> (来自 recursive 递归). 直觉: 能被计算机完全解决的判定问题. R 包括所有正则语言、所有上下文无关语言, 以及算法课 (CS161) 里的大多数问题.</p>
+</div>
+
+<div class="card de">
+  <span class="folie">Slide 54–57</span>
+  <p><b>R and RE Languages</b></p>
+  <ul>
+    <li>Every decider for \( L \) is also a recognizer for \( L \).</li>
+    <li>This means that \( \mathbf{R} \subseteq \mathbf{RE} \).</li>
+    <li>Hugely important theoretical question: \( \mathbf{R} \overset{?}{=} \mathbf{RE} \)</li>
+    <li>That is, if you can just confirm “yes” answers to a problem, can you necessarily <i>solve</i> that problem?</li>
+  </ul>
+  <p><b>Which Picture is Correct?</b></p>
+  <p class="src">(图: 两种可能: Regular Languages ⊂ CFLs ⊂ R = RE ⊂ All Languages, 或 Regular Languages ⊂ CFLs ⊂ R ⊊ RE ⊂ All Languages.)</p>
+  <p><b>Unanswered Questions</b></p>
+  <ul>
+    <li>Why exactly is RE an interesting class of problems?</li>
+    <li>What does the \( \mathbf{R} \overset{?}{=} \mathbf{RE} \) question mean?</li>
+    <li>Is \( \mathbf{R} = \mathbf{RE} \)?</li>
+    <li>What lies beyond R and RE?</li>
+    <li>We'll see the answers to each of these in due time.</li>
+  </ul>
+  <p><b>Next Time</b></p>
+  <ul>
+    <li><b>Emergent Properties</b><ul><li>Larger phenomena made of smaller parts.</li></ul></li>
+    <li><b>Universal Machines</b><ul><li>A single, “most powerful” computer.</li></ul></li>
+    <li><b>Self-Reference</b><ul><li>Programs that ask questions about themselves.</li></ul></li>
+  </ul>
+</div>
+<div class="zh">
+  <p>每个判定器都是识别器, 所以 R ⊆ RE. 重大的理论问题: R = RE 吗? 即: 能确认「是」的答案, 是否就一定能完全解决问题? 两种图景: R 和 RE 重合, 或 R 严格小于 RE. 后面几讲会证明答案是后者: 存在可识别但不可判定的语言 (例如停机问题). 也存在 RE 之外的语言, 连识别器都没有.</p>
+  <p>下一讲: 涌现性质, 通用图灵机 (一台能模拟所有图灵机的「最强」机器), 以及自指 (程序询问关于自己的问题).</p>
+</div>
+<div class="add">
+  <p>一个有用的事实 (后面的课会用到类似的想法): 如果 L 和它的补 \( \overline{L} \) 都可识别, 那么 L 可判定. 做法是把两个识别器<b>交替</b>运行, 各走一步: 任何串 w 要么在 L 中 (L 的识别器迟早接受), 要么在 \( \overline{L} \) 中 (另一个迟早接受), 所以交替运行一定会停下来并给出正确答案. 不能先把一个跑完再跑另一个, 因为第一个可能永远不停.</p>
+</div>
+
+</main>
+<script data-goatcounter="https://yikesyellowpharmakon.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
