@@ -371,3 +371,114 @@ X rarcres | canceled flights to Houston: 栈 [root, canceled, flights] 时 cance
 X oracle | 给定正确树, 能算出每一步应做的转移, 这些 (格局, 转移) 对就是分类器的训练样本.
 X conllu | HEAD 一列就把树完全表示出来: 每个词记下自己的父亲. 德语 UD 例句 Alle wußten, daß uns nicht mehr viel Zeit blieb: wußten 的 HEAD 是 0 (根), blieb 以 ccomp 依附于它.
 X tbconv | 课件写 siehe Sitzung 5, 指的就是本讲 1.5 节. NP-SBJ 的中心词直接得到 nsubj, 不用从位置推断.
+
+# ===== SNS 06 · 句法功能 =====
+D synf | Syntaktische Funktionen fassen Dependenzrelationen zu Klassen von gleichartigen Relationen zusammen; in Dependenzgrammatiken werden sie als getypte Kanten dargestellt.
+X synf | 上一讲只画边, 这一讲给边分类: 一个依附词对中心词起什么作用. 分类依据是形态句法表现 (能不能变被动、和谁一致、用什么格), 不是意思. 主语、宾语、状语、定语都是句法功能, 和名词、动词这类词类范畴是两套东西: Maria 和 Moritz 都是专有名词, 在 Maria sah Moritz 里功能却不同.
+S synf | relkat | 关系范畴 | relationale Kategorien | 句法功能是关系的类, 不是词的类.
+S synf | getypt | 带类型的边 | getypte Kanten | 依存图里把功能写在边上, 如 subj(x,y).
+
+D valkl | Komplemente sind valenzgeforderte Dependenten eines Kopfes, Adjunkte sind nicht-valenzgeforderte Dependenten.
+X valkl | 配价层面问「中心词要求哪些依附词」. 补足语的出现由中心词要求, 通常连形式 (格) 也要求; 中心词带着要填的空位. 附加语方向相反: 空位在依附词上, 它能挂到某类中心词上, 而且可以重复、自由添加. 「可有可无」不等于附加语: Er isst (einen Apfel) 的宾语可省, 仍是补足语.
+S valkl | leerst | 空位 | Leerstelle | 中心词上要用特定形式的成分填的位置 (Bühler).
+S valkl | quantv | 量的配价 | quantitative Valenz | 要几个依附词.
+S valkl | qualv | 质的配价 | qualitative Valenz | 依附词要什么形式, 如第三格.
+S valkl | angabe6 | 说明语 | Angabe | 修饰动词的附加语, 也叫 Zirkumstant.
+S valkl | attr6 | 定语 | Attribut | 修饰名词的附加语.
+
+D grrel | Grammatische Relationen sind die Relationen zwischen Prädikat und seinen Dependenten (Satzgliedern), kategorisiert über morphosyntaktische Kriterien wie Passivierbarkeit, Relativierbarkeit und Agreement.
+X grrel | 语法关系是谓语和句子成分之间的核心功能. 判断看形式: 和动词一致、无标记 (主格) 的论元是主语; 能变成被动句主语的是直接宾语. 位置不决定功能: Den Mann beißt der Hund 的主语仍是 der Hund. 句子成分是能在句中移位的直接组成部分 (SNS 01).
+S grrel | passiv | 可被动化 | Passivierbarkeit | 能否变成被动句的主语.
+S grrel | relat | 可关系化 | Relativierbarkeit | 能否被关系从句提取.
+S grrel | agree | 一致 | Agreement | 和动词在人称、数上一致.
+
+D kernarg | Kernargumente (Subjekt, Objekte) stehen in der Hierarchie Subjekt > Direktes Objekt > Indir. Objekt > Adverbiale über den peripheren Argumenten (Adverbiale).
+X kernarg | 语法关系构成等级: 某个句法结构能用在一个功能上, 就也能用在所有更高的功能上 (具体到哪一级因语言而异). 由此分出核心论元 (主语、宾语) 和外围论元 (状语), 即 core / oblique. 这和补足语 / 附加语是交叉的: 外围的状语也可能是配价要求的 (die Blumen ins Wasser stellen), 核心的主语也可能不是补足语 (es regnet 的 es).
+S kernarg | hier | 功能等级 | Hierarchie grammatischer Funktionen | 主语 > 直接宾语 > 间接宾语 > 状语.
+S kernarg | periph | 外围论元 | peripheres Argument | 状语, 一般是附加语.
+S kernarg | quer | 两种分类交叉 | quer zu dieser Kategorisierung | 核心与外围不等于补足语与附加语.
+
+D praed | Das Prädikat ist der Kopf des Satzes (Wurzelknoten), formal ein Verb oder Verbkomplex, und kongruiert mit dem Subjekt.
+X praed | 谓语是依存树的根. 形式上是动词或动词复合体: 助动词 + 动词 (hat geschlafen), 系词 + 表语 (ist müde). 这是狭义谓语; 生成语法的广义谓语是动词加补足语, 相当于 VP. 动词的核心论元数: 不及物 1、及物 2、双及物 3.
+S praed | verbkompl | 动词复合体 | Verbkomplex | 助动词或系词加实义部分.
+S praed | intrans | 不及物、及物、双及物 | intransitiv, transitiv, ditransitiv | 核心论元 1、2、3 个.
+
+D subjekt | Das Subjekt ist das Kernargument eines intransitiven Verbs bzw. das Agens-Kernargument eines transitiven Verbs, prototypisch im Nominativ und mit dem Verb kongruierend.
+X subjekt | 主语靠形式认: 主格、与动词一致、中场里通常在宾语前. 典型语义角色是施事, 但 Das Eis schmilzt 的主语是受事; 典型语用角色是话题. 并列时主语可以省 (ich kam, sah und siegte), 宾语不行. 代词脱落语言 (意大利语 piove) 靠一致就够; 德语主语位置必须有东西, 所以有虚位词 es regnet.
+S subjekt | expl6 | 虚位词 | Expletiv | 语义空的主语, UD 标 expl.
+S subjekt | prodrop | 代词脱落语言 | Pro-Drop | 主语可以不出现的语言.
+S subjekt | agens6 | 施事 | Agens | 主语的典型语义角色.
+S subjekt | topic6 | 话题 | Topic | 主语的典型语用角色.
+
+D dobj | Das direkte Objekt ist das Patiens-Kernargument eines transitiven Verbs, prototypisch im Akkusativ, und wird im Passiv zum Subjekt.
+X dobj | 直接宾语是及物动词的受事论元, 靠近动词, 能被关系化. 关键测试是被动: Die Sonne erwärmt den See → Der See wird erwärmt. 德语有些动词要第二格 (Der schönen Tage erinnert er sich), 第三格或介词宾语; UD 都标 obj, 介词宾语除外 (obl).
+S dobj | patiens6 | 受事 / 客体 | Patiens / Theme | 典型语义角色.
+S dobj | akk | 第四格 | Akkusativ | 典型的宾语格.
+
+D iobj | Das indirekte Objekt ist das Recipient-Argument eines ditransitiven Verbs, kodiert durch Dativ oder präpositional, relativierbar, aber nicht passivierbar.
+X iobj | 双及物动词 geben 的接受者: Er gibt seinem Freund das Buch. 比直接宾语离动词远: (ein Buch gegeben) hat er seinem Freund 可以, *(seinem Freund gegeben) hat er ein Buch 不行. 用介词表达的 (to his friend) 在 UD 里标 obl, 因为 UD 按形式标注.
+S iobj | recip | 接受者 | Recipient / Goal | 典型语义角色.
+S iobj | topikal | 和动词一起前置的测试 | Topikalisierung Konstituente mit Verb | 只有离动词近的宾语能和动词一起前置.
+
+D adverb | Das Adverbial ist ein Satzglied, das weder Prädikat, Subjekt noch (indirektes) Objekt ist, und lokale, zeitliche, kausale oder modale Umstände angibt.
+X adverb | 状语说明事件的状况: 地点、方向、时间、工具、方式、原因. 不能变被动, 不与动词一致. 形式可以是介词短语 (介词状语)、旁格名词短语 (格状语: Er ging den ganzen Tag)、副词或状语从句. 和定语相对: 定语修饰的是名词性成分的内部.
+S adverb | praepadv | 介词状语 | Präpositionaladverbial | 用介词表达的状语.
+S adverb | kasusadv6 | 格状语 | Kasusadverbial | 用旁格表达的状语.
+
+D freidat | Der freie Dativ ist ein nicht von der Verbvalenz geforderter Dativ, z. B. Dativus ethicus und Dativus iudicantis.
+X freidat | 看起来像第三格宾语, 其实是附加的: 情感第三格 Du bist mir ein Held! 表示说话人的关心, 判断第三格 Das ist mir zu laut 表示从谁的角度判断. Dürscheid 的表里它和状语只差一点: 不能放在句首. 可以去掉, 不能用 wem 正常提问.
+S freidat | ethicus | 情感第三格 | Ethicus | 表示说话人的关心.
+S freidat | iudicantis | 判断第三格 | Iudicantis | 表示判断的角度.
+
+D udgr | In UD-Labels ist aufgenommen, durch welche Formklasse die Funktion realisiert wird (Kombination aus Wortart und Funktionslabel).
+X udgr | UD 的标签是「形式 + 功能」的组合. 主语: nsubj (名词)、expl (虚位词)、csubj (从句); 宾语: obj、iobj、ccomp (补足从句); 状语: obl (名词, 带介词时介词标 case)、advmod (副词)、advcl (状语从句). 同一功能换一种形式, 标签就变: He gave his friend a book 是 iobj, to his friend 是 obl.
+S udgr | nsubj6 | 名词性主语 | nsubj | 由名词短语实现的主语.
+S udgr | csubj6 | 从句主语 | csubj | 由从句实现的主语.
+S udgr | obl6 | 旁格名词 | obl | 名词性的状语, 也包括介词宾语.
+S udgr | advmod6 | 副词修饰语 | advmod | 由副词实现的状语.
+S udgr | ccomp6 | 补足从句 | ccomp | 由从句实现的宾语.
+
+D advkomp | Ein Element in adverbialer Funktion kann vom Verb gefordert sein (adverbiales Komplement); sein Auftreten ist valenzgefordert, seine Form nicht.
+X advkomp | Er stellt die Blumen ins Wasser: 去掉 ins Wasser 不合语法, 所以是补足语; 但 in die Vase、an das Fenster 都行, 形式不限. 可有可无的状语补足语用 geschehen 测试: *Er fährt, und es geschieht nach München. 配价很难操作化 (工具 mit dem Messer 算不算 schneiden 的配价?), 所以 UD 有意不区分, 都标 obl.
+S advkomp | geschtest | 发生测试 | Geschehenstest | 能挪进 und das geschieht … 的是附加语.
+S advkomp | formfrei | 只要求出现, 不要求形式 | Auftreten valenzgefordert, Form nicht | 与介词宾语的区别.
+
+D pobj | Das Präpositionalobjekt wird mit semantisch leerer Präposition gebildet, ist valenzgefordert und verhält sich syntaktisch ähnlich wie Objekte.
+X pobj | 介词宾语的介词没有实义 (warten auf 的 auf 不表示「上面」), 出现和形式都由动词要求 (glauben an, 不能换介词). 区分介词状语的办法: 能换成代副词 + 从句 (er wartet darauf, dass …), 能用 worauf 提问. UD 标 obl, TIGER 标 op.
+S pobj | rektkas | 支配格 | Rektionskasus | 介词起的作用相当于动词支配的格.
+S pobj | pronadv | 代副词测试 | Pronominaladverb | 换成 darauf, 用 worauf 提问.
+
+D kasadv | Beim Kasusobjekt wird der Kasus vom Verb regiert, beim Kasusadverbial nicht; Kasusadverbiale sind nicht passivierbar und nicht mit Objektpronomen erfragbar.
+X kasadv | er gedachte der schönen Tage (第二格宾语, gedenken 支配) 对 Er lief den ganzen Tag (第四格表时长, 和 laufen 无关). 格状语不能用 wen 提问, 只能问 wie lange; 不能变被动 (*Der ganze Tag wird gelaufen); 同格的可以叠加, 格宾语不行.
+S kasadv | regiert | 格由动词支配 | Kasus vom Verb regiert | 格宾语有, 格状语没有.
+S kasadv | erfrag | 用宾语代词提问 | Erfragbarkeit mit einem Objektpronomen | wessen gedachte er? 对 *wen lief er?
+
+D kodier | Agreement markiert die syntaktische Funktion durch Spiegelung von Merkmalen des Dependents am Kopf (head-marking), Kasus durch grammatische Marker am Dependent (dependent-marking).
+X kodier | 两种标记方式. 一致: 依附词的特征反映在中心词上, du läufst 的 -st 反映主语是第二人称单数. 格: 记号在依附词上, den Hund 的 den 标第四格. 补足语的格由配价要求, 附加语的格看它的意思. 德语两种都有; 有的语言动词同时和主语、宾语一致.
+S kodier | headmark | 中心词标记 | head-marking | 通过一致标在中心词上.
+S kodier | depmark | 依附词标记 | dependent-marking | 通过格标在依附词上.
+
+D primacy | Präposition als Kasusmarker: Nomen (Inhaltswort) als Kopf, Präposition als Funktionswort, das den Kopf modifiziert (UD: primacy of content words).
+X primacy | 介词短语有两种分析约定: 介词作中心词, 名词是它的依附词 (pcomp, Stanford Dependencies); 或名词作中心词, 介词作格标记 (case). 这门课和 UD 用后者. 好处是跨语言可比: 德语 im Park 用介词, 芬兰语用处所格词尾, 按实词优先两者的依存树一样.
+S primacy | casemark | 格标记 | case | 介词挂在名词上.
+S primacy | pcomp6 | 介词补足语 | pcomp | 另一种约定: 名词挂在介词上.
+
+D ppfunk | Präpositionalphrasen fungieren als verbales Adjunkt (Adverbial), verbales Komplement (adverbiales Komplement, Präpositionalobjekt) oder nominales Attribut (Präpositionalattribut).
+X ppfunk | 同样形式的介词短语可以起四种功能. Der Hund wartet auf die Katze im Fenster auf der Straße: auf die Katze 是 warten 要求的介词宾语, im Fenster 挂在 Katze 上是定语 (nmod), auf der Straße 挂在 wartet 上是状语 (obl). 挂靠歧义问的就是: 介词短语是名词的定语, 还是动词的附加语.
+S ppfunk | ppadj | 动词附加语 | verbales Adjunkt | 状语, obl.
+S ppfunk | ppkomp | 动词补足语 | verbales Komplement | 状语补足语或介词宾语.
+S ppfunk | ppattr | 介词定语 | Präpositionalattribut | 名词的依附词, nmod.
+
+D attrib | Ein Attribut ist ein nominaler Dependent, der mit dem Nomen endozentrisch eine erweiterte NP bildet und rekursiv wiederholbar ist.
+X attrib | 定语修饰名词: 可以是述谓性的限定 (der kleine Hund), 也可以是非述谓的关系 (Das Bellen des Hundes, 类似动词的论元). 名词的依附词从不必有, 所以用广义的定语概念, 名词的补足语也算定语, 不像 X-bar 那样区分. 向心: 名词仍是中心词, 结果还是名词短语, 可以一层层叠加.
+S attrib | endo | 向心 | endozentrisch | 整体范畴和中心词相同.
+S attrib | adjattr | 形容词 / 分词定语 | Adjektiv-/Partizipial-Attribut | UD 标 amod.
+S attrib | genattr | 介词 / 第二格定语 | Präpositional-/Genitiv-Attribut | UD 标 nmod.
+S attrib | attrsatz | 定语从句 | Attributsatz | UD 标 acl.
+
+D udattr | Nominale Dependenten in UD: nominal modifier (nmod), adjectival modifier (amod), determiner (det), numeric modifier (nummod), appositional modifier (appos).
+X udattr | 名词短语内部的 UD 标签: Hund des Lehrers 标 nmod:poss (冒号后是子类型); Hund vom Lehrer、Hund im Park 标 nmod, 介词是 case; rotes Auto 标 amod; der Hund 标 det; zwei Hunde 标 nummod; Brutus, mein Hund 标 appos, 中心词是前面的 Brutus. 同一个名词短语挂在动词上标 obl, 挂在名词上标 nmod.
+S udattr | nmod6 | 名词修饰语 | nmod | 修饰名词的名词.
+S udattr | amod6 | 形容词修饰语 | amod | 修饰名词的形容词.
+S udattr | nummod6 | 数词修饰语 | nummod | 修饰名词的数词.
+S udattr | appos6 | 同位语 | appos | 对前面名词的补充说明.

@@ -302,3 +302,30 @@ D kd | Bei einer Kurvendiskussion untersucht man Definitionsbereich, Nullstellen
 X kd | 一条曲线按顺序看完: 定义域 (尤其分母何时为 0); 零点和 f(0); 对称性; 渐近线; 用 f' 划分单调区间; 用临界点、不可导点和端点找极值, 区分必要条件和充分条件; 用 f'' 看凹凸和拐点; 最后画图. 例 f(x) = x³ − 3x: 关于原点对称, 零点 0 和 ±√3, f'(x) = 3(x − 1)(x + 1), 在 −1 局部最大、1 局部最小, f'' = 6x 在 0 变号是拐点.
 S kd | reihenfolge | 讨论的顺序 |  | 定义域、零点、对称、渐近线、单调、极值、凹凸、画图.
 S kd | sym | 对称性 |  | 关于 y 轴或原点.
+
+# ===== MGTN Vl 9 =====
+D rechregeln | Für x, y, z ∈ ℝⁿ und α, β ∈ ℝ gilt: Kommutativgesetz, Assoziativgesetz, zwei Distributivgesetze, Assoziativität von ·, neutrales Element 0, inverse Elemente −x = (−1)·x, Kürzungsregeln und 1 · x = x.
+X rechregeln | 按分量定义的运算继承了实数的规律: 每条的证明都是把向量拆成分量, 在每个分量上用一次实数的运算律, 再合回去. 例: (α + β)x 的第 i 个分量是 (α + β)xᵢ = αxᵢ + βxᵢ. i)–vii) 和 x) 这八条以后会变成抽象向量空间的公理; 消去律 viii)、ix) 能由它们推出.
+S rechregeln | kommut | 交换律 | Kommutativgesetz | x + y = y + x.
+S rechregeln | distrib | 分配律 | Distributivgesetz | α(x + y) = αx + αy, (α + β)x = αx + βx.
+S rechregeln | nullv | 零向量 | Nullvektor | 加法的中性元.
+S rechregeln | invers | 相反向量 | Existenz inverser Elemente | x + (−x) = 0.
+
+D laenge | Für x, y ∈ ℝⁿ heißt ‖x‖ := √(Σ xᵢ²) die Länge von x und d(x, y) := ‖x − y‖ der Abstand zwischen x und y.
+X laenge | 平面上 x 是直角三角形的斜边, 两条直角边是 x₁ 和 x₂, 勾股定理给出 ‖x‖² = x₁² + x₂²; 三维时用两次勾股定理. 距离是从 y 走到 x 那一段箭头 x − y 的长度. ℝ⁴ 里画不出来, 公式照用: ‖(3, 4, 0, 0)‖ = 5, d((3, 4, 0, 0), (1, 2, 3, 4)) = √33 ≈ 5.745.
+S laenge | pythag | 勾股定理 | Satz des Pythagoras | 长度定义的来源.
+
+D skalarprod | Für x, y ∈ ℝⁿ heißt ⟨x, y⟩ := Σ xᵢ · yᵢ das Standardskalarprodukt der Vektoren x und y.
+X skalarprod | 内积输入两个向量、输出一个实数, 和数乘 (数 × 向量 = 向量) 不同. ⟨x, x⟩ = ‖x‖², 所以长度可以由内积算出. 几何意义: ⟨x, y⟩ = ‖x‖‖y‖cos α, 也就是 x 的长度乘 y 在 x 方向上的投影长度 (带符号); 例 ⟨(2, 4), (1, −2)⟩ = −6, cos α = −0.6, 夹角约 127°.
+S skalarprod | proj | 投影 | Projektion | y 在 x 方向上的影子, ‖z‖ = ‖y‖ |cos α|.
+S skalarprod | cosform | 夹角公式 | cos(α) = ⟨x, y⟩ / (‖x‖ ‖y‖) | 由内积算夹角.
+
+D ortho | Zwei Vektoren x, y ∈ ℝⁿ mit x ≠ 0 und y ≠ 0 heißen orthogonal zueinander stehend, falls ⟨x, y⟩ = 0 gilt.
+X ortho | 这是把 α = 90° 的情形反过来当定义, ℝⁿ 里画不出直角, 就用内积定义「垂直」. 零向量和谁的内积都是 0, 但它没有方向, 所以排除. 非零分量互相错开的两个向量一定正交: ⟨(3, 4, 0, 0), (0, 0, 7, 9)⟩ = 0.
+
+D skpeig | Seien x, y, z ∈ ℝⁿ, α ∈ ℝ: ⟨x + y, z⟩ = ⟨x, z⟩ + ⟨y, z⟩, ⟨αx, y⟩ = α⟨x, y⟩ (ebenso in der 2. Komponente), ⟨x, y⟩ = ⟨y, x⟩, ⟨x, x⟩ ≥ 0 und ⟨x, x⟩ = 0 ⇔ x = 0.
+X skpeig | 可加性和齐次性合起来是双线性, 内积可以像普通乘法一样展开: ⟨x + y, x + y⟩ = ⟨x, x⟩ + 2⟨x, y⟩ + ⟨y, y⟩. 正定性的证明: 非负数之和为 0 只能每项都为 0. 易混的一点: 数因子从内积里直接提出, 从长度里提出要加绝对值, ‖αx‖ = |α| ‖x‖.
+S skpeig | additiv | 可加性 | Additivität | 每个位置上和可以拆开.
+S skpeig | homogen | 齐次性 | Homogenität | 数因子可以提出.
+S skpeig | symm | 对称性 | Symmetrie | ⟨x, y⟩ = ⟨y, x⟩.
+S skpeig | posdef | 正定性 | Positive Definitheit | ⟨x, x⟩ ≥ 0, 只有零向量取 0.

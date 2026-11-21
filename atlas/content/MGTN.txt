@@ -327,3 +327,34 @@ DROP 人名, 归入 Cantor 定理 | Cantor
 ZH 描述性名称 (板书讲了内容, 没有这个词) | 至少一样多
 DE 描述性名称 (板书讲了内容, 没有这个标题) | Mächtigkeit unendlicher Mengen
 ZH 学科标准译名 | 康托尔-伯恩斯坦定理
+
+# ===== MGTN Vl 9 (20.11.2026): Rechenregeln in ℝⁿ, Länge, Abstand, Standardskalarprodukt, Orthogonalität 2026-11-20 =====
+N rechregeln | la | ℝⁿ 的运算律 | Rechenregeln für (ℝⁿ, +, ·) | s11 | 按分量定义的加法和数乘满足交换律、结合律、分配律, 有零向量和相反向量, 还能消去. | i)–vii) 和 x) 以后作抽象向量空间的公理 ;; 证明都靠实数的运算律逐分量推出 | (αβ)x = α(βx)
+N laenge | la | 长度与距离 | Definition (Länge, Abstand) | s12 | 长度是各分量平方和的平方根, 距离是两个向量之差的长度. | 来自勾股定理, 每多一维多一项平方 ;; d(x, y) = d(y, x) | ‖(3, 4, 0, 0)‖ = 5
+N skalarprod | la | 标准内积 | Standardskalarprodukt | s12 | ⟨x, y⟩ = Σ xᵢ yᵢ, 两个向量对应分量相乘再相加, 结果是实数. | ⟨x, x⟩ = ‖x‖² ;; 几何上 ⟨x, y⟩ = ‖x‖‖y‖cos α ;; 符号看夹角: 锐角正、直角零、钝角负 | ⟨(2, 4), (1, −2)⟩ = −6
+N ortho | la | 正交 | Orthogonalität | s12 | 两个非零向量的标准内积为 0 时互相正交, 记作 x ⊥ y. | 平面上就是垂直 ;; 零向量被排除在定义之外 | ⟨(3, 4, 0, 0), (0, 0, 7, 9)⟩ = 0
+N skpeig | la | 标准内积的性质 | Satz (Eigenschaften des Standardskalarprodukts) | s12 | 两个位置上都可加、齐次 (双线性), 对称, 正定: ⟨x, x⟩ ≥ 0 且只有零向量取 0. | 数因子从内积里直接提出, 从长度里提出要加绝对值 ;; 证明都是逐分量用实数的运算律
+
+E rn > rechregeln | 运算律是 ℝⁿ 加法和数乘的性质.
+E rechregeln > linkomb | 线性组合的计算靠这些运算律.
+E rn > laenge | 长度和距离定义在 ℝⁿ 上.
+E laenge ~ norm | 欧氏范数就是这里的长度.
+E laenge > skalarprod | ⟨x, x⟩ = ‖x‖².
+E skalarprod > ortho | 内积为 0 就是正交.
+E skalarprod > skpeig | 内积的计算规则.
+E skpeig ~ norm | 范数的数乘规则从内积性质推出.
+
+T Nullvektor | der | Nullvektoren | 零向量 | la | Vektor, dessen Komponenten alle 0 sind; neutrales Element der Addition. | 所有分量都为 0 的向量, 加法的中性元. |  | s11
+T Länge | die | Längen | 长度 | la | ‖x‖ = Wurzel aus der Summe der quadrierten Komponenten. | 各分量平方和的平方根. | Abstand | s12
+T Abstand | der | Abstände | 距离 | la | d(x, y) = ‖x − y‖. | 两个向量之差的长度. | Länge | s12
+T Standardskalarprodukt | das | Standardskalarprodukte | 标准内积 | la | ⟨x, y⟩ = Summe der Produkte der Komponenten. | 对应分量相乘再相加. |  | s12 | Skalarprodukt
+T Projektion | die | Projektionen | 投影 | la | Schatten des Vektors y auf den Vektor x; ‖z‖ = ‖y‖ · |cos α|. | y 在 x 方向上的影子. |  | s12
+T orthogonal |  |  | 正交 | la | Zwei Vektoren ungleich dem Nullvektor mit Standardskalarprodukt 0. | 内积为 0 的两个非零向量. |  | s12 | Orthogonalität
+
+M Nullvektor | rechregeln
+M Länge | laenge
+M Abstand | laenge
+M Standardskalarprodukt | skalarprod
+M Projektion | skalarprod
+M orthogonal | ortho
+DE 描述性名称 (板书标题, 在合集里作 h4 小标题或写在公式里) | Definition (Länge, Abstand); Existenz inverser Elemente; Orthogonalität; Rechenregeln für (ℝⁿ, +, ·); Satz (Eigenschaften des Standardskalarprodukts); cos(α) = ⟨x, y⟩ / (‖x‖ ‖y‖)

@@ -555,3 +555,98 @@ SKIP SNS 05: 章节标题, 内容归入其下各概念 | Dependenzstruktur; Depe
 DROP SNS 05: 并入 挂靠歧义 | PP-Attachment
 ZH 描述性小标题, 不是术语 | 两种结构互相隐含; 依存结构的合式条件; 依存规则; 成分树库转依存
 ZH 学科标准译名 | 左弧; 右弧; 通用依存
+
+# ===== SNS 06 · 句法功能 (Wisiorek, 2026-11-18) 2026-11-20 =====
+B funk | 句法功能 | Syntaktische Funktionen | 给依存边贴标签: 配价分类与功能分类, 句子成分的语法关系, UD 标签, 状语的补足语与附加语, 名词短语里的定语.
+
+N synf | funk | 句法功能 | Syntaktische Funktion | 06:funktion | 按形态句法表现把依存关系归成的类, 在依存树里画成带类型的边. | 也叫关系范畴 ;; 主语、宾语、状语、定语都是句法功能 ;; 和词类是两套范畴 | subj(x,y)
+N valkl | funk | 配价分类 | Valenzklassifikation | 06:valenz | 按中心词是否要求把依附词分成补足语和附加语: 补足语填中心词的空位, 附加语自带空位挂到中心词上. | 补足语的出现由配价允准, 可必有可可有可无 ;; 附加语可重复、可自由添加 ;; 和功能分类交叉
+N grrel | funk | 语法关系 | Grammatische Relationen | 06:einfach | 谓语和它的依附词 (句子成分) 之间的核心句法功能, 按被动化、关系化、一致等标准分类. | 也叫 Satzgliedfunktion ;; 表现相同的论元归为同一功能 ;; 主语: 与动词一致的无标记论元
+N kernarg | funk | 核心论元 | Kernargument | 06:einfach | 主语和宾语这类核心的语法关系, 与外围的状语相对; 关系等级是主语 > 直接宾语 > 间接宾语 > 状语. | 某结构适用于一个功能, 就适用于所有更高的功能 ;; 核心论元一般是补足语, 但有例外 | es regnet
+N praed | funk | 谓语 | Prädikat | 06:satzglied | 句子的中心词 (依存树的根): 动词或动词复合体, 与主语一致. | 狭义谓语, 不同于生成语法的 VP ;; 不及物 1 个、及物 2 个、双及物 3 个核心论元 | hat geschlafen; ist müde
+N subjekt | funk | 主语 | Subjekt | 06:satzglied | 不及物动词唯一的核心论元或及物动词的施事论元, 典型为主格, 与动词一致. | 德语主语位置必须有成分, 必要时用虚位词 es ;; 典型语义角色是施事, 典型语用角色是话题 | Das Eis schmilzt
+N dobj | funk | 直接宾语 | Objekt | 06:satzglied | 及物动词的受事核心论元, 典型为第四格, 可以变成被动句的主语. | 有些动词要第二格、第三格或介词宾语 ;; 靠近动词 | Die Sonne erwärmt den See
+N iobj | funk | 间接宾语 | Indirektes Objekt | 06:satzglied | 双及物动词的接受者论元, 第三格或用介词表达, 不能变被动, 比直接宾语离动词远. | 用介词的在 UD 里标 obl ;; 和动词一起前置的测试 | Er gibt seinem Freund das Buch
+N adverb | funk | 状语 | Adverbial | 06:satzglied | 既非谓语、主语也非宾语的句子成分, 说明地点、时间、原因、方式; 用介词或旁格表达. | 不能变被动、不与动词一致 ;; 德语第四格和第二格也能作状语 | Er ging den ganzen Tag
+N freidat | funk | 自由第三格 | freier Dativ | 06:satzglied | 不由动词配价要求的第三格, 如情感第三格和判断第三格. | 可以去掉 ;; 不能用宾语代词提问 ;; 不能放在句首 | Das ist mir zu laut
+N udgr | funk | UD 标注体系中的语法关系 | Grammatische Relationen im UD-Annotationschema | 06:ud | UD 标签同时写功能和实现它的形式, 如 nsubj 与 csubj, obl 与 advmod. | 主语: nsubj、expl、csubj ;; 宾语: obj、iobj、ccomp ;; 状语: obl (+ case)、advmod、advcl | Er läuft im Park (obl)
+N advkomp | funk | 状语补足语 | adverbiales Komplement | 06:kompadj | 起状语作用、却由动词配价要求出现的成分; 形式不受限制. | 去掉后不合语法 ;; 可有可无的用 geschehen 测试 ;; UD 不区分, 一律标 obl | Er stellt die Blumen ins Wasser
+N pobj | funk | 介词宾语 | Präpositionalobjekt | 06:kompadj | 动词要求的、介词语义空的介词短语, 出现和形式都被要求; UD 标 obl, TIGER 标 op. | 可换成代副词加从句 ;; 用 worauf 这类代副词提问 | Er denkt nur an sich
+N kasadv | funk | 格状语 | Kasusadverbial | 06:kompadj | 带格但格不由动词支配的状语名词短语, 与格宾语相对. | 不能用宾语代词提问 ;; 不能变被动 ;; 同格可叠加 | Er lief den ganzen Tag
+N kodier | funk | 语法关系的形态标记 | Morphologische Kodierung von Grammatischen Relationen | 06:mod | 语法关系靠一致 (标在中心词上) 或格 (标在依附词上) 来标记. | 一致按关系等级标核心论元 ;; 补足语的格由配价要求, 附加语的格看语义 | du läufst; den Hund
+N primacy | funk | 实词优先 | primacy of content words | 06:mod | UD 的约定: 介词短语的中心词是名词, 介词作格标记 (case) 挂在名词上. | 另一种约定以介词为中心 (pcomp, Stanford Dependencies) ;; 跨语言可比 | im Sommer
+N ppfunk | funk | 介词短语的句法功能 | Syntaktische Funktionen von Präpositionalphrasen | 06:mod | 介词短语可作动词的附加语 (状语)、动词的补足语 (状语补足语、介词宾语) 或名词的定语 (nmod). | 定语还是附加语, 就是挂靠歧义 | Der Hund wartet auf die Katze im Fenster auf der Straße
+N attrib | funk | 定语 | Attribut | 06:attribut | 名词的依附词, 与名词向心地组成更大的名词短语, 可递归叠加; 名词的依附词从不是必有的. | 广义定语也包括名词的补足语 ;; 实现为 amod、nmod、acl | der kleine Elephant des Kindes im Zoo
+N udattr | funk | UD 标注体系中的定语功能 | Attributfunktionen im UD-Annotationschema | 06:udattr | 名词短语内部的 UD 标签: nmod (带 case)、amod、det、nummod、appos、acl. | 第二格定语标 nmod:poss ;; 挂在名词上标 nmod, 挂在动词上标 obl | Hund des Lehrers
+
+E dstr > synf | 句法功能是依存边上的标签.
+E ergang > valkl | 配价分类就是补足成分和说明成分的区分.
+E ka ~ valkl | SNS 01 的测试区分的是同一对概念.
+E valkl ~ synf | 两个互相独立的分类层面.
+E synf > grrel | 语法关系是句子层面最核心的句法功能.
+E grrel > kernarg | 语法关系排成等级, 分出核心和外围.
+E grrel > praed | 语法关系以谓语为中心.
+E praed > subjekt | 主语与谓语一致.
+E kernarg > subjekt | 主语是等级最高的核心论元.
+E kernarg > dobj | 直接宾语是核心论元.
+E dobj ~ iobj | 两种宾语, 按格和被动化区分.
+E kernarg > adverb | 状语是外围论元.
+E dobj ~ freidat | 自由第三格看起来像第三格宾语.
+E grrel > udgr | UD 用带类型的边标语法关系.
+E adverb > advkomp | 状语也可以是动词要求的补足语.
+E katest > advkomp | geschehen 测试用来认出可有可无的状语补足语.
+E advkomp ~ pobj | 都是补足语, UD 里都标 obl.
+E dobj ~ kasadv | 都带格, 区别在格是否由动词支配.
+E adverb > kasadv | 格状语是状语的一种形式.
+E mittel > kodier | 一致和格是两种句法表达手段.
+E headrule > primacy | 介词短语的中心语按 UD 是名词.
+E primacy > ppfunk | 介词作格标记, 功能看介词短语挂在哪里.
+E attach > ppfunk | 挂靠歧义就是定语还是附加语的问题.
+E synf > attrib | 定语是名词短语里的句法功能.
+E attrib > udattr | UD 给定语的不同形式不同标签.
+E udgr ~ udattr | 同一种名词短语挂在动词上是 obl, 挂在名词上是 nmod.
+
+T Syntaktische Funktion | die | Syntaktische Funktionen | 句法功能 | funk | Klasse gleichartiger Dependenzrelationen nach ihrem (morpho)syntaktischen Verhalten. | 按 (形态) 句法表现归成一类的依存关系. | Wortart | 06:funktion
+T Kernargument | das | Kernargumente | 核心论元 | funk | Subjekt oder Objekt eines Verbs, im Gegensatz zum peripheren Adverbial. | 动词的主语或宾语, 与外围的状语相对. | peripheres Argument | 06:einfach
+T peripheres Argument | das | periphere Argumente | 外围论元 | funk | Adverbial als nicht-zentrales Argument des Verbs. | 作为非核心论元的状语. | Kernargument | 06:einfach
+T Prädikat | das | Prädikate | 谓语 | funk | Kopf des Satzes: Verb oder Verbkomplex, kongruiert mit dem Subjekt. | 句子的中心词: 动词或动词复合体, 与主语一致. |  | 06:satzglied
+T Subjekt | das | Subjekte | 主语 | funk | Kernargument eines intransitiven bzw. Agens-Argument eines transitiven Verbs, prototypisch im Nominativ. | 不及物动词的核心论元或及物动词的施事论元, 典型为主格. | Objekt | 06:satzglied | nsubj
+T Objekt | das | Objekte | 宾语 | funk | Patiens-Kernargument eines transitiven Verbs, prototypisch im Akkusativ, passivierbar. | 及物动词的受事核心论元, 典型为第四格, 可变被动. | Subjekt | 06:satzglied | obj
+T indirektes Objekt | das | indirekte Objekte | 间接宾语 | funk | Recipient-Argument eines ditransitiven Verbs, meist im Dativ. | 双及物动词的接受者论元, 多为第三格. | Objekt | 06:satzglied | iobj
+T Expletiv | das | Expletive | 虚位词 | funk | Semantisch leeres Element in Subjektposition, z. B. es in es regnet. | 主语位置上语义空的成分, 如 es regnet 的 es. |  | 06:satzglied | expl
+T Leerstelle | die | Leerstellen | 空位 | funk | Stelle beim Kopf, die mit einer Konstituente bestimmter Form zu füllen ist. | 中心词上要用特定形式的成分去填的位置. |  | 06:valenz
+T freier Dativ | der | freie Dative | 自由第三格 | funk | Dativ, der nicht von der Valenz des Verbs gefordert ist. | 不由动词配价要求的第三格. | Dativobjekt | 06:satzglied
+T Präpositionalobjekt | das | Präpositionalobjekte | 介词宾语 | funk | Valenzgeforderte PP mit semantisch leerer Präposition. | 动词要求的、介词语义为空的介词短语. | Adverbial | 06:kompadj | op
+T Kasusadverbial | das | Kasusadverbiale | 格状语 | funk | Adverbial in einem obliquen Kasus, dessen Kasus nicht vom Verb regiert wird. | 用旁格表达、格不由动词支配的状语. | Objekt | 06:kompadj
+T Attribut | das | Attribute | 定语 | funk | Nominaler Dependent, der mit dem Nomen endozentrisch eine erweiterte NP bildet. | 名词的依附词, 与名词向心地组成更大的名词短语. | Adverbial | 06:attribut | nmod; amod
+T head-marking |  |  | 中心词标记 | funk | Markierung der syntaktischen Funktion am Kopf durch Agreement. | 通过一致把句法功能标在中心词上. | dependent-marking | 06:mod
+T dependent-marking |  |  | 依附词标记 | funk | Markierung der syntaktischen Funktion durch grammatische Marker am Dependent (Kasus). | 用格之类的语法标记把句法功能标在依附词上. | head-marking | 06:mod
+
+M Syntaktische Funktion | synf
+M Kernargument | kernarg
+M peripheres Argument | kernarg
+M Prädikat | praed
+M Subjekt | subjekt
+M Objekt | dobj
+M indirektes Objekt | iobj
+M Expletiv | subjekt
+M Leerstelle | valkl
+M freier Dativ | freidat
+M Präpositionalobjekt | pobj
+M Kasusadverbial | kasadv
+M Attribut | attrib
+M head-marking | kodier
+M dependent-marking | kodier
+
+SKIP SNS 06: 章节标题, 内容归入其下各概念 | 1. 依存关系的分类; 3. 名词短语中的句法功能
+DROP SNS 06: 归入 术语 Satzglied | Satzglieder
+DROP SNS 06: 并入 挂靠歧义 与 介词短语的句法功能 | PP-Attachment-Ambiguität
+ZH 描述性小标题, 不是术语 | 语法关系的形态标记; 介词短语的句法功能
+DROP SNS 06: 归入 主语 的子概念 | Agens; Pro-Drop; Topic
+DROP SNS 06: 归入 状语补足语 (概念及其子概念 发生测试) | Geschehenstest; adverbiales Komplement
+DROP SNS 06: 归入 概念 语法关系 | Grammatische Relationen
+DROP SNS 06: 归入 介词宾语 的子概念 支配格 | Rektionskasus
+DROP SNS 06: 归入 定语 的子概念 向心 | endozentrisch
+DROP SNS 06: 归入 概念 实词优先 | primacy of content words
+DROP SNS 06: 归入 配价分类 的子概念 | qualitative Valenz; quantitative Valenz
+ZH 描述性小标题, 不是术语 | 两种分类交叉; 代副词测试; 副词修饰语; 功能等级; 只要求出现, 不要求形式; 可关系化; 可被动化; 和动词一起前置的测试

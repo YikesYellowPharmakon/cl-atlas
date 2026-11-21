@@ -255,3 +255,97 @@ X ctxemb | Llama 2 的隐藏层维度是 4096 / 5120 / 8192, 课件写的 5192 �
 X ova | 二分类时再训练 notag 分类器是多余的: 它的正负例正好和 <stime> 的相反, W_notag ≈ −W_stime, 比大小就等于看 x · W_stime 的正负.
 X iob | Seminar at 4 pm will …: 逐词元贪心分类, 每次把上一步自己给的标签当特征: Seminar O (−1_Label_StartOfSentence), at O, 4 B-stime, pm I-stime.
 X spanmod | University of California Berkeley 里 California 误判为 O, 实体就被切成 University of 和一个以 I-ORG 开头的不合法片段.
+
+# ===== IE 08 · NER & KG =====
+D birnnner | Bidirectional RNNs read the input both from left-to-right and right-to-left and concatenate the hidden states to get the output.
+X birnnner | 窗口分类器的窗口太小会丢信息, 太大会带进噪声; RNN 按顺序读整句, 只记住有用的信息. 但单向 RNN 处理句首的 JFK 时还没读到后面, JFK was the 35th US president 和 JFK is in New York City 里的 JFK 得到同一个状态. 双向 RNN 再从右往左读一遍, 拼接两个状态, 每个位置都看到整句.
+S birnnner | fwd | 前向层 | forward | 从左往右读.
+S birnnner | bwd | 后向层 | backward | 从右往左读.
+
+D crf | CRF adds (soft) constraints on the final predicted tags ensuring they are valid given previous tags; the transition matrix is learned during training.
+X crf | 双向 RNN 在每个位置独立选标签, 没有机制惩罚 B-ORG 后面跟 I-LOC. CRF 加一个学出来的转移矩阵: 序列得分 = 各位置的发射分 + 相邻标签的转移分, 在所有序列上归一化. 矩阵里 B-LOC → I-LOC 是大正数, O → I-xxx 停在 0, 不合法的组合是负数, 所以是「软」约束.
+S crf | transm | 转移矩阵 | transition matrix | 前一个标签到后一个标签的得分.
+S crf | soft | 软约束 | (soft) constraints | 不合法的转移得低分, 不是被禁止.
+
+D bilstmcrf | Prediction: the tag sequence score is calculated using the RNN outputs and the transition scores (Viterbi algorithm).
+X bilstmcrf | BiLSTM 给每个词在每个标签上一个发射分 (CRF Input Matrix), CRF 给相邻标签一个转移分. 预测用 Viterbi: 对每个位置、每个标签只留到达它的最好路径, 代价 O(n·k²), 不必枚举 kⁿ 条序列. 选中的标签不一定是该列最大的, 由整条路径的总分决定 (Huang et al., 2015).
+S bilstmcrf | emission | 发射分 | CRF Input Matrix | BiLSTM 输出的每词每标签得分.
+S bilstmcrf | vit8 | Viterbi 算法 | Viterbi | 找总分最高的标签序列.
+
+D kgraph | A knowledge graph captures entities, attributes and relationships: nodes are entities labeled with attributes, typed edges capture semantic relations between them.
+X kgraph | 序列标注找出了实体, 知识图谱把它们连起来、存起来、可以查询. 节点是实体 (具体东西、概念、信息资源), 带类型等属性; 带类型的边是关系: John Lennon —memberOf→ Beatles, —bornIn→ Liverpool. 图谱常用信息抽取自动构建, 反过来也能为抽取提供预训练的实体和关系嵌入.
+S kgraph | node | 节点 | Nodes are entities | 实体, 带属性标签.
+S kgraph | edge | 带类型的边 | Typed edges | 实体之间的语义关系.
+
+D rdf | Most knowledge graph implementations use RDF triples <rdf:subject, rdf:predicate, rdf:object>: r(s,p,o).
+X rdf | RDF (资源描述框架) 是知识图谱事实上的标准. 三元组 (s, p, o): 主语是被描述的实体 (URI 或空白节点), 谓词是特征 (URI), 宾语是值 (URI、空白节点或字面量). 一组三元组叫 RDF 图. 这正是前几周讲的关系: 两个实体加一个关系类型.
+S rdf | subj8 | 主语 | Subject | 被描述的实体.
+S rdf | pred8 | 谓词 | Predicate | 实体的一个特征.
+S rdf | obj8 | 宾语 | Object | 特征的值, 可以是字面量.
+
+D kgprob | Basic problems: Who/what are the entities (nodes) in the graph? What are their attributes and types (labels)? How are they related (edges)?
+X kgprob | 建知识图谱要回答三个问题: 节点是谁, 节点是什么类型、有什么属性, 节点之间有什么边. 它们分别对应实体识别和链接、实体分类和属性抽取、关系抽取. 后半讲的各个任务都可以挂到这三个问题上.
+S kgprob | qnode | 实体是谁 | Who/what are the entities | 节点.
+S kgprob | qattr | 属性和类型 | attributes and types | 标签.
+S kgprob | qedge | 怎样相连 | How are they related | 边.
+
+D kext | Knowledge extraction is built on the foundation of NLP techniques (part-of-speech tagging, dependency parsing, named entity recognition, coreference resolution) and turns unstructured documents into structured knowledge.
+X kext | 输入是非结构化、有歧义、数量巨大的文档, 输出是结构化、精确、可直接用于下游任务的知识. 例句 John was born in Liverpool, to Julia and Alfred Lennon 分三层: 句子层做词性、依存和 NER; 文档层做共指消解 (Lennon、Mrs. Lennon、his mother 指谁); 抽取层做实体消解、实体链接、关系抽取, 得到 birthplace、childOf、spouse 等边.
+S kext | sentlvl | 句子层 | Sentence | 词性标注、依存分析、NER.
+S kext | doclvl | 文档层 | Document | 共指消解.
+S kext | ielvl | 抽取层 | Information Extraction | 实体消解、实体链接、关系抽取.
+
+D gcons | Extracted knowledge is ambiguous, incomplete and inconsistent, which the graph construction step has to resolve.
+X gcons | 直接抽取的知识有三个问题. 有歧义: Beetles / beetles / Beatles, 关系也可能是 citizenOf、livedIn 或 bornIn. 不完整: 漏掉关系 (coworker)、标签、实体. 不一致: John Lennon 同时有两个 spouse (缺了时间), 互斥标签 alive 和 dead, 违反定义域约束. 所以图构建要消歧、补全、解决冲突.
+S gcons | ambig8 | 有歧义 | ambiguous | 同一词形指不同东西.
+S gcons | incompl | 不完整 | incomplete | 漏掉关系、标签、实体.
+S gcons | inconsist | 不一致 | inconsistent | 互相矛盾的事实.
+
+D nerkg | NER → KG: entities and their types become nodes of the graph; KG → NER: what the KG already knows makes NER easier and more accurate.
+X nerkg | 两个方向都成立. NER 从 Tim Cook works for Apple 里识别出人和机构, 加上关系得到三元组. 反过来, 新文本只出现 Cook announced …, cook 也可能是普通名词; 图谱已经知道 Tim Cook 是人, NER 就更准. 两者可以迭代互相改进.
+
+D deppat | Combine tokens, dependency paths, and entity types to define rules (from sentence to patterns).
+X deppat | 依存分析的结果当特征: 模式「人, DT CEO of 机构」在依存上是 appos 加 nmod (+ case). 它能匹配 Bill Gates, the CEO of Microsoft, 也能匹配中间插了形容词的 the brilliant and charming CEO of Apple Inc., 因为依存路径不变; 表面词序的规则做不到. a former CEO 会改变关系含义, 要额外处理.
+S deppat | apposp | 同位语 | appos | Argument 1 与 CEO 之间.
+S deppat | nmodp | 名词修饰语 | nmod | CEO 与 Argument 2 之间.
+
+D eres | Entity resolution determines that different mentions refer to the same real-world entity, so that both can be linked to a unique representation in the knowledge graph.
+X eres | Friedrich Merz met the French president 和 Merz announced new policies 里的两个提及, NER 都识别为 PERSON; 实体消解判断它们是同一个人. 它处理命名实体的不同写法, 常常跨文档、跨数据源; 共指消解则在一篇文档内部把代词和名词短语连起来. 幻灯片的抽取结果误写成 Angela Merkel.
+
+D elink | Entity linking connects an entity mention to a specific entry in a KG/knowledge base and resolves the lexical ambiguity of entity mentions.
+X elink | NER 只说 Apple 是机构, 实体链接确定它是 Wikidata / DBpedia 里的 Apple Inc. 节点, 而不是 Apple Records. 「Michael Jordan」可能是篮球运动员, 也可能是机器学习学者, 要看上下文. 链接之后, 图谱里关于该节点的知识都能用.
+
+D names | Entities with the same name and different names for entities are the two main problems with entity names.
+X names | 同名不同实体: 同类实体共用名字 (John Smith、Springfield), 事物以彼此命名 (Washington、Paris、Amazon), 部分指称 (只说名、用城市代球队). 同一实体不同名字: 绰号, 拼写错误 (Baarak、Barrack), 不一致的写法 (MSFT、GOOG). 前一类是实体链接要解决的消歧, 后一类是实体消解要做的合并.
+S names | samename | 同名不同实体 | Entities with Same Name | 需要消歧.
+S names | diffname | 同一实体不同名字 | Different Names for Entities | 需要合并.
+
+D elpipe | Entity linking proceeds by candidate generation and then narrows the candidates using entity types, coreference and coherence.
+X elpipe | Washington drops 10 points after game with UCLA Bruins: 候选生成列出所有叫 Washington 的实体; 实体类型 (LOC/ORG) 排除人名; 共指 (文中有 UWashington、Huskies) 排除州、湖和高中; 连贯性 (同句有另一支大学球队 UCLA Bruins) 只留 Washington Huskies.
+S elpipe | candgen | 候选生成 | Candidate Generation | 列出所有可能的实体.
+S elpipe | enttype | 实体类型 | Entity Types | 按 NER 类型排除.
+S elpipe | coref8 | 共指 | Coreference | 用文中其他提及排除.
+S elpipe | coher | 连贯性 | Coherence | 和同句其他实体保持一致.
+
+D tradel | Traditional entity disambiguation ranks candidate entities according to lexical similarity and/or empirical co-occurrence with mentions; each mention is disambiguated independently.
+X tradel | 消歧被看成排序: 用人工设计的特征或相似度, 比较提及的上下文和候选实体的文字描述, 算出置信度, 选最高的. 例: Apple released a new iPhone, Apple Inc. 0.95、Apple Records 0.03、水果 0.02. 每个提及独立处理, 不考虑全句的连贯性.
+
+D neural | General architecture for neural entity linking: mention detection, candidate generation and entity ranking, with neural encoders for mentions and entities.
+X neural | Sevgili 等人总结的一般架构: 提及检测找出 Scott Young, 候选生成给出作家、美式足球运动员、威尔士足球运动员等, 实体排序打分选出一个. 候选生成也可以用事先算好的先验 p(e∣m), 例如统计维基百科里某个锚文本链接到各页面的次数.
+S neural | mdetect | 提及检测 | Mention Detection | 找出实体提及.
+S neural | prior | 提及-实体先验 | mention-entity priors | p(e∣m), 来自维基百科超链接.
+
+D menc | The current mainstream approach is to construct a dense contextualized vector representation of a mention using an encoder neural network.
+X menc | 用 LSTM、GRU 或 Transformer 把提及连同上下文编成一个向量. 例: 把提及遮住, 「[MASK] began writing while in his teens, submitting stories to various publications」的上下文就足以说明这是一位作家. 也可以直接取知识图谱网络里的实体嵌入.
+
+D eenc | Candidate entity representations are learned from unstructured texts (word2vec-like co-occurrence), from relations in KGs (graph embeddings), or by a full neural encoder of textual descriptions.
+X eenc | 三种来源: 文本共现 (算法原本为词设计), 图谱里实体之间的关系 (图嵌入方法), 或者训练一个神经编码器把实体描述转成嵌入. 二维可视化里三个 Scott Young 各自落在同领域实体的簇里, 说明嵌入抓住了实体属于哪个领域.
+S eenc | txtemb | 文本共现表示 | unstructured texts | word2vec 类方法.
+S eenc | graphemb | 图嵌入 | graph embedding methods | 用图谱关系.
+S eenc | descenc | 描述编码器 | neural encoder | 编码实体的文字描述.
+
+D erank | Entity ranking: similarity between mention vector and candidate entity vectors (dot product, cosine) is combined with features such as mention-entity priors in a feed-forward network to obtain local scores.
+X erank | s(m, e) = y_m · y_e (点积), 或除以两个向量长度得到余弦. 相似度和先验 p(e∣m) 等一起进前馈网络, 输出每个候选的局部得分, 取最高. 例: Scott Young played for the Cleveland Browns, Cleveland Browns 是美式足球队, 所以选美式足球运动员.
+
+D vecvskg | Similarity search only looks for information most similar to the query; with a KG, similar information from multiple sources is stored as one node, which is more interpretable and explainable.
+X vecvskg | 向量检索 (如 RAG 的向量库) 只找和查询最像的文本块; 知识图谱把多个来源说的同一件事合成一个节点, 能顺着边解释答案来自哪里. 两者结合就是混合系统, 即神经知识图谱.

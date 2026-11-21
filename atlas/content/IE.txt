@@ -353,3 +353,87 @@ SKIP IE 07: 本讲小结和阅读清单, 内容已在各概念里 | In this lect
 DROP IE 07: 并入 金标准 / 引用别的课的概念, 本讲只作类比 | Hidden-Markov-Modell
 ZH 描述性名称 | BiLSTM-CRF 槽位填充; 前一个标签作特征; 独立分类器与贪心解码; 线性打分
 DE 描述性名称 (课件讲了内容, 没有这个标题) | Bias and decision boundary; Cost function · log loss; Learning rate; Perceptron learning rule; Slot filling with LSTM and CRF
+
+# ===== IE 08 · Week 6: NER & KG (Alaçam, WiSe 26-27) 2026-11-20 =====
+B kgb | 序列标注与知识图谱 | Sequence Tagging & Knowledge Graphs | 用双向 RNN 和 CRF 做 NER; 把识别出的实体连成知识图谱; 实体消解、实体链接和神经实体链接的流程.
+
+N birnnner | kgb | 双向 RNN | Bidirectional RNNs | 08:seqtag | 一个 RNN 从左往右、一个从右往左读, 拼接同一位置的两个状态再输出标签, 每个位置都看到整句. | 单向 RNN 处理句首词时看不到右文 ;; 窗口大小的两难由此消失 | JFK was the 35th US president / JFK is in New York City
+N crf | kgb | 条件随机场 | Conditional Random Fields (CRF) | 08:seqtag | 在输出层加标签之间的转移得分, 让每个标签也依赖前一个标签, 给标签序列加软约束. | 转移矩阵是学出来的得分, 可以为负 ;; 整条序列的得分归一化后才是概率 | B-ORG 后接 I-LOC 得分很低
+N bilstmcrf | kgb | BiLSTM + CRF | LSTM + CRF for NER | 08:seqtag | BiLSTM 给每个位置各标签的发射分, 加上 CRF 的转移分, 用 Viterbi 找总分最高的标签序列. | 不是每列各取最大 ;; Viterbi 代价 O(n·k²) (Huang et al., 2015)
+N kgraph | kgb | 知识图谱 | Knowledge Graph | 08:kg | 图形式的知识: 节点是实体并带类型等属性, 带类型的边是实体之间的语义关系. | 常用信息抽取方法从文本自动构建 ;; 可以用预训练的实体、关系嵌入 | John Lennon —memberOf→ Beatles
+N rdf | kgb | RDF 三元组 | RDF triples | 08:kg | 知识图谱最常用的表示: <主语, 谓词, 宾语>, 即 r(s, p, o); 一组三元组就是一个 RDF 图. | 主语是 URI 或空白节点 ;; 宾语可以是实体也可以是字面量 | (Abraham_Lincoln, BornOnDate, "1809-02-12")
+N kgprob | kgb | 三个基本问题 | Basic Problems | 08:kg | 建图要回答: 实体 (节点) 是谁, 它们的属性和类型是什么, 它们之间是什么关系 (边). | 分别对应实体识别与链接、实体分类、关系抽取
+N kext | kgb | 知识抽取 | Knowledge Extraction | 08:construct | 用 NLP 技术从非结构化文档里抽出实体和关系, 是构建知识图谱的第一步. | 句子层: 词性、依存、NER ;; 文档层: 共指消解 ;; 抽取层: 实体消解、实体链接、关系抽取 | John was born in Liverpool, to Julia and Alfred Lennon.
+N gcons | kgb | 图构建 | Graph Construction | 08:construct | 把抽取出的三元组整理成一致的图; 直接抽取的知识有歧义、不完整、不一致. | Beetles / beetles / Beatles ;; 漏掉的关系 ;; 两个 spouse 互相矛盾
+N nerkg | kgb | NER 与知识图谱的关系 | NER <> KG Relation | 08:construct | NER 给知识图谱提供节点, 知识图谱又给 NER 提供先验知识, 让识别更容易、更准. | (Tim Cook, works_for, Apple) ;; 已知 Tim Cook 是人, Cook announced 就好认
+N deppat | kgb | 依存分析 | Dependency Parsing | 08:construct | 依存路径和实体类型组合成抽取模式, 一个模式能匹配表面词序不同的很多句子. | 人, DT CEO of 机构 (appos + nmod) ;; 回去重读 Sarawagi 第一章 | Bill Gates, the CEO of Microsoft
+N eres | kgb | 实体消解 | Entity Resolution | 08:resolution | 判断不同的实体提及是否指同一个现实世界的实体, 好让它们链接到图谱里同一个节点. | 处理命名实体的不同写法, 常跨文档 ;; 不同于文档内部的共指消解 | Friedrich Merz = Merz
+N elink | kgb | 实体链接 | Entity Linking | 08:resolution | 把文本里的实体提及连到知识图谱或知识库里的一个具体条目, 消解提及的词汇歧义. | NER 只给类型, 实体链接给出是哪一个 | Apple → Apple Inc. (Wikidata)
+N names | kgb | 实体名称的两大问题 | Entity Names: Two Main Problems | 08:resolution | 同名不同实体 (要消歧) 和同一实体不同名字 (要合并). | 同类共用名、以彼此命名、部分指称 ;; 绰号、拼写错误、不一致的写法 | Washington; MSFT
+N elpipe | kgb | 实体链接的方法 | Entity Linking Approach | 08:elapproach | 先生成候选, 再用实体类型、共指和全句连贯性逐步排除, 剩下的就是链接目标. | 候选生成 ;; 按实体类型和共指排除 ;; 按连贯性排除 | Washington → Washington Huskies
+N tradel | kgb | 传统的实体消歧 | Traditional approach for entity disambiguation | 08:elapproach | 把消歧看成排序: 按字面相似度和共现给候选打分, 每个提及独立消歧, 选置信度最高的. | 特征是人工设计的 ;; 比较提及上下文和候选的文字描述 | Apple Inc. 0.95
+N neural | kgb | 神经实体链接 | neural entity linking | 08:elapproach | 提及检测、候选生成、实体排序三步, 用神经网络编码提及和候选再打分. | 候选也可以用维基百科超链接统计的先验 p(e∣m) | Scott Young → Scott_Young_(Welsh_footballer)
+N menc | kgb | 提及编码 | Mention Encoding | 08:elapproach | 用编码器网络给提及构造稠密的、依赖上下文的向量. | LSTM、GRU 或 Transformer ;; 也可以取知识图谱里的实体嵌入 | [MASK] began writing while in his teens
+N eenc | kgb | 候选实体的编码 | Candidate Entity Encoding | 08:elapproach | 候选实体的向量可以来自文本共现 (word2vec 类)、图谱关系的图嵌入, 或编码实体描述的神经编码器. | 同名实体落在各自领域的簇里
+N erank | kgb | 实体排序 | Entity Ranking | 08:elapproach | 提及向量和候选向量算相似度 (点积或余弦), 再和先验等特征一起进前馈网络, 得到每个候选的得分. | s(m, e) = y_m · y_e | Scott Young played for the Cleveland Browns.
+N vecvskg | kgb | 向量相似度与知识图谱 | Vector-based similarity versus Knowledge Graph based IE | 08:summary | 向量检索只找最相似的内容; 知识图谱把多个来源的同一知识合成一个节点, 更可解释, 两者可以结合. | 混合系统: 神经知识图谱
+
+E iob > crf | CRF 给 IOB 标签序列加约束.
+E greedyseq ~ crf | 独立地逐个选标签对整条序列一起选.
+E window ~ birnnner | 双向 RNN 去掉了窗口大小的两难.
+E birnnner > bilstmcrf | BiLSTM 提供发射分.
+E crf > bilstmcrf | CRF 提供转移分.
+E slotcrf ~ bilstmcrf | 同一种结构, 一个做槽位填充一个做 NER.
+E bilstmcrf > kext | 识别出的实体是知识抽取的输入.
+E kgraph > rdf | 知识图谱的标准表示.
+E kgraph > kgprob | 建图要回答的问题.
+E kgprob > kext | 三个问题都靠知识抽取回答.
+E kext > gcons | 抽取之后才能构建图.
+E kgraph > nerkg | NER 与图谱互相帮助.
+E kext > deppat | 依存分析是知识抽取的一层.
+E rulemeth ~ deppat | 依存模式就是写在依存路径上的规则.
+E kext > eres | 抽取层的任务.
+E names > eres | 同一实体不同名字要合并.
+E names > elink | 同名不同实体要消歧.
+E eres > elink | 消解后再链接到唯一的节点.
+E elink > elpipe | 实体链接的步骤.
+E elpipe > tradel | 传统做法: 按特征给候选排序.
+E tradel ~ neural | 人工特征对神经编码.
+E neural > menc | 第一步要把提及编成向量.
+E neural > eenc | 候选也要编成向量.
+E menc > erank | 用提及向量打分.
+E eenc > erank | 用候选向量打分.
+E staticemb > eenc | 候选编码的一种来源是 word2vec 类方法.
+E ctxemb > menc | 提及编码用上下文嵌入.
+E kgraph ~ vecvskg | 和向量检索对比.
+
+T bidirectional RNN |  |  | 双向 RNN | kgb | RNN reading the input both from left to right and from right to left, concatenating the hidden states. | 从左往右和从右往左各读一遍、拼接隐藏状态的 RNN. |  | 08:seqtag | Bidirectional RNNs
+T CRF |  |  | 条件随机场 | kgb | Output layer that makes each tag depend on the previous tag via a learned transition matrix. | 用学到的转移矩阵让每个标签依赖前一个标签的输出层. |  | 08:seqtag | Conditional Random Fields
+T transition matrix |  |  | 转移矩阵 | kgb | Learned scores T(i,j) for tag j following tag i. | 标签 j 跟在标签 i 后面的学到的得分. |  | 08:seqtag
+T Viterbi |  |  | Viterbi 算法 | kgb | Dynamic programming algorithm that finds the best-scoring tag sequence. | 找得分最高的标签序列的动态规划算法. |  | 08:seqtag | Viterbi algorithm
+T knowledge graph |  |  | 知识图谱 | kgb | Knowledge in graph form: entities as nodes, typed edges as relations. | 图形式的知识: 实体是节点, 带类型的边是关系. |  | 08:kg | KG
+T RDF |  |  | RDF 三元组 | kgb | Resource Description Framework; de facto standard representing knowledge as (subject, predicate, object) triples. | 资源描述框架; 把知识表示成三元组的事实标准. |  | 08:kg | Resource Description Framework
+T knowledge extraction |  |  | 知识抽取 | kgb | Extracting entities and relations from unstructured text with NLP techniques. | 用 NLP 技术从非结构化文本抽取实体和关系. | graph construction | 08:construct
+T graph construction |  |  | 图构建 | kgb | Turning extracted knowledge into a consistent graph. | 把抽取出的知识整理成一致的图. | knowledge extraction | 08:construct
+T entity resolution |  |  | 实体消解 | kgb | Determining that different mentions refer to the same real-world entity. | 判断不同提及指同一个现实实体. | entity linking | 08:resolution
+T entity linking |  |  | 实体链接 | kgb | Connecting an entity mention to a specific entry in a knowledge graph or knowledge base. | 把实体提及连到知识图谱里的具体条目. | entity resolution | 08:resolution | EL
+T candidate generation |  |  | 候选生成 | kgb | First step of entity linking: listing all entities a mention could refer to. | 实体链接的第一步: 列出提及可能指的所有实体. |  | 08:elapproach
+T mention encoding |  |  | 提及编码 | kgb | Dense contextualized vector representation of a mention built by an encoder. | 编码器给提及构造的稠密上下文向量. |  | 08:elapproach
+
+M bidirectional RNN | birnnner
+M CRF | crf
+M transition matrix | crf
+M Viterbi | bilstmcrf
+M knowledge graph | kgraph
+M RDF | rdf
+M knowledge extraction | kext
+M graph construction | gcons
+M entity resolution | eres
+M entity linking | elink
+M candidate generation | elpipe
+M mention encoding | menc
+
+SKIP IE 08: 课程安排、文献清单和本讲提纲 | 课程安排与文献
+ZH 描述性名称 | NER 与知识图谱的关系; 三个基本问题; 向量相似度与知识图谱
+ZH 描述性名称 | 前向层; 后向层; 名词修饰语; 实体是谁; 怎样相连; 描述编码器; 文本共现表示; 软约束
+DE 描述性名称 (课件讲了内容, 写法不同: 原文笔误 constrains; Coherence 只出现在图里) | (soft) constraints; Coherence

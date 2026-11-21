@@ -294,3 +294,62 @@ X seg | 可以理解成每个段一对 base + bounds, 堆和栈之间的空隙�
 S seg | segnr | 段号与偏移 |  | 高位选段, 低位是偏移.
 S seg | schutzbit | 保护位 |  | 每段单独的读写权限.
 S seg | sbrk | sbrk() |  | 推高堆段的界限.
+
+# ===== BS 06 · Virtueller Speicher =====
+D rss | Rss (Resident Set Size): Summe der Größe aller Seiten, deren present Bit gesetzt ist; Pss wie Rss, aber geteilt durch die Anzahl der Prozesse, die dieselben Seiten einblenden.
+X rss | pmap -X pid 每行列出一段连续的虚拟地址: 权限位、映射的文件、Size (虚拟大小) 和 Rss (真正在物理内存里的部分). 栈有 132 KiB 虚拟空间, 只驻留 16 KiB, 没用到的页从没装进来. libc 的代码段 Rss 836、Pss 46: 被很多进程共享, 每个只分摊一小份.
+S rss | pss | 按比例分摊的大小 | Proportional Set Size | 共享页按共享进程数平均.
+S rss | perm | 保护位 | Perm | r、w、x、p.
+
+D rowmaj | In Row-major Reihenfolge liegen die Elemente einer Zeile hintereinander im Speicher; table[row * MAX_COLUMNS + column].
+X rowmaj | 外层行、内层列的循环按内存顺序访问, 一页上的 1024 个 int 共用一次地址转换. 外层列、内层行时相继两次访问差一整行, 几乎每步换页. 演示: 1000 × 1000 的矩阵乘法, 按行的版本 dTLB 读未命中约 1 万次、2.17 秒; 按列的版本 15 亿次、6.06 秒. 算法一样, 只差访问顺序.
+S rowmaj | dtlb | 数据 TLB 未命中 | dTLB-load-misses | 用 perf stat 测.
+
+D vmmech | Hardware und Betriebssystem arbeiten zusammen, um Adressen zu übersetzen; bei einem Seitenfehler (present-Bit gelöscht) trappt die Hardware ins Betriebssystem, das eine Seite ersetzt und die referenzierte Seite von der Festplatte lädt.
+X vmmech | 三层代价相差几个数量级: TLB 命中几乎免费; TLB 未命中要遍历页表 (多几次访存); 缺页要读磁盘. 缺页时操作系统选一页换出, 如果它的 dirty 位为 1 先写回磁盘, 然后读入所缺的页, 更新页表、置 present 位, 进程从出错的指令继续. 没改过的页磁盘上的副本仍是最新的, 直接丢弃.
+S vmmech | tlbhit | TLB 命中 | TLB-Treffer | 转换完成, 页在内存里.
+S vmmech | tlbmiss | TLB 未命中 | TLB-Fehler | 遍历页表.
+S vmmech | dirtybit | 脏位 | Dirty-Bit | 换出前要不要写回.
+
+D precint | Präzise Interrupts unterbrechen die CPU trotz Pipelining so, dass alle Instruktionen vor dem Seitenfehler vollständig abgeschlossen sind und alle anschließenden neu gestartet werden können.
+X precint | 缺页可能发生在取指令或读写数据时, 之后进程要接着执行而察觉不到. CPU 有流水线, 几条指令同时在不同阶段, 所以要精确中断. 难点在架构: 一条先改了寄存器、再访存缺页的指令, 直接重启会把寄存器改两次; 复杂指令集更容易出这种问题.
+
+D seitenausw | Seitenauswahl: Wann sollte eine Seite von der Festplatte in den Speicher geladen werden? Demand Paging, Prepaging (Prefetching) oder Hinting.
+X seitenausw | 按需调页拖到缺页时才装入, 进程启动时内存里一页都没有, 每个新页都要付一次缺页代价. 预调页预测将来的访问, 提前装入, 对顺序访问效果好. 提示: 用户告诉操作系统将来要用、不再要用或会顺序访问, 例如 madvise(). 预取猜错会浪费内存、挤掉有用的页.
+S seitenausw | demand | 按需调页 | Demand Paging | 只在缺页时装入.
+S seitenausw | prepag | 预调页 | Prepaging | 访问之前装入.
+S seitenausw | hint | 提示 | Hinting | 用户给出访问提示.
+
+D ersetz | Seitenersetzung: Welche residente Seite im Speicher sollte auf die Festplatte ausgelagert werden? Wurde sie modifiziert, wird sie geschrieben, andernfalls verworfen.
+X ersetz | 目标是缺页最少, 因为缺页要做昂贵的磁盘 I/O. 正因为 I/O 慢, 操作系统有时间算一个好决定. 三个基本算法: OPT (看未来, 只作基准)、FIFO (看装入时间)、LRU (看最后一次使用). 手算时按访问序列逐行写出页框内容, 数缺页次数.
+
+D optpage | OPT ersetzt die Seite, die am längsten in der Zukunft nicht verwendet wird; minimiert garantiert die Anzahl der Seitenfehler.
+X optpage | 被换出的页总要到下一次使用时才再引起缺页; 选下一次用得最晚的那页, 就把这次缺页推得最远, 所以最优. 但操作系统不能预知未来, OPT 只用来衡量别的算法. 例: ABCABDADBCB, 3 个页框, 缺页 5 次; 访问 D 时换出最晚才用的 C.
+
+D fifopage | FIFO ersetzt die Seite, die am längsten im Speicher war; fair und einfach zu implementieren, aber manche Seiten könnten immer benötigt werden.
+X fifopage | FIFO 只看页是什么时候装进来的, 一页被反复使用照样会变老被换出. 同一序列 ABCABDADBCB 缺页 7 次: 访问 D 时换掉最早的 A, 下一步又要 A. FIFO 没有栈性质, 内存加大时缺页甚至可能变多.
+
+D lrupage | LRU ersetzt die Seite, die am längsten in der Vergangenheit nicht verwendet wurde; mit Lokalität nähert sich LRU dem OPT-Algorithmus an.
+X lrupage | LRU 用过去预测未来: 最久没用的页, 将来大概也不用. 有局部性时和 OPT 一样好: ABCABDADBCB 也是 5 次. 代价是要记录每页何时被访问; 对一次性扫描这样的负载效果差.
+
+D stackprop | Stack Property: Präsente Seiten bei kleinerem Speicher sind eine Teilmenge der Seiten bei größerem Speicher; LRU und OPT erfüllen sie.
+X stackprop | k 个页框时 LRU 内存里正好是最近用过的 k 个不同的页, k + 1 个页框时是最近 k + 1 个, 前者包含在后者里; 所以大内存时缺页的地方, 小内存时一定也缺页. FIFO 的内容取决于装入时间, 页框数一变全变了, 没有这种包含关系.
+
+D belady | Belady’s Anomalie: Bei FIFO kann zusätzlicher physischer Speicher in manchen Fällen zusätzliche Page Faults verursachen.
+X belady | 访问序列 ABCDABEABCDE: FIFO 3 个页框缺页 9 次, 4 个页框缺页 10 次. 4 个页框时 E 换掉 A 之后, 接下来每一页都正好是刚被换掉的那一页. 同一序列 LRU 是 10 次和 8 次, OPT 是 7 次和 6 次.
+
+D lruimpl | LRU berücksichtigt nicht die Häufigkeit der Zugriffe; perfektes LRU wird in der Praxis nicht implementiert, Ziel ist eine alte Seite, nicht unbedingt die älteste.
+X lruimpl | 问题: 一次扫描大片数据会把常用页都挤出去; 纯 LFU 按频率又永远忘不掉早已不用的页. 精确 LRU 的软件实现每次访问都要改链表, 访存慢; 硬件时间戳换出时要扫描全部页, 换出慢. 既然 LRU 本身就是 OPT 的近似, 就再简化一步.
+S lruimpl | lfu | 最不常用 | LFU (Least-Frequently-Used) | 按访问频率.
+S lruimpl | swlru | 软件精确 LRU | Software-Perfect-LRU | 有序链表, 访问时移到表头.
+S lruimpl | hwlru | 硬件精确 LRU | Hardware-Perfect-LRU | 每页时间戳.
+
+D clock | Clock-Algorithmus: Laufe zyklisch durch alle belegten Seitenrahmen; ist das Reference Bit gesetzt, lösche es, andernfalls lagere die Seite aus und ersetze sie.
+X clock | 硬件给每个页框一个访问位, 访问时置 1. 换页时指针沿圈转: 位为 1 就清零给它第二次机会, 为 0 就换出, 换上的新页位置 1, 指针移到下一个. 例 ABCDEFBDFAFG, 5 个页框: F 来时一圈清零后换掉 A, A 来时跳过 B 换掉 C, G 来时跳过 D 换掉 E, 共 8 次缺页, 选择和 LRU 相同.
+S clock | refbit | 访问位 | Reference-Bit | 访问时由硬件置 1.
+S clock | hand | 指针 | Zeiger | 指向下一个要看的页框.
+
+D clockext | Erweiterungen: mehrere Seiten auf einmal ersetzen, Zähler für Durchläufe (n-th Chance), Nutzung des Dirty-Bits zur Bevorzugung von Dirty Pages.
+X clockext | 每次只换一页、只写一块磁盘不划算, 所以一次找多页, 记空闲页框列表. n-th Chance: 访问位为 0 时计数器加 1, 超过阈值才换出, 更细地区分使用频率. 脏页换出要先写盘, 所以优先换出访问位和脏位都为 0 的页, 让脏页多留一会儿.
+S clockext | nth | 第 n 次机会 | n-th Chance | 计数器超过阈值才换出.
+S clockext | dirtyfirst | 优待脏页 | Bevorzugung von Dirty Pages | 先换出不脏的页.

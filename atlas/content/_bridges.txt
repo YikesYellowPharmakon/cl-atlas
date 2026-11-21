@@ -209,3 +209,11 @@ X IDP:neuron ~ IE:percep | 单个神经元就是感知机.
 X IE:iob ~ EICL:hmmmod | IOB 标注把信息抽取变成序列标注, 可以用 HMM 来解.
 X DPNLP1:moe ~ DPNLP2:experts | 同一个混合专家模型; DPNLP II 细讲路由、负载均衡和激活参数.
 X DPNLP2:byt5 ~ DPNLP1:bpe | 字节级模型去掉了 BPE 这类子词分词器.
+X SNS:grrel ~ EICL:subj | EICL 讲主语、谓语、宾语的判定, SNS 把它们放进语法关系的体系.
+X SNS:udgr ~ EICL:ud | 同一套标签: 通用依存.
+X SNS:valkl ~ EICL:valenz | 同一概念: 配价.
+X IE:birnnner ~ DPNLP1:birnn | 同一结构: 双向 RNN.
+X IE:bilstmcrf ~ EICL:viterbi | BiLSTM-CRF 的解码就是 Viterbi 算法.
+X DPNLP2:linrnn ~ DPNLP1:rnn | 去掉非线性的 RNN.
+X DPNLP2:hwscan ~ DPNLP1:flash | 同一思路: 瓶颈在显存读写, 在 SRAM 里融合计算.
+X DPNLP2:attncost ~ DPNLP1:selfatt | 自注意力的平方代价.

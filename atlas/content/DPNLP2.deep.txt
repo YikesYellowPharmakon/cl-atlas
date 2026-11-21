@@ -261,3 +261,100 @@ D dsample | Sampling starts from an all-[MASK] sequence of fixed length; at each
 X dsample | 按反向过程, 已揭开的 token 不再改; 实践中常先揭开最有把握的位置 (LLaDA). 同一步揭开的 token 彼此独立抽样: 「I live in」后两个空位可能抽出 San York, 一步揭开越多越严重, 这就是速度和质量的权衡. 其他方案: 均匀扩散把 token 换成随机的别的 token, 天然支持自我修正但更难学, 目前掩码扩散效果更好; 这是非常活跃的研究方向 (D3PM、SEDD、MDLM、LLaDA).
 S dsample | sanyork | 同一步的独立抽样 |  | 可能出现 San York.
 S dsample | alt | 其他方案与研究现状 | Alternatives to Masked Diffusion | 均匀扩散等.
+
+# ===== DPNLP2 06 · Linear RNNs and State Space Models =====
+D attncost | Every token attends to every earlier token, so we need to compute c. n²/2 scores per head and layer; doubling the context roughly quadruples the attention compute.
+X attncost | 嵌入和 FFN 占大部分参数, 注意力参数少但计算量随 n² 增长, 序列到一两千个词后就超过线性部分. 因果注意力要算 n(n+1)/2 个分数: n = 6 时 21 个, n = 12 时 78 个. FlashAttention 减少的是显存读写, 要算的分数一个没少, 仍是 O(n²).
+
+D sparseatt | Sparse attention computes only a subset of the n² scores: each token attends to w ≪ n other tokens → O(nw).
+X sparseatt | 想法: 让每个词只关注较少的词. 最常见的是滑动窗口; 研究里还有分解的 strided / fixed 模式、空洞窗口、全局词和随机边. 问题是稀疏的不规则访存跑不满 GPU 的矩阵乘法单元, 效果也没有明显胜过完整注意力.
+
+D slidewin | With window w, information moves up to w positions per layer → up to L · w after L layers (local attention).
+X slidewin | 每个词只看自己周围 w 个词 (因果版只看前面 w 个). 和 CNN 的感受野一样, 叠层能传得更远: w = 2、3 层时最上层能看到 6 个词之前. 代价是远处的信息要经过很多层接力, 越传越模糊.
+S slidewin | localatt | 局部注意力 | local attention | 滑动窗口注意力的另一个名字.
+S slidewin | causalwin | 因果滑动窗口 | causal sliding window | 只看前面的 w 个词.
+
+D sparsetf | Factorized attention splits the attention pattern across two cheap heads: strided (previous ℓ positions + every ℓ-th position) or fixed (own block + summary positions).
+X sparsetf | 两个头各管一部分, 合起来任意位置两跳可达: strided 先跳到相差不到 ℓ 的跨步位置, 再走最后一段; fixed 先到目标所在块末的汇总位置. ℓ 取约 √n 时每个头约 n√n 个分数.
+
+D longformer | Longformer uses a sliding window of w tokens in every layer, dilated windows in some heads, and global attention for task tokens.
+X longformer | 空洞窗口隔几个取一个, 同样代价看得更远. 全局注意力给 [CLS]、问题词这类任务词: 它们看所有词, 所有词也看它们. 全局词个数是常数, 总代价仍是线性.
+
+D bigbird | BigBird combines random, window and global attention; random edges keep paths between any two tokens short.
+X bigbird | 把词当节点、注意力当边, 随机边让图的直径约为 log n. 只用全局词也能让任意两词两跳可达, 但所有信息都挤过少数节点, 成了瓶颈; 随机边提供很多条分散的短路径.
+
+D effattn | No variant clearly beats full attention in performance; sparsity is GPU-unfriendly; what survived: sliding windows, mixed with global layers.
+X effattn | Mistral 7B 全部是局部层 (w = 4096), Gemma 3 每 5 个局部层配 1 个全局层 (w = 1024), gpt-oss 局部与全局交替 (w = 128). 局部层的 KV 缓存只存 w 个词, 全局层保证远距离信息能直接取到.
+
+D rnntrade | RNNs: constant cost per generated token and constant memory; Transformers: cost and memory per token grow with n; advantage of transformers: parallel training.
+X rnntrade | 对比表: 训练能否并行 (Transformer 能, RNN 不能)、训练计算 O(n²) 对 O(n)、推理每个新词 O(n) 对 O(1)、推理内存 O(n) 对 O(1). 问题是能否同时得到并行训练和常数推理, 线性 RNN 和 Mamba 就是回答.
+
+D seqtrain | hₜ depends on hₜ₋₁ through the non-linearity f → n steps that must run one after another.
+X seqtrain | 每一步只是小的矩阵乘向量, 而 GPU 为大的矩阵乘矩阵设计. Transformer 训练时一次处理所有位置: 因果掩码让每个位置看不到后面, teacher forcing 让输入是真实的前一个词.
+
+D rnngrad | The chain rule gives one factor per step, each containing W; k steps back corresponds to c. Wᵏ: gradients vanish or explode.
+X rnngrad | ∂h₃/∂h₀ 是三个 f′·W 的乘积. W 缩小向量, 梯度消失; 拉长, 梯度爆炸, 长距离依赖学不到. 标量: 1.1⁵⁰ ≈ 117, 0.9⁵⁰ ≈ 0.005, 只差 0.1, 50 步后差四个数量级.
+
+D linrnn | Linear RNNs remove the non-linearity from the recurrence: hₜ = A hₜ₋₁ + B xₜ, yₜ = C hₜ; non-linearities move between recurrent layers.
+X linrnn | 分工和 Transformer 一样: 一个子层沿时间混合 (线性递归), 一个子层逐位置变换 (MLP 或门控). 模型整体仍是非线性的, 只是「沿时间传递」是线性的. 这让展开、卷积和扫描成为可能.
+
+D lticonv | The kernel collects the weights Kₖ = C Aᵏ B of tokens k steps back; yₜ = Σₖ Kₖ xₜ₋ₖ is a 1D convolution over the input sequence.
+X lticonv | 从 h₀ = 0 展开, 每往回一步多乘一个 A, 所以输出是输入的加权和, 权重只取决于距离 k. 标量例子 A = 0.5、B = C = 1, 核 (1, 0.5, 0.25, …), 输入 (4, 2, 0, 2) 得输出 (4, 4, 2, 3), 和直接跑递归一样. 训练时核矩阵乘输入一次算出所有位置, 推理时走递归.
+S lticonv | toeplitz | 下三角对角常数矩阵 | lower-triangular and constant along each diagonal | 核写成矩阵的样子.
+
+D lti | Linear time-invariant (LTI): the same A, B, C at every step; required for the convolution view.
+X lti | 卷积要求每一步的参数相同. 这既是 LTI 模型能并行训练的原因, 也是它的局限: 固定的核对每个距离给固定权重, 不能根据内容决定存什么、跳过什么.
+
+D pscan | A scan computes all running results of an operation; a parallel scan needs log₂ n steps and works for any associative operation.
+X pscan | 并行前缀和: 每步让每个位置加上左边 1、2、4 … 个位置远的值. 线性递归的一步是「乘 A 再加 b」, 两步合起来形式不变, 用 (A, b) 对按 (A₂A₁, A₂b₁ + b₂) 合并, 满足结合律. 例 A = 0.5、x = (4, 2, 0, 2) 两步得到 4, 4, 2, 3. 参数每步不同也能用.
+S pscan | assoc | 结合律 | associative | 能改变先合并哪两段的前提.
+S pscan | pairop | (A, b) 对的合并 | (A₁, b₁) • (A₂, b₂) | 概括一段连续的步.
+
+D diag | Most matrices can be written as A = PΛP⁻¹; in products the inner P⁻¹P cancel, so Aᵏ = PΛᵏP⁻¹.
+X diag | 例: (0.6 0.2; 0.2 0.6) = P diag(0.8, 0.4) P⁻¹, 特征向量 (1, 1) 和 (1, −1). 连乘时中间抵消, 只需对角线上的特征值取幂. 不可对角化的矩阵很少见; 实矩阵的特征值可能是复数.
+
+D diaglin | Diagonalize A = PΛP⁻¹ and absorb P⁻¹ into B and P into C: we simply learn the diagonal λ; the recurrence becomes element-wise.
+X diaglin | 换一组状态坐标, 输入输出关系不变, 状态的每一维变成独立的标量递归 hₜ = λ ⊙ hₜ₋₁ + B xₜ. 扫描的合并也逐元素, 每次 N 次运算, 而稠密矩阵乘法要 N³.
+
+D lingrad | Since hₜ = λ ⊙ hₜ₋₁ + B xₜ, each chain rule step contributes just λ: |λᵢ| < 1 means no explosion, near 1 means long memory.
+X lingrad | 往回 k 步的梯度是 λᵏ, 没有 f′ 也没有矩阵. 衰减仍是指数的, 但衰减率是可直接控制的参数. 记忆半衰期 ln 0.5 / ln |λ|: 0.5 → 1 步, 0.9 → 6.6, 0.99 → 69, 0.999 → 693; 1 − λ 每小 10 倍, 记忆长 10 倍.
+S lingrad | halflife | 半衰期 | memory half-life | |λ|ᵏ = 1/2 需要的步数.
+
+D lru | The LRU learns νᵢ freely and sets λᵢ = exp(−exp(νᵢ)) ∈ (0, 1), initializes close to 1, normalizes the input by γᵢ = √(1 − λᵢ²) and uses complex λᵢ.
+X lru | 稳定参数化保证 λ 永远在 (0, 1) 里; 初始化在 0.9 到 0.999, 从一开始就有长记忆; 归一化让白噪声输入时状态方差保持 1, 否则 λ → 1 时状态越积越大. 在 Long Range Arena 上一步步从 tanh RNN 改到 LRU, PathFinder 和 PathX 直到加了稳定参数化和归一化才从 50 % 跳到 90 % 以上.
+S lru | stabpar | 稳定参数化 | Stable parameterization | λ = exp(−exp(ν)).
+S lru | lruinit | 初始化接近 1 | Initialization close to 1 | 长记忆.
+S lru | lrunorm | 归一化 | Normalization | 输入乘 √(1 − λ²).
+S lru | pathx | PathX | PathX | 16K 个词的长程任务.
+
+D ssmodel | State space models from control theory: continuous-time linear dynamics h′(τ) = A h(τ) + B x(τ), y(τ) = C h(τ); sampling with step size Δ gives a linear RNN.
+X ssmodel | 离散化 (零阶保持): Ā = exp(ΔA), B̄ = (ΔA)⁻¹(exp(ΔA) − I) ΔB ≈ ΔB. 好处是步长 Δ 有明确意义 (时间分辨率), A 的特征值实部为负时离散后自动稳定. SSM 层对输入的每个通道各跑一个这样的系统.
+S ssmodel | disc | 离散化 | discretized | 由连续系统得到 Ā、B̄.
+S ssmodel | stepsize | 步长 | step size | Δ, 越大每步遗忘越多.
+
+D s4 | S4 (Structured State Space Sequence Model) was the first model to solve PathX; later variants come from SSMs, linear RNNs and linear attention.
+X s4 | 时间线: HiPPO、S4、S5、DSS / S4D (状态空间视角), LRU、RWKV、xLSTM、Griffin (RNN 视角), RetNet、Gated DeltaNet (线性注意力视角), 再到 2025 年起的混合 LLM. 它们的区别在 A 的结构和 A、B、C 是否依赖输入; 数学上都是线性递归.
+
+D selcopy | Selective copying: reproduce the colored tokens, ignore the filler tokens in between; a fixed kernel can only copy with fixed spacing.
+X selcopy | LTI 对每个词用同样的参数, 不能根据内容决定存什么、跳过什么. 彩色词的位置每次不同, 固定的卷积核做不到. 语言里到处是这种需求: 跳过填充词, 记住出现过的名字. 这解释了为什么 LTI 的线性 RNN 是弱的语言模型.
+
+D selssm | Selection: B, C and the step size Δ become functions of the current token; time-varying → no convolution kernel, but scan still works.
+X selssm | Bₜ = W_B xₜ, Cₜ = W_C xₜ, Δₜ = softplus(w⊤xₜ + b). 对每个通道用 Δₜ 把 A、Bₜ 离散化, 递归更新, 用 Cₜ 读出. 这是 Mamba 的核心 (S6). A 本身不依赖输入, 但 Āₜ = exp(ΔₜA) 通过 Δₜ 间接依赖. 对状态仍是线性的, 所以扫描仍适用.
+
+D deltagate | With N = 1, A = −1, B = 1, Δₜ = softplus(zₜ): Ā = 1 − σ(zₜ), B̄ = σ(zₜ), so hₜ = (1 − σ(zₜ)) hₜ₋₁ + σ(zₜ) xₜ: the classic RNN gate.
+X deltagate | exp(−softplus(z)) = 1/(1 + eᶻ) = 1 − σ(z), B̄ = 1 − e^(−Δ) = σ(z). 状态更新是「(1 − σ) × 旧状态 + σ × 新输入」, 正是 GRU / LSTM 的门. Δₜ → 0 时门关, 状态保持、当前词被跳过 (填充词); Δₜ 大时门开, 状态重置为当前词.
+
+D hwscan | Mamba fuses discretization, scan and readout in fast SRAM and writes only y; the naive approach writes all states hₜ to slow GPU memory (HBM).
+X hwscan | 扫描处理的状态张量 B × L × D × N 比输入大 N 倍. 显存 HBM (40 GB, 1.5 TB/s) 慢, 片上 SRAM (20 MB, 19 TB/s) 快约 13 倍. 融合成一个内核在 SRAM 里算完, 反向传播需要的中间状态用时重算. 和 FlashAttention 一样, 瓶颈在内存读写.
+
+D mamba | The full Mamba model stacks blocks built around the selective SSM; Mamba is the first attention-free model to match a strong transformer recipe (Transformer++).
+X mamba | Mamba 块: 线性投影把维度扩大 E = 2 倍, 短卷积, 选择性 SSM, 旁边一条门控支路 (SiLU), 再投影回去; 整个块代替「注意力 + FFN」. 在 Pile 上的扩展律和 Transformer++ 持平, Mamba-3B 胜过同规模、追平两倍大的 Transformer, 生成吞吐量高 5 倍, 上下文到 100 万词仍在变好.
+
+D conststate | Mamba keeps an N-dimensional state for each of its E · D channels plus last convolution inputs: c. 12 MB for Mamba-2.8B, for any n.
+X conststate | 每层 2 · 2560 · 16 个状态数, 64 层约 524 万, 加卷积缓存约 620 万个数, 16 位约 12 MB. 同规模 Pythia-2.8B 每词要存 K 和 V: 2 · 32 · 2560 · 2 字节 ≈ 0.33 MB, 2K 词 0.7 GB, 128K 词 43 GB.
+
+D statelim | Everything must fit into hₜ: the state is lossy; copying and retrieval suffer compared to transformers.
+X statelim | Transformer 的 KV 缓存每词一项, 能精确回查; SSM 把所有词压进固定大小的向量. Transformer 能复制的字符串比 SSM 长得多; 8B 规模纯 Mamba 在 5-shot MMLU 和电话簿查找上落后, 但只有 7 % 注意力层的混合模型胜过 Transformer.
+
+D hybrid | Many recent long-context LLMs combine many linear-recurrent layers with a few attention layers: constant-size state vs. exact lookup into the past.
+X hybrid | 递归层多用 Mamba-2 或带 delta 规则的门控线性注意力 (Gated DeltaNet). 比例 (递归 : 注意力) 从 3:1 到 7:1: Jamba、MiniMax-01 为 7:1, Qwen3-Next、Kimi Linear、Qwen3.5 为 3:1, Nemotron 3 为 4:1 和 5:1. 注意力没有消失, 只是变成少数层.

@@ -1149,6 +1149,7 @@
   <a href="#b3">练习单 3 · 关系代数</a>
   <a href="#b4">练习单 4 · 键与关系代数</a>
   <a href="#b5">练习单 5 · SQL (一)</a>
+  <a href="#b6">练习单 6 · SQL (二)</a>
 </nav>
 <main class="wrap">
 
@@ -1850,6 +1851,210 @@ Paul     Winter      2800.00</pre>
   <p>两种写法有一个边界差别: 如果数据库里根本没有 Landshut 客户, 双重 NOT EXISTS 返回<b>所有</b>员工 (「对空集的所有元素都成立」是空真), 计数写法返回空 (连接后没有行可分组). 按逻辑, 前者才是全称量词的正确含义. 计数写法里 COUNT(DISTINCT …) 不能换成 COUNT(*): 同一位员工卖给同一位客户两次会<span class="nb">被数两次.</span></p>
 </details>
 <div class="warn"><p><b>原题小错:</b> 练习单抬头写的是「WS 2025/26」, 但日期是 13.11.2026、讨论从 23.11. 开始, 应为 WS 2026/27 <span class="nb">(沿用了去年的模板).</span></p></div>
+</article>
+</section>
+
+<section class="part" id="b6">
+<h2>练习单 6: SQL (二)<br><span class="de-title">Übungsblatt 6: SQL #2</span><small><span class="rl">对应 <a href="DBS-05-SQL.html#join">DBS 05 · 连接</a>、<a href="DBS-05-SQL.html#agg">聚合与分组</a>、<a href="DBS-05-SQL.html#sort">排序</a>、<a href="DBS-05-SQL.html#sub">子查询</a>;</span><span class="rl">源文件 Zettel06.pdf;</span><span class="rl">讨论时间: Besprechung ab 30.11.</span></small></h2>
+
+<div class="zh">
+  <p>题目只给了模式, 没给数据. 下面每条 SQL 都在 PostgreSQL 18.6 (PGlite) 和 DuckDB 2.0 上用一份自造的小大学数据库跑过: 6 位教授 (其中 Kopernikus 和 Popper 不开课)、10 个学生 (第 1 到第 18 学期, Neumann 不听任何课)、9 门课、7 条先修关系 (Softwaretechnik 有两门先修课)、30 条听课记录、10 条考试成绩 (note 是 <code>numeric(2,1)</code>). Softwaretechnik 照题目的例子安排成 6 个听众、其中 1 人在第 5 学期. 数据故意放进了会让错误写法露馅的情况, 下面的「易错」都是实际<span class="nb">跑出来的.</span></p>
+</div>
+
+<article id="b6-1">
+<h3>题 6-1 a): 每门课的平均分<br><span class="de-title"><span class="seg">Aufgabe 6-1 ·</span> <span class="seg">Anfragen in SQL ·</span> <span class="seg">a)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 6 · Aufgabe 6-1</span>
+  <p>Gegeben seien die Relationen als Datenmodell für eine <span class="nb">Universitätsdatenbank:</span></p>
+  <ul>
+    <li>Professoren (persNr, name, <span class="nb">raum)</span></li>
+    <li>Studenten (matrNr, name, <span class="nb">semester)</span></li>
+    <li>Vorlesungen (vorlNr, titel, ects, gelesenVon → <span class="nb">Professoren</span></li>
+    <li>Voraussetzungen (vorausgesetzt → Vorlesungen, vorlesung → <span class="nb">Vorlesungen)</span></li>
+    <li>hoeren (matrNr → Studenten,vorlNr → <span class="nb">Vorlesungen)</span></li>
+    <li>Pruefungen (matrNr → Studenten,vorlNr → Vorlesungen, <span class="nb">note)</span></li>
+  </ul>
+  <p>Formulieren Sie folgende Anfragen für das obige Datenbankschema in <span class="nb">SQL DQL.</span></p>
+  <p>a) Bestimmen Sie für jede Vorlesung (Anzuzeigen: Nummer und Titel ) die Durchschnittsnote (gerundet auf drei Stellen) über alle in dem Fach stattgefundenen <span class="nb">Prüfungen.</span></p>
+  <p>Runden: Zum Runden können Sie die Funktion ROUND benutzen. Beispielsweise wird das Ergebnis der Berechnung in folgender Anfrage auf drei Nachkommastellen <span class="nb">gerundet:</span></p>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>ROUND(menge*gewicht / <span class="tk-n">1000</span>,<span class="tk-n">3</span>) <span class="tk-k">FROM </span>LTP <span class="tk-k">NATURAL JOIN </span>T</pre>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 给定一个大学数据库的关系: 教授 (人员号、姓名、办公室)、学生 (学号、姓名、学期)、课程 (课号、名称、学分、授课教授)、先修关系 (vorausgesetzt 是被要求的那门课, vorlesung 是提出要求的那门课)、听课 (哪个学生听哪门课)、考试 (哪个学生考哪门课, 成绩). 用 SQL 的查询部分写出下面的查询. a) 对每门课 (显示课号和名称) 求这门课所有考试的平均分, 保留三位小数. 提示: 可以用 ROUND 函数, 例如 <code>ROUND(表达式, 3)</code> <span class="nb">四舍五入到三位小数.</span></p>
+  <p><b>思路:</b> 课程和考试连接, 按课程分组, 每组求 AVG(note) (<a href="DBS-05-SQL.html#agg">DBS 05 · 聚合与分组</a>). SELECT 里出现的非聚合列 (课号、名称) 都要写进 GROUP BY. 没有考试的课要不要出现? 题目说的是「已经举行过的考试」, <span class="nb">没有考试就没有平均分.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>v.vorlNr, v.titel, ROUND(<span class="tk-k">AVG</span>(p.note), <span class="tk-n">3</span>) <span class="tk-k">AS </span>durchschnitt
+<span class="tk-k">FROM </span>Vorlesungen v <span class="tk-k">JOIN </span>Pruefungen p <span class="tk-k">ON </span>v.vorlNr = p.vorlNr
+<span class="tk-k">GROUP BY </span>v.vorlNr, v.titel;</pre>
+  <p>测试数据的实际输出 (PostgreSQL, <span class="nb">按课号排):</span></p>
+<pre data-lang="output"> vorlnr | titel             | durchschnitt
+--------+-------------------+--------------
+      2 | Ethik             |        1.667
+      3 | Erkenntnistheorie |        2.100
+      4 | Logik             |        1.300
+      6 | Softwaretechnik   |        2.567</pre>
+  <p>Ethik 有三次考试 1.0、2.3、1.7, 平均 5.0 / 3 = 1.6667, 四舍五入到 1.667. 只有有考试的 4 门课出现, 这是内连接的效果, 也正是题目要的. 若想让没有考试的课以 NULL 出现, 改成 <code>LEFT JOIN</code> (AVG 对空组返回 <span class="nb">NULL).</span></p>
+  <p>vorlNr 是主键, 按它分组就够了; titel 也写进 GROUP BY, 是因为 SQL 标准要求 SELECT 里的非聚合列都出现在 GROUP BY 中 (PostgreSQL 在按主键分组时允许省略, <span class="nb">但写上更保险).</span></p>
+  <p><b>易错:</b> PostgreSQL 的两参数 <code>ROUND(x, 3)</code> 只接受 <code>numeric</code>. 如果 note 是 <code>real</code> 或 <code class="lc">double precision</code>, 实测报错 <code class="lc">function round(double precision, integer) does not exist</code>, 要先转换: <code class="lc">ROUND(AVG(note)::numeric, 3)</code>. DuckDB 两种类型都接受. 这里 note 定义成 <code>numeric(2,1)</code>, AVG 的结果也是 numeric, <span class="nb">不会出这个问题.</span></p>
+</details>
+</article>
+
+<article id="b6-2">
+<h3>题 6-1 b): 每位教授开几门课<br><span class="de-title"><span class="seg">Aufgabe 6-1 ·</span> <span class="seg">b)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 6 · Aufgabe 6-1 b</span>
+  <p>b) Bestimmen Sie Personalnummer und Namen eines jeden Professors, zusammen mit der Anzahl der unterschiedlichen Vorlesungen, die er hält. Professoren ohne Vorlesung sollen mit einer Vorlesungsanzahl von 0 angegeben <span class="nb">werden.</span></p>
+  <p>Sortieren Sie das Ergebnis absteigend nach der Anzahl der <span class="nb">Vorlesungen.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 列出每位教授的人员号和姓名, 以及他讲的不同课程的数量. 没有课的教授也要列出来, 数量写 0. <span class="nb">结果按课程数降序排.</span></p>
+  <p><b>思路:</b> 「没有课的也要出现」就是外连接: Professoren LEFT JOIN Vorlesungen, 没有课的教授保留下来, 课程那一侧填 NULL. 然后分组计数. 关键是数什么: COUNT(*) 数的是行, COUNT(列) 只数非 NULL <span class="nb">的值.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>p.persNr, p.name, <span class="tk-k">COUNT</span>(<span class="tk-k">DISTINCT </span>v.vorlNr) <span class="tk-k">AS </span>anzahl
+<span class="tk-k">FROM </span>Professoren p <span class="tk-k">LEFT JOIN </span>Vorlesungen v <span class="tk-k">ON </span>v.gelesenVon = p.persNr
+<span class="tk-k">GROUP BY </span>p.persNr, p.name
+<span class="tk-k">ORDER BY </span>anzahl <span class="tk-k">DESC</span>;</pre>
+  <p>测试数据的<span class="nb">实际输出:</span></p>
+<pre data-lang="output"> persnr | name       | anzahl
+--------+------------+--------
+      2 | Russel     |      4
+      1 | Sokrates   |      3
+      5 | Augustinus |      1
+      7 | Kant       |      1
+      3 | Kopernikus |      0
+      4 | Popper     |      0</pre>
+  <p>Kopernikus 和 Popper 没有课, 外连接后各有一行, 课程列是 NULL; <code>COUNT(v.vorlNr)</code> 不数 NULL, 得 0. DISTINCT 对应题目的「不同的课程」: 这里每门课只有一个 vorlNr, 加不加结果相同, 写上和题意一致. 并列的行 (1 门课的两人、0 门课的两人) 之间的顺序没有规定, PostgreSQL 和 DuckDB 实测给出的顺序就不一样; 需要确定顺序时再加第二个排序键, 如 <code class="lc">ORDER BY anzahl DESC, p.name</code>.</p>
+  <p><b>易错:</b> 写成 <code>COUNT(*)</code>, 实测 Kopernikus 和 Popper 都变成 1: 外连接给他们保留的那一行也被数进去了. 写成内连接 <code>JOIN</code>, <span class="nb">这两个人直接消失.</span></p>
+</details>
+</article>
+
+<article id="b6-3">
+<h3>题 6-1 c): 认识多少个高年级同学<br><span class="de-title"><span class="seg">Aufgabe 6-1 ·</span> <span class="seg">c)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 6 · Aufgabe 6-1 c</span>
+  <p>c) Bestimmen Sie für jeden Studenten (Anzuzeigen: Matrikelnummer und Name), wieviele andere Studenten aus einem höheren Semester dieser kennt (d.h. beide besuchen mindestens eine Vorlesung gemeinsam). Zeigen Sie nur Studenten an die mehr als zwei andere Studenten aus einem höheren Semester <span class="nb">kennen.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 对每个学生 (显示学号和姓名), 求他认识多少个学期比他高的其他学生; 「认识」的意思是两人至少一起听一门课. 只显示认识两个以上 (多于 2 个) <span class="nb">高年级学生的人.</span></p>
+  <p><b>思路:</b> 一对学生要用同一张表出现两次 (别名 s1、s2, h1、h2), 通过同一门课连起来: h1.vorlNr = h2.vorlNr. 条件 s2.semester &gt; s1.semester 同时保证了「另一个人」. 分组后计数, 再用 HAVING 筛「多于两个」. 想一想: 两个人一起听了两门课, <span class="nb">会被数几次?</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">SELECT </span>s1.matrNr, s1.name, <span class="tk-k">COUNT</span>(<span class="tk-k">DISTINCT </span>s2.matrNr) <span class="tk-k">AS </span>anzahl
+<span class="tk-k">FROM </span>Studenten s1
+<span class="tk-k">JOIN </span>hoeren h1     <span class="tk-k">ON </span>s1.matrNr = h1.matrNr
+<span class="tk-k">JOIN </span>hoeren h2     <span class="tk-k">ON </span>h1.vorlNr = h2.vorlNr
+<span class="tk-k">JOIN </span>Studenten s2  <span class="tk-k">ON </span>h2.matrNr = s2.matrNr
+<span class="tk-k">WHERE </span>s2.semester &gt; s1.semester
+<span class="tk-k">GROUP BY </span>s1.matrNr, s1.name
+<span class="tk-k">HAVING COUNT</span>(<span class="tk-k">DISTINCT </span>s2.matrNr) &gt; <span class="tk-n">2</span>;</pre>
+  <p>测试数据的实际输出 <span class="nb">(按学号排):</span></p>
+<pre data-lang="output"> matrnr | name         | anzahl
+--------+--------------+--------
+    104 | Aristoxenos  |      3
+    105 | Schopenhauer |      4
+    106 | Carnap       |      6
+    107 | Theophrastos |      4
+    108 | Feuerbach    |      7</pre>
+  <p>Fichte (第 10 学期) 只认识两个更高学期的人 (Xenokrates、Jonas), 不满足「多于两个」, 不出现; Xenokrates 在最高的第 18 学期, 没有更高的人, 连分组都进不去. 用 <code>&gt; 2</code>, 不是 <span class="nb"><code>&gt;= 2</code>.</span></p>
+  <p><b>易错:</b> 用 <code>COUNT(*)</code> 代替 <code class="lc">COUNT(DISTINCT s2.matrNr)</code>. 连接的每一行是「s1 和 s2 一起听的一门课」, 两人一起听几门课就有几行. 实测 Feuerbach 从 7 变成 12, Fichte 从 2 变成 4, Jonas 从 1 变成 4, 后两个人都被错误地放<span class="nb">进了结果.</span></p>
+</details>
+</article>
+
+<article id="b6-4">
+<h3>题 6-1 d): 有忠实听众的教授<br><span class="de-title"><span class="seg">Aufgabe 6-1 ·</span> <span class="seg">d)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 6 · Aufgabe 6-1 d</span>
+  <p>d) Bestimmen Sie die Professoren (Anzuzeigen: Personalnummer und Name), für die mindestens zwei Studenten mindestens drei Vorlesungen des jeweiligen Professors <span class="nb">hören.</span></p>
+  <p>Tipp: Erstellen Sie passende Views, um die Anfrage übersichtlicher zu <span class="nb">gestalten.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 找出这样的教授 (显示人员号和姓名): 至少有两个学生, 每人都听了这位教授的至少三门课. 提示: 建合适的视图, <span class="nb">让查询更清楚.</span></p>
+  <p><b>思路:</b> 两层计数, 分两步写. 第一步: 对每一对 (学生, 教授) 数这个学生听了这位教授几门课, 存成视图. 第二步: 在视图里筛出「至少三门」的行, 再按教授分组, 数这样的学生有没有两个以上. 视图 (Sicht, View) 就是一个起了名字的查询: <code class="lc">CREATE VIEW 名字 AS SELECT …</code>, 之后可以像表一样在 FROM 里用, 不存数据, 每次查询时重新计算 (外部层的概念见 <span class="nb"><a href="DBS-01-数据库系统基础.html">DBS 01</a>).</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">CREATE VIEW </span>HoertBeiProf <span class="tk-k">AS
+SELECT </span>h.matrNr, v.gelesenVon <span class="tk-k">AS </span>persNr, <span class="tk-k">COUNT</span>(*) <span class="tk-k">AS </span>anzahl
+<span class="tk-k">FROM </span>hoeren h <span class="tk-k">JOIN </span>Vorlesungen v <span class="tk-k">ON </span>h.vorlNr = v.vorlNr
+<span class="tk-k">GROUP BY </span>h.matrNr, v.gelesenVon;
+
+<span class="tk-k">SELECT </span>p.persNr, p.name
+<span class="tk-k">FROM </span>Professoren p <span class="tk-k">JOIN </span>HoertBeiProf hb <span class="tk-k">ON </span>p.persNr = hb.persNr
+<span class="tk-k">WHERE </span>hb.anzahl &gt;= <span class="tk-n">3
+</span><span class="tk-k">GROUP BY </span>p.persNr, p.name
+<span class="tk-k">HAVING COUNT</span>(*) &gt;= <span class="tk-n">2</span>;</pre>
+  <p>视图里 anzahl ≥ 2 的行 <span class="nb">(测试数据):</span></p>
+<pre data-lang="output"> matrnr | persnr | anzahl
+--------+--------+--------
+    101 |      1 |      3
+    102 |      1 |      3
+    108 |      1 |      3
+    103 |      2 |      3
+    104 |      2 |      2
+    105 |      2 |      2
+    106 |      2 |      2</pre>
+  <p>最终结果只有一行 <code>1 | Sokrates</code>: 他有三个学生各听了他全部三门课 (Ethik、Logik、Mäeutik). Russel 开了 4 门课, 但只有 Fichte (103) 听了其中 3 门, 其余人最多听 2 门, <span class="nb">所以不满足.</span></p>
+  <p>WHERE 和 HAVING 各管一层: WHERE 在分组前筛视图的行 (每个学生对这位教授够不够三门), HAVING 在分组后筛组 (够格的学生有没有两个). 视图里的 COUNT(*) 不需要 DISTINCT: hoeren 的主键是 (matrNr, vorlNr), 同一学生同一门课<span class="nb">只有一行.</span></p>
+  <p>不用视图也可以把它写成 FROM 里的子查询 (<code class="lc">FROM Professoren p JOIN (SELECT …) hb ON …</code>), 结果相同; 视图的好处是能单独查看中间结果, 像上面那样先核<span class="nb">对第一步.</span></p>
+</details>
+</article>
+
+<article id="b6-5">
+<h3>题 6-1 e): 有先修要求的课, 听众的学期分布<br><span class="de-title"><span class="seg">Aufgabe 6-1 ·</span> <span class="seg">e)</span></span></h3>
+<div class="card de">
+  <span class="folie">Übungsblatt 6 · Aufgabe 6-1 e</span>
+  <p>e) Bestimmen Sie für jede Vorlesung (Anzuzeigen: Nummer und Titel), welche mindestens eine andere Vorlesung voraussetzt, die prozentualen Anteile (gerundet auf zwei Nachkommastellen) der teilnehmenden Studenten pro <span class="nb">Semester.</span></p>
+  <p>Dabei interessieren uns nur Vorlesungen die von Studenten aus unterschiedlichen Semestern gehört werden. Andere Vorlesungen sollen nicht in der Ergebnistabelle <span class="nb">auftauchen.</span></p>
+  <p>Ein Beispiel: Die Vorlesung Softwaretechnik setzt eine andere Vorlesungen voraus und wird von insgesamt 6 Studenten gehört. Davon stammt ein Student aus dem fünften Semester. Also macht dieser Fünftsemestler ein sechstel aller Hörer aus. Das entsprechende Ergebnistupel ist somit (6,’Softwaretechnik’, 5, 16.<span class="nb">67).</span></p>
+  <p>Das Ergebnis soll folgendermaßen sortiert werden: alphabetisch nach dem Vorlesungstitel, dann absteigend nach dem prozentualen Anteil, bei gleichem Anteil aufsteigend nach dem <span class="nb">Semester.</span></p>
+  <p>Tipp: Erstellen Sie passende <span class="nb">Views</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 对每门至少要求一门先修课的课程 (显示课号和名称), 求听课学生按学期的百分比分布 (保留两位小数). 只考虑听众来自不同学期的课, 其他课不出现在结果里. 例: Softwaretechnik 要求一门先修课, 共 6 人听, 其中 1 人在第 5 学期, 占六分之一, 对应的结果元组是 (6, 'Softwaretechnik', 5, 16.67). 排序: 先按课程名字母序, 再按百分比降序, 百分比相同时按学期升序. 提示: <span class="nb">建合适的视图.</span></p>
+  <p><b>思路:</b> 三个条件分开处理, 每个一个视图或一步. ① 「有先修要求」: 课号出现在 Voraussetzungen.vorlesung 里, 用 IN 子查询, 不要直接连接 (一门课有几门先修课就会被复制几次). ② 每门课的总人数, 同时用 HAVING COUNT(DISTINCT semester) &gt; 1 去掉只有一个学期的课. ③ 按 (课程, 学期) 分组计数, 除以总人数, 乘 100. <span class="nb">除法时注意整数除法.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+<pre data-lang="sql"><span class="tk-k">CREATE VIEW </span>Hoerer <span class="tk-k">AS                 </span><span class="tk-c">-- Hörer von Vorlesungen mit Voraussetzung
+</span><span class="tk-k">SELECT </span>h.vorlNr, s.semester
+<span class="tk-k">FROM </span>hoeren h <span class="tk-k">JOIN </span>Studenten s <span class="tk-k">ON </span>h.matrNr = s.matrNr
+<span class="tk-k">WHERE </span>h.vorlNr <span class="tk-k">IN </span>(<span class="tk-k">SELECT </span>vorlesung <span class="tk-k">FROM </span>Voraussetzungen);
+
+<span class="tk-k">CREATE VIEW </span>Gesamt <span class="tk-k">AS                 </span><span class="tk-c">-- Hörerzahl, nur bei mehreren Semestern
+</span><span class="tk-k">SELECT </span>vorlNr, <span class="tk-k">COUNT</span>(*) <span class="tk-k">AS </span>gesamt
+<span class="tk-k">FROM </span>Hoerer
+<span class="tk-k">GROUP BY </span>vorlNr
+<span class="tk-k">HAVING COUNT</span>(<span class="tk-k">DISTINCT </span>semester) &gt; <span class="tk-n">1</span>;
+
+<span class="tk-k">SELECT </span>v.vorlNr, v.titel, h.semester,
+       ROUND(<span class="tk-k">COUNT</span>(*) * <span class="tk-n">100</span>.<span class="tk-n">0 </span>/ <span class="tk-k">g</span>.gesamt, <span class="tk-n">2</span>) <span class="tk-k">AS </span>anteil
+<span class="tk-k">FROM </span>Hoerer h
+<span class="tk-k">JOIN </span>Gesamt <span class="tk-k">g      ON </span>h.vorlNr = <span class="tk-k">g</span>.vorlNr
+<span class="tk-k">JOIN </span>Vorlesungen v <span class="tk-k">ON </span>v.vorlNr = h.vorlNr
+<span class="tk-k">GROUP BY </span>v.vorlNr, v.titel, h.semester, <span class="tk-k">g</span>.gesamt
+<span class="tk-k">ORDER BY </span>v.titel, anteil <span class="tk-k">DESC</span>, h.semester;</pre>
+  <p>测试数据的实际输出 <span class="nb">(两个系统相同):</span></p>
+<pre data-lang="output"> vorlnr | titel             | semester | anteil
+--------+-------------------+----------+--------
+      8 | Bioethik          |        3 |  50.00
+      8 | Bioethik          |       10 |  50.00
+      3 | Erkenntnistheorie |        6 |  33.33
+      3 | Erkenntnistheorie |        8 |  33.33
+      3 | Erkenntnistheorie |       10 |  33.33
+      2 | Ethik             |        2 |  25.00
+      2 | Ethik             |        3 |  25.00
+      2 | Ethik             |       12 |  25.00
+      2 | Ethik             |       18 |  25.00
+      6 | Softwaretechnik   |        2 |  33.33
+      6 | Softwaretechnik   |        3 |  16.67
+      6 | Softwaretechnik   |        5 |  16.67
+      6 | Softwaretechnik   |        6 |  16.67
+      6 | Softwaretechnik   |        8 |  16.67</pre>
+  <p>题目的例子 (6, Softwaretechnik, 5, 16.67) 在里面. 被去掉的课: Grundzüge 和 Logik、Mäeutik 没有先修要求; Wissenschaftstheorie 只有 1 个听众; Glaube und Wissen 的两个听众都在第 2 学期. 排序的第二、第三键在 Softwaretechnik 里看得到: 33.33 排在前面, 四个 16.67 按学期 3、5、6、<span class="nb">8 升序.</span></p>
+  <p>g.gesamt 写进 GROUP BY: 它在每门课内是常数, 但不写进去, SELECT 里就不能直接用它 (它既不是分组列, <span class="nb">也不在聚合函数里).</span></p>
+  <p><b>易错 1:</b> 写成 <code class="lc">COUNT(*) * 100 / g.gesamt</code>. PostgreSQL 里两个整数相除是整数除法, 实测 Softwaretechnik 得到 33 和 16, 不是 33.33 和 16.67. 写 <code>100.0</code> 让计算变成小数. DuckDB 的 <code>/</code> 永远是小数除法 (得 16.666…), 这个错误在 DuckDB 里看不出来, 换到 PostgreSQL <span class="nb">才暴露.</span></p>
+  <p><b>易错 2:</b> 用 <code class="lc">JOIN Voraussetzungen ON h.vorlNr = vorlesung</code> 代替 IN. Softwaretechnik 有两门先修课, 实测连接后变成 12 行而不是 6 行. 如果总人数从同一个连接结果里数, 分子分母一起翻倍, 百分比碰巧不变; 但只要总人数换个方式数 (比如直接从 hoeren), 结果就错了. IN 或 EXISTS 只判断「有没有」, <span class="nb">不复制行.</span></p>
+</details>
 </article>
 </section>
 

@@ -1131,6 +1131,7 @@
       <a href="#u2">练习 2 · 面向对象与正则</a>
       <a href="#u3">练习 3 · NLTK 语料库</a>
       <a href="#u4">练习 4 · NLTK 预处理</a>
+      <a href="#u5">练习 5 · 词性标注</a>
     </nav>
   </div>
 </header>
@@ -3029,6 +3030,486 @@ lemmatizer.lemmatize(<span class="tk-s">"went"</span>, <span class="tk-s">"v"</s
   <p>德语例子: <code class="lc">SnowballStemmer("german").stem("Häuser")</code> 实测是 <code>haus</code>: 德语 Snowball 会先小写, 并把 ä 当作 a 处理. 幻灯片的 Häus 只是示意「词干不一定是真词」, <span class="nb">不是真实输出.</span></p>
 </details>
 <div class="warn"><p><b>幻灯片错误:</b> <code>SnowballStemmer()</code> 缺少必需的语言参数, 运行报 <code>TypeError</code>, 应为 <code class="lc">SnowballStemmer("english")</code>.</p></div>
+</article>
+</section>
+
+<section class="part" id="u5">
+<h2>练习 5: 词性标注<br><span class="de-title">Exercise Session: POS Tagging</span><small><span class="rl">对应 <a href="SP-07-词性标注.html#grundlagen">SP 07 · 词性标注基础</a>、<a href="SP-07-词性标注.html#auto">自动词性标注</a>、<a href="SP-07-词性标注.html#ngram">n 元标注器</a>、<a href="SP-07-词性标注.html#optimierung">开发、优化与评估</a>;</span><span class="rl">源文件 Exercise 6.pdf;</span><span class="rl">练习课幻灯片 (Riedler, Garcés Arias), 代码用 NLTK 3.10 和 Brown 语料实际运行过.</span></small></h2>
+
+<article id="u5-1">
+<h3>今天的内容与基本概念<br><span class="de-title"><span class="seg">Today ·</span> <span class="seg">NLP Pipeline ·</span> <span class="seg">Definitions</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 3–5</span>
+  <p><b>Today</b></p>
+  <p>Goal: build POS taggers that get better step by step, and learn how to measure <span class="nb">“better”.</span></p>
+  <ol>
+    <li>What is POS tagging, and why can it be <span class="nb">challenging?</span></li>
+    <li>Four taggers in NLTK:
+      <ul>
+        <li>Default tagger → one tag for <span class="nb">everything</span></li>
+        <li>Regular expression tagger → look at the word’s <span class="nb">shape</span></li>
+        <li>Lookup (unigram) tagger → look at the word <span class="nb">itself</span></li>
+        <li>N-gram tagger → look at the word and its <span class="nb">context</span></li>
+      </ul></li>
+    <li>How to evaluate a tagger: accuracy, train / dev / test <span class="nb">splits</span></li>
+  </ol>
+  <p>We use the same corpus throughout: the Brown corpus, category news (about 100,000 tokens, tagged by <span class="nb">hand).</span></p>
+  <p><b>NLP Pipeline</b></p>
+  <p>A sequence of processing steps applied to a text. Typically two <span class="nb">phases:</span></p>
+  <ul>
+    <li>Pre-processing: segment the text into units that NLP tasks can use.
+      <ul><li>Sentence <span class="nb">splitting</span></li><li>Tokenization</li><li>Normalization</li></ul></li>
+    <li>Processing: the actual NLP task.
+      <ul><li>POS Tagging ← <span class="nb">today</span></li><li>Feature annotation (sentiment, named <span class="nb">entity)</span></li><li>Syntactic, semantic, pragmatic <span class="nb">parsing</span></li></ul></li>
+  </ul>
+  <p>Example:</p>
+<pre data-lang="text">raw text   "The jury said the number of voters was small."
+tokens     ['The', 'jury', 'said', 'the', 'number', 'of', 'voters', ...]
+POS tags   [('The', 'AT'), ('jury', 'NN'), ('said', 'VBD'), ...]</pre>
+  <p><b>Definitions</b></p>
+  <ul>
+    <li>Part-of-speech (POS): word class / lexical category (e.g., verb, adjective, noun, <span class="nb">adverb).</span></li>
+    <li>POS tagging: label each word with its POS tag. One label per token, so it is a token-level <span class="nb">task.</span></li>
+    <li>Tagset: the collection of tags used for POS <span class="nb">tagging.</span></li>
+    <li>POS tagger: takes a word sequence as input and returns a sequence of POS tags, <span class="nb">one per word.</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 目标: 一步步造出越来越好的词性标注器, 并学会量「好」. 三块内容: 词性标注是什么、难在哪; NLTK 里的四种标注器 (默认标注器给所有词同一个标签, 正则标注器看词形, 查表 (一元) 标注器看词本身, n 元标注器看词和上下文); 怎样评估标注器: 准确率, 训练 / 开发 / 测试集的划分. 全程用 Brown 语料的 news 类 (约 10 万个人工标注的词符). NLP 流水线分两段: 预处理 (分句、分词、规范化) 把文本切成任务能用的单位; 处理才是真正的任务 (今天是词性标注, 还有情感、命名实体之类的特征标注, 以及句法、语义、语用分析). 定义: <b>Part of Speech 词性</b>是词类; <b>POS tagging 词性标注</b>给每个词一个标签, 一个词符一个标签, 所以是词符级任务; <b>Tagset 标签集</b>是所用标签的集合; 标注器输入词序列, <span class="nb">输出等长的标签序列.</span></p>
+  <p><b>思路:</b> 四个标注器是按「用了多少信息」排的, 后面每一个都应该比前一个准; 评估部分回答「准多少」以及「在哪些数据上量才算公平」. 这些都是 <a href="SP-07-词性标注.html#auto">SP 07</a> 的内容, 练习课换了一组例子<span class="nb">再走一遍.</span></p>
+</div>
+</article>
+
+<article id="u5-2">
+<h3>Brown 语料的标签与歧义<br><span class="de-title"><span class="seg">A tagged sentence ·</span> <span class="seg">The Brown tagset ·</span> <span class="seg">Ambiguity</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 6–8</span>
+  <p><b>Example: A tagged sentence</b></p>
+  <p>Input: a list of tokens. Output: a list of (word, <span class="nb">tag) pairs.</span></p>
+<pre data-lang="python"><span class="tk-k">import </span>nltk
+<span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>brown
+<span class="tk-b">print</span>(brown.tagged_sents(categories=<span class="tk-s">'news'</span>)[<span class="tk-n">3</span>][<span class="tk-n">12</span>:<span class="tk-n">15</span>])</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('the', 'AT'), ('jury', 'NN'), ('said', 'VBD')]</pre>
+  <div class="tablewrap"><table>
+    <tr><th>Word</th><td>the</td><td>jury</td><td>said</td></tr>
+    <tr><th>Tag</th><td>AT</td><td>NN</td><td>VBD</td></tr>
+    <tr><th>Meaning</th><td>article</td><td class="wide">noun (singular)</td><td class="wide">verb (past tense)</td></tr>
+  </table></div>
+  <p>These hand-annotated tags are the gold standard: we compare every tagger’s prediction against <span class="nb">them.</span></p>
+  <p><b>The Brown tagset</b></p>
+  <div class="tablewrap"><table>
+    <tr><th>Tag</th><th>Meaning</th><th>Tag</th><th>Meaning</th></tr>
+    <tr><td>NN</td><td class="wide">noun, singular (jury)</td><td>VB</td><td class="wide">verb, base form (cut)</td></tr>
+    <tr><td>NNS</td><td class="wide">noun, plural (voters)</td><td>VBD</td><td class="wide">verb, past tense (said)</td></tr>
+    <tr><td>NP</td><td class="wide">proper noun (Congo)</td><td>VBG</td><td class="wide">verb, -ing form (running)</td></tr>
+    <tr><td>AT</td><td class="wide">article (the, a)</td><td>VBN</td><td class="wide">verb, past participle (received)</td></tr>
+    <tr><td>JJ</td><td class="wide">adjective (widespread)</td><td>VBZ</td><td class="wide">verb, 3rd sg. present (goes)</td></tr>
+    <tr><td>RB</td><td>adverb (only)</td><td>MD</td><td>modal (could)</td></tr>
+    <tr><td>IN</td><td class="wide">preposition (of, in)</td><td>BEZ</td><td>the word is</td></tr>
+    <tr><td>CC</td><td class="wide">coord. conjunction (and)</td><td>BEDZ</td><td>the word was</td></tr>
+    <tr><td>DT</td><td class="wide">determiner (this)</td><td>CD</td><td class="wide">cardinal number (12)</td></tr>
+  </table></div>
+  <p>A tagset is a design decision: other corpora use other tagsets (e.g., Penn Treebank, Universal Dependencies, STTS for <span class="nb">German).</span></p>
+  <p><b>Ambiguity in POS tagging</b></p>
+  <p>Many words have more than one possible tag. The correct one depends on the <span class="nb">context.</span></p>
+  <div class="tablewrap"><table>
+    <tr><th>Sentence</th><th>Tag of <i>cut</i></th></tr>
+    <tr><td class="wide">I want to cut the paper</td><td>VB (verb)</td></tr>
+    <tr><td class="wide">The cut was deep</td><td>NN (noun)</td></tr>
+  </table></div>
+  <p>How often does <i>cut</i> occur with each tag in the whole Brown <span class="nb">corpus?</span></p>
+<pre data-lang="python">cfd = nltk.ConditionalFreqDist(brown.tagged_words())
+<span class="tk-b">print</span>(cfd[<span class="tk-s">'cut'</span>].most_common(<span class="tk-n">4</span>))</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('VB', 75), ('VBN', 60), ('VBD', 25), ('NN', 17)]</pre>
+  <p>Keep this example in mind: we come back to it with the n-gram <span class="nb">tagger.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 标注好的句子是一个 (词, 标签) 对的列表. <code class="lc">tagged_sents(...)[3][12:15]</code> 取 news 类第 4 句的第 13–15 个词: the 冠词 AT, jury 单数名词 NN, said 过去式动词 VBD. 这些人工标注的标签是 gold standard 金标准, 所有标注器的输出都和它比. 表里是 Brown 标签集的常用标签; 注意 Brown 给 be 的各个形式单独的标签 (is 是 BEZ, was 是 BEDZ). 标签集是人为设计的, 别的语料用别的标签集 (英语的 Penn Treebank、跨语言的 Universal Dependencies、德语的 STTS). 很多词有多个可能的标签, 正确的那个取决于上下文: to cut 里 cut 是动词原形 VB, the cut 里是名词 NN. 在整个 Brown 语料里数 cut 的各个标签: VB 75 次、VBN 60 次、VBD 25 次、<span class="nb">NN 17 次.</span></p>
+  <p><b>思路:</b> <code>ConditionalFreqDist</code> 收到 (词, 标签) 对时, 以词为条件、对标签计数, <code>cfd['cut']</code> 就是 cut 的标签分布. cut 的过去式和过去分词都是 cut, 所以 VBD、VBN 也很多: 一个词形在 Brown 里能有四种标签. 只看词本身的标注器 (后面的查表标注器) 永远给 cut 同一个标签 VB, 对 VBN、VBD、<span class="nb">NN 的用法全错.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>两段代码实际运行的输出与幻灯片完全相同. 注意 Slide 8 统计的是<b>整个</b> Brown 语料 (<code>brown.tagged_words()</code>, 没有限定 news), 和其余幻灯片只用 news <span class="nb">类不同.</span></p>
+</details>
+</article>
+
+<article id="u5-3">
+<h3>TreeTagger<br><span class="de-title">Tree Tagger</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 9</span>
+  <ul>
+    <li>A ready-made tool that annotates POS and lemma, exists for multiple <span class="nb">languages</span></li>
+    <li>Download: https://www.cis.lmu.de/~schmid/tools/TreeTagger/</li>
+    <li>Install: <span class="nb"><code class="lc">sh install-tagger.sh</code></span></li>
+    <li>Example:
+<pre data-lang="shell"><span class="tk-b">echo </span><span class="tk-s">'Hello world!' </span>| cmd/tree-tagger-english</pre></li>
+    <li>Output: one line per token with three columns: word, POS tag, lemma
+<pre data-lang="output">Hello   UH    hello
+world   NN    world
+!       SENT  !</pre></li>
+    <li>Remark: UH stands for “interjection” and SENT for “sentence-ending <span class="nb">punctuation”.</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> TreeTagger 是一个现成的工具, 同时标词性和 Lemma 词元, 支持多种语言 (Helmut Schmid 在 CIS 开发). 下载后运行安装脚本, 用管道把文本送给 <code>cmd/tree-tagger-english</code>; 输出每个词符一行, 三列: 词、词性标签、词元. UH 是感叹词, SENT 是句末标点. 它用的是 Penn Treebank 风格的英语标签, <span class="nb">不是 Brown 的.</span></p>
+  <p><b>思路:</b> 这一页只是告诉你有现成工具可用, 不用自己训练. 和后面 NLTK 自己搭的标注器相比, 它多给了词元 (world 的词元是 world, said <span class="nb">的词元会是 say).</span></p>
+</div>
+</article>
+
+<article id="u5-4">
+<h3>怎样评估标注器: 准确率<br><span class="de-title">Evaluation of a tagger</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 10</span>
+  <div class="math-block"><span class="katex-display"><span class="katex" data-o="\[\text{accuracy} = \frac{\text{number of tokens with the correct tag}}{\text{number of all tokens}}\]"><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">accuracy</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">number of all tokens</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">number of tokens with the correct tag</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></div>
+  <p>Example: gold standard vs. the output of a given <span class="nb">tagger</span></p>
+  <div class="tablewrap"><table class="nowrap">
+    <tr><th>Word</th><td>the</td><td>jury</td><td>said</td><td>this</td><td>city</td></tr>
+    <tr><th>Gold</th><td>AT</td><td>NN</td><td>VBD</td><td>DT</td><td>NN</td></tr>
+    <tr><th>Tagger</th><td>AT</td><td>NN</td><td>NN</td><td>NNS</td><td>NN</td></tr>
+    <tr><th></th><td>✓</td><td>✓</td><td>×</td><td>×</td><td>✓</td></tr>
+  </table></div>
+  <p>3 of 5 tags are correct: accuracy = 3/5 <span class="nb">= 0.6.</span></p>
+  <p>In NLTK, every tagger can be scored against gold-tagged <span class="nb">sentences:</span></p>
+<pre data-lang="python">tagger.accuracy(brown.tagged_sents(categories=<span class="tk-s">'news'</span>))</pre>
+  <p>Remark: Older code uses <code>tagger.evaluate(...)</code>: same result, but <span class="nb">deprecated.</span></p>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 准确率 = 标对的词符数 ÷ 全部词符数. 例: 五个词里 said 被标成 NN (应为 VBD), this 被标成 NNS (应为 DT), 其余三个对, 准确率 3/5 = 0.6. NLTK 里每个标注器都有 <code>accuracy(金标准句子)</code> 方法: 它先去掉金标准的标签, 让标注器重新标, 再逐词比较. 旧代码写 <code>evaluate</code>, 结果一样, 但已被弃用 (在 NLTK 3.10 里调用会给出 <span class="nb">DeprecationWarning).</span></p>
+  <p><b>思路:</b> 分母是词符, 不是句子, 也不是不同的词: the 出现 5580 次就算 5580 次. 所以高频词标没标对, 对准确率影响最大, 这正是后面查表标注器的出发点. this 被标成 NNS 是正则标注器 <code>.*s$</code> 规则的典型错误 <span class="nb">(Slide 13).</span></p>
+</div>
+</article>
+
+<article id="u5-5">
+<h3>默认标注器: 基线<br><span class="de-title">Default Tagger</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 11–12</span>
+  <ul>
+    <li>Idea: give every word the same tag, no matter what the <span class="nb">word is.</span></li>
+    <li>Which tag? The most frequent one in the <span class="nb">corpus:</span></li>
+  </ul>
+<pre data-lang="python">tags = [tag <span class="tk-k">for </span>(word, tag) <span class="tk-k">in </span>brown.tagged_words(categories=<span class="tk-s">'news'</span>)]
+<span class="tk-b">print</span>(nltk.FreqDist(tags).max())</pre>
+  <p>Output:</p>
+<pre data-lang="output">NN</pre>
+  <ul>
+    <li>Serves as a baseline or as a backup for other <span class="nb">taggers.</span></li>
+    <li>Baseline: the simplest way to solve a task. It is the reference point for other methods: a new method should at least outperform the baseline; otherwise, its utility might be <span class="nb">limited.</span></li>
+  </ul>
+  <p><b>Default Tagger: Example</b></p>
+<pre data-lang="python"><span class="tk-k">import </span>nltk
+<span class="tk-k">from </span>nltk.corpus <span class="tk-k">import </span>brown
+<span class="tk-c"># https://www.nltk.org/howto/corpus.html#tagged-corpora
+
+</span>sent = brown.sents(categories=<span class="tk-s">'news'</span>)[<span class="tk-n">3</span>]
+noun_tagger = nltk.DefaultTagger(<span class="tk-s">'NN'</span>)
+<span class="tk-b">print</span>(noun_tagger.tag(sent)[:<span class="tk-n">6</span>])
+<span class="tk-b">print</span>(noun_tagger.accuracy(brown.tagged_sents(categories=<span class="tk-s">'news'</span>)))</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('``', 'NN'), ('Only', 'NN'), ('a', 'NN'), ('relative', 'NN'),
+ ('handful', 'NN'), ('of', 'NN')]
+0.13089484257215028</pre>
+  <ul>
+    <li>Only <i>handful</i> is tagged correctly <span class="nb">here.</span></li>
+    <li>Accuracy ≈ 13 %: exactly the share of NN tokens in the corpus (13,162 of 100,<span class="nb">554).</span></li>
+    <li>This is the number every other tagger has to <span class="nb">beat.</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 默认标注器给每个词同一个标签, 不管词是什么. 选哪个标签? 语料里最常见的那个: 数 news 类所有标签, 最多的是 NN. 它的用处是当 <b>Baseline 基线</b>, 或者给别的标注器兜底. 基线是解决任务的最简单办法, 是衡量其他方法的参照点: 新方法至少要比基线好, 否则用处有限. 例子: 第 4 句前 6 个词全被标成 NN, 只有 handful 对了 (它本来就是名词). 在整个 news 上的准确率约 13%, 正好等于 NN 词符所占的比例 (100,554 个词符里有 13,162 个 NN). 这是其他标注器都要<span class="nb">超过的数.</span></p>
+  <p><b>思路:</b> 准确率为什么正好等于 NN 的比例: 默认标注器每个词都猜 NN, 金标准是 NN 的就猜对, 不是的就猜错, 所以猜对的个数 = NN 的个数. 第 4 句的金标准是 <code>``</code> (开引号) <code>``</code>、Only RB、a AT、relative JJ、handful NN、of IN, 实测确认 6 个里只有 handful 是 <span class="nb">NN.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实际运行的输出与幻灯片相同. 13162 / 100554 = 0.130895, 和 <code>accuracy</code> 的结果逐位一致. 「最常见的标签」要在训练数据上数; 这里数的是整个 news, 后面 Slide 26 在测试集上量时, 默认标注器的准确率是 0.126 (测试集里 NN <span class="nb">的比例略低).</span></p>
+</details>
+</article>
+
+<article id="u5-6">
+<h3>正则表达式标注器<br><span class="de-title">Regular Expression Tagger</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 13–15</span>
+  <ul>
+    <li>Idea: the shape of a word (mostly its ending) hints at its POS.
+      <ul><li>walked, jumped → probably past <span class="nb">tense</span></li><li>running, sleeping → probably -ing <span class="nb">form</span></li></ul></li>
+    <li>Rules are written as tuples (regex, <span class="nb">tag).</span></li>
+    <li>Example: <code class="lc">(r'.*ed$', 'VBD')</code> tags every token ending in <i>-ed</i> as simple <span class="nb">past.</span></li>
+    <li>Order matters: the rules are tried from top to bottom, and the first one that matches wins. So put specific rules first and a catch-all rule <span class="nb">last.</span></li>
+    <li>Disadvantages:
+      <ul><li>Tedious: each tag requires its own hand-written <span class="nb">rule(s).</span></li><li>Endings are unreliable: <i>was</i> and <i>this</i> end in <i>-s</i>, but they are not plural <span class="nb">nouns.</span></li></ul></li>
+  </ul>
+<pre data-lang="python">patterns = [
+    (<span class="tk-s">r'.*ing$'</span>, <span class="tk-s">'VBG'</span>),                <span class="tk-c"># gerunds
+    </span>(<span class="tk-s">r'.*ed$'</span>, <span class="tk-s">'VBD'</span>),                 <span class="tk-c"># simple past
+    </span>(<span class="tk-s">r'.*es$'</span>, <span class="tk-s">'VBZ'</span>),                 <span class="tk-c"># 3rd singular present
+    </span>(<span class="tk-s">r'.*ould$'</span>, <span class="tk-s">'MD'</span>),                <span class="tk-c"># modals
+    </span>(<span class="tk-s">r".*'s$"</span>, <span class="tk-s">'NN$'</span>),                 <span class="tk-c"># possessive nouns
+    </span>(<span class="tk-s">r'.*s$'</span>, <span class="tk-s">'NNS'</span>),                  <span class="tk-c"># plural nouns
+    </span>(<span class="tk-s">r'^-?[0-9]+(.[0-9]+)?$'</span>, <span class="tk-s">'CD'</span>),   <span class="tk-c"># cardinal numbers
+    </span>(<span class="tk-s">r'.*'</span>, <span class="tk-s">'NN'</span>)                      <span class="tk-c"># nouns (default)
+</span>]
+regexp_tagger = nltk.RegexpTagger(patterns)
+sent = <span class="tk-s">"She walked to the shops and could buy 12 things"</span>.split()
+<span class="tk-b">print</span>(regexp_tagger.tag(sent))
+<span class="tk-b">print</span>(regexp_tagger.accuracy(brown.tagged_sents(categories=<span class="tk-s">'news'</span>)))</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('She', 'NN'), ('walked', 'VBD'), ('to', 'NN'), ('the', 'NN'),
+ ('shops', 'NNS'), ('and', 'NN'), ('could', 'MD'), ('buy', 'NN'),
+ ('12', 'CD'), ('things', 'NNS')]
+0.20326391789486245</pre>
+  <p><b>Reading the Output</b> — Which rule matched which <span class="nb">word?</span></p>
+  <div class="tablewrap"><table>
+    <tr><th>Word</th><th>Tag</th><th class="wide">Rule that matched</th><th>Correct?</th></tr>
+    <tr><td>walked</td><td>VBD</td><td><code>.*ed$</code></td><td>✓</td></tr>
+    <tr><td>shops, things</td><td>NNS</td><td><code>.*s$</code></td><td>✓</td></tr>
+    <tr><td>could</td><td>MD</td><td><code>.*ould$</code></td><td>✓</td></tr>
+    <tr><td>12</td><td>CD</td><td>number pattern</td><td>✓</td></tr>
+    <tr><td class="wide">She, to, the, and, buy</td><td>NN</td><td><code>.*</code> (default)</td><td>×</td></tr>
+  </table></div>
+  <p>But the rules also make mistakes (adapted from the Brown <span class="nb">corpus):</span></p>
+<pre data-lang="python">sent = <span class="tk-s">"a handful of reports was received"</span>.split()
+<span class="tk-b">print</span>(regexp_tagger.tag(sent))</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('a', 'NN'), ('handful', 'NN'), ('of', 'NN'), ('reports', 'NNS'),
+ ('was', 'NNS'), ('received', 'VBD')]</pre>
+  <ul>
+    <li><i>was</i>: ends in <i>-s</i>, but is not a plural noun (gold tag: <span class="nb">BEDZ).</span></li>
+    <li><i>received</i>: ends in <i>-ed</i>, but is a past participle here (gold tag: <span class="nb">VBN).</span></li>
+    <li>Accuracy ≈ 20 % (default tagger: 13 %). Still poor: frequent words such as <i>the</i>, <i>of</i>, <i>and</i> all fall through <span class="nb">to NN.</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 正则标注器的想法是: 词形 (主要是词尾) 暗示词性, 如 -ed 多半是过去式, -ing 多半是 -ing 形式. 规则写成 (正则, 标签) 二元组, 从上往下试, 第一条匹配上的生效, 所以具体的规则放前面, 兜底的 <code>.*</code> 放最后. 缺点: 每个标签都要手写规则, 很繁琐; 词尾不可靠, was 和 this 以 -s 结尾却不是复数名词. 例句里 walked、shops、things、could、12 标对了, She、to、the、and、buy 落到兜底规则变成 NN, 全错. 第二个例句里 was 被标成 NNS (应为 BEDZ), received 被标成 VBD (这里是过去分词 VBN). 准确率约 20%, 比默认标注器的 13% 好, 但 the、of、and 这些高频词都落到 NN, <span class="nb">仍然很差.</span></p>
+  <p><b>思路:</b> 顺序的影响可以自己试: 把 <code>.*s$</code> 放到 <code>.*es$</code> 前面, goes 就会被标成 NNS. <code>.*'s$</code> 必须在 <code>.*s$</code> 前面, 否则 John's 会被当成复数. 12 先试了前面 6 条 (都不匹配, 因为不以 ing/ed/es/ould/'s/s 结尾), <span class="nb">才走到数字规则.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>两段代码实际运行的输出与幻灯片完全相同. received 的错误说明正则只看词形, 看不到上下文: was received 的被动结构要求过去分词, 而 -ed 规则只能给一个<span class="nb">固定标签.</span></p>
+</details>
+<div class="warn">
+  <p><b>幻灯片小错:</b> 数字规则 <code>r'^-?[0-9]+(.[0-9]+)?$'</code> 里的点没有转义, <code>.</code> 匹配任意字符, 所以 <code>1a5</code>、<code>3/4</code>、<code>1,5</code> 也会被标成 CD (实测 <code class="lc">regexp_tagger.tag(['1a5'])</code> 给出 CD). 本意是小数点, 应写成 <code>r'^-?[0-9]+(\.[0-9]+)?$'</code>. 这条规则照搬自 NLTK 书第 5 章, 原书也没转义; 在这几个例句里不<span class="nb">影响结果.</span></p>
+</div>
+</article>
+
+<article id="u5-7">
+<h3>查表标注器 (一元标注器) 与回退<br><span class="de-title"><span class="seg">Lookup Tagger (Unigram Tagger) ·</span> <span class="seg">Backoff ·</span> <span class="seg">Evaluation</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 16–20</span>
+  <ul>
+    <li>Problem so far: frequent words such as <i>the</i>, <i>of</i>, <i>and</i> are always tagged wrongly, and they make up a large part of every <span class="nb">text.</span></li>
+    <li>Idea: build a small dictionary word → tag for the most frequent <span class="nb">words.</span></li>
+  </ul>
+  <p><b>Step 1</b>: find the 100 most frequent <span class="nb">words.</span></p>
+<pre data-lang="python">news_words = brown.words(categories=<span class="tk-s">'news'</span>)
+most_freq_words = nltk.FreqDist(news_words).most_common(<span class="tk-n">100</span>)
+<span class="tk-b">print</span>(most_freq_words[:<span class="tk-n">4</span>])</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('the', 5580), (',', 5188), ('.', 4030), ('of', 2849)]</pre>
+  <ul>
+    <li><code>FreqDist</code> counts how often each word <span class="nb">occurs.</span></li>
+    <li><code>most_common(100)</code> returns the top 100 as (word, count) <span class="nb">pairs.</span></li>
+    <li>Punctuation marks are tokens too, so they appear in the <span class="nb">list.</span></li>
+  </ul>
+  <p><b>Step 2a</b>: get the corpus as a list of (word, <span class="nb">tag) pairs.</span></p>
+<pre data-lang="python">tagged_news_words = brown.tagged_words(categories=<span class="tk-s">'news'</span>)
+<span class="tk-b">print</span>(tagged_news_words[:<span class="tk-n">3</span>])</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('The', 'AT'), ('Fulton', 'NP-TL'), ('County', 'NN-TL')]</pre>
+  <p>The suffix <i>-TL</i> marks words that are part of a title or name (Fulton <span class="nb">County).</span></p>
+  <p><b>Step 2b</b>: for each word, count how often it occurs with <span class="nb">each tag.</span></p>
+<pre data-lang="python">cfd = nltk.ConditionalFreqDist(tagged_news_words)
+<span class="tk-b">print</span>(cfd[<span class="tk-s">'to'</span>].most_common(<span class="tk-n">2</span>))   <span class="tk-c"># the tag counts of the word 'to'
+</span><span class="tk-b">print</span>(cfd[<span class="tk-s">'to'</span>][<span class="tk-s">'IN'</span>])            <span class="tk-c"># how often is 'to' tagged IN?
+</span><span class="tk-b">print</span>(cfd[<span class="tk-s">'to'</span>].max())            <span class="tk-c"># the most frequent tag of 'to'</span></pre>
+  <p>Output:</p>
+<pre data-lang="output">[('TO', 1222), ('IN', 880)]
+880
+TO</pre>
+  <p><code>cfd</code> works like a dictionary: one table of tag counts per word. TO: infinitive marker (<i>to go</i>). IN: preposition (<span class="nb"><i>to Paris</i>).</span></p>
+  <p><b>Step 3</b>: for each of the 100 words, store its most <span class="nb">frequent tag.</span></p>
+<pre data-lang="python">likely_tags = {}                          <span class="tk-c"># empty dictionary
+</span><span class="tk-k">for </span>(word, count) <span class="tk-k">in </span>most_freq_words:     <span class="tk-c"># the 100 words from step 1
+    </span>likely_tags[word] = cfd[word].max()   <span class="tk-c"># most frequent tag (step 2)
+</span><span class="tk-b">print</span>(<span class="tk-b">len</span>(likely_tags))
+<span class="tk-b">print</span>(<span class="tk-b">list</span>(likely_tags.items())[:<span class="tk-n">6</span>])</pre>
+  <p>Output:</p>
+<pre data-lang="output">100
+[('the', 'AT'), (',', ','), ('.', '.'),
+ ('of', 'IN'), ('and', 'CC'), ('to', 'TO')]</pre>
+  <p>The result is a plain dictionary word → tag (the → AT, of → IN, and → CC, to → TO, …). This dictionary is the lookup tagger: to tag a word, <span class="nb">look it up.</span></p>
+  <p><b>Example and Backoff</b></p>
+<pre data-lang="python">sent = <span class="tk-s">"This is a test sentence"</span>.split()
+baseline_tagger = nltk.UnigramTagger(model=likely_tags)
+<span class="tk-b">print</span>(baseline_tagger.tag(sent))</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('This', None), ('is', 'BEZ'), ('a', 'AT'), ('test', None), ('sentence', None)]</pre>
+  <ul>
+    <li>Words outside the top 100 get <code>None</code>: the tagger does not know <span class="nb">them.</span></li>
+    <li>Backoff: when a tagger cannot assign a tag, hand the word to another tagger. Here: the default <span class="nb">tagger.</span></li>
+  </ul>
+<pre data-lang="python">backoff_tagger = nltk.DefaultTagger(<span class="tk-s">'NN'</span>)
+baseline_tagger = nltk.UnigramTagger(
+    model=likely_tags, backoff=backoff_tagger)
+<span class="tk-b">print</span>(baseline_tagger.tag(sent))</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('This', 'NN'), ('is', 'BEZ'), ('a', 'AT'), ('test', 'NN'), ('sentence', 'NN')]</pre>
+  <p><b>Evaluation</b> — Accuracy on Brown news, for different sizes of the lookup <span class="nb">table:</span></p>
+  <div class="tablewrap"><table>
+    <tr><th class="wide">Words in the table</th><th class="wide">Without backoff</th><th class="wide">With backoff to NN</th></tr>
+    <tr><td>10</td><td>0.261</td><td>0.392</td></tr>
+    <tr><td>100</td><td>0.456</td><td>0.582</td></tr>
+    <tr><td>1,000</td><td>0.656</td><td>0.725</td></tr>
+    <tr><td>10,000</td><td>0.891</td><td>0.900</td></tr>
+  </table></div>
+  <ul>
+    <li>Just 100 words already give 46 %: a few very frequent words cover a large part of the <span class="nb">text.</span></li>
+    <li>Backoff always helps: a guess (NN) is better than <span class="nb"><code>None</code>.</span></li>
+    <li>Still wrong: <i>This</i> should be DT, not NN. And a word always gets the same tag, whatever the <span class="nb">context.</span></li>
+    <li>Remark: we measured on the same data we built the table from. Is that a fair test? <span class="nb">→ next slide</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 前两个标注器的问题是 the、of、and 这些高频词总是标错, 而它们占了每篇文本的很大一部分. 想法: 只为最高频的词建一个「词 → 标签」的小词典. 第 1 步, 用 FreqDist 找出 news 里最常见的 100 个词 (标点也是词符, 所以逗号、句号也在里面). 第 2 步, 取 (词, 标签) 对的列表 (标签后缀 -TL 表示这个词是标题或名称的一部分, 如 Fulton County), 用 ConditionalFreqDist 对每个词数各个标签的次数: to 被标成 TO (不定式标记, to go) 1222 次, 标成 IN (介词, to Paris) 880 次, 最常见的是 TO. 第 3 步, 为这 100 个词各存下最常见的标签, 得到一个普通字典, 它就是查表标注器. 用它标 This is a test sentence: 不在前 100 里的词得到 None. <b>Backoff 回退</b>: 一个标注器给不出标签时, 把这个词交给另一个标注器, 这里交给默认标注器 NN. 表越大越准: 100 个词就有 46%; 回退总有帮助, 猜 NN 总比 None 强. 仍然的问题: This 应为 DT; 一个词永远是同一个标签, 不管上下文. 最后一问: 我们在建表用的同一份数据上量准确率, <span class="nb">公平吗?</span></p>
+  <p><b>思路:</b> <code>UnigramTagger(model=字典)</code> 直接用给定的字典, 不训练; 后面 <code class="lc">UnigramTagger(train_sents)</code> 是从训练语料里自动为<b>每个</b>词数出最常见的标签, 原理和这里手搭的 likely_tags 一样, 只是不限 100 个. This 标错的原因: 前 100 词按原样计数, 表里只有小写的 this (实测 this 的最常见标签是 DT), 大写开头的 This 查不到, 落到 NN. 最后一问的答案在下一节: 不公平, <span class="nb">结果偏乐观.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>所有代码实际运行的输出都与幻灯片相同; 评估表四行八个数也全部重算核对过 (表大小 n 时取 news 的前 n 个高频词, 在整个 news 上量). None 和回退的区别在准确率上很明显: 100 词时从 0.456 升到 0.582, 多出来的 12 个百分点就是表外那些本来就该是 NN <span class="nb">的词.</span></p>
+</details>
+</article>
+
+<article id="u5-8">
+<h3>训练集、开发集与测试集<br><span class="de-title"><span class="seg">Datasets ·</span> <span class="seg">Example</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 21–22</span>
+  <p>In Machine Learning we usually split a dataset into three <span class="nb">parts:</span></p>
+  <ul>
+    <li>Train split: the large part. Its examples are used to train the model (e.g., a POS tagger). Training can mean mathematical optimization (minimizing a loss function) or, as for our taggers, counting frequencies of words and <span class="nb">tags.</span></li>
+    <li>Dev split (development data): many models have hyperparameters (“configurations”), e.g., the size of our lookup table. They are tuned on a held-out dev <span class="nb">split.</span></li>
+    <li>Test split: used once at the end, for the final <span class="nb">evaluation.</span></li>
+  </ul>
+  <p>Why a separate test split? Evaluating a model on the data it was trained on is overly optimistic: the results are much better than “in the real <span class="nb">world”.</span></p>
+  <p>Analogy: an exam that repeats the exercise sheets word for word tests memorization, not <span class="nb">understanding.</span></p>
+<pre data-lang="python">tagged_sents = brown.tagged_sents(categories=<span class="tk-s">'news'</span>)
+size = <span class="tk-b">int</span>(<span class="tk-b">len</span>(tagged_sents) * <span class="tk-n">0.9</span>)
+train_sents = tagged_sents[:size]   <span class="tk-c"># first 90 %
+</span>test_sents = tagged_sents[size:]    <span class="tk-c"># last 10 %
+</span><span class="tk-b">print</span>(<span class="tk-b">len</span>(train_sents), <span class="tk-b">len</span>(test_sents))
+
+<span class="tk-c"># learns the most frequent tag of EVERY word in the training data
+</span>unigram_tagger = nltk.UnigramTagger(train_sents)
+<span class="tk-b">print</span>(unigram_tagger.accuracy(train_sents))
+<span class="tk-b">print</span>(unigram_tagger.accuracy(test_sents))</pre>
+  <p>Output:</p>
+<pre data-lang="output">4160 463
+0.9353630649241612
+0.8121200039868434</pre>
+  <ul>
+    <li>On data it has already seen: 93.5 %. On new data: 81.<span class="nb">2 %.</span></li>
+    <li>The test score is the honest one. The gap comes mainly from words in the test split that never occurred in training (they get <span class="nb"><code>None</code>).</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 机器学习里通常把数据分成三份. 训练集最大, 用来训练模型; 训练可以是数学优化 (最小化损失函数), 也可以像这里的标注器一样只是数词和标签的频率. 开发集用来调 <b>Hyperparameter 超参数</b> (模型的「配置」, 如查表的大小), 要和训练集分开. 测试集只在最后用一次, 做最终评估. 为什么要单独的测试集: 在训练数据上评估过于乐观, 结果比「真实世界」好得多; 就像考试原样重复练习题, 考的是记忆, 不是理解. 例子: news 的 4623 句, 前 90% (4160 句) 训练, 后 10% (463 句) 测试. 一元标注器为训练数据里每个词学最常见的标签; 在见过的数据上 93.5%, 在新数据上 81.2%. 测试分数才是诚实的; 差距主要来自测试集里训练时没出现过的词, <span class="nb">它们得到 None.</span></p>
+  <p><b>思路:</b> 为什么在训练集上也不是 100%: 一个词只能有一个标签, 同一个词的少数用法 (cut 的 VBN、NN) 在训练集里也会标错. 为什么按顺序切而不是随机切: 顺序切让测试句和训练句来自不同的文章, 更接近「新文本」; 随机切会把同一篇文章的句子分到两边, <span class="nb">分数偏高.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>实际运行的输出与幻灯片相同. 「主要来自没见过的词」也核对过: 测试集 10,033 个词符里有 1,146 个 (11.4%) 在训练集里没出现过, 它们全部是 None, 一项就占了 81.2% 和 100% <span class="nb">之间差距的大部分.</span></p>
+</details>
+</article>
+
+<article id="u5-9">
+<h3>n 元标注器与回退组合<br><span class="de-title"><span class="seg">N-gram Tagger ·</span> <span class="seg">Combining Taggers with Backoff</span></span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 23–25</span>
+  <ul>
+    <li>Shortcoming of unigrams: they ignore context. <i>cut</i> always gets the same tag, in “to cut” as well as in <span class="nb">“the cut”.</span></li>
+    <li>Idea: also look at what comes before the word.
+      <ul>
+        <li>Unigram: only the current <span class="nb">word (“cut”)</span></li>
+        <li>Bigram: current word + 1 step of context <span class="nb">(“to cut”)</span></li>
+        <li>Trigram: current word + 2 steps of context (“likes <span class="nb">to cut”)</span></li>
+        <li>n-gram: current word + n − 1 steps of <span class="nb">context</span></li>
+      </ul></li>
+    <li>In NLTK, the context is the tags of the previous words, not the words <span class="nb">themselves:</span></li>
+  </ul>
+  <div class="tablewrap"><table>
+    <tr><th class="wide">Context seen by the bigram tagger</th><th>Chosen tag</th></tr>
+    <tr><td class="wide">previous tag TO, current word <i>cut</i></td><td>→ VB</td></tr>
+    <tr><td class="wide">previous tag AT, current word <i>cut</i></td><td>→ NN</td></tr>
+  </table></div>
+<pre data-lang="python">bigram_tagger = nltk.BigramTagger(train_sents)
+<span class="tk-b">print</span>(bigram_tagger.accuracy(test_sents))
+sent = <span class="tk-s">"The population of the Congo is 13.5 million , divided into"
+</span><span class="tk-b">print</span>(bigram_tagger.tag(sent.split()))</pre>
+  <p>Output:</p>
+<pre data-lang="output">0.10206319146815508
+[('The', 'AT'), ('population', 'NN'), ('of', 'IN'), ('the', 'AT'),
+ ('Congo', 'NP'), ('is', 'BEZ'), ('13.5', None), ('million', None),
+ (',', None), ('divided', None), ('into', None)]</pre>
+  <p>Only 10 % on the test split: worse than the default tagger! <span class="nb">Why?</span></p>
+  <ul>
+    <li><i>13.5</i> never occurred in the training data, so it gets <span class="nb"><code>None</code>.</span></li>
+    <li>The next word, <i>million</i>, now has the context “previous tag <code>None</code>”. That was never seen in training either, so it also gets <code>None</code>, and so on until the end of the <span class="nb">sentence.</span></li>
+    <li>Sparse data problem: the more context we use, the more often we meet a context that never occurred in <span class="nb">training.</span></li>
+  </ul>
+  <p><b>Combining Taggers with Backoff</b> — Try the most specific tagger first. If it has no answer, <span class="nb">back off.</span></p>
+<pre data-lang="python">t0 = nltk.DefaultTagger(<span class="tk-s">'NN'</span>)
+t1 = nltk.UnigramTagger(train_sents, backoff=t0)
+t2 = nltk.BigramTagger(train_sents, backoff=t1)
+sent = <span class="tk-s">"The cut was deep"</span>.split()
+<span class="tk-b">print</span>(t1.tag(sent))
+<span class="tk-b">print</span>(t2.tag(sent))
+<span class="tk-b">print</span>(t1.accuracy(test_sents), t2.accuracy(test_sents))</pre>
+  <p>Output:</p>
+<pre data-lang="output">[('The', 'AT'), ('cut', 'VB'), ('was', 'BEDZ'), ('deep', 'RB')]
+[('The', 'AT'), ('cut', 'NN'), ('was', 'BEDZ'), ('deep', 'RB')]
+0.8361407355726104 0.8452108043456593</pre>
+  <ul>
+    <li>Unigram: <i>cut</i> → VB, its most frequent tag. <span class="nb">Wrong here.</span></li>
+    <li>Bigram: after an article (AT), <i>cut</i> → NN. <span class="nb">Correct.</span></li>
+    <li>Not perfect yet: <i>deep</i> should be an <span class="nb">adjective (JJ).</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 一元标注器的缺点是忽略上下文, cut 在 to cut 和 the cut 里得到同一个标签. 想法: 也看前面的内容. 一元只看当前词, 二元多看前 1 步, 三元多看前 2 步, n 元多看前 n − 1 步. NLTK 里的「上下文」是前面词的<b>标签</b>, 不是前面的词本身: 前一个标签是 TO、当前词 cut → VB; 前一个标签是 AT、当前词 cut → NN. 单独的二元标注器在测试集上只有 10%, 比默认标注器还差. 原因: 13.5 在训练数据里没出现过, 得到 None; 下一个词 million 的上下文变成「前一个标签是 None」, 训练时也没见过, 于是也是 None, 一直传到句末. 这叫 <b>Sparse data problem 数据稀疏问题</b>: 用的上下文越多, 越常碰到训练里没出现过的上下文. 解决办法是组合回退: 先试最具体的标注器, 给不出答案就退到下一个. 例句 The cut was deep: 一元 + 默认把 cut 标成它最常见的 VB, 错; 二元在冠词 AT 后面把 cut 标成 NN, 对. 但还不完美: deep 应为形容词 JJ. 准确率从 83.6% 升到 84.<span class="nb">5%.</span></p>
+  <p><b>思路:</b> 回退链 <code>t2 → t1 → t0</code> 的顺序是「上下文最多 → 最少 → 不看词」. 二元标注器只有在 (前一个标签, 当前词) 这一对在训练里见过时才回答, 否则交给 t1, t1 不认识这个词再交给 t0. None 不会再传染, 因为 t1 一定先给出一个标签. 为什么上下文用标签而不用词: 「AT + cut」在训练里比「the + cut」「a + cut」「this + cut」合起来出现得多, <span class="nb">用标签能缓解稀疏.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>三段代码实际运行的输出与幻灯片完全相同. deep 为什么是 RB: 在训练集 (news 前 90%) 里 deep 出现 6 次, RB 和 JJ 各 3 次, 打平时 <code>FreqDist.max()</code> 取先出现的 RB; 二元标注器也没见过「BEDZ + deep」, 退到一元. 在整个 news 里 deep 是 JJ 4 次、RB 3 次, 打平是切分造成的. was deep 里的 deep 是表语形容词, <span class="nb">应为 JJ.</span></p>
+</details>
+</article>
+
+<article id="u5-10">
+<h3>总结: 各标注器的准确率<br><span class="de-title">Summary: Accuracy Evaluation</span></h3>
+<div class="card orig">
+  <span class="slide">Exercise Session · Slide 26</span>
+  <p>All taggers on the same held-out test split (last 10 % of Brown <span class="nb">news):</span></p>
+  <div class="tablewrap"><table>
+    <tr><th>Tagger</th><th>Looks at</th><th>Accuracy</th></tr>
+    <tr><td>Default (NN)</td><td>nothing</td><td>0.126</td></tr>
+    <tr><td class="wide">Regular expressions</td><td>word endings</td><td>0.205</td></tr>
+    <tr><td class="wide">Lookup, top 100 words</td><td class="wide">the word, if frequent</td><td>0.462</td></tr>
+    <tr><td class="wide">Lookup, top 100 words + default</td><td></td><td>0.584</td></tr>
+    <tr><td class="wide">Unigram (trained) + default</td><td>the word</td><td>0.836</td></tr>
+    <tr><td class="wide">Bigram + unigram + default</td><td class="wide">word + previous tag</td><td>0.845</td></tr>
+    <tr><td class="wide">Trigram + bigram + unigram + default</td><td class="wide">word + 2 previous tags</td><td>0.843</td></tr>
+    <tr><td class="wide">Bigram alone, no backoff</td><td></td><td>0.102</td></tr>
+  </table></div>
+  <ul>
+    <li>Each step uses more information about the word and its <span class="nb">context.</span></li>
+    <li>Backoff is essential: specific taggers are precise, but often have no <span class="nb">answer.</span></li>
+    <li>More context is not automatically better (trigram &lt; <span class="nb">bigram here).</span></li>
+    <li>The best n is a hyperparameter: choose it on the dev <span class="nb">split.</span></li>
+  </ul>
+</div>
+<div class="zh">
+  <p><b>翻译:</b> 所有标注器在同一个留出的测试集 (news 的后 10%) 上的准确率: 默认 0.126, 正则 0.205, 前 100 词查表 0.462, 加回退 0.584, 训练出的一元 + 默认 0.836, 二元 + 一元 + 默认 0.845, 三元回退链 0.843, 单独的二元 0.102. 每一步都多用了一点关于词和上下文的信息; 回退必不可少, 具体的标注器准, 但常常给不出答案; 上下文多不一定更好 (这里三元比二元低); 最好的 n 是超参数, <span class="nb">应该在开发集上选.</span></p>
+  <p><b>思路:</b> 表的读法: 从上往下看「用了什么信息」和准确率一起涨, 最后两行是两个反例 (三元略降, 二元单独用崩溃), 说明稀疏数据和回退的作用. 「在开发集上选 n」: 这里只切了训练和测试, 若直接拿测试集比较二元和三元再选, 测试集就被用来调参了, <span class="nb">不再是「只用一次」.</span></p>
+</div>
+<details class="answer"><summary>答案 (先自己做再看)</summary>
+  <p>八个数全部实测重现 (三元链是 <code class="lc">TrigramTagger(train_sents, backoff=t2)</code>, 0.8433). 默认标注器在测试集上是 0.126, 比在整个 news 上的 0.131 略低, 因为测试集里 NN <span class="nb">的比例略低.</span></p>
+</details>
+<div class="warn">
+  <p><b>幻灯片前后不一致:</b> 标题说所有标注器都在「留出的」测试集上量, 但两行查表结果 (0.462、0.584) 用的是 Slide 16–18 从<b>整个</b> news (包括测试集) 数出来的前 100 词和它们的标签, 测试集并没有真正留出. 只用训练集建表, 实测是 0.460 和 0.582, 差别很小 (100 个高频词的标签很稳定), 但正是 Slide 21 说的「在训练数据上评估<span class="nb">过于乐观」.</span></p>
+</div>
 </article>
 </section>
 

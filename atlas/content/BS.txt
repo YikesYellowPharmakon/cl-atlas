@@ -337,3 +337,76 @@ M Policy | vmem
 
 DROP BS 05: 并入 Page Fault | Seitenfehler
 ZH 描述性名称 | TLB 替换策略
+
+# ===== BS 06 · Virtueller Speicher (Kinder) 2026-11-20 =====
+B vmpol | 虚拟内存的机制与策略 | Mechanismen & Policies für Virtuellen Speicher | 缺页时硬件和操作系统怎样配合, 何时调页, 换出哪一页: OPT、FIFO、LRU 与时钟算法.
+
+N rss | vmpol | 驻留集大小 | Resident Set Size | 06:demo | 一个进程真正在物理内存里的页的总大小; pmap -X 逐段列出, Pss 再把共享页按进程数分摊. | 没碰过的页从不装入 (按需调页) ;; 共享库的 Pss 远小于 Rss | [stack]: Size 132, Rss 16
+N rowmaj | vmpol | 行优先 | Row-major Reihenfolge | 06:demo | 二维数组在内存里按行连续存放; 按存放顺序遍历有空间局部性, 按列遍历每步都可能换页. | 同样的矩阵乘法, 循环顺序不同, dTLB 未命中差五个数量级 | table[row * MAX_COLUMNS + column]
+N vmmech | vmpol | 虚拟内存的机制 | Mechanismen für Virtuellen Speicher | 06:mech | 先查 TLB, 再查页表; present 位为 0 时陷入操作系统, 换出一页、读入所缺的页, 更新页表后进程继续. | 缺页不由硬件处理 ;; dirty 位决定换出时要不要写盘
+N precint | vmpol | 精确中断 | präzise Interrupts | 06:mech | 缺页时中断要保证之前的指令全部完成、之后的都能重新开始, 让缺页对进程透明. | 难度取决于处理器架构 ;; 关键: 出错的指令能否无副作用地重启
+N seitenausw | vmpol | 调页 | Seitenauswahl | 06:policy | 何时把页从磁盘装进内存: 按需调页、预调页, 或结合用户提示. | 策略目标是缺页尽量少 ;; 磁盘 I/O 慢, 操作系统有时间好好决定 | madvise()
+N ersetz | vmpol | 页面置换 | Seitenersetzung | 06:ersetzung | 内存满时选一页换出到磁盘: 脏页先写回, 否则直接丢弃. | 评价标准是缺页次数 ;; OPT 只作比较基准
+N optpage | vmpol | 最优算法 | OPT | 06:ersetzung | 换出将来最久不会再用到的页, 保证缺页最少, 但要预知未来. | 只用于比较 | ABCABDADBCB, 3 页框: 5 次缺页
+N fifopage | vmpol | 先进先出 | FIFO (First-In, First-Out) | 06:ersetzung | 换出在内存里待得最久的页; 公平、简单, 但会换掉一直要用的页. | 看装入时间, 不看使用 ;; 可能出现 Belady 异常 | ABCABDADBCB: 7 次缺页
+N lrupage | vmpol | 最近最少使用 | LRU (Least-Recently-Used) | 06:ersetzung | 换出过去最久没被使用的页, 用过去预测未来; 有局部性时接近 OPT. | 要记录访问, 实现难 ;; 不是对所有负载都好 | ABCABDADBCB: 5 次缺页
+N stackprop | vmpol | 栈性质 | Stack Property | 06:ersetzung | 小内存驻留的页总是大内存驻留的页的子集, 所以内存加大缺页不会变多; LRU 和 OPT 有, FIFO 没有. | k 个页框的 LRU = 最近用过的 k 个页
+N belady | vmpol | Belady 异常 | Belady’s Anomalie | 06:ersetzung | FIFO 在内存变大时缺页反而变多的现象. | ABCDABEABCDE: 3 页框 9 次, 4 页框 10 次 ;; 原因: 没有栈性质 (Belady, Nelson, Shedler 1969)
+N lruimpl | vmpol | LRU 的问题与实现 | Probleme bei LRU · Implementierung von LRU | 06:lru | LRU 不看访问频率, 一次扫描会冲掉内存; 精确 LRU 要么访存慢、要么换出慢, 实际只找「老的」页. | 纯 LFU 忘不掉旧页 ;; 软件链表对硬件时间戳
+N clock | vmpol | 时钟算法 | Clock-Algorithmus | 06:clock | 页框排成一圈, 指针遇到访问位为 1 的页就清零前进, 遇到 0 就换出; 是 LRU 的近似. | 硬件只需每页一个访问位 ;; 全为 1 时退化成 FIFO | ABCDEFBDFAFG, 5 页框: 8 次缺页
+N clockext | vmpol | 时钟算法的扩展 | Erweiterungen des Clock-Algorithmus | 06:clock | 一次换出多页、加经过次数计数器 (n-th Chance)、优先换出既没访问也不脏的页. | 写盘贵, 所以让脏页多留一会儿
+
+E vmem > vmmech | 虚拟内存要靠这套软硬件配合实现.
+E pfault > vmmech | 缺页处理是机制的核心.
+E tlb > vmmech | 先查 TLB.
+E vmmech > precint | 进程要能透明地继续.
+E vmmech > seitenausw | 机制之上的第一个策略问题.
+E vmmech > ersetz | 机制之上的第二个策略问题.
+E vmem > rss | pmap 显示哪些页真正驻留.
+E seitenausw ~ rss | 按需调页解释了 Rss 为什么小.
+E lokal > rowmaj | 访问顺序决定局部性.
+E tlb > rowmaj | 按列遍历几乎每步都 TLB 未命中.
+E ersetz > optpage | 最优的置换策略.
+E ersetz > fifopage | 最简单的置换策略.
+E ersetz > lrupage | 用过去预测未来的置换策略.
+E fifo ~ fifopage | 同一思路: 调度里先来先服务, 置换里先进先出.
+E tlbersatz ~ lrupage | TLB 也用 LRU 替换.
+E lokal > lrupage | LRU 靠局部性才有效.
+E optpage ~ lrupage | OPT 往未来看, LRU 往过去看.
+E lrupage > stackprop | LRU 满足栈性质.
+E fifopage > belady | FIFO 会出现 Belady 异常.
+E stackprop ~ belady | 没有栈性质才会有异常.
+E lrupage > lruimpl | LRU 的缺点和实现代价.
+E lruimpl > clock | 时钟算法是实用的近似.
+E pte > clock | 页表项里的访问位.
+E clock > clockext | 时钟算法的改进.
+
+T Seitenauswahl | die |  | 调页 | vmpol | Entscheidung, wann Seiten von der Festplatte in den Speicher geladen werden. | 决定何时把页从磁盘装入内存. | Seitenersetzung | 06:policy
+T Demand Paging |  |  | 按需调页 | vmpol | Seite wird nur geladen, wenn ein Seitenfehler auftritt. | 只在缺页时才装入. | Prepaging | 06:policy
+T Prepaging |  |  | 预调页 | vmpol | Seite wird geladen, bevor darauf zugegriffen wird. | 访问之前就装入. | Demand Paging | 06:policy | Prefetching
+T Hinting |  |  | 提示 | vmpol | Kombination mit benutzerdefinierten Hinweisen zu Seitenzugriffen, z. B. madvise(). | 结合用户给的访问提示. |  | 06:policy
+T Seitenersetzung | die |  | 页面置换 | vmpol | Auswahl der residenten Seite, die auf die Festplatte ausgelagert wird. | 选择换出到磁盘的驻留页. | Seitenauswahl | 06:ersetzung
+T OPT |  |  | 最优算法 | vmpol | Ersetze die Seite, die am längsten in der Zukunft nicht verwendet wird. | 换出将来最久不用的页. | LRU | 06:ersetzung
+T LRU |  |  | 最近最少使用 | vmpol | Ersetze die Seite, die am längsten in der Vergangenheit nicht verwendet wurde. | 换出过去最久没用的页. | OPT | 06:ersetzung | Least-Recently-Used
+T Stack Property |  |  | 栈性质 | vmpol | Ein kleinerer Cache ist immer eine Teilmenge eines größeren. | 小缓存总是大缓存的子集. | Belady’s Anomalie | 06:ersetzung
+T Belady’s Anomalie |  |  | Belady 异常 | vmpol | Bei FIFO in manchen Fällen zusätzliche Page Faults trotz mehr Speicher. | FIFO 有时内存更多缺页反而更多. | Stack Property | 06:ersetzung
+T Reference-Bit | das | Reference-Bits | 访问位 | vmpol | Bit pro Seitenrahmen, das bei jedem Zugriff gesetzt wird. | 每个页框一位, 访问时置 1. |  | 06:clock | Accessed-Bit
+T präzise Interrupts |  |  | 精确中断 | vmpol | Unterbrechung, nach der alle vorherigen Instruktionen abgeschlossen sind und alle späteren neu gestartet werden können. | 之前的指令全部完成、之后的都能重启的中断. |  | 06:mech
+
+M Seitenauswahl | seitenausw
+M Demand Paging | seitenausw
+M Prepaging | seitenausw
+M Hinting | seitenausw
+M Seitenersetzung | ersetz
+M OPT | optpage
+M LRU | lrupage
+M Stack Property | stackprop
+M Belady’s Anomalie | belady
+M Reference-Bit | clock
+M präzise Interrupts | precint
+
+SKIP BS 06: 上一讲小结, 内容已在 BS 05 各概念里 | 回顾: 分页
+SKIP BS 06: 第 1 部分总结, 内容已在 BS 02–06 各概念里 | 总结: 虚拟化
+DROP BS 06: 归入 术语 Belady’s Anomalie (加粗时连带了中文) | Belady’s Anomalie Belady
+ZH 描述性名称 | 时钟算法的扩展
+ZH 描述性名称 | 硬件精确 LRU; 软件精确 LRU; 脏位

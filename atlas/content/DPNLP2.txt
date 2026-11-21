@@ -296,3 +296,95 @@ M expert parallelism | activep
 M upcycling | finegr
 ZH 描述性名称 | FFN 作为键值记忆
 DE 描述性名称 (课件讲了内容, 标题写法不同: BYTEIFICIATION 是笔误) | Byteification; Router · Top-k
+
+# ===== DPNLP2 06 · Linear RNNs and State Space Models 2026-11-20 =====
+B ssm | 线性 RNN 与状态空间模型 | Linear RNNs and State Space Models | 注意力的平方代价与稀疏注意力; 去掉非线性的线性 RNN 能并行训练、常数推理; 选择性 SSM (Mamba) 与混合模型.
+
+N attncost | ssm | 自注意力的平方代价 | Recap: Self-Attention is Quadratic | 06:s6-recap | 每个词关注之前的每个词, 每头每层约 n²/2 个分数; 上下文翻倍, 注意力计算约变 4 倍. | 参数少但计算多 ;; FlashAttention 只省访存, 不省计算 | n = 6: 21; n = 12: 78
+N sparseatt | ssm | 稀疏注意力 | Sparse Attention | 06:s6-sparse | 只算 n² 个分数里的一部分, 每个词只关注 w ≪ n 个词, 代价 O(nw). | 最常见: 滑动窗口 ;; 稀疏模式对 GPU 不友好
+N slidewin | ssm | 滑动窗口 | sliding window | 06:s6-sparse | 每个词只看周围 w 个词; 叠 L 层后信息最远传 L·w 个位置, 也叫局部注意力. | 类比 CNN 的感受野 ;; 远距离信息要层层接力 | L · w = 3 · 2
+N sparsetf | ssm | 分解注意力 | Factorized attention | 06:s6-sparse | Sparse Transformer 把注意力模式分到两个计算量小的头上, 任意位置两跳可达. | strided 适合图像, fixed 适合文本 (Child et al. 2019)
+N longformer | ssm | Longformer | Longformer | 06:s6-sparse | 每层滑动窗口, 部分头用空洞窗口, 少数任务词用全局注意力. | 全局词看所有词、所有词看它 (Beltagy et al. 2020) | [CLS]
+N bigbird | ssm | BigBird | BigBird | 06:s6-sparse | 把随机、窗口和全局注意力合在一起; 随机边让任意两词之间的路径都很短. | 只靠全局词会成瓶颈 (Zaheer et al. 2020)
+N effattn | ssm | 当前大模型里的高效注意力 | Efficient Attention in Current LMs | 06:s6-sparse | 没有变体明显胜过完整注意力; 留下来的是滑动窗口层和全局层的混合. | Mistral 7B 全局部 ;; Gemma 3 五局部一全局 ;; gpt-oss 交替
+N rnntrade | ssm | Transformer 与 RNN 的对比 | Transformers vs. RNNs | 06:s6-rnn | RNN 推理每词常数代价和常数内存, Transformer 能并行训练; 目标是两者兼得. | 训练 O(n²) 对 O(n) ;; 推理每词 O(n) 对 O(1)
+N seqtrain | ssm | 顺序训练 | Sequential Training | 06:s6-rnn | 非线性递归让 n 步必须依次计算, 每步只是小的矩阵乘向量, GPU 跑不满. | Transformer 靠因果掩码和 teacher forcing 一步并行
+N rnngrad | ssm | 梯度不稳定 | Unstable Gradients | 06:s6-rnn | 链式法则每步一个含 W 的因子, 往回 k 步约 Wᵏ: 缩小就消失, 拉长就爆炸. | 1.1⁵⁰ ≈ 117 ;; 0.9⁵⁰ ≈ 0.005
+N linrnn | ssm | 线性 RNN | Linear RNNs | 06:s6-linear | 去掉递归里的非线性: hₜ = A hₜ₋₁ + B xₜ, yₜ = C hₜ; 非线性移到层与层之间. | 一个子层混合位置, 一个子层逐位置变换
+N lticonv | ssm | 卷积核 | kernel | 06:s6-linear | 线性 RNN 展开后输出是输入和核 Kₖ = C Aᵏ B 的一维因果卷积, 训练时可一次算出所有位置. | 推理时仍走递归, 每词 O(1) | A = 0.5: K = (1, 0.5, 0.25, …)
+N lti | ssm | 线性时不变 | linear time-invariant (LTI) | 06:s6-linear | 每一步用同样的 A、B、C; 卷积技巧的前提, 也是它不能按内容选择的原因. | 核矩阵下三角、对角线常数
+N pscan | ssm | 并行扫描 | parallel scan | 06:s6-linear | 对满足结合律的运算, log₂ n 步并行算出所有前缀结果; 线性递归用 (A, b) 对合并. | (A₁, b₁) • (A₂, b₂) = (A₂A₁, A₂b₁ + b₂) ;; 参数每步不同也适用 | 3, 4, 8, 9, 14, 23, 25, 31
+N diag | ssm | 对角化 | Diagonalization | 06:s6-linear | A = PΛP⁻¹, 连乘时中间的 P⁻¹P 抵消, Aᵏ = PΛᵏP⁻¹, 只有特征值取幂. | 特征值可能是复数
+N diaglin | ssm | 对角线性 RNN | Diagonal Linear RNNs | 06:s6-linear | 把 P 并进 B 和 C, 只学对角线 λ, 递归和扫描都变成逐元素, 每次合并 N 次运算而非 N³. | hₜ = λ ⊙ hₜ₋₁ + B xₜ
+N lingrad | ssm | 线性 RNN 的梯度 | Gradients in Linear RNNs | 06:s6-linear | 每步链式因子只是 λ, 往回 k 步是 λᵏ; |λ| < 1 不爆炸, 接近 1 记忆长. | 半衰期 ln 0.5 / ln |λ| ;; 0.99 约 69 步
+N lru | ssm | 线性循环单元 | The Linear Recurrent Unit (LRU) | 06:s6-linear | λ = exp(−exp(ν)) 保证在 (0, 1), 初始化接近 1, 输入乘 √(1 − λ²) 归一化, 用复数 λ. | 长程任务 PathX 需要接近 1 的特征值和归一化 (Orvieto et al. 2023)
+N ssmodel | ssm | 状态空间模型 | State space models | 06:s6-ssm | 控制论的连续时间线性系统 h′ = A h + B x; 以步长 Δ 离散化就是线性 RNN. | Ā = exp(ΔA), B̄ ≈ ΔB ;; 每个输入通道一个系统
+N s4 | ssm | S4 | Structured State Space Sequence Model | 06:s6-ssm | 第一个解决 PathX 的模型; 之后的变体来自状态空间、线性 RNN、线性注意力三个方向. | 区别在 A 的结构和参数是否依赖输入 (Gu et al. 2022)
+N selcopy | ssm | 选择性复制 | Selective copying | 06:s6-lti | 只复制散落在填充词之间的彩色词; 固定的卷积核只能复制固定间隔, LTI 模型做不到. | LTI 不能按内容决定存什么、跳过什么
+N selssm | ssm | 选择性 SSM | Selective State Space Models | 06:s6-lti | B、C 和步长 Δ 都由当前词算出; 参数随时间变化, 没有卷积核, 但扫描仍可用. | Δₜ = softplus(w⊤xₜ + b) ;; Ā 通过 Δ 间接依赖输入 (Gu and Dao 2024)
+N deltagate | ssm | 步长作为门控 | The Step Size Δ Acts as a Gate | 06:s6-lti | 状态更新变成 (1 − σ) 乘旧状态加 σ 乘输入, 即经典门控: Δ 小保留, Δ 大重置. | 跳过填充词 = 关门
+N hwscan | ssm | 硬件感知的选择性扫描 | Hardware-Aware Selective Scan | 06:s6-lti | 把离散化、扫描、读出融合在片上 SRAM 里算完, 只把输出写回显存. | 状态比输入大 N 倍 ;; 和 FlashAttention 同一思路
+N mamba | ssm | 完整的 Mamba 模型 | Full Mamba Model | 06:s6-mamba | 选择性 SSM 加扩维投影、短卷积和门控支路组成的块, 代替注意力加 FFN. | 第一个追平 Transformer++ 的无注意力模型 ;; 生成吞吐量高 5 倍
+N conststate | ssm | 推理时的常数大小状态 | Constant-Size State at Inference | 06:s6-mamba | Mamba 的状态大小和序列长度无关; 同规模 Transformer 的 KV 缓存每词增长. | Mamba-2.8B 约 12 MB ;; Pythia-2.8B 每词 0.33 MB, 128K 时 43 GB
+N statelim | ssm | 固定大小状态的极限 | The Limits of a Fixed-Size State | 06:s6-mamba | 状态有损, 复制和精确检索吃亏; 只加少量注意力层的混合模型就能补上. | 8B 规模 7 % 注意力层的混合模型胜过 Transformer (Waleffe et al. 2024)
+N hybrid | ssm | 混合模型 | Hybrid Models | 06:s6-mamba | 很多线性递归层配少量注意力层: 递归层状态固定, 注意力层精确回查. | 递归层多用 Mamba-2 或 Gated DeltaNet ;; 比例 3:1 到 7:1 | Jamba, Qwen3-Next, Nemotron 3
+
+E selfattn > attncost | 自注意力两两打分, 所以是平方代价.
+E attncost > sparseatt | 少算一些分数.
+E sparseatt > slidewin | 最常见的稀疏模式.
+E sparseatt > sparsetf | 分解成两个便宜的头.
+E slidewin > longformer | Longformer 以滑动窗口为基础.
+E sparsetf ~ longformer | 两种不同的稀疏模式.
+E longformer > bigbird | BigBird 再加随机边.
+E slidewin > effattn | 当前模型里留下来的就是滑动窗口.
+E rnnlim > rnntrade | RNN 的优缺点回顾.
+E attncost > rnntrade | 平方代价促使回头看 RNN.
+E rnntrade > seqtrain | RNN 的第一个难点.
+E rnntrade > rnngrad | RNN 的第二个难点.
+E seqtrain > linrnn | 去掉非线性才能并行.
+E rnngrad > linrnn | 去掉非线性后梯度只剩 λᵏ.
+E linrnn > lticonv | 线性递归展开就是卷积.
+E lticonv > lti | 卷积要求参数每步相同.
+E lticonv ~ pscan | 两种并行方法, 扫描不要求 LTI.
+E pscan > diaglin | 对角化让扫描的合并变便宜.
+E diag > diaglin | 先对角化再只学对角线.
+E diaglin > lingrad | 梯度变成逐元素的 λᵏ.
+E rnngrad ~ lingrad | Wᵏ 对 λᵏ.
+E lingrad > lru | LRU 按梯度分析设计参数化和初始化.
+E linrnn > ssmodel | 线性 RNN 就是离散化的状态空间模型.
+E ssmodel > s4 | S4 是第一个成功的 SSM.
+E lti > selcopy | LTI 做不到选择性复制.
+E selcopy > selssm | 选择性就是为它引入的.
+E ssmodel > selssm | 在 SSM 上让参数依赖输入.
+E pscan > selssm | 没有卷积核, 只能用扫描.
+E selssm > deltagate | 步长相当于门控.
+E selssm > hwscan | 扫描要在硬件上高效.
+E hwscan > mamba | Mamba 的实现方式.
+E selssm > mamba | Mamba 的核心层.
+E mamba > conststate | 推理优势.
+E conststate > statelim | 固定状态的代价.
+E statelim > hybrid | 少量注意力层补上精确回查.
+E effattn ~ hybrid | 同一种折中: 便宜的层为主, 少量全局层.
+
+T sparse attention |  |  | 稀疏注意力 | ssm | Computing only a subset of the n² attention scores. | 只算 n² 个注意力分数的一部分. |  | 06:s6-sparse
+T local attention |  |  | 局部注意力 | ssm | Sliding-window attention where each token attends to w neighbours. | 每个词只关注 w 个邻居的滑动窗口注意力. | global attention | 06:s6-sparse
+T linear RNN |  |  | 线性 RNN | ssm | RNN whose recurrence h_t = A h_{t-1} + B x_t contains no non-linearity. | 递归里没有非线性的 RNN. |  | 06:s6-linear
+T LTI |  |  | 线性时不变 | ssm | Linear time-invariant: the same A, B, C at every step. | 每一步用同样的 A、B、C. | selection | 06:s6-linear | linear time-invariant
+T scan |  |  | 扫描 | ssm | Computing all running results of an associative operation. | 算出一个结合运算的所有前缀结果. |  | 06:s6-linear | parallel scan
+T diagonalization |  |  | 对角化 | ssm | Writing A = PΛP⁻¹ with the eigenvalues on the diagonal of Λ. | 把 A 写成 PΛP⁻¹, 特征值在对角线上. |  | 06:s6-linear
+T state space model |  |  | 状态空间模型 | ssm | Continuous-time linear dynamics h′ = A h + B x, y = C h, discretized with step size Δ. | 连续时间线性系统, 以步长 Δ 离散化. |  | 06:s6-ssm | SSM
+T selection |  |  | 选择 | ssm | Making B, C and the step size Δ functions of the current token. | 让 B、C 和步长由当前词算出. | LTI | 06:s6-lti
+
+M sparse attention | sparseatt
+M local attention | slidewin
+M linear RNN | linrnn
+M LTI | lti
+M scan | pscan
+M diagonalization | diag
+M state space model | ssmodel
+M selection | selssm
+
+SKIP DPNLP2 06: 章节标题与参考文献, 内容归入其下各概念 | 6 线性 RNN 与状态空间模型; 参考文献
+ZH 描述性名称 | 自注意力的平方代价; 当前大模型里的高效注意力; Transformer 与 RNN 的对比; 对角线性 RNN; 线性 RNN 的梯度; 步长作为门控; 硬件感知的选择性扫描; 推理时的常数大小状态; 固定大小状态的极限
+ZH 描述性名称 | (A, b) 对的合并; 下三角对角常数矩阵
+DE 描述性名称 (课件里写成公式或只出现在图中) | (A₁, b₁) • (A₂, b₂); The Step Size Δ Acts as a Gate; causal sliding window; memory half-life
